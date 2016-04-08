@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <record model="ir.ui.view" id="uis_papl_apl_list">
+      <field name="name">APL List</field>
+      <field name="model">uis.papl.apl</field>
+      <field name="arch" type="xml">
+        <tree string="List of Air power line" editable="top" create="true" edit="false">
+          <field name="id"/>
+          <field name="name" string="Name"/>
+          <field name="inv_num" string="Inventory Num"/>
+          <field name="bld_year" string="Build Year"/>
+          <field name="startexp_date" string="Start Explatation Date"/>
+          <field name="line_len" string="Line Lengt (km)"/>
+		  <field name="line_len_calc" string="Calculate line len(m)"/>
+          <field name="pillar_id" string="Pillars" widget='one2many'/>
+		  <field name="sup_substation_id" string="Supply Substation" widget='many2one'/>
+		  <button name="act_show_map" string="Map" type="object" icon="STOCK_FIND"/>
+        </tree>
+		</field>
+    </record>
+		
+	<record id="uis_papl_apl_form" model="ir.ui.view">
+	  <field name="name">APL form view</field>
+	  <field name="model">uis.papl.apl</field>
+	  <field name="arch" type="xml">
+		<form string="APL form" context="{apl_is=1}">
+		  <header>
+			<b>Information about APL</b>
+			<button name="act_show_map" string="Map" type="object" class="oe_highlight"/>
+		  </header>
+		  <sheet string="Details">
+			<label for="name" string="Name of APL:"/>
+				<h1>
+				  <field name="name"/>
+				</h1>
+				
+			<label for="full_name" string="Full name of APL:"/>
+			  <h2>
+				<field name="full_name"/>
+			  </h2>
+			<group>
+			  <group>
+				<label for="bld_year" class="oe_edit_only"/>
+				<field name="bld_year"/>
+				<label for="startexp_date" class="oe_edit_only"/>
+				<field name="startexp_date"/>
+				<label for="sup_substation_id" class="oe_edit_only"/>
+                <field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
+				<label for="inv_num"/>
+				<field name="inv_num"/>
+			  </group>
+			</group>
+			<notebook>
+			  <page string="Main details">
+				<group>
+				  <group>
+					<label for="line_len"/>
+					<field name="line_len"/>
+					<label for="line_len_calc"/>
+					<field name="line_len_calc"/>
+					<label for="prol_max_len"/>
+					<field name="prol_max_len"/>
+					<label for="prol_med_len"/>
+					<field name="prol_med_len"/>
+					<label for="prol_min_len"/>
+					<field name="prol_min_len"/>
+				  </group>
+				</group>
+			  </page>
+			  <page string="Resistance wire">
+				
+			  </page>
+			  <page string="Taps">
+				<field name="tap_ids">
+				  
+				</field>
+			  </page>
+			  <page string="Pillars">
+				<field name="pillar_id">
+				  <tree>
+					<field name="tap_id"/>
+					<field name="name"/>
+					<field name="num_by_vl"/>
+					<field name="pillar_material_id"/>
+					<field name="pillar_type_id"/>
+					<field name="len_prev_pillar"/>
+				  </tree>
+				</field>
+				<!--<search string="Search pillar">
+				
+				    <tree string="List of pillars" editable="bottom">
+					  <field name="name"/>
+					  <field name="num_by_vl"/>
+					  <field name="longitude"/>
+					  <field name="latitude"/>
+					  <field name="pillar_type_id" string="Type"/>
+					  <field name="pillar_material_id" string="Material" widget='many2one'/>
+				    </tree>
+				</field>
+				</search>!-->
+			  </page>
+			  <page string="Crossing">
+				
+			  </page>
+			  <page string="Fittings">
+				
+			  </page>
+			  <page string="Connections">
+				
+			  </page>
+			  <page string="Insulators">
+				
+			  </page>
+			  <!--<page string="GEO">
+				<button name="act_show_map" string="Map" type="object" class="oe_highlight"/>
+				<field name="url_maps" widget="html">
+				<iframe src="/apl_map" width="100%" height="500" marginwidth="0" marginheight="0" frameborder="no" scrolling="no" style="border-width:0px;">!-->
+				<!--  <iframe src="/apl_map/?apl_ids=1,2,3,4" width="100%" height="600" marginwidth="0" marginheight="0" frameborder="no" scrolling="no" style="border-width:0px;">
+				  </iframe>
+				!-->
+				<!--</field>
+				<br></br>
+				<object data="/apl_map/?apl_ids=1,2" width="100%" height="600"></object>
+			  </page>!-->
+			  <page string="MRO">
+				
+			  </page>
+			  <page string="Daigram">
+				<!--<diagram string="Diagram of pillars">
+				  <node object="uis.papl.apl" shape="rectangle">
+					<field name="pillar_id"/>
+				  </node>
+				</diagram>!-->
+			  </page>
+			</notebook>
+		  </sheet>
+		</form>
+	  </field>
+	</record>
+	
+	<record model="ir.ui.view" id="uis_papl_pillar_list">
+      <field name="name">Pillar List</field>
+      <field name="model">uis.papl.pillar</field>
+      <field name="arch" type="xml">
+        <tree string="List of Pillar" editable="top" create="true" edit="false">
+          <field name="id"/>
+          <field name="name" string="Pillar Name"/>
+          <field name="num_by_vl" string ="Number pillar on power line"/>
+		  <field name="pillar_type_id" string="Pillar Type" widget='many2one'/>
+		  <field name="pillar_material_id" string="Pillar material" widget='many2one'/>
+		  <field name="longitude" string="Longitude"/>
+		  <field name="latitude" string="Latitude"/>
+		  <field name="prev_longitude" string="Prev Longitude"/>
+		  <field name="prev_latitude" string="Prev Latitude"/>
+		  <field name="len_prev_pillar" string="Lenght to prev pillar (m)" widget="progressbar"/>
+		  <field name="azimut_from_prev" string="prev_azimut (degr)"/>
+		  <field name="elevation" string="Elevation"/>
+		  <field name="apl_id" string="APL" widget="many2onebutton"/>
+		  <field name="tap_id" string ="Tap"/>
+		  <field name="parent_id" string="Prev pillar" widget="many2onebutton"/>
+		</tree>
+		</field>
+    </record>
+	
+	<record model="ir.ui.view" id="uis_papl_tap_list">
+	  <field name="name">Tap List</field>
+	  <field name="model">uis.papl.tap</field>
+	  <field name="arch" type="xml">
+		<tree string="List of Tap" editable="top" create="true" edit="true">
+		  <field name="id"/>
+		  <field name="name"/>
+		  <field name="apl_id"/>
+		  <field name="pillar_cnt"/>
+		  <field name="cnt_np"/>
+		  <field name="pillar_ids" readonly="1" widget="one2many"/>
+		  <button name="act_normalize_num" string="Normalize" type="object" icon="STOCK_REFRESH"/>
+		  <button name="get_elevation" string="Elevation" type="object" icon="STOCK_EXECUTE"/>
+		</tree>
+	  </field>
+	</record>
+	
+	<record model="ir.ui.view" id="uis_papl_substation_list">
+	  <field name="name">Power Substation List</field>
+	  <field name="model">uis.papl.substation</field>
+	  <field name="arch" type="xml">
+		<tree string="List of Power Substation" editable="top" create="true" edit="true">
+		  <field name="id"/>
+		  <field name="name" string="Substation Name"/>
+		  <field name="apl_id" string="APLs" widget='one2many'/>
+		  <button name="act_show_map" string="Map" type="object" icon="STOCK_FIND"/>
+		</tree>
+	  </field>
+	</record>
+	
+	<record model="ir.ui.view" id="wizard_create_pillar">
+	  <field name="name">Create additional Pillars</field>
+	  <field name="type">form</field>
+	  <field name="model">uis.papl.wizard.create.pillars</field>
+	  <field name="arch" type="xml">
+		<form>
+		  <h1>Form for creation of new pillar between 2 pillars</h1>
+		  <label for="pillar1_id"/>
+		  <field name="pillar1_id" string="Start Pillar"/>
+		  <label for="pillar2_id"/>
+		  <field name="pillar2_id" string="End Pillar"/>
+		  <label for="distance"/>
+		  <field name="distance" string="Distance between pillars"/>
+		  <label for="apl_id"/>
+		  <field name="apl_id" string="APLs"/>
+		  <label for="tap_id"/>
+		  <field name="tap_id" string="Tap"/>
+		  <label for="count_pillar"/>
+		  <field name="count_pillar"/>
+		  <label for="calc_med_dist"/>
+		  <field name="calc_med_dist"/>
+		  <label for="start_num"/>
+		  <field name="start_num"/>
+		  <!--<field name="pillar1_id"/>
+		  <field name="pillar2_id"/>
+		  <field name="apl_id"/>  !-->
+		  <footer>
+			<button string="Cancel" special="cancel"/>
+			<!--<button name="confirm" string="Apply" class="oe_highlight"/>!-->
+			<button name="save_create" type="object" string="Create" class="oe_highlight"/>
+		  </footer>
+		</form>
+	  </field>
+	</record>
+
+
+    <!-- actions opening views on models -->
+  
+    <record model="ir.actions.act_window" id="uis_papl_apl_action_window">
+      <field name="name">List of air power line</field>
+      <field name="res_model">uis.papl.apl</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+         <p class="oe_view_nocontent_create">Create passport of APL</p>
+      </field>
+    </record>
+   
+    <record model="ir.actions.act_window" id="uis_papl_pillar_action_window">
+		<field name="name">List of pillar</field>
+		<field name="res_model">uis.papl.pillar</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+	    <field name="help" type="html">
+			<p class="oe_view_nocontent_create">Create new pillar for APL</p>
+		</field>
+	</record>
+	
+	<record id="uis_papl_substation_action_window" model="ir.actions.act_window">
+	  <field name="name">List of substations</field>
+	  <field name="res_model">uis.papl.substation</field>
+	  <field name="view_type">form</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p class="oe_view_nocontent_create">Create new power substation</p>
+	  </field>
+	</record>
+	
+	<record id="uis_papl_tap_action_window" model="ir.actions.act_window">
+	  <field name="name">List of Tap</field>
+	  <field name="res_model">uis.papl.tap</field>
+	  <field name="view_type">form</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p class="oe_view_nocontent_create">Create new Tap</p>
+	  </field>
+	</record>
+	
+	<record id="uis_papl_wiz_creat_pillar" model="ir.actions.act_window">
+	  <field name="name">Create new pillars</field>
+	  <field name="res_model">uis.papl.wizard.create.pillars</field>
+	  <field name="view_type">form</field>
+      <field name="view_mode">form</field>
+      <field name="target">new</field>
+	</record>
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="passportvl.action_server">
+      <field name="name">passportvl server</field>
+      <field name="model_id" ref="model_passportvl_passportvl"/>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <menuitem name="APL Management" id="uis_papl_menu_root"/>
+
+    <!-- menu categories -->
+    
+    <menuitem name="Air power line (APL)" id="uis_papl_menu_apl" parent="uis_papl_menu_root"/>
+    <menuitem name="Transformer Station" id="uis_papl_menu_tp" parent="uis_papl_menu_root"/>
+	<menuitem name="Pillar" id="uis_papl_menu_pillar" parent="uis_papl_menu_root"/>
+	<menuitem name="Substation" id="uis_papl_menu_substation" parent="uis_papl_menu_root"/>
+	<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>
+
+    <!-- actions -->
+    
+    <menuitem name="List of APL" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
+              action="uis_papl_apl_action_window"/>
+	<menuitem name="List of Tap" id="uis_papl_menu_tap_list" parent="uis_papl_menu_apl"
+              action="uis_papl_tap_action_window"/>
+	<menuitem name="Pillar Wizard" id="uis_papl_menu_pillar_wiz" parent="uis_papl_menu_apl"
+              action="uis_papl_wiz_creat_pillar"/>
+	<menuitem name="List of Pillar" id="uis_papl_menu_pillar_list" parent="uis_papl_menu_pillar" 
+			  action="uis_papl_pillar_action_window"/>
+	<menuitem name="List of Power substation" id="uis_papl_menu_substation_list" parent="uis_papl_menu_substation"
+			  action="uis_papl_substation_action_window"/>
+    <!--
+    <menuitem name="Server to list" id="passportvl" parent="passportvl.menu_2"
+              action="passportvl.action_server"/>
+    -->
+  </data>
+</openerp>

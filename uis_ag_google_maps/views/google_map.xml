@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<template id="uis_google_map">
+&lt;!DOCTYPE html&gt;
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <title>MAPS</title>
+        <link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/google-map.css" />
+    </head>
+    <body> <!--t-att-data-partner-url="pillar_url or ''"!-->
+        <script>
+            var lines_data=<t t-raw="lines_data"/>;
+			var odoo_pillar_data = <t t-raw="pillar_data"/>;
+        </script>
+		<div id="screen">
+			<div id="odoo-google-map"></div>
+			<div id="pillar_wizard">
+				<div id="w_pillar_1"></div>
+				<div id="w_pillar_2"></div>
+				<div id="g_b2_pillar"></div>
+			</div>
+			<div id="apl_info"></div>
+			
+		</div>
+        <script src="http://maps.google.com/maps/api/js?key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"></script>
+		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/Chart.js"></script>
+        <script type="text/javascript" src="/uis_ag_google_maps/static/src/js/markerclusterer_compiled.js"></script>
+        <script type="text/javascript" src="/uis_ag_google_maps/static/src/js/google_map.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    </body>
+</html>
+</template>
+
+<record id="uis_papl_apl_map" model="ir.ui.view">
+	  <field name="name">APL map</field>
+	  <field name="model">uis.papl.apl</field>
+	  <field name="arch" type="xml">
+		<form string="APL map">
+		  <iframe src="/apl_map/?apl_ids=1,2,3,4" width="100%" height="600" marginwidth="0" marginheight="0" frameborder="no" scrolling="no" style="border-width:0px;">
+		  </iframe>
+        </form>
+      </field>
+</record>
+</data>
+</openerp>
