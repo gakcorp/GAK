@@ -43,13 +43,13 @@
 			  </h2>
 			<group>
 			  <group>
-				<label for="bld_year" class="oe_edit_only"/>
+				<!--<label for="bld_year" class="oe_edit_only"/>!-->
 				<field name="bld_year"/>
-				<label for="startexp_date" class="oe_edit_only"/>
+				<!--<label for="startexp_date" class="oe_edit_only"/>!-->
 				<field name="startexp_date"/>
-				<label for="sup_substation_id" class="oe_edit_only"/>
+				<!--<label for="sup_substation_id" class="oe_edit_only"/>!-->
                 <field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
-				<label for="inv_num"/>
+				<!--<label for="inv_num"/>!-->
 				<field name="inv_num"/>
 			  </group>
 			</group>
@@ -57,15 +57,15 @@
 			  <page string="Main details">
 				<group>
 				  <group>
-					<label for="line_len"/>
+					<!--<label for="line_len"/>!-->
 					<field name="line_len"/>
-					<label for="line_len_calc"/>
+					<!--<label for="line_len_calc"/>!-->
 					<field name="line_len_calc"/>
-					<label for="prol_max_len"/>
+					<!--<label for="prol_max_len"/>!-->
 					<field name="prol_max_len"/>
-					<label for="prol_med_len"/>
+					<!--<label for="prol_med_len"/>!-->
 					<field name="prol_med_len"/>
-					<label for="prol_min_len"/>
+					<!--<label for="prol_min_len"/>!-->
 					<field name="prol_min_len"/>
 				  </group>
 				</group>
@@ -125,16 +125,16 @@
 				<br></br>
 				<object data="/apl_map/?apl_ids=1,2" width="100%" height="600"></object>
 			  </page>!-->
-			  <page string="MRO">
+			  <!--<page string="MRO">
 				
-			  </page>
-			  <page string="Daigram">
-				<!--<diagram string="Diagram of pillars">
+			  </page>!-->
+			  <!--<page string="Daigram">
+				<diagram string="Diagram of pillars">
 				  <node object="uis.papl.apl" shape="rectangle">
 					<field name="pillar_id"/>
 				  </node>
-				</diagram>!-->
-			  </page>
+				</diagram>
+			  </page>!-->
 			</notebook>
 		  </sheet>
 		</form>
