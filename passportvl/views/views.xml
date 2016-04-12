@@ -30,6 +30,8 @@
 			<button name="act_show_map" string="Map" type="object" class="oe_highlight"/>
 		  </header>
 		  <sheet string="Details">
+			<div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+			</div>
 			<label for="name" string="Name of APL:"/>
 				<h1>
 				  <field name="name"/>

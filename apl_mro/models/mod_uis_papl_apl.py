@@ -11,7 +11,7 @@ class uis_mro_mod_uis_papl_apl(osv.Model):
         res = dict.fromkeys(ids, 0)
         maintenance = self.pool['uis.papl.mro.order']
         for apl in self.browse(cr, uid, ids, context=context):
-            res[apl.id] = maintenance.search_count(cr,uid, [('apl_id', '=', apl.id)], context=context)
+            res[apl.id] = 0 #maintenance.search_count(cr,uid, [('apl_id', '=', apl.id)], context=context)
         return res
 
     _columns = {
