@@ -27,7 +27,88 @@ class mro_order(osv.osv):
         ('bm', 'Breakdown'),
         ('cm', 'Corrective')
     ]
+    _track={
+        'state':{
+            'apl_mro.mt_order_confirmed': lambda self,cr,uid,obj,ctx=None: obj['state'] == 'ready',
+        }
+    }
+    _columns = {
+        'name': fields.char('Reference', size=64),
+        'origin': fields.char('Source Document', size=64, readonly=True, states={'draft': [('readonly', False)]},
+            help="Reference of the document that generated this maintenance order."),
+        'state': fields.selection(STATE_SELECTION, 'Status', readonly=True,
+            help="When the maintenance order is created the status is set to 'Draft'.\n\
+            If the order is confirmed the status is set to 'Waiting Parts'.\n\
+            If the stock is available then the status is set to 'Ready to Maintenance'.\n\
+            When the maintenance is over, the status is set to 'Done'."),
+        'maintenance_type': fields.selection(MAINTENANCE_TYPE_SELECTION, 'Maintenance Type', required=True, readonly=True, states={'draft': [('readonly', False)]}),
+        #'task_id': fields.many2one('mro.task', 'Task', readonly=True, states={'draft': [('readonly', False)]}),
+        'description': fields.char('Description', size=64, translate=True, required=True, readonly=True, states={'draft': [('readonly', False)]}),
+        'apl_id': fields.many2one('uis.papl.apl', 'Air power line', required=False, readonly=True, states={'draft': [('readonly', False)]}),
+        'date_planned': fields.datetime('Planned Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)]}),
+        'date_scheduled': fields.datetime('Scheduled Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)],'released':[('readonly',False)],'ready':[('readonly',False)]}),
+        'date_execution': fields.datetime('Execution Date', required=True, states={'done':[('readonly',True)],'cancel':[('readonly',True)]}),
+        #'parts_lines': fields.one2many('mro.order.parts.line', 'maintenance_id', 'Planned parts',
+        #    readonly=True, states={'draft':[('readonly',False)]}),
+        #'parts_ready_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
+        #'parts_move_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
+        #'parts_moved_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
+        'tools_description': fields.text('Tools Description',translate=True),
+        'labor_description': fields.text('Labor Description',translate=True),
+        'operations_description': fields.text('Operations Description',translate=True),
+        'documentation_description': fields.text('Documentation Description',translate=True),
+        'problem_description': fields.text('Problem Description'),
+        'company_id': fields.many2one('res.company','Company',required=True, readonly=True, states={'draft':[('readonly',False)]}),
+        #'procurement_group_id': fields.many2one('procurement.group', 'Procurement group', copy=False),
+        #'category_ids': fields.related('asset_id', 'category_ids', type='many2many', relation='asset.category', string='Asset Category', readonly=True),
+    }
+    _defaults = {
+        'state': lambda *a: 'draft',
+        'maintenance_type': lambda *a: 'bm',
+        'date_planned': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
+        'date_scheduled': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
+        'date_execution': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
+        'company_id': lambda self, cr, uid, c: self.pool.get('res.company')._company_default_get(cr, uid, 'uis.papl.mro.order', context=c),
+    }
 
+    _order = 'date_execution'
+
+    def onchange_apl(self, cr, uid, ids, apl):
+        value = {}
+        if apl:
+            value['apl_id'] = self.pool.get('uis.papl.apl').browse(cr, uid, apl).id #need correction
+        return {'value': value}
+    
+    def onchange_planned_date(self, cr, uid, ids, date):
+        return {'value': {
+            'date_scheduled': date,
+        }}
+    def onchange_planned_date(self, cr, uid, ids, date):
+        """
+        onchange handler of date_planned.
+        """
+        return {'value': {
+            'date_scheduled': date,
+        }}
+
+    def onchange_scheduled_date(self, cr, uid, ids, date):
+        """
+        onchange handler of date_scheduled.
+        """
+        return {'value': {
+            'date_execution': date,
+        }}
+
+    def onchange_execution_date(self, cr, uid, ids, date, state):
+        """
+        onchange handler of date_execution.
+        """
+        value = {}
+        if state == 'draft':
+            value['value'] = {'date_planned': date}
+        else:
+            value['value'] = {'date_scheduled': date}
+        return value
 '''
     _track = {
         'state': {

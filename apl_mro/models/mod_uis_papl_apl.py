@@ -11,7 +11,7 @@ class uis_mro_mod_uis_papl_apl(osv.Model):
         res = dict.fromkeys(ids, 0)
         maintenance = self.pool['uis.papl.mro.order']
         for apl in self.browse(cr, uid, ids, context=context):
-            res[apl.id] = 0 #maintenance.search_count(cr,uid, [('apl_id', '=', apl.id)], context=context)
+            res[apl.id] = maintenance.search_count(cr,uid, [('apl_id', '=', apl.id)], context=context)
         return res
 
     _columns = {
@@ -24,7 +24,7 @@ class uis_mro_mod_uis_papl_apl(osv.Model):
             'name': _('Maintenance Orders'),
             'view_type': 'form',
             'view_mode': 'tree,form',
-            'res_model': 'mro.order',
+            'res_model': 'uis.papl.mro.order',
             'type': 'ir.actions.act_window',
             'target': 'current',
         }

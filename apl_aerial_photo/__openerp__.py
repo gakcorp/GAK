@@ -1,22 +1,17 @@
 {
-    'name': 'APL MRO',
+    'name': 'APL AERO PHOTO',
     'version': '0.1',
-    'summary': 'Air Power Line Maintenance, Repair and Operation',
+    'summary': 'Aerial photos for APL, Pillars and Substations',
     'description': """
-Manage Maintenance process for APL (Passport VL)
+Manage and show aerial photos for APL, Pillars and Substation
 =================================================
-
-Air power line Maintenance, Repair and Operation.
 
 Main Features
 -------------
-    * Request Service/Maintenance Management
-    * Maintenance Work Orders Management
-    * Parts Management
-    * Tasks Management (standard job)
-    * Convert Maintenance Order to Task
-    * Print Maintenance Order
-    * Print Maintenance Request
+    * Auto load photos from server (ftp) folder
+    * Load exif data for aerial photos (geodata, latitude, longitude)
+    * Automatic binding aerial photos to Pillar, APL
+    * View images for pillars and apl forms
     """,
     
     'author': 'GIS.Aktiv',
@@ -27,7 +22,8 @@ Main Features
     'demo': ['demo/demo.xml'],
     'data':[
         'views/mod_apl_view.xml',
-        'views/uis_papl_mro_view.xml'
+        'views/mod_pillar_view.xml',
+        'views/uis_papl_aerialphoto_view.xml'
     ],
     'application': True,
 }
