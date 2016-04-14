@@ -140,7 +140,7 @@
             </field>
         </record>
 		<!-- avialable only in ent solution!-->
-		<!--
+		
 		<record id="mro_order_gantt_view" model="ir.ui.view">
 			<field name="name">uis.papl.mro.order.gantt</field>
 			<field name="model">uis.papl.mro.order</field>
@@ -155,7 +155,7 @@
 				</gantt>
 			</field>
 		</record>
-        !-->
+        
         <record id="mro_order_form_view" model="ir.ui.view">
             <field name="name">uis.papl.mro.order.form</field>
             <field name="model">uis.papl.mro.order</field>
@@ -323,13 +323,13 @@
             <field name="view_mode">tree,form,calendar</field>
             <!--<field name="context" eval="{'default_categ_id': ref('mro.product_category_mro')}"/>!-->
         </record>
-		<!--<record model="ir.actions.act_window" id="papl_action_apl_orders_gantt">
+		<record model="ir.actions.act_window" id="papl_action_apl_orders_gantt">
 			<field name="name">Maintance Gantt</field>
 			<field name="res_model">uis.papl.mro.order</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_mode">gantt</field>
 			<field name="view_id" ref="mro_order_gantt_view"/>
-		</record>!-->
+		</record>
 
 		<menuitem name="MRO" id="uis_papl_menu_mro" parent="passportvl.uis_papl_menu_root"/>
 		<!-- actions -->
@@ -338,13 +338,12 @@
 			action="papl_action_apl_orders"
 			sequence="10"
 			/>
-		<!--<menuitem name="Maintance Gantt"
+		<menuitem name="Maintance Gantt"
 			id="uis_papl_menu_mro_gantt" parent="uis_papl_menu_mro"
 			action="papl_action_apl_orders_gantt"
 			sequence="20"
 			/>
-		!-->
-
+		
         <!-- Parts menu !--> 
  <!--       <menuitem name="Parts"
             id="menu_maintenance_parts"
