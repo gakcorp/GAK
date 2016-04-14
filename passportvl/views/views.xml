@@ -52,6 +52,7 @@
                 <field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
 				<!--<label for="inv_num"/>!-->
 				<field name="inv_num"/>
+				<field name="build_company"/>
 			  </group>
 			</group>
 			<notebook>
@@ -69,6 +70,12 @@
 					<!--<label for="prol_min_len"/>!-->
 					<field name="prol_min_len"/>
 				  </group>
+				  <group>
+					<field name="count_circ"/>
+					<field name="climatic_conditions"/>
+					<field name="tap_text"/>
+				  </group>
+				  <!--<field name="tap_text"/>!-->
 				</group>
 			  </page>
 			  <page string="Resistance wire">

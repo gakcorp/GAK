@@ -90,7 +90,7 @@ class uis_papl_pillar(models.Model):
 				new_name=str(record.num_by_vl)
 				tap_name=record.tap_id.name
 				apl_name=record.apl_id.name
-				mname=new_name+"_"+unicode(tap_name)+"_"+unicode(apl_name)
+				mname=new_name+"."+unicode(tap_name)
 				record.name=mname
 		
 	@api.depends('longitude','latitude','parent_id')
@@ -150,8 +150,30 @@ class uis_papl_tap(models.Model):
 	cnt_np=fields.Integer(compute='_get_cnt_np', string='Pillars wo prev')
 	pillar_cnt=fields.Integer(compute='_get_cnt_np', string='Total pillars')
 	pillar_ids=fields.One2many('uis.papl.pillar','tap_id',string='Pillars')
+	line_len_calc=fields.Float(digits=(6,2), compute='_tap_get_len')
 	is_main_line=fields.Boolean(string='is main line')
 	
+	def _tap_get_len(self):
+		for tap in self:
+			vsum=0
+			vmin=1000
+			vmax=0
+			vmed=0
+			vcnt=0
+			for pil in tap.pillar_ids:
+				vcnt=vcnt+1
+				lpp=pil.len_prev_pillar
+				vsum=vsum+lpp
+				vmed=vsum/vcnt
+				if lpp<vmin:
+					vmin=lpp
+				if lpp>vmax:
+					vmax=lpp
+			tap.line_len_calc=vsum
+			#record.prol_max_len=vmax
+			#record.prol_min_len=vmin
+			#record.prol_med_len=vmed
+			
 	@api.depends('apl_id','pillar_ids')
 	def _get_cnt_np(self):
 		for tap in self:
@@ -228,18 +250,31 @@ class uis_papl_apl(models.Model):
 	inv_num = fields.Char()
 	bld_year =fields.Char(string="Building year")
 	startexp_date = fields.Date(string="Start operations date")
+	build_company = fields.Many2one('res.company',string='construction installation company')
 	line_len=fields.Float(digits=(3,2))
 	line_len_calc=fields.Float(digits=(6,2), compute='_apl_get_len')
 	prol_max_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_med_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_min_len=fields.Float(digits=(2,2), compute='_apl_get_len')
+	count_circ=fields.Char(string="Number of circuits")
+	climatic_conditions=fields.Char(string="Climatic conditions")
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply Substation")
+	tap_text=fields.Char(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
 	url_maps=fields.Char(compute='_apl_get_url_maps')
+	
+	def _get_tap_text_for_apl(self):
+		for apl in self:
+			res=''
+			for tap in apl.tap_ids:
+				if not(tap.is_main_line):
+					taplen=tap.line_len_calc;
+					res=res+tap.name+' - '+str(taplen)+' (m); '
+			apl.tap_text=res
 	
 	@api.depends('tap_ids','pillar_id')
 	def _get_cnt_pillar_wo_tap(self):
