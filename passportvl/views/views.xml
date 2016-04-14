@@ -81,14 +81,14 @@
 			  </page>
 			  <page string="Pillars">
 				<field name="pillar_id">
-				  <tree>
+				  <!--<tree context="{'group_by': 'pillar_type_id'}">
 					<field name="tap_id"/>
 					<field name="name"/>
 					<field name="num_by_vl"/>
 					<field name="pillar_material_id"/>
 					<field name="pillar_type_id"/>
 					<field name="len_prev_pillar"/>
-				  </tree>
+				  </tree>!-->
 				</field>
 				<!--<search string="Search pillar">
 				
@@ -142,6 +142,43 @@
 	  </field>
 	</record>
 	
+	<record id="uis_papl_pillar_search" model="ir.ui.view">
+            <field name="name">uis.papl.pillar.search</field>
+            <field name="model">uis.papl.pillar</field>
+            <field name="arch" type="xml">
+                <search string="Search Pillar">
+					<field name="id"/>
+					<field name="name"/>
+                    <field name="num_by_vl"/>
+                    <field name="pillar_material_id"/>
+					<field name="pillar_type_id"/>
+					<field name="longitude"/>
+					<field name="latitude"/>
+					<field name="apl_id"/>
+					<field name="tap_id"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                      <filter name="group_pillar_material"
+                              string="Material"
+                              context="{'group_by': 'pillar_material_id'}"
+                              />
+                      <filter name="group_pillar_type"
+                              string="Type"
+                              context="{'group_by': 'pillar_type_id'}"
+                              />
+                      <filter name="group_pillar_apl"
+                              string="APL"
+                              context="{'group_by': 'apl_id'}"
+                              />
+                      <filter name="group_pillar_tap"
+                              string="TAP"
+                              context="{'group_by': 'tap_id'}"
+                              />
+                    </group>
+                </search>
+            </field>
+        </record>
+	
 	<record model="ir.ui.view" id="uis_papl_pillar_list">
       <field name="name">Pillar List</field>
       <field name="model">uis.papl.pillar</field>
@@ -152,12 +189,12 @@
           <field name="num_by_vl" string ="Number pillar on power line"/>
 		  <field name="pillar_type_id" string="Pillar Type" widget='many2one'/>
 		  <field name="pillar_material_id" string="Pillar material" widget='many2one'/>
-		  <field name="longitude" string="Longitude"/>
+		  <!--<field name="longitude" string="Longitude"/>
 		  <field name="latitude" string="Latitude"/>
 		  <field name="prev_longitude" string="Prev Longitude"/>
-		  <field name="prev_latitude" string="Prev Latitude"/>
+		  <field name="prev_latitude" string="Prev Latitude"/>!-->
 		  <field name="len_prev_pillar" string="Lenght to prev pillar (m)" widget="progressbar"/>
-		  <field name="azimut_from_prev" string="prev_azimut (degr)"/>
+		  <!--<field name="azimut_from_prev" string="prev_azimut (degr)"/>!-->
 		  <field name="elevation" string="Elevation"/>
 		  <field name="apl_id" string="APL" widget="many2onebutton"/>
 		  <field name="tap_id" string ="Tap"/>
@@ -165,6 +202,7 @@
 		</tree>
 		</field>
     </record>
+	
 	
 	<record model="ir.ui.view" id="uis_papl_tap_list">
 	  <field name="name">Tap List</field>
