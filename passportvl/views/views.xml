@@ -14,6 +14,7 @@
           <field name="line_len" string="Line Lengt (km)"/>
 		  <field name="line_len_calc" string="Calculate line len(m)"/>
           <field name="pillar_id" string="Pillars" widget='one2many'/>
+		  <field name="cnt_pillar_wo_tap"/>
 		  <field name="sup_substation_id" string="Supply Substation" widget='many2one'/>
 		  <button name="act_show_map" string="Map" type="object" icon="STOCK_FIND"/>
         </tree>

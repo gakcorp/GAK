@@ -233,11 +233,23 @@ class uis_papl_apl(models.Model):
 	prol_med_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_min_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
+	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply Substation")
 	code_maps=fields.Text()
 	status=fields.Char()
 	url_maps=fields.Char(compute='_apl_get_url_maps')
+	
+	@api.depends('tap_ids','pillar_id')
+	def _get_cnt_pillar_wo_tap(self):
+		for apl in self:
+			cnt=0
+			t_pillar=0
+			for pillar in apl.pillar_id:
+				if not (pillar.tap_id):
+					cnt=cnt+1
+			apl.cnt_pillar_wo_tap=cnt
+			
 	
 	@api.multi
 	def act_show_map(self):
