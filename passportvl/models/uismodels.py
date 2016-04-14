@@ -144,7 +144,7 @@ class uis_papl_pillar(models.Model):
 
 class uis_papl_tap(models.Model):
 	_name = 'uis.papl.tap'
-	name=fields.Char(string="Name")
+	name=fields.Char(string="Name", compute='_get_tap_full_name')
 	full_name=fields.Char()
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
 	cnt_np=fields.Integer(compute='_get_cnt_np', string='Pillars wo prev')
@@ -152,6 +152,33 @@ class uis_papl_tap(models.Model):
 	pillar_ids=fields.One2many('uis.papl.pillar','tap_id',string='Pillars')
 	line_len_calc=fields.Float(digits=(6,2), compute='_tap_get_len')
 	is_main_line=fields.Boolean(string='is main line')
+	num_by_vl=fields.Integer(string='Number', compute='_get_num_by_vl')
+	conn_pillar_id=fields.Many2one('uis.papl.pillar', string='Connect Pilar', compute='_get_num_by_vl')
+	
+	@api.depends('num_by_vl','apl_id','conn_pillar_id')
+	def _get_tap_full_name(self):
+		for tap in self:
+			nname=''
+			str_apl_name='NOAPL'
+			if (tap.apl_id):
+				str_apl_name=unicode(tap.apl_id.name)
+			if tap.is_main_line:
+				nname='ML.'+str_apl_name
+			if not(tap.is_main_line):
+				str_num_by_vl='NC'
+				if tap.num_by_vl>0:
+					str_num_by_vl=str(tap.num_by_vl)
+				str_conn_pillar='NCON'
+				if tap.conn_pillar_id:
+					str_conn_pillar=str(tap.conn_pillar_id.num_by_vl)
+				nname='O.'+str_num_by_vl+'.('+str_conn_pillar+').'+str_apl_name
+			tap.name=nname
+			
+	def _get_num_by_vl(self):
+		for tap in self:
+			print tap.name
+			tap.apl_id.define_taps_num()
+			print tap.apl_id.name
 	
 	def _tap_get_len(self):
 		for tap in self:
@@ -245,8 +272,11 @@ class uis_papl_tap(models.Model):
 	
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
-	name = fields.Char()
-	full_name=fields.Char()
+	name = fields.Char(string="Name", compute="_get_apl_name")
+	short_name=fields.Char(string="Short name")
+	apl_type=fields.Char(string="Type APL")
+	feeder_num=fields.Integer(string="Feeder")
+	voltage=fields.Integer(string="Voltage (kV)")
 	inv_num = fields.Char()
 	bld_year =fields.Char(string="Building year")
 	startexp_date = fields.Date(string="Start operations date")
@@ -261,12 +291,65 @@ class uis_papl_apl(models.Model):
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
-	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply Substation")
+	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply substation")
 	tap_text=fields.Char(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
 	url_maps=fields.Char(compute='_apl_get_url_maps')
 	
+	@api.depends('short_name','apl_type','feeder_num','voltage','sup_substation_id')
+	def _get_apl_name(self):
+		for apl in self:
+			nname=''
+			str_apl_type='*NT*'
+			if apl.apl_type:
+				str_apl_type=unicode(apl.apl_type)
+			str_voltage='*0*'
+			if apl.voltage>0:
+				str_voltage=str(apl.voltage)
+			str_feeder_num='*NFD*'
+			if apl.feeder_num>0:
+				str_feeder_num=str(apl.feeder_num)
+			str_ssn='*NPS*'
+			if (apl.sup_substation_id):
+				str_ssn=apl.sup_substation_id.name
+			str_short_name=''
+			if apl.short_name:
+				str_short_name='('+unicode(apl.short_name)+')'
+			nname=unicode(str_apl_type)+'-'+str_voltage+'kV'+' F.'+str_feeder_num+'-'+str_ssn+str_short_name
+			apl.name=nname
+	@api.multi
+	def define_taps_num(self):
+		for apl in self:
+			taps=[]
+			cpillar=[]
+			for tap in apl.tap_ids:
+				if not(tap.is_main_line):
+					taps.append(tap)
+					conpil=-1
+					for pil in tap.pillar_ids:
+						if pil.tap_id<>pil.parent_id.tap_id:
+							conpil=pil.parent_id.num_by_vl
+							tap.conn_pillar_id=pil.parent_id
+					cpillar.append(conpil)
+			print taps
+			print cpillar
+			sortcpillar=sorted(cpillar)
+			print sortcpillar
+			cn_tap=1
+			i=0
+			for num in sortcpillar:
+				i=i+1
+				if num>0:
+					ind=cpillar.index(num)
+					print ind
+					cpillar[ind]=-2
+					taps[ind].num_by_vl=cn_tap
+					cn_tap=cn_tap+1
+					print 'current num by vl for tap'+str(cn_tap)
+				print num
+			#tap.num_by_vl=0
+				
 	def _get_tap_text_for_apl(self):
 		for apl in self:
 			res=''

@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
+	<record id="uis_papl_apl_search" model="ir.ui.view">
+      <field name="name">uis.papl.apl.search</field>
+      <field name="model">uis.papl.apl</field>
+      <field name="arch" type="xml">
+      <search string="Search Pillar">
+		<field name="id"/>
+		<field name="name"/>
+        <field name="apl_type"/>
+        <field name="inv_num"/>
+		<field name="sup_substation_id"/>
+		<separator/>
+        <group expand="0" string="Group By">
+		  <filter name="group_apl_sup_substation"
+			string="Supply substation"
+            context="{'group_by': 'sup_substation_id'}"
+          />
+          <filter name="group_apl_voltage"
+            string="Voltage"
+            context="{'group_by': 'voltage'}"
+          />
+        </group>
+      </search>
+      </field>
+    </record>
+	
     <record model="ir.ui.view" id="uis_papl_apl_list">
       <field name="name">APL List</field>
       <field name="model">uis.papl.apl</field>
@@ -33,14 +58,14 @@
 		  <sheet string="Details">
 			<div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
 			</div>
-			<label for="name" string="Name of APL:"/>
+			<!--<label for="name" string="Name of APL:"/>!-->
 				<h1>
 				  <field name="name"/>
 				</h1>
 				
-			<label for="full_name" string="Full name of APL:"/>
+			<!--<label for="full_name" string="Full name of APL:"/>!-->
 			  <h2>
-				<field name="full_name"/>
+				<field name="short_name"/>
 			  </h2>
 			<group>
 			  <group>
@@ -48,11 +73,16 @@
 				<field name="bld_year"/>
 				<!--<label for="startexp_date" class="oe_edit_only"/>!-->
 				<field name="startexp_date"/>
-				<!--<label for="sup_substation_id" class="oe_edit_only"/>!-->
-                <field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
 				<!--<label for="inv_num"/>!-->
 				<field name="inv_num"/>
 				<field name="build_company"/>
+			  </group>
+			  <group>
+				<!--<label for="sup_substation_id" class="oe_edit_only"/>!-->
+                <field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
+				<field name="apl_type"/>
+				<field name="feeder_num"/>
+				<field name="voltage"/>
 			  </group>
 			</group>
 			<notebook>
