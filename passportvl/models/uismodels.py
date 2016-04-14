@@ -86,12 +86,15 @@ class uis_papl_pillar(models.Model):
 	@api.depends('num_by_vl','tap_id','apl_id')
 	def _get_pillar_full_name(self):
 		for record in self:
-			if not record.name:
-				new_name=str(record.num_by_vl)
-				tap_name=record.tap_id.name
-				apl_name=record.apl_id.name
-				mname=new_name+"."+unicode(tap_name)
-				record.name=mname
+			new_name=str(record.num_by_vl)
+			#tap_name=record.tap_id.name
+			#apl_name=record.apl_id.name
+			str_tap_num_by_vl=str(record.tap_id.num_by_vl)
+			if (record.tap_id.is_main_line):
+				str_tap_num_by_vl='ML'
+			tap_name='T('+str_tap_num_by_vl+')_Feed'+str(record.apl_id.feeder_num)
+			mname=new_name+"."+unicode(tap_name)
+			record.name=mname
 		
 	@api.depends('longitude','latitude','parent_id')
 	def _pillar_get_len(self):
