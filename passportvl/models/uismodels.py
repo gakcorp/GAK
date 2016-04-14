@@ -144,12 +144,13 @@ class uis_papl_pillar(models.Model):
 
 class uis_papl_tap(models.Model):
 	_name = 'uis.papl.tap'
-	name=fields.Char()
+	name=fields.Char(string="Name")
 	full_name=fields.Char()
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
 	cnt_np=fields.Integer(compute='_get_cnt_np', string='Pillars wo prev')
 	pillar_cnt=fields.Integer(compute='_get_cnt_np', string='Total pillars')
 	pillar_ids=fields.One2many('uis.papl.pillar','tap_id',string='Pillars')
+	is_main_line=fields.Boolean(string='is main line')
 	
 	@api.depends('apl_id','pillar_ids')
 	def _get_cnt_np(self):
