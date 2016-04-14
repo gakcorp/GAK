@@ -130,13 +130,32 @@
             <field name="name">uis.papl.mro.order.calendar</field>
             <field name="model">uis.papl.mro.order</field>
             <field name="arch" type="xml">
-                <calendar color="apl_id" date_start="date_execution" string="Maintenance Orders">
-                    <field name="name"/>
-                    <field name="description"/>
+                <calendar color="apl_id" date_start="date_execution" date_stop="date_deadline" string="Maintenance Orders">
+                    <field name="apl_id"/>
+					<field name="description"/>
+					<field name="state"/>
+					<field name="maintenance_type"/>
+					<field name="company_id"/>
                 </calendar>
             </field>
         </record>
-        
+		<!-- avialable only in ent solution!-->
+		<!--
+		<record id="mro_order_gantt_view" model="ir.ui.view">
+			<field name="name">uis.papl.mro.order.gantt</field>
+			<field name="model">uis.papl.mro.order</field>
+			<field name="arch" type="xml">
+				<gantt default_group_by="apl_id" date_start="date_execution" date_stop="date_deadline" string="Maintance Gantt">
+					<field name="apl_id"/>
+					<field name="apl_id"/>
+					<field name="description"/>
+					<field name="state"/>
+					<field name="maintenance_type"/>
+					<field name="company_id"/>
+				</gantt>
+			</field>
+		</record>
+        !-->
         <record id="mro_order_form_view" model="ir.ui.view">
             <field name="name">uis.papl.mro.order.form</field>
             <field name="model">uis.papl.mro.order</field>
@@ -171,14 +190,16 @@
                                 <field name="date_planned" on_change="onchange_planned_date(date_planned)"/>
                                 <field name="date_scheduled" on_change="onchange_scheduled_date(date_scheduled)"/>
                                 <field name="date_execution" on_change="onchange_execution_date(date_execution,state)"/>
+								<field name="date_deadline"/>
                                 <!--<field name="origin"/>!-->
                             </group>
-                            <group>
-                                <!--<field name="company_id" groups="base.group_multi_company" widget="selection"/>!-->
-                                <field name="company_id"/>
-                            </group>
+                            
                             <!--<group groups="stock.group_locations">
                             </group>!-->
+                        </group>
+						<group>
+							<!--<field name="company_id" groups="base.group_multi_company" widget="selection"/>!-->
+							<field name="company_id"/>
                         </group>
                         <notebook>
                             <!--<page string="Parts">
@@ -260,6 +281,7 @@
                     <field name="name"/>
                     <field name="maintenance_type"/>
                     <field name="apl_id"/>
+					<field name="company_id"/>
                     <!--<field name="category_ids"/>!-->
                     <filter icon="terp-mail-message-new" string="Unread Messages" name="message_unread" domain="[('message_unread','=',True)]"/>
                     <separator/>
@@ -284,26 +306,45 @@
                               string="Execution Date"
                               context="{'group_by': 'date_execution'}"
                               />
+					  <filter name="group_company"
+							  string="Company"
+							  context="{'group_by':'company_id'}"
+							  />
                     </group>
                 </search>
             </field>
         </record>
-<!--
-        <record id="action_orders" model="ir.actions.act_window">
+
+        <record id="papl_action_apl_orders" model="ir.actions.act_window">
             <field name="name">Maintenance Orders</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">mro.order</field>
+            <field name="res_model">uis.papl.mro.order</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar</field>
-            <field name="context" eval="{'default_categ_id': ref('mro.product_category_mro')}"/>
+            <!--<field name="context" eval="{'default_categ_id': ref('mro.product_category_mro')}"/>!-->
         </record>
+		<!--<record model="ir.actions.act_window" id="papl_action_apl_orders_gantt">
+			<field name="name">Maintance Gantt</field>
+			<field name="res_model">uis.papl.mro.order</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">gantt</field>
+			<field name="view_id" ref="mro_order_gantt_view"/>
+		</record>!-->
 
-        <menuitem name="Maintenance Orders"
-            action="action_orders"
-            id="menu_mro_order"
-            parent="menu_mro_maintenance"
-            sequence="10"/>
-1-->
+		<menuitem name="MRO" id="uis_papl_menu_mro" parent="passportvl.uis_papl_menu_root"/>
+		<!-- actions -->
+        <menuitem name="Maintance Orders"
+			id="uis_papl_menu_mro_list" parent="uis_papl_menu_mro"
+			action="papl_action_apl_orders"
+			sequence="10"
+			/>
+		<!--<menuitem name="Maintance Gantt"
+			id="uis_papl_menu_mro_gantt" parent="uis_papl_menu_mro"
+			action="papl_action_apl_orders_gantt"
+			sequence="20"
+			/>
+		!-->
+
         <!-- Parts menu !--> 
  <!--       <menuitem name="Parts"
             id="menu_maintenance_parts"
