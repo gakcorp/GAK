@@ -43,6 +43,48 @@
       </field>
     </record>
     
+    <record model="ir.ui.view" id="uis_papl_deprtment_form">
+        <field name="name">Department form</field>
+        <field name="model">uis.papl.department</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <b>Information about Department</b>
+                </header>
+            <sheet string="Details">
+                <div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+                </div>
+				<h1>
+                    <field name="name"/>
+				</h1>
+                <h2>
+                    <field name="address"/>
+                </h2>
+                <h3>
+                    <field name="telephone"/>
+                </h3>
+                <field name="parent_department_id"/>
+                <group>
+                    <group>
+                        <field name="substation_count"/>
+                        <field name="apl_count"/>
+                        <field name="pillar_count"/>
+                        <field name="line_len"/>
+                    </group>
+                    <group>
+                        <field name="substation_ids"
+                               widget="many2many_tags"
+                               options="{'no_create_edit':True,
+                               'no_quick_create':False}"
+                               domain="[('department_id','=',False)]"
+                               />
+                    </group>
+                </group>
+            </sheet>
+            </form>
+        </field>
+    </record>
+ 
     <!-- actions opening views on models -->
     <!--actions!-->
 	<record id="uis_papl_department_action_window" model="ir.actions.act_window">
