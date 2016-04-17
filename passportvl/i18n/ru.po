@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 9.0c\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-17 15:04+0000\n"
-"PO-Revision-Date: 2016-04-17 18:11+0300\n"
+"PO-Revision-Date: 2016-04-17 19:55+0300\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -33,7 +33,7 @@ msgstr "ВЛ"
 #. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_root
 msgid "APL Management"
-msgstr "АкстивГИС"
+msgstr "АктивГИС"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_apl_id
