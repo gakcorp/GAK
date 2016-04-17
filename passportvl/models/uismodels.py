@@ -8,6 +8,7 @@ class uis_papl_substation(models.Model):
 	name=fields.Char()
 	apl_id=fields.One2many('uis.papl.apl','sup_substation_id', string="APLs")
 	url_maps=fields.Char(compute='_ss_get_url_maps')
+	department_id=fields.Many2one('uis.papl.department', string="Department")
 	
 	@api.depends('apl_id')
 	def _ss_get_url_maps(self):

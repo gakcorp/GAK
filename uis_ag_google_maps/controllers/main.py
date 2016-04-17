@@ -108,11 +108,14 @@ class pillar_google_map(http.Controller):
                     if pillar.num_by_vl>max_num:
                         max_num=pillar.num_by_vl
                         end_pillar=pillar
+                print "!!!!!end pillar for "+tap.name+' is '+end_pillar.name
                 i=0
                 np=end_pillar
                 n_id=np.id
                 pillar_cnt=tap.pillar_cnt
-                while (n_id>0) and (pillar_cnt-i>=1):
+                print tap.name+"_"+str(pillar_cnt)
+                while (n_id>0) and (pillar_cnt-i>=0):
+                    print np.name
                     line["counter"]=line["counter"]+1
                     line["coord"].append({
                         'ltd':np.latitude,
@@ -137,7 +140,7 @@ class pillar_google_map(http.Controller):
                 })
                 
             for pillar_id in apl_id.pillar_id:
-                print "Do pillar"+pillar_id.name
+                #print "Do pillar"+pillar_id.name
                 pillar_data["counter"]=pillar_data["counter"]+1
                 if pillar_id.latitude>maxlat:
                     maxlat=pillar_id.latitude

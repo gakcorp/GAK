@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
+	<record id="uis_papl_department_search" model="ir.ui.view">
+	  <field name="name">uis.papl.department.search</field>
+	  <field name="model">uis.papl.department</field>
+	  <field name="arch" type="xml">
+		<search string="Department Search">
+		  <field name="id"/>
+		  <field name="name"/>
+		</search>
+	  </field>
+	</record>
+	
 	<record id="uis_papl_apl_search" model="ir.ui.view">
       <field name="name">uis.papl.apl.search</field>
       <field name="model">uis.papl.apl</field>
@@ -329,6 +340,16 @@
 		</field>
 	</record>
 	
+	<record id="uis_papl_department_action_window" model="ir.actions.act_window">
+	  <field name="name">List of Department</field>
+	  <field name="res_model">uis.papl.department</field>
+	  <field name="view_type">form</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p class="oe_view_nocontent_create">Create new power substation</p>
+	  </field>
+	</record>
+	
 	<record id="uis_papl_substation_action_window" model="ir.actions.act_window">
 	  <field name="name">List of substations</field>
 	  <field name="res_model">uis.papl.substation</field>
@@ -374,7 +395,7 @@
     <menuitem name="APL Management" id="uis_papl_menu_root"/>
 
     <!-- menu categories -->
-    
+    <menuitem name="Departments" id="uis_papl_menu_department" parent="uis_papl_menu_root"/>
     <menuitem name="Air power line (APL)" id="uis_papl_menu_apl" parent="uis_papl_menu_root"/>
     <menuitem name="Transformer Station" id="uis_papl_menu_tp" parent="uis_papl_menu_root"/>
 	<menuitem name="Pillar" id="uis_papl_menu_pillar" parent="uis_papl_menu_root"/>
@@ -382,7 +403,8 @@
 	<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>
 
     <!-- actions -->
-    
+     <menuitem name="List of Departments" id="uis_papl_menu_department_list" parent="uis_papl_menu_department"
+              action="uis_papl_department_action_window"/>
     <menuitem name="List of APL" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
               action="uis_papl_apl_action_window"/>
 	<menuitem name="List of Tap" id="uis_papl_menu_tap_list" parent="uis_papl_menu_apl"
