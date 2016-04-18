@@ -394,14 +394,26 @@
 
     <menuitem name="APL Management" id="uis_papl_menu_root"/>
 
-    <!-- menu categories -->
+    <!--menu new categories!-->
+	<menuitem name="Management" id="uis_papl_menu_management" parent="uis_papl_menu_root"/>
+	<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>
+	
+	<!--menu categories APLPillar etc!-->
+	<menuitem name="Air power line (APL)" id="uis_papl_menu_apl" parent="uis_papl_menu_management"/>
+    <menuitem name="Transformer Station" id="uis_papl_menu_tp" parent="uis_papl_menu_management"/>
+	<menuitem name="Pillar" id="uis_papl_menu_pillar" parent="uis_papl_menu_management"/>
+	<menuitem name="Substation" id="uis_papl_menu_substation" parent="uis_papl_menu_management"/>
+	<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>
+	
+	<!-- menu categories -->
+	<!--
     <menuitem name="Departments" id="uis_papl_menu_department" parent="uis_papl_menu_root"/>
     <menuitem name="Air power line (APL)" id="uis_papl_menu_apl" parent="uis_papl_menu_root"/>
     <menuitem name="Transformer Station" id="uis_papl_menu_tp" parent="uis_papl_menu_root"/>
 	<menuitem name="Pillar" id="uis_papl_menu_pillar" parent="uis_papl_menu_root"/>
 	<menuitem name="Substation" id="uis_papl_menu_substation" parent="uis_papl_menu_root"/>
 	<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>
-
+!-->
     <!-- actions -->
      <menuitem name="List of Departments" id="uis_papl_menu_department_list" parent="uis_papl_menu_department"
               action="uis_papl_department_action_window"/>
