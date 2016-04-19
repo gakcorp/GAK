@@ -27,6 +27,7 @@
         'views/views.xml',
         'views/templates.xml',
         'views/department.xml',
+        'views/transformation.xml'
 
     ],
     # only loaded in demonstration mode

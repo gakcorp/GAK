@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
-	<record id="uis_papl_department_search" model="ir.ui.view">
-	  <field name="name">uis.papl.department.search</field>
-	  <field name="model">uis.papl.department</field>
+	<record id="uis_papl_transformer_search" model="ir.ui.view">
+	  <field name="name">uis.papl.transforer.search</field>
+	  <field name="model">uis.papl.transformer</field>
 	  <field name="arch" type="xml">
-		<search string="Department Search">
+		<search string="Transformation Search">
 		  <field name="id"/>
 		  <field name="name"/>
-          <field name="substation_ids"/>
-          <field name="address"/>
-          <field name="telephone"/>
-        </search>
+          <field name="apl_id"/>
+		  <field name="pillar_id"/>
+         </search>
 	  </field>
 	</record>
 	
-    <record model="ir.ui.view" id="uis_papl_department_list">
+    <!--<record model="ir.ui.view" id="uis_papl_department_list">
       <field name="name">Department List</field>
       <field name="model">uis.papl.department</field>
       <field name="arch" type="xml">
@@ -83,26 +82,26 @@
             </sheet>
             </form>
         </field>
-    </record>
+    </record>!-->
  
     <!-- actions opening views on models -->
     <!--actions!-->
-	<record id="uis_papl_department_action_window" model="ir.actions.act_window">
-	  <field name="name">List of Department</field>
-	  <field name="res_model">uis.papl.department</field>
+	<record id="uis_papl_transformer_action_window" model="ir.actions.act_window">
+	  <field name="name">List of Transformers</field>
+	  <field name="res_model">uis.papl.transformer</field>
 	  <field name="view_type">form</field>
-	  <field name="view_mode">tree,form,graph</field>
+	  <field name="view_mode">tree,form</field>
 	  <field name="help" type="html">
-		<p class="oe_view_nocontent_create">Create new power substation</p>
+		<p class="oe_view_nocontent_create">Create new transformer</p>
 	  </field>
 	</record>
 	
 	
-    <menuitem name="Departments" id="uis_papl_menu_department" parent="uis_papl_menu_management"/>
+    <menuitem name="Transformer" id="uis_papl_menu_transformer" parent="uis_papl_menu_management"/>
     
     <!-- actions -->
-    <menuitem name="List of Departments" id="uis_papl_menu_department_list" parent="uis_papl_menu_department"
-              action="uis_papl_department_action_window"/>
+    <menuitem name="List of Transformers" id="uis_papl_menu_transformer_list" parent="uis_papl_menu_transformer"
+              action="uis_papl_transformer_action_window"/>
     
   </data>
 </openerp>
