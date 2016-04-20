@@ -26,6 +26,7 @@ Main Features
     'depends': ['passportvl','base','mail'],
     'demo': ['demo/demo.xml'],
     'data':[
+            'views/mod_apl_view.xml',
             'views/uis_papl_mro_view.xml'
     ],
     'application': True,
