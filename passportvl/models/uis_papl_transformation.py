@@ -7,10 +7,11 @@ class uis_papl_transformation(models.Model):
 	name=fields.Char(string='Name')
 	apl_id=fields.Many2one('uis.papl.apl', string='APL Name')
 	tap_id=fields.Many2one('uis.papl.tap', string='Tap Name')
-	pillar_id=fields.Many2one('uis.papl.pillar',string='Pillar Name', domain="[('id','in',near_pillar_ids.id)]")
+	pillar_id=fields.Many2one('uis.papl.pillar',string='Pillar Name', domain="[('id','in',str_pillar_ids)]")
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
 	#near_pillar_ids=fields.Many2one('uis.papl.pillar', string='Near pillars ids', compute='_get_near_pillar')
+	str_pillar_ids=fields.Char(string="pillar ids str", compure='_get_near_pillar')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='near_pillar_ids',
 									 column1='trans_id',
@@ -25,6 +26,7 @@ class uis_papl_transformation(models.Model):
 			lat1=trans.latitude
 			long1=trans.longitude
 			delta=0.01
+			nstr=''
 			max_dist=200
 			pillars = self.pool.get('uis.papl.pillar').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
@@ -60,15 +62,23 @@ class uis_papl_transformation(models.Model):
 						print 'Distance to'+str(pillar.id)+'='+str(dist)+' < max_dist='+str(max_dist)
 						near_pillars.append(pillar)
 						near_pillars_ids.append(pillar.id)
+						trans.near_pillar_ids=[(4,pillar.id,0)]
+						if (nstr==''):
+							nstr=str(pillar.id)
+						if (nstr!=''):
+							nstr=nstr+','+str(pillar.id)
 			#print near_pillars
 			#trans.near_pillar_ids=near_pillars
 			#print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 			#print trans.near_pillar_ids
 			#trans.near_pillar_ids=pillar
 			#trans.near_pillar_ids=(5)
-			trans.near_pillar_ids=(6,False,near_pillars)
+			#trans.near_pillar_ids=(6,near_pillars_ids
+			#trans.near_pillar_ids=[(6,0,near_pillars)]
 			#print [(6,0,near_pillars_ids)]
-			#print trans.near_pillar_ids[1]
+			nstr='['+nstr+']'
+			trans.str_pillar_ids=nstr
+			print trans.str_pillar_ids
 
 		'''
 		

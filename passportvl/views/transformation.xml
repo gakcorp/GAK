@@ -65,9 +65,9 @@
 				<group>
 				  <field name="latitude"/>
 				  <field name="longitude"/>
-				  <field name="near_pillar_ids"/><!-- widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>!-->
-				  <field name="pillar_id"
-					   options="{'no_create_edit':True,'no_quick_create':True}"/>
+				  <field name="str_pillar_ids"/>
+				  <field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+				  <field name="pillar_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
 				</group>
                 <!--<field name="parent_department_id"/>
                 <group>
