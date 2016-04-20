@@ -10,11 +10,18 @@ class uis_papl_transformation(models.Model):
 	pillar_id=fields.Many2one('uis.papl.pillar',string='Pillar Name')
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
-	near_pillar_ids_str=fields.Char(string='near pillars ids' compute='_get_near_pillar_ids')
+	near_pillar_ids=fields.Many2one('uis.papl.pillar', string='Near pillars ids', compute='_get_near_pillar_ids')
 	
 	def _get_near_pillar_ids(self):
 		for trans in self:
-			np_str='1,2,3,54,32,345'
-			print trans.near_pillar_ids_str=np_str
+			np=[]
+			pillars_obj=self.env['uis.papl.pillar']
+			#browse(cr, uid, ids, context=context):
+			#pillars=pillars_obj.browse(cr,uid,pillars_obj.search([]),context=context)
+			#for pillar in pillars:
+			#	if pillar.id<10:
+			#		np.append(pillar)		
+			#trans.near_pillar_ids=pillars
+					
 			
 			

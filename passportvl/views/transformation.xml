@@ -41,14 +41,14 @@
         </graph>
       </field>
     </record>
-    
-    <record model="ir.ui.view" id="uis_papl_deprtment_form">
+    !-->
+    <record model="ir.ui.view" id="uis_papl_transformer_form">
         <field name="name">Department form</field>
-        <field name="model">uis.papl.department</field>
+        <field name="model">uis.papl.transformer</field>
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <b>Information about Department</b>
+                    <b>Information about Transformer</b>
                 </header>
             <sheet string="Details">
                 <div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
@@ -57,12 +57,20 @@
                     <field name="name"/>
 				</h1>
                 <h2>
-                    <field name="address"/>
+                    <field name="apl_id"/>
                 </h2>
                 <h3>
-                    <field name="telephone"/>
+                    <field name="tap_id"/>
                 </h3>
-                <field name="parent_department_id"/>
+				<group>
+				  <field name="latitude"/>
+				  <field name="longitude"/>
+				  <field name="near_pillar_ids"/><!-- widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>!-->
+				  <field name="pillar_id"
+					   options="{'no_create_edit':True,'no_quick_create':True}"
+					   domain="[('id','in',near_pillar_ids)]"/>
+				</group>
+                <!--<field name="parent_department_id"/>
                 <group>
                     <group>
                         <field name="substation_count"/>
@@ -78,7 +86,7 @@
                                domain="[('department_id','=',False)]"
                                />
                     </group>
-                </group>
+                </group>!-->
             </sheet>
             </form>
         </field>
