@@ -1,25 +1,57 @@
 # -*- coding: utf-8 -*-
 import math, urllib, json, time
 from openerp import models, fields, api
+class uis_papl_transformation_type(models.Model):
+	_name='uis.papl.transformer.type'
+	_description='Transformer Types'
+	name=fields.Char(string='Name')
+
 class uis_papl_transformation(models.Model):
 	_name='uis.papl.transformer'
 	_description='Transformer'
+	#Main data
 	name=fields.Char(string='Name')
-	apl_id=fields.Many2one('uis.papl.apl', string='APL Name')
-	tap_id=fields.Many2one('uis.papl.tap', string='Tap Name')
-	pillar_id=fields.Many2one('uis.papl.pillar',string='Pillar Name', domain="[('id','in',str_pillar_ids)]")
+	apl_id=fields.Many2one('uis.papl.apl', string='APL Name', compute='_get_apl_tap_id')
+	tap_id=fields.Many2one('uis.papl.tap', string='Tap Name', compute='_get_apl_tap_id')
+	pillar_id=fields.Many2one('uis.papl.pillar',string='Pillar Name', domain="[('id','in',near_pillar_ids[0][2])]")
+	
+	#GEODATA
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
-	#near_pillar_ids=fields.Many2one('uis.papl.pillar', string='Near pillars ids', compute='_get_near_pillar')
-	str_pillar_ids=fields.Char(string="pillar ids str", compure='_get_near_pillar')
+	str_pillar_ids=fields.Char(string="pillar ids str", compute='_get_near_pillar')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='near_pillar_ids',
 									 column1='trans_id',
 									 column2='pillar_id',
 									 compute='_get_near_pillar'
 									 )
+	
+	#Details data
+	bld_year=fields.Integer(string='Build year')
+	start_exp_year=fields.Integer(string='Start of operation')
+	trans_type=fields.Many2one('uis.papl.transformer.type', string='Type of transformer')
+	voltage=fields.Char(string="Voltage")
+	manufacturer = fields.Many2one('res.company',string='construction installation company') #!!!Add domain for manufacturer
+	manuf_num=fields.Char(string='Manufacturer code')
+	climatic=fields.Char(string='Climatic')
+	inv_num=fields.Char(string='Inv num')
+	weight=fields.Float(digits=(4,2),string='Weight (kg)')
+	code=fields.Integer(string='Code')
+	full_code=fields.Char(string='UniCode', compute='_get_unicode')
+							   
 	#near_pillar_ids=fields.function(_get_near_pillar_ids,type='many2one',obj="uis.papl.pillar",method=True,string='Near pillars id'),
 	
+	@api.depends('code')
+	def _get_unicode(self,cr,uid,ids,context=None):
+		for trans in self.browse(cr,uid,ids,context=context):
+			trans.full_code=str(trans.tap_id.full_code)+'.'+str(trans.code)
+			
+	@api.depends('pillar_id')
+	def _get_apl_tap_id(self,cr,uid,ids,context=None):
+		for trans in self.browse(cr,uid,ids,context=context):
+			trans.apl_id=trans.pillar_id.apl_id
+			trans.tap_id=trans.pillar_id.tap_id
+		
 	@api.depends('latitude','longitude')
 	def _get_near_pillar(self,cr,uid,ids,context=None):
 		for trans in self.browse(cr,uid,ids,context=context):
@@ -57,9 +89,7 @@ class uis_papl_transformation(models.Model):
 						x = sl1*sl2+cl1*cl2*cdelta
 						ad = math.atan2(y,x)
 						dist = ad*rad
-					print str(pillar.id)+'='+str(dist)+' deltalat='+str(lat2-lat1)+' deltalong='+str(long2-long1)
 					if (dist<max_dist) and (dist>0):
-						print 'Distance to'+str(pillar.id)+'='+str(dist)+' < max_dist='+str(max_dist)
 						near_pillars.append(pillar)
 						near_pillars_ids.append(pillar.id)
 						trans.near_pillar_ids=[(4,pillar.id,0)]
@@ -67,51 +97,9 @@ class uis_papl_transformation(models.Model):
 							nstr=str(pillar.id)
 						if (nstr!=''):
 							nstr=nstr+','+str(pillar.id)
-			#print near_pillars
-			#trans.near_pillar_ids=near_pillars
-			#print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-			#print trans.near_pillar_ids
-			#trans.near_pillar_ids=pillar
-			#trans.near_pillar_ids=(5)
-			#trans.near_pillar_ids=(6,near_pillars_ids
-			#trans.near_pillar_ids=[(6,0,near_pillars)]
-			#print [(6,0,near_pillars_ids)]
+							print str(pillar.id)+':'+nstr
 			nstr='['+nstr+']'
 			trans.str_pillar_ids=nstr
 			print trans.str_pillar_ids
 
-		'''
-		
-		'user_id': fields.many2one("res.users", "Users"),
-
-_defaults = {
-    'user_id': _get_users,
-}
-And then change the code in your method.
-
-Try this:
-
-def _get_users(self, cr, uid, context=None):
-    users_ids = []
-    officer_ids = self.search(cr, uid , 'bpl.officer', [('is_user', '=', True)])
-    for record in self.browse(cr, uid, officer_ids, context=context):
-        if record.user_id:
-            users_ids.append(record.user_id.id)
-    return users_ids
-	
-	
-		for trans in self:
-			np=[]
-			pillars_obj=self.env['uis.papl.pillar']
-			all_pillars_ids=pillars_obj.search([])
-			print all_pillars_ids
-			#all_pillars=pillars_obj.browse([])
-			#browse(cr, uid, ids, context=context):
-			#pillars=pillars_obj.browse(cr,uid,pillars_obj.search([]),context=context)
-			#for pillar in pillars:
-			#	if pillar.id<10:
-			#		np.append(pillar)		
-			#trans.near_pillar_ids=pillars
-				'''	
-			
 			

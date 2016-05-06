@@ -10,10 +10,25 @@
 		  <field name="name"/>
           <field name="apl_id"/>
 		  <field name="pillar_id"/>
+		  <filed name="voltage"/>
          </search>
 	  </field>
 	</record>
 	
+	<record id="uis_papl_transformer_view" model="ir.ui.view">
+      <field name="name">Transformer List</field>
+      <field name="model">uis.papl.transformer</field>
+      <field name="arch" type="xml">
+        <tree string="List of Transformer" editable="top" create="true" edit="false">
+          <field name="id"/>
+          <field name="name"/>
+		  <field name="voltage"/>
+          <field name="inv_num"/>
+          <field name="bld_year"/>
+          <field name="start_exp_year"/>
+        </tree>
+		</field>
+    </record>
     <!--<record model="ir.ui.view" id="uis_papl_department_list">
       <field name="name">Department List</field>
       <field name="model">uis.papl.department</field>
@@ -62,34 +77,43 @@
                 <h3>
                     <field name="tap_id"/>
                 </h3>
-				<group>
-				  <field name="latitude"/>
-				  <field name="longitude"/>
-				  <field name="str_pillar_ids"/>
-				  <field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
-				  <field name="pillar_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
-				</group>
-                <!--<field name="parent_department_id"/>
-                <group>
-                    <group>
-                        <field name="substation_count"/>
-                        <field name="apl_count"/>
-                        <field name="pillar_count"/>
-                        <field name="line_len"/>
-                    </group>
-                    <group>
-                        <field name="substation_ids"
-                               widget="many2many_tags"
-                               options="{'no_create_edit':True,
-                               'no_quick_create':False}"
-                               domain="[('department_id','=',False)]"
-                               />
-                    </group>
-                </group>!-->
-            </sheet>
+				<notebook>
+				  <page string="Details">
+					<group>
+					  <group>
+						<field name='trans_type'/>
+						<field name='climatic'/>
+						<field name='voltage'/>
+						<field name='manuf_num'/>
+						<field name='inv_num'/>
+						<field name='weight'/>
+					  </group>
+					  <group>
+						<field name='manufacturer'/>
+						<field name='bld_year'/>
+						<field name='start_exp_year'/>
+						<field name='code'/>
+						<field name='full_code'/>
+					  </group>
+					</group>
+				  </page>
+				  <page string="Geo Data">
+					<group>
+					  <field name="latitude"/>
+					  <field name="longitude"/>
+					</group>
+				  </page>
+				  <page string="Connections">
+					<group>
+					  <field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+					  <field name="pillar_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
+					</group>
+				  </page>
+				</notebook>
+			  </sheet>
             </form>
         </field>
-    </record>!-->
+    </record>
  
     <!-- actions opening views on models -->
     <!--actions!-->

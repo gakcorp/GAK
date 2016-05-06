@@ -158,6 +158,14 @@ class uis_papl_tap(models.Model):
 	is_main_line=fields.Boolean(string='is main line')
 	num_by_vl=fields.Integer(string='Number', compute='_get_num_by_vl')
 	conn_pillar_id=fields.Many2one('uis.papl.pillar', string='Connect Pilar', compute='_get_num_by_vl')
+	code=fields.Integer(string='Code', compute='_get_unicode')
+	full_code=fields.Char(string='UniCode', compute='_get_unicode')
+	
+	@api.depends('code')
+	def _get_unicode(self,cr,uid,ids,context=None):
+		for tap in self.browse(cr,uid,ids,context=context):
+			tap.full_code='XTR.'+str(tap.code)
+			tap.code=tap.num_by_vl
 	
 	@api.depends('num_by_vl','apl_id','conn_pillar_id')
 	def _get_tap_full_name(self):
