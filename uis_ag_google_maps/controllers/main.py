@@ -42,7 +42,23 @@ class pillar_google_map(http.Controller):
             print record.name
             record.latitude=g_pillar_lat
             record.longitude=g_pillar_lng
-        
+    
+    @http.route('/st', auth='public')
+    def save_new_point(self, *arg, **post):
+        print 'Getting /st'
+        cr,uid,context=request.cr,request.uid, request.context
+        trans_obj=request.registry['uis.papl.transformer']
+        g_trans_id=post.get('id',"")
+        g_trans_lat=post.get('nltd',"")
+        g_trans_lng=post.get('nlng',"")
+        domain=[("id","=",g_trans_id)]
+        trans_id=trans_obj.search(cr,uid,domain, context=context)
+        print trans_id
+        for record in trans_obj.browse(cr, uid, trans_id, context=context):
+            print record.name
+            record.latitude=g_trans_lat
+            record.longitude=g_trans_lng
+            
     @http.route('/map',auth='public')
     def map(self,*arg,**post):
         print "Map Service v2"
@@ -59,6 +75,7 @@ class pillar_google_map(http.Controller):
         cr, uid, context = request.cr, request.uid, request.context
         pillar_obj = request.registry['uis.papl.pillar']
         apl_obj=request.registry['uis.papl.apl']
+        trans_obj=request.registry['uis.papl.transformer']
         values=""
         clean_ids=[]
         for s in post.get('apl_ids',"").split(","):
@@ -81,6 +98,10 @@ class pillar_google_map(http.Controller):
             "counter":0,
             "taps":[]
         }
+        ktp_data={
+            "counter":0,
+            "trans":[]
+        }
         s_data={
             "counter":0
         }
@@ -91,7 +112,6 @@ class pillar_google_map(http.Controller):
         for apl_id in apl_obj.browse(cr, uid, apl_ids, context=context):
             print apl_id.name
             apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
-            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             for tap in apl_id.tap_ids:
                 lines_data["counter"]=lines_data["counter"]+1
                 line={
@@ -108,7 +128,6 @@ class pillar_google_map(http.Controller):
                     if pillar.num_by_vl>max_num:
                         max_num=pillar.num_by_vl
                         end_pillar=pillar
-                print "!!!!!end pillar for "+tap.name+' is '+end_pillar.name
                 i=0
                 np=end_pillar
                 n_id=np.id
@@ -164,6 +183,20 @@ class pillar_google_map(http.Controller):
                     #'prevlatitude': escape(str(pillar_id.prev_latitude)),
                     #'prevlangitude': escape(str(pillar_id.prev_longitude))
                     })
+            domain=[("apl_id","=",apl_id.id)]
+            trans_ids=trans_obj.search(cr, uid, domain, context=context)
+            for trans in trans_obj.browse(cr, uid, trans_ids, context=context):
+                print trans.name
+                ktp_data["counter"]=ktp_data["counter"]+1
+                ktp_data["trans"].append({
+                    'id':trans.id,
+                    'name':trans.name,
+                    'apl':trans.apl_id.name,
+                    'apl_id':trans.apl_id.id,
+                    'tap_id':trans.tap_id.id,
+                    'latitude': escape(str(trans.latitude)),
+                    'longitude': escape(str(trans.longitude)),
+                })
         medlat=(maxlat+minlat)/2
         medlong=(maxlong+minlong)/2
         pillar_data["latitude"]=medlat
@@ -171,7 +204,8 @@ class pillar_google_map(http.Controller):
         values = {
             #'partner_url': post.get('partner_url'),
             'pillar_data': json.dumps(pillar_data),
-            'lines_data': json.dumps(lines_data)
+            'lines_data': json.dumps(lines_data),
+            'ktp_data': json.dumps(ktp_data)
         }
         return request.render("uis_ag_google_maps.uis_google_map", values)
 '''

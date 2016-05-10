@@ -26,8 +26,8 @@ class uis_papl_transformation(models.Model):
 	#Main data
 	name=fields.Char(string='Name')
 	state=fields.Selection(STATE_SELECTION,'Status',readonly=True,default='draft')
-	apl_id=fields.Many2one('uis.papl.apl', string='APL Name', compute='_get_apl_tap_id')
-	tap_id=fields.Many2one('uis.papl.tap', string='Tap Name', compute='_get_apl_tap_id')
+	apl_id=fields.Many2one('uis.papl.apl', string='APL Name', store=True, compute='_get_apl_tap_id')
+	tap_id=fields.Many2one('uis.papl.tap', string='Tap Name', store=True, compute='_get_apl_tap_id')
 	pillar_id=fields.Many2one('uis.papl.pillar',string='Pillar Name', domain="[('id','in',near_pillar_ids[0][2])]")
 	
 	#GEODATA

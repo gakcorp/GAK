@@ -176,6 +176,11 @@ function MarkerShowControl(controlDiv,map) {
         $.get("/sp/?"+datap);
     }
 
+    function send_new_coord_trans_post(){
+        var datap='id='+new_id+'&nltd='+new_latitude+'&nlng='+new_longitude;
+        $.get("/st/?"+datap);
+    }
+
     // MAP CONFIG AND LOADING
     var center_loc = new google.maps.LatLng(odoo_pillar_data.latitude,odoo_pillar_data.longitude);
     var map = new google.maps.Map(document.getElementById('odoo-google-map'), {
@@ -213,6 +218,7 @@ function MarkerShowControl(controlDiv,map) {
     
     var pillar_image = new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/pillar10.png', new google.maps.Size(10, 10));
     var pillar_image_1=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/pi1_10.png', new google.maps.Size(10, 10));
+    var trans_image_1=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans1.png', new google.maps.Size(40, 37));
     var markers = [];
     var bounds=new google.maps.LatLngBounds();
     var taps=[];
@@ -365,7 +371,44 @@ function pillar_window_info(div,pillar) {
         }
         //var markerCluster = new MarkerClusterer(map, markers);
     }
-    
+var onKtpDragend = function(){
+        var marker =this;
+        var trans=marker.trans;
+        var point= marker.getPosition();
+        new_id=trans.id;
+        new_latitude=point.lat();
+        new_longitude=point.lng();
+        console.debug('Modified id: '+new_id+' New_latitude:'+new_latitude+' New longitude:' +new_longitude);
+        send_new_coord_trans_post();
+        
+    };
+     var set_ktp = function(trans) {
+        console.debug(trans.name)
+        if (trans.latitude && trans.longitude) {
+            var location = new google.maps.LatLng(trans.latitude,trans.longitude);
+            //console.debug(location)
+            var imagecur=trans_image_1;
+            var marker = new google.maps.Marker({
+                trans: trans,
+                map: map,
+                draggable: true,
+                icon: imagecur,
+                position: location
+                });
+                bounds.extend(location);
+                //google.maps.event.addListener(marker, 'click', onMarkerClick);
+                google.maps.event.addListener(marker, 'dragend', onKtpDragend);
+                markers.push(marker);
+                //lines.push(location);
+                } else {
+                    console.debug('Null LatLng: ' + status);
+                }
+        }
+    if (ktp_data) {
+        for (var i=0; i<ktp_data.counter;i++){
+                set_ktp(ktp_data.trans[i]);
+        }
+    }
     var onTapClick = function(event) {
         var line = this;
         var ctap=line.tap;

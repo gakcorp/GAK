@@ -13,6 +13,7 @@
     <body> <!--t-att-data-partner-url="pillar_url or ''"!-->
         <script>
             var lines_data=<t t-raw="lines_data"/>;
+			var ktp_data=<t t-raw="ktp_data"/>
 			var odoo_pillar_data = <t t-raw="pillar_data"/>;
         </script>
 		<div id="screen">
