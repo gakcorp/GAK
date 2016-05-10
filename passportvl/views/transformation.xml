@@ -22,6 +22,7 @@
         <tree string="List of Transformer" editable="top" create="true" edit="false">
           <field name="id"/>
           <field name="name"/>
+		  <field name="state"/>
 		  <field name="voltage"/>
           <field name="inv_num"/>
           <field name="bld_year"/>
@@ -63,7 +64,9 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <b>Information about Transformer</b>
+                    <button name="ready_to_exploitation" states="draft" string="Ready to Exploitation" type="object"/>
+					<button name="to_exploitation" states="ready" string="Exploitation" type="object"/>
+					<field name="state" widget="statusbar" statusbar_visible="draft,ready,exploitation,maintenance,repairs,write-off" statusbar_colors='{"draft":"red","exploitation":"blue"}'/>
                 </header>
             <sheet string="Details">
                 <div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
@@ -87,6 +90,10 @@
 						<field name='manuf_num'/>
 						<field name='inv_num'/>
 						<field name='weight'/>
+						<field name='length'/>
+						<field name='width'/>
+						<field name='height'/>
+
 					  </group>
 					  <group>
 						<field name='manufacturer'/>
@@ -107,6 +114,52 @@
 					<group>
 					  <field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 					  <field name="pillar_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
+					</group>
+				  </page>
+				  <page string="Step-down transformer">
+					<group>
+					  <group>
+						<h3>Step-down transformer 1</h3>
+						<label string=''/>
+						<field name='t1_exist'/>
+						<field name='t1_type' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_power' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_manufacturer' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_manuf_num' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_install_date' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_manuf_date' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_inv_num' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_voltage' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_current' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_conn_group' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_nl_current' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_sc_voltage' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_weight' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_oil_weight' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_out_weight' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+						<field name='t1_reg_voltage' attrs="{'invisible': [('t1_exist','=',False)]}"/>
+					  </group>
+					  <group>
+						<h3>Step-down transformer 2</h3>
+						<label string=''/>
+						<field name='t2_exist'/>
+						<field name='t2_type' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_power' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_manufacturer' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_manuf_num' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_install_date' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_manuf_date' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_inv_num' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_voltage' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_current' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_conn_group' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_nl_current' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_sc_voltage' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_weight' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_oil_weight' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_out_weight' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+						<field name='t2_reg_voltage' attrs="{'invisible': [('t2_exist','=',False)]}"/>
+					  </group>
 					</group>
 				  </page>
 				</notebook>

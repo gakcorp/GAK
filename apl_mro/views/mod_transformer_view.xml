@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-        <record id="view_papl_apl_mro_buttons_from" model="ir.ui.view">
-            <field name="name">uis.papl.apl.inherit</field>
-            <field name="model">uis.papl.apl</field>
-            <field name="inherit_id" ref="passportvl.uis_papl_apl_form"/>
-            <!--<field name="groups_id" eval="[(4, ref('asset.group_mro_user'))]"/>!-->
+        <record id="view_papl_transformer_mro_buttons_form" model="ir.ui.view">
+            <field name="name">uis.papl.transformer.inherit</field>
+            <field name="model">uis.papl.transformer</field>
+            <field name="inherit_id" ref="passportvl.uis_papl_transformer_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='buttons']" position="inside">
                    <button class="oe_inline oe_stat_button" name="action_view_maintenance" type="object" 

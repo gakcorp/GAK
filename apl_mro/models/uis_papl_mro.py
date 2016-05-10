@@ -45,6 +45,7 @@ class mro_order(osv.osv):
         #'task_id': fields.many2one('mro.task', 'Task', readonly=True, states={'draft': [('readonly', False)]}),
         'description': fields.char('Description', size=64, translate=True, required=True, readonly=True, states={'draft': [('readonly', False)]}),
         'apl_id': fields.many2one('uis.papl.apl', 'Air power line', required=False, readonly=True, states={'draft': [('readonly', False)]}),
+        'transformer_id': fields.many2one('uis.papl.transformer', 'Transformer', required=False, readonly=True, states={'draft':[('readonly',False)]}),
         'date_planned': fields.datetime('Planned Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)]}),
         'date_scheduled': fields.datetime('Scheduled Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)],'released':[('readonly',False)],'ready':[('readonly',False)]}),
         'date_execution': fields.datetime('Execution Date', required=True, states={'done':[('readonly',True)],'cancel':[('readonly',True)]}),
@@ -79,6 +80,12 @@ class mro_order(osv.osv):
         if apl:
             value['apl_id'] = self.pool.get('uis.papl.apl').browse(cr, uid, apl).id #need correction
         return {'value': value}
+    
+    def onchange_transformer(self, cr, uid, ids, trans):
+        value = {}
+        if trans:
+           apl_id = self.pool.get('uis.papl.transformer').browse(cr, uid, trans).apl_id #need correction
+        return {'value': {'apl_id':apl_id}}
     
     def onchange_planned_date(self, cr, uid, ids, date):
         return {'value': {

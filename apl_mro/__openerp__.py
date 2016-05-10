@@ -27,11 +27,13 @@ Main Features
     'demo': ['demo/demo.xml'],
     'data':[
             'views/mod_apl_view.xml',
+            'views/mod_transformer_view.xml',
             'views/uis_papl_mro_view.xml'
+           
     ],
     'application': True,
 }
-#        'views/mod_apl_view.xml', 
+#        'views/mod_transformer_view.xml' 'views/mod_apl_view.xml', 
 #'images': ['images/maintenance_requests.png','images/maintenance_orders.png','images/maintenance_order.png','images/maintenance_tasks.png','images/maintenance_task.png'],
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

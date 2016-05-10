@@ -6,11 +6,26 @@ class uis_papl_transformation_type(models.Model):
 	_description='Transformer Types'
 	name=fields.Char(string='Name')
 
+
+class uis_papl_transformation_t_type(models.Model):
+	_name='uis.papl.transformer.t_type'
+	_description='Transformer Types'
+	name=fields.Char(string='Name')
+	
 class uis_papl_transformation(models.Model):
+	STATE_SELECTION = [
+		('draft', 'DRAFT'),
+		('ready', 'READY TO EXPLOITATION'),
+		('exploitation', 'EXPLOITATION'),
+		('maintenance', 'MAINTENANCE'),
+		('repairs', 'REPAIRS'),
+		('write-off','WRITE-OFF')]
+	
 	_name='uis.papl.transformer'
 	_description='Transformer'
 	#Main data
 	name=fields.Char(string='Name')
+	state=fields.Selection(STATE_SELECTION,'Status',readonly=True,default='draft')
 	apl_id=fields.Many2one('uis.papl.apl', string='APL Name', compute='_get_apl_tap_id')
 	tap_id=fields.Many2one('uis.papl.tap', string='Tap Name', compute='_get_apl_tap_id')
 	pillar_id=fields.Many2one('uis.papl.pillar',string='Pillar Name', domain="[('id','in',near_pillar_ids[0][2])]")
@@ -29,16 +44,56 @@ class uis_papl_transformation(models.Model):
 	#Details data
 	bld_year=fields.Integer(string='Build year')
 	start_exp_year=fields.Integer(string='Start of operation')
-	trans_type=fields.Many2one('uis.papl.transformer.type', string='Type of transformer')
+	trans_type=fields.Many2one('uis.papl.transformer.type', string='Type of transformer substation')
 	voltage=fields.Char(string="Voltage")
 	manufacturer = fields.Many2one('res.company',string='construction installation company') #!!!Add domain for manufacturer
 	manuf_num=fields.Char(string='Manufacturer code')
 	climatic=fields.Char(string='Climatic')
 	inv_num=fields.Char(string='Inv num')
 	weight=fields.Float(digits=(4,2),string='Weight (kg)')
+	length=fields.Float(digits=(4,2),string='Length (m)')
+	width=fields.Float(digits=(4,2),string='Width (m)')
+	height=fields.Float(digits=(4,2),string='Height (m)')
 	code=fields.Integer(string='Code')
 	full_code=fields.Char(string='UniCode', compute='_get_unicode')
-							   
+	
+	#step-down Transformer 1 data
+	t1_exist=fields.Boolean(string='Exist')
+	t1_type=fields.Many2one('uis.papl.transformer.t_type', string='Transformer Type')
+	t1_power=fields.Char(string='Power (kVA)')
+	t1_manufacturer=fields.Many2one('res.company', string='Manufacturer')
+	t1_manuf_num=fields.Char(string='Manufacturer code')
+	t1_install_date=fields.Date(string='Install date')
+	t1_manuf_date=fields.Date(string='Manufacturing date')
+	t1_inv_num=fields.Char(string='Inventory num')
+	t1_voltage=fields.Char(string='Rated voltage (kV)')
+	t1_current=fields.Char(string='Rated current (A)')
+	t1_conn_group=fields.Char(string='Connection group')
+	t1_nl_current=fields.Char(string='No-load current')
+	t1_sc_voltage=fields.Char(string='Short circuit voltage')
+	t1_weight=fields.Float(digits=(4,2),string='Weight (kg)')
+	t1_oil_weight=fields.Float(digits=(4,2),string='Oil weight (kg)')
+	t1_out_weight=fields.Float(digits=(4,2), string='Outer weight (kg)')
+	t1_reg_voltage=fields.Char(string='Voltage regulator')
+	
+		#step-down Transformer 2 data
+	t2_exist=fields.Boolean(string='Exist')
+	t2_type=fields.Many2one('uis.papl.transformer.t_type', string='Transformer Type')
+	t2_power=fields.Char(string='Power (kVA)')
+	t2_manufacturer=fields.Many2one('res.company', string='Manufacturer')
+	t2_manuf_num=fields.Char(string='Manufacturer code')
+	t2_install_date=fields.Date(string='Install date')
+	t2_manuf_date=fields.Date(string='Manufacturing date')
+	t2_inv_num=fields.Char(string='Inventory num')
+	t2_voltage=fields.Char(string='Rated voltage (kV)')
+	t2_current=fields.Char(string='Rated current (A)')
+	t2_conn_group=fields.Char(string='Connection group')
+	t2_nl_current=fields.Char(string='No-load current')
+	t2_sc_voltage=fields.Char(string='Short circuit voltage')
+	t2_weight=fields.Float(digits=(4,2),string='Weight (kg)')
+	t2_oil_weight=fields.Float(digits=(4,2),string='Oil weight (kg)')
+	t2_out_weight=fields.Float(digits=(4,2), string='Outer weight (kg)')
+	t2_reg_voltage=fields.Char(string='Voltage regulator')
 	#near_pillar_ids=fields.function(_get_near_pillar_ids,type='many2one',obj="uis.papl.pillar",method=True,string='Near pillars id'),
 	
 	@api.depends('code')
@@ -102,4 +157,9 @@ class uis_papl_transformation(models.Model):
 			trans.str_pillar_ids=nstr
 			print trans.str_pillar_ids
 
-			
+	def ready_to_exploitation(self,cr,uid,ids,context=None):
+		for trans in self.browse(cr,uid,ids,context=context):
+			trans.state='ready'
+	def to_exploitation(self,cr,uid,ids,context=None):
+		for trans in self.browse(cr,uid,ids,context=context):
+			trans.state='exploitation'
