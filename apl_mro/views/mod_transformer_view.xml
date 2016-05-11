@@ -11,7 +11,16 @@
                        icon="fa-cogs">
                        <field string="Maintenance" name="mro_count" widget="statinfo"/>
                    </button>
+				   <button class="oe_inline oe_stat_button" name="action_view_defect" type="object"
+						icon="fa-exclamation-triangle">
+						<field string="Defects" name="defect_count" widget="statinfo"/>
+				   </button>
                 </xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page string="Defects">
+						<field name="defect_ids"/>
+					</page>
+				</xpath>
             </field>
         </record>
 <!--

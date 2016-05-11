@@ -28,7 +28,8 @@ Main Features
     'data':[
             'views/mod_apl_view.xml',
             'views/mod_transformer_view.xml',
-            'views/uis_papl_mro_view.xml'
+            'views/uis_papl_mro_view.xml',
+            'views/uis_papl_mro_defect_view.xml'
            
     ],
     'application': True,

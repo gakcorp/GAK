@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+
+        <!-- Top menu item -->
+        <menuitem name="Maintenance"
+            id="base.menu_mro_root"
+            groups="asset.group_mro_customer"
+            sequence="80"/>
+
+        <!-- Maintenance menu -->
+        <menuitem name="Maintenance"
+            id="menu_mro_maintenance"
+            parent="base.menu_mro_root"
+            sequence="1"/>
+         
+        <!-- Maintenance order menu -->
+        <record id="mro_defect_tree_view" model="ir.ui.view">
+            <field name="name">uis.papl.mro.defect.tree</field>
+            <field name="model">uis.papl.mro.defect</field>
+            <field name="arch" type="xml">
+                <tree fonts="bold:message_unread==True" string="Maintenance Orders">
+                    <field name="message_unread" invisible="1"/>
+                    <field name="name"/>
+                    <!--<field name="date_execution" string="Order Date" widget="date"/>!-->
+                    <field name="apl_id"/>
+					<field name="tap_id"/>
+					<field name="pillar_id"/>
+					<field name="transformer_id"/>
+                     <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        
+	   
+
+        <record id="mro_order_search" model="ir.ui.view">
+            <field name="name">uis.papl.mro.defect.search</field>
+            <field name="model">uis.papl.mro.defect</field>
+            <field name="arch" type="xml">
+                <search string="Search Defect">
+                    <field name="name"/>
+                    <field name="apl_id"/>
+					<field name="tap_id"/>
+					<field name="pillar_id"/>
+					<field name="transformer_id"/>
+					
+                    <filter icon="terp-mail-message-new" string="Unread Messages" name="message_unread" domain="[('message_unread','=',True)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                      <filter name="group_state"
+                              string="State"
+                              context="{'group_by': 'state'}"
+                              />
+                      <filter name="group_apl"
+                              string="APL"
+                              context="{'group_by': 'apl_id'}"
+                              />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="papl_action_apl_defects" model="ir.actions.act_window">
+            <field name="name">Defects</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">uis.papl.mro.defect</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name="context" eval="{'default_categ_id': ref('mro.product_category_mro')}"/>!-->
+        </record>
+
+
+        <menuitem name="Defects"
+			id="uis_papl_menu_defect_list" parent="uis_papl_menu_mro"
+			action="papl_action_apl_defects"
+			sequence="10"
+			/>
+
+ 	</data>
+</openerp>

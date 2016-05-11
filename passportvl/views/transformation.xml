@@ -67,7 +67,7 @@
                     <button name="ready_to_exploitation" states="draft" string="Ready to Exploitation" type="object"/>
 					<button name="to_exploitation" states="ready" string="Exploitation" type="object"/>
 					<button name="force_to_draft" string="To Draft" type="object"/>
-					<field name="state" widget="statusbar" statusbar_visible="draft,ready,exploitation,defect,maintenance,repairs,write-off" statusbar_colors='{"draft":"red","exploitation":"blue"}'/>
+					<field name="state" widget="statusbar" statusbar_visible="draft,ready,exploitation,defect,maintenance,repairs,write-off" statusbar_colors='{"draft":"red","exploitation":"blue","defect":"red"}'/>
                 </header>
             <sheet string="Details">
                 <div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
