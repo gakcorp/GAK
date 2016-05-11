@@ -194,6 +194,7 @@ class pillar_google_map(http.Controller):
                     'apl':trans.apl_id.name,
                     'apl_id':trans.apl_id.id,
                     'tap_id':trans.tap_id.id,
+                    'state':trans.state,
                     'latitude': escape(str(trans.latitude)),
                     'longitude': escape(str(trans.longitude)),
                 })
