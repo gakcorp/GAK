@@ -17,6 +17,7 @@ class uis_papl_transformation(models.Model):
 		('draft', 'DRAFT'),
 		('ready', 'READY TO EXPLOITATION'),
 		('exploitation', 'EXPLOITATION'),
+		('defect','DEFECT'),
 		('maintenance', 'MAINTENANCE'),
 		('repairs', 'REPAIRS'),
 		('write-off','WRITE-OFF')]
@@ -163,3 +164,6 @@ class uis_papl_transformation(models.Model):
 	def to_exploitation(self,cr,uid,ids,context=None):
 		for trans in self.browse(cr,uid,ids,context=context):
 			trans.state='exploitation'
+	def force_to_draft(self,cr,uid,ids,context=None):
+		for trans in self.browse(cr,uid,ids,context=context):
+			trans.state='draft'

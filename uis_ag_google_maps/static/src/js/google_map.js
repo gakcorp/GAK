@@ -216,9 +216,17 @@ function MarkerShowControl(controlDiv,map) {
     var infoWindow = new google.maps.InfoWindow();
     var TapinfoWindow = new google.maps.InfoWindow()
     
-    var pillar_image = new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/pillar10.png', new google.maps.Size(10, 10));
-    var pillar_image_1=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/pi1_10.png', new google.maps.Size(10, 10));
+    var pillar_image = new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/pillar10.png', new google.maps.Size(10, 10), new google.maps.Point(0,0), new google.maps.Point(5,5));
+    var pillar_image_1=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/pi1_10.png', new google.maps.Size(10, 10), new google.maps.Point(0,0), new google.maps.Point(5,5));
     var trans_image_1=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans1.png', new google.maps.Size(40, 37));
+    var trans_icon =[];
+    trans_icon['draft']=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans_icon/1_trans_draft_30.png', new google.maps.Size(30, 30));
+    trans_icon['ready']=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans_icon/1_trans_ready_30.png', new google.maps.Size(30, 30));
+    trans_icon['exploitation']=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans_icon/1_trans_exp_30.png', new google.maps.Size(30, 30));
+    trans_icon['defect']=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans_icon/1_trans_defect_30.png', new google.maps.Size(30, 30));
+    trans_icon['maintenance']=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans_icon/1_trans_maintenance_30.png', new google.maps.Size(30, 30));
+    trans_icon['repairs']=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans_icon/1_trans_repairs_30.png', new google.maps.Size(30, 30));
+    trans_icon['write-off']=new google.maps.MarkerImage('/uis_ag_google_maps/static/src/img/trans_icon/1_trans_write_off_30.png', new google.maps.Size(30, 30));
     var markers = [];
     var bounds=new google.maps.LatLngBounds();
     var taps=[];
@@ -387,7 +395,8 @@ var onKtpDragend = function(){
         if (trans.latitude && trans.longitude) {
             var location = new google.maps.LatLng(trans.latitude,trans.longitude);
             //console.debug(location)
-            var imagecur=trans_image_1;
+            console.debug(trans_icon[trans.state]);
+            var imagecur=trans_icon[trans.state];
             var marker = new google.maps.Marker({
                 trans: trans,
                 map: map,
@@ -521,6 +530,14 @@ var onKtpDragend = function(){
         strokeWeight:2
     })*/
     
+        google.maps.event.addListener(map, 'zoom_changed', function() {
+            var zoom = map.getZoom();
+            if (zoom <= 13) {
+                set_show_pillar(null)
+            } else {
+               set_show_pillar(map);
+            }
+        })
     
 };
 
