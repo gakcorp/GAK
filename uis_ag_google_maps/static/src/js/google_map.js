@@ -1,8 +1,53 @@
     'use strict';
-    
+
+var center_loc = new google.maps.LatLng(odoo_pillar_data.latitude,odoo_pillar_data.longitude);
+var map = new google.maps.Map(document.getElementById('odoo-google-map'), {
+        zoom: 13,
+        center: center_loc,
+        //mapTypeId: google.maps.MapTypeId.HYBRID,
+        mapTypeControlOptions:{
+            mapTypeIds: [google.maps.MapTypeId.HYBRID, google.maps.MapTypeId.ROADMAP],
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
+        }
+       });
+var rosreestr_show=1;
+var RosreestrMapType=new google.maps.ImageMapType({
+        getTileUrl: function(coord,zoom){
+            var s=Math.pow(2,zoom);
+            var twidth=256;
+            var theight=256;
+            var gBl = map.getProjection().fromPointToLatLng(
+                new google.maps.Point(coord.x * twidth / s, (coord.y + 1) * theight / s)); // bottom left / SW
+            var gTr = map.getProjection().fromPointToLatLng(
+                new google.maps.Point((coord.x + 1) * twidth / s, coord.y * theight / s)); // top right / NE
+            // Bounding box coords for tile in WMS pre-1.3 format (x,y)
+            var bbox = gBl.lng() + "," + gBl.lat() + "," + gTr.lng() + "," + gTr.lat();
+            var bbox = "{xmin:"+gBl.lng() + ",ymin:" + gBl.lat() + ",xmax:" + gTr.lng() + ",ymax:" + gTr.lat()+",spatialReference:{wkid:4326}}";
+            var url= "http://maps.rosreestr.ru/arcgis/rest/services/Cadastre/Cadastre/MapServer/export?";
+            url = url+"dpi=96";
+            url=url+"&transparent=true";
+            url=url+"&format=png32";
+            //url=url+"&bboxSR=102100";
+            url=url+"&bboxSR=4326";
+            //url=url+"&imageSR=102100";
+            url=url+"&imageSR=102100";
+            url=url+"&size=256,256";
+            url=url+"&f=image";
+            url=url+"&bbox="+bbox;
+            //console.debug(bbox);
+            return url;
+        },
+        tileSize: new google.maps.Size(256,256),
+        isPng: true,
+        alt: "Rosreestr Layer",
+        name: "Rosreestr",
+        maxZoom:19,
+        opacity: 1
+    });
+
 function initialize_map() {
     
-var rosreestr_show=1;
+
 var oporaclick_enabled=0;
 var show_pillar=1;
 function RosreestrControl(controlDiv,map) {
@@ -134,39 +179,7 @@ function MarkerShowControl(controlDiv,map) {
     var pillar1=[];
     var pillar2=[];
     
-    var RosreestrMapType=new google.maps.ImageMapType({
-        getTileUrl: function(coord,zoom){
-            var s=Math.pow(2,zoom);
-            var twidth=256;
-            var theight=256;
-            var gBl = map.getProjection().fromPointToLatLng(
-                new google.maps.Point(coord.x * twidth / s, (coord.y + 1) * theight / s)); // bottom left / SW
-            var gTr = map.getProjection().fromPointToLatLng(
-                new google.maps.Point((coord.x + 1) * twidth / s, coord.y * theight / s)); // top right / NE
-            // Bounding box coords for tile in WMS pre-1.3 format (x,y)
-            var bbox = gBl.lng() + "," + gBl.lat() + "," + gTr.lng() + "," + gTr.lat();
-            var bbox = "{xmin:"+gBl.lng() + ",ymin:" + gBl.lat() + ",xmax:" + gTr.lng() + ",ymax:" + gTr.lat()+",spatialReference:{wkid:4326}}";
-            var url= "http://maps.rosreestr.ru/arcgis/rest/services/Cadastre/Cadastre/MapServer/export?";
-            url = url+"dpi=96";
-            url=url+"&transparent=true";
-            url=url+"&format=png32";
-            //url=url+"&bboxSR=102100";
-            url=url+"&bboxSR=4326";
-            //url=url+"&imageSR=102100";
-            url=url+"&imageSR=102100";
-            url=url+"&size=256,256";
-            url=url+"&f=image";
-            url=url+"&bbox="+bbox;
-            //console.debug(bbox);
-            return url;
-        },
-        tileSize: new google.maps.Size(256,256),
-        isPng: true,
-        alt: "Rosreestr Layer",
-        name: "Rosreestr",
-        maxZoom:19,
-        opacity: 1
-    });
+    
     //http://maps.rosreestr.ru/arcgis/rest/services/Cadastre/Cadastre/MapServer/export?dpi=96&transparent=true&format=png32&bboxSR=102100&imageSR=102100&size=256%2C256&f=image&bbox=
     // ResultURL:=GetURLBase+RoundEx(GetLMetr,10)+','+RoundEx(GetBMetr,10)+','+RoundEx(GetRMetr,10)+','+RoundEx(GetTMetr,10);
     
@@ -182,16 +195,8 @@ function MarkerShowControl(controlDiv,map) {
     }
 
     // MAP CONFIG AND LOADING
-    var center_loc = new google.maps.LatLng(odoo_pillar_data.latitude,odoo_pillar_data.longitude);
-    var map = new google.maps.Map(document.getElementById('odoo-google-map'), {
-        zoom: 13,
-        center: center_loc,
-        //mapTypeId: google.maps.MapTypeId.HYBRID,
-        mapTypeControlOptions:{
-            mapTypeIds: [google.maps.MapTypeId.HYBRID, google.maps.MapTypeId.ROADMAP],
-            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
-        }
-    });
+    
+
     //map.mapTypes.set('Rosreestr',RosreestrMapType);
     //map.setMapTypeId(google.maps.MapTypeId.HYBRID);
     //map.setMapTypeId('Rosreestr');
