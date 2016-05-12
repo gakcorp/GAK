@@ -14,6 +14,14 @@
     padding:5px;
 }
 
+.leftbar_list_group{
+    padding-left: 0px;
+    border-left-width: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-top-width: 1px;
+}
+
 .menu_button:hover{
     -moz-box-shadow: 0 0 10px #ccc;
     -webkit-box-shadow: 0 0 10px #ccc;

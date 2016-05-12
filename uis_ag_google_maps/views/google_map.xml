@@ -12,6 +12,7 @@
 		<!--<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/bootstrap.min.css"/>!-->
 		<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/leftbar.css"/>
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
     </head>
     <body> <!--t-att-data-partner-url="pillar_url or ''"!-->
         <script>
@@ -45,11 +46,21 @@
 						</div>
 					</div>
 					</div>
-				<ul class="sidebar-nav">
-					<li>
-						<a href="#">
-							Pillars
-						</a>
+				<ul class="sidebar-nav list-group">
+					<li class="list-group-item leftbar_list_group">
+						<span class="glyphicon glyphicon-transfer"></span>
+						APL
+						<span class="badge"><script>document.write(ktp_data.counter)</script></span>
+					</li>
+					<li class="list-group-item">
+						<span class="glyphicon glyphicon-record"></span>
+						Pillars
+						<span class="badge"><script>document.write(odoo_pillar_data.counter)</script></span>
+					</li>
+					<li class="list-group-item">
+						<span class="glyphicon glyphicon-flash"></span>
+						Transformers
+						<span class="badge"><script>document.write(ktp_data.counter)</script></span>
 					</li>
 				</ul>
 				</div>

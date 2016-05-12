@@ -44,7 +44,7 @@ class pillar_google_map(http.Controller):
             record.longitude=g_pillar_lng
     
     @http.route('/st', auth='public')
-    def save_new_point(self, *arg, **post):
+    def save_new_trans_point(self, *arg, **post):
         print 'Getting /st'
         cr,uid,context=request.cr,request.uid, request.context
         trans_obj=request.registry['uis.papl.transformer']
