@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<template id="passportvl.uis_papl_apl_report_passport">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="report.external_layout">
+                <div class="page">
+                    <br/><br/><br/>
+                    <h1>Паспорт ВЛ</h1>
+                    <h2>Наименование воздушной линии:<br/>
+                    <span t-field="o.name"/></h2>
+                    <br/>
+                    <img t-att-src="'/report/barcode/QR/%s' % 'Паспорт ВЛ тестовый вариант QR кода'"/>
+                    <div class="row mt32 mb32">
+                        <div class="col-xs-3">
+                            <strong>Наименование:</strong><br/>
+                            <span t-field="o.name"/>
+                        </div>
+                    </div>
+                </div>
+             </t>
+        </t>
+    </t>
+</template>
+</data>
+</openerp>

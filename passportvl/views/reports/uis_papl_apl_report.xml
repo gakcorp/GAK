@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <report 
+            string="Passport" 
+            id="action_report_apl_report_passport" 
+            model="uis.papl.apl" 
+            name="passportvl.uis_papl_apl_report_passport" 
+            file="passportvl.uis_papl_apl_report_passport" 
+            report_type="qweb-pdf"
+        />
+    </data>
+</openerp>
