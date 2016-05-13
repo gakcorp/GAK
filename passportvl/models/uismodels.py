@@ -281,11 +281,15 @@ class uis_papl_tap(models.Model):
 					cp=np
 				i=i+1
 			
+class uis_papl_apl_cable(models.Model):
+	_name='uis.papl.apl.cable'
+	name=fields.Char(string="Name")
 	
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
 	short_name=fields.Char(string="Short name")
+	locality=fields.Char(string="Locality")
 	apl_type=fields.Char(string="Type APL")
 	feeder_num=fields.Integer(string="Feeder")
 	voltage=fields.Integer(string="Voltage (kV)")
@@ -293,13 +297,22 @@ class uis_papl_apl(models.Model):
 	bld_year =fields.Char(string="Building year")
 	startexp_date = fields.Date(string="Start operations date")
 	build_company = fields.Many2one('res.company',string='construction installation company')
+	cable_ids=fields.Many2many('uis.papl.apl.cable',
+								relation='cable_ids',
+								column1='apl_id',
+								column2='cable_id'
+								)
 	line_len=fields.Float(digits=(3,2))
 	line_len_calc=fields.Float(digits=(6,2), compute='_apl_get_len')
 	prol_max_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_med_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_min_len=fields.Float(digits=(2,2), compute='_apl_get_len')
+	sag_max=fields.Float(digits=(3,2), string="Sag maximum")
+	sag_med=fields.Float(digits=(3,2), string="Sag medium")
+	sag_min=fields.Float(digits=(3,2), string="Sag minimum")
 	count_circ=fields.Char(string="Number of circuits")
 	climatic_conditions=fields.Char(string="Climatic conditions")
+	sw_point=fields.Char(string="Switching point")
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
