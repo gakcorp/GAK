@@ -6,18 +6,211 @@
         <t t-foreach="docs" t-as="o">
             <t t-call="report.external_layout">
                 <div class="page">
-                    <br/><br/><br/>
-                    <h1>Паспорт ВЛ</h1>
-                    <h2>Наименование воздушной линии:<br/>
-                    <span t-field="o.name"/></h2>
+                    <style type="text/css">
+                        .report-field{
+                        border-bottom: 1px solid black;
+                        }
+                    </style>
+                    <p class="text-center">
+                    <br/><br/>
+                    <div class="row">
+                        <div class="col-xs-8"/>
+                        <div class="col-xs-4">
+                            Locality:<span t-field="o.locality"/><br/>
+                            Department:<span t-field="o.sup_substation_id.department_id"/><br/>
+                            Substation:<span t-field="o.sup_substation_id"/><br/>
+                            Date:<span t-esc="time.strftime('%d.%m.%Y')"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <h1><br/><br/><br/>Passport VL</h1><br/>
+                            <h2>Name of air power line:<br/>
+                            <span t-field="o.name"/></h2><br/><br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4"/>
+                        <div class="col-xs-4 text-center">
+                        <img t-att-src="'https://api.qrserver.com/v1/create-qr-code/?data=http://demo.uisgis.ru:8069%s' % o.url_maps"/>        
+                        </div>
+                        <div class="col-xs-4"/>
+                    </div>
+                    
                     <br/>
-                    <!--<img t-att-src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ПаспортВЛ тестовый вариант QR кода'/>!-->
-                    <div class="row mt32 mb32">
-                        <div class="col-xs-3">
-                            <strong>Наименование:</strong><br/>
+                    <br/>
+                    <div class="row">
+                        <div class="col-xs-4"/>
+                        <div class="col-xs-4 text-center">
+                            <span t-esc="time.strftime('%d.%m.%Y')"/>
+                        </div>
+                    </div>
+                    </p>
+                    <!--<img t-att-src="'/report/barcode/QR/%s' % 'http://demo.uisgis.ru:8069/apl_id'"/>!-->
+                    <p style="page-break-after:always;">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <strong>Name of APL:</strong><br/>
+                        </div>
+                        <div class="col-xs-8 report-field">
                             <span t-field="o.name"/>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            Year of building
+                        </div>
+                        <div class="col-xs-8 report-field">
+                            <span t-field="o.bld_year"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            Start-up date
+                        </div>
+                        <div class="col-xs-8 report-field">
+                            <span t-field="o.startexp_date"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            Inventory number
+                        </div>
+                        <div class="col-xs-8 report-field">
+                            <span t-field="o.inv_num"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            Installation company
+                        </div>
+                        <div class="col-xs-8 report-field">
+                            <span t-field="o.build_company"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <h3>I. The circuit schematic</h3>
+                        </div>
+                        <div class="col-xs-12 text-center">
+                            <img src="/passportvl/static/src/img/scheme_example.png"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <h3>II. Main details</h3>
+                        </div>
+                        <div class="col-xs-12 text-center">
+                            <h4>1. General characteristics</h4>
+                        </div>
+                    </div>
+                    <div class="row" >
+                        <div class="col-xs-6">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    1. Lenght (km):
+                                </div>
+                                <div class="col-xs-6 text-center report-field">
+                                    <span t-field="o.line_len"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    1(a). Lenght calculated (m):
+                                </div>
+                                <div class="col-xs-6 text-center report-field">
+                                    <span t-field="o.line_len_calc"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    2. Span lenght (m):
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2"/>
+                                <div class="col-xs-6 text-left">Maximum (m):</div>
+                                <div class="col-xs-4 text-center report-field"><span t-field="o.prol_max_len"/></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2"/>
+                                <div class="col-xs-6 text-left">Medium (m):</div>
+                                <div class="col-xs-4 text-center report-field"><span t-field="o.prol_med_len"/></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2"/>
+                                <div class="col-xs-6 text-left">Minimum (m):</div>
+                                <div class="col-xs-4 text-center report-field"><span t-field="o.prol_min_len"/></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    3. Cable:
+                                </div>
+                                <div class="col-xs-6 text-center report-field">
+                                    <span t-foreach="o.cable_ids" t-as="c">
+                                        <span t-field="c.name"/>;
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    4. Sag (m):
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2"/>
+                                <div class="col-xs-6 text-left">Maximum (m):</div>
+                                <div class="col-xs-4 text-center report-field"><span t-field="o.sag_max"/></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2"/>
+                                <div class="col-xs-6 text-left">Medium (m):</div>
+                                <div class="col-xs-4 text-center report-field"><span t-field="o.sag_med"/></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2"/>
+                                <div class="col-xs-6 text-left">Minimum (m):</div>
+                                <div class="col-xs-4 text-center report-field"><span t-field="o.sag_min"/></div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6" style="border-left:1px solid black;">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    5. Number of circuits:
+                                </div>
+                                <div class="col-xs-6 text-center report-field">
+                                    <span t-field="o.count_circ"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    6. Climatic conditions:
+                                </div>
+                                <div class="col-xs-6 text-center report-field">
+                                    <span t-field="o.climatic_conditions"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    7. Switching point:
+                                </div>
+                                <div class="col-xs-6 text-center report-field">
+                                    <span t-field="o.sw_point"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    8. Taps:
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 text-justify">
+                                    <span t-field="o.tap_text"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </p>
                 </div>
              </t>
         </t>

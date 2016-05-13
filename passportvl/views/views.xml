@@ -81,6 +81,7 @@
 			<group>
 			  <group>
 				<!--<label for="bld_year" class="oe_edit_only"/>!-->
+				<field name="locality"/>
 				<field name="bld_year"/>
 				<!--<label for="startexp_date" class="oe_edit_only"/>!-->
 				<field name="startexp_date"/>
@@ -101,6 +102,7 @@
 				<group>
 				  <group>
 					<!--<label for="line_len"/>!-->
+					<field name="cable_ids" widget="many2many_tags"/>
 					<field name="line_len"/>
 					<!--<label for="line_len_calc"/>!-->
 					<field name="line_len_calc"/>
@@ -110,10 +112,14 @@
 					<field name="prol_med_len"/>
 					<!--<label for="prol_min_len"/>!-->
 					<field name="prol_min_len"/>
+					<field name="sag_max"/>
+					<field name="sag_med"/>
+					<field name="sag_min"/>
 				  </group>
 				  <group>
 					<field name="count_circ"/>
 					<field name="climatic_conditions"/>
+					<field name="sw_point"/>
 					<field name="tap_text"/>
 				  </group>
 				  <!--<field name="tap_text"/>!-->
