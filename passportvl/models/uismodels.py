@@ -317,10 +317,12 @@ class uis_papl_apl(models.Model):
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply substation")
+	transformer_ids=fields.One2many('uis.papl.transformer','apl_id', string="Transformers")
 	tap_text=fields.Char(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
 	url_maps=fields.Char(compute='_apl_get_url_maps')
+	url_scheme=fields.Char(compute='_apl_get_url_scheme')
 	
 	@api.depends('short_name','apl_type','feeder_num','voltage','sup_substation_id')
 	def _get_apl_name(self):
@@ -408,13 +410,29 @@ class uis_papl_apl(models.Model):
 			#'url':'http://www.yandex.ru'
 			}
 	
+	@api.multi
+	def act_show_scheme(self):
+		print "Debug info. Start Show_map"
+		print self.url_maps
+		return{
+			'name': 'Scheme',
+			'res_model':'ir.actions.act_url',
+			'type':'ir.actions.act_url',
+			'target':'new',
+			'url':self.url_scheme,
+			#'url':'http://www.yandex.ru'
+			}
+	
 	@api.depends('pillar_id')
 	def _apl_get_url_maps(self):
 		for record in self:
 			record.url_maps="/apl_map/?apl_ids="+unicode(str(record.id))
-			#record.url_maps='Do iframe:<br><iframe src="/apl_map/?apl_ids='+unicode(str(record.id))+'" width="100%" height="600" marginwidth="0" marginheight="0" frameborder="no" scrolling="no" style="border-width:0px;"></iframe>'
-			#record.url_maps='<a href="/apl_map/?apl_ids=1">Link</a><br>Do object:<br><div><object type="text/html" data="/apl_map/?apl_ids='+unicode(str(record.id))+'" width="100%" height="600" marginwidth="0" marginheight="0" frameborder="no" scrolling="no" style="border-width:0px;"></object></div>'
-	#@api.depends('pillar_id')
+	
+	@api.depends('pillar_id')
+	def _apl_get_url_scheme(self):
+		for record in self:
+			record.url_scheme="/apl_scheme/?apl_ids="+unicode(str(record.id))
+
 	def _apl_get_len(self):
 		for record in self:
 			vsum=0

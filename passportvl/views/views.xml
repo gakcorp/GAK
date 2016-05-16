@@ -62,15 +62,19 @@
 	  <field name="model">uis.papl.apl</field>
 	  <field name="arch" type="xml">
 		<form string="APL form" context="{apl_is=1}">
-		  <header>
-			<b>Information about APL</b>
-			<button name="act_show_map" string="Map" type="object" class="oe_highlight"/>
-		  </header>
 		  <sheet string="Details">
 			<div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+			  <button class="oe_inline" name="act_show_scheme" type="object" 
+                       icon="fa-object-group">
+                       Scheme
+                   </button>
+			   <button class="oe_inline" name="act_show_map" type="object" 
+                       icon="fa-map">
+                       Map
+                   </button><br/>
 			</div>
 			<!--<label for="name" string="Name of APL:"/>!-->
-				<h1>
+				<h1 style="position:absolute;">
 				  <field name="name"/>
 				</h1>
 				

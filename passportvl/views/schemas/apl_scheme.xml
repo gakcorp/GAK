@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<template id="uis_apl_scheme">
+&lt;!DOCTYPE html&gt;
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
+        <title>Scheme</title>
+        <link rel="stylesheet" type="text/css" href="/passportvl/static/src/css/joint.css" />
+		<!--<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/bootstrap.min.css"/>!-->
+		<script src="/passportvl/static/src/js/jquery.min.js"></script>
+        <script src="/passportvl/static/src/js/lodash.min.js"></script>
+        <script src="/passportvl/static/src/js/backbone-min.js"></script>
+        <script src="/passportvl/static/src/js/joint.js"></script>
+		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
+    </head>
+    <body>
+        <script>
+            var ps_data=<t t-raw="ps_data"/>;
+            var pillar_data=<t t-raw="pillar_data"/>;
+            var pillar_links=<t t-raw="pillar_links"/>;
+            var trans_data=<t t-raw="trans_data"/>;
+        </script>
+        <div id="scheme_holder"></div>
+        <script src="/passportvl/static/src/js/apl-scheme.js"></script>
+    </body>
+</html>
+</template>
+</data>
+</openerp>
