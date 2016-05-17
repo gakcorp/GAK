@@ -102,6 +102,32 @@
 			  </group>
 			</group>
 			<notebook>
+			  <page string="Scheme">
+				<div id="scheme_holder"></div>
+				<div id="scheme_id_apls">
+				  <field name="id"/>
+				</div>
+				
+				<script>
+				  var elem_apl_ids=document.getElementById('scheme_id_apls');
+				  var ce_apl_ids=elem_apl_ids.children;
+				  var spans_apl_ids=elem_apl_ids.getElementsByTagName("span");
+				  var str_id=spans_apl_ids[1].innerHTML;
+				  var apl_ids=[parseInt(str_id)];
+				</script>
+				
+				<link rel="stylesheet" type="text/css" href="/passportvl/static/src/css/joint.css" />
+				<!--
+				<script src="/passportvl/static/src/js/jquery.min.js"></script>
+				<script src="/passportvl/static/src/js/lodash.min.js"></script>
+				
+				<script src="/passportvl/static/src/js/backbone-min.js"></script>
+				
+				<script src="/passportvl/static/src/js/joint.js"></script>
+
+				<script src="/passportvl/static/src/js/apl-scheme.js"></script>
+				!-->
+			  </page>
 			  <page string="Main details">
 				<group>
 				  <group>
