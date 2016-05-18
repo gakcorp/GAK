@@ -1,4 +1,16 @@
-var paper_width=800;
+//var apl_ids=[3];
+
+console.debug('Start calculate scheme');
+var pillar_data=[];
+var pillar_links=[];
+var ps_data=[];
+var trans_data=[];
+
+var pillars=[];
+var trans=[];
+
+
+var paper_width=700;
 var paper_height=400;
 var graph = new joint.dia.Graph;
 var paper = new joint.dia.Paper({
@@ -6,12 +18,14 @@ var paper = new joint.dia.Paper({
     width:paper_width,
     height:paper_height,
     model:graph,
-    gridSize:1
+    gridSize:1,
+    interactive: false
 })
+paper.$el.css('pointer-events', 'none');
 
-var pillars=[];
-var trans=[];
-    
+
+function print_pillar(pd) {
+
 var set_pillar = function(pillar) {
     console.debug(pillar.sid);
     pillars[pillar.id] = new joint.shapes.basic.Circle({
@@ -25,12 +39,15 @@ var set_pillar = function(pillar) {
         });
     graph.addCell(pillars[pillar.id]);
     };
-
-if (pillar_data) {
-    for (var i=0; i<pillar_data.counter;i++){
-        set_pillar(pillar_data.pillars[i]);
+console.debug(pillar_data)
+if (pd) {
+    for (var i=0; i<pd.counter;i++){
+        set_pillar(pd.pillars[i]);
     }
 }
+}
+
+function print_trans(td) {
 
 var set_trans = function(tr) {
     trans[tr.id] = new joint.shapes.basic.Rect({
@@ -44,13 +61,14 @@ var set_trans = function(tr) {
         });
     graph.addCell(trans[tr.id]);
     };
-if (trans_data) {
-    for (var i=0; i<trans_data.counter;i++){
+if (td) {
+    for (var i=0; i<td.counter;i++){
        set_trans(trans_data.transformers[i]); 
     }
-    //code
+}
 }
 
+function print_link(ld) {
 var set_pillar_links=function(plink){
     console.debug(plink.target_id);
     var link=new joint.dia.Link({
@@ -59,8 +77,41 @@ var set_pillar_links=function(plink){
     });
     graph.addCell(link);
 }
-if (pillar_links) {
-    for (var i=0; i<pillar_links.counter;i++){
-        set_pillar_links(pillar_links.links[i]);
+if (ld) {
+    for (var i=0; i<ld.counter;i++){
+        set_pillar_links(ld.links[i]);
     }
 }
+}
+function load_data() {
+    var data={};
+    data['apl_ids']=apl_ids;
+
+    var xhr=new XMLHttpRequest();
+    xhr.open('POST', '/apiv1/data/scheme/pillardata/',true);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    xhr.send(JSON.stringify(data));
+    
+   
+    xhr.onload = function(e) {
+    var resp = JSON.parse(this.response);
+    pillar_data=JSON.parse(resp.result.pillar_data);
+    print_pillar(pillar_data);
+    trans_data=JSON.parse(resp.result.trans_data);
+    print_trans(trans_data);
+    pillar_links=JSON.parse(resp.result.pillar_links);
+    print_link(pillar_links);
+    }
+}
+
+
+
+
+load_data(); 
+
+
+
+
+
+
+
