@@ -1,1 +1,1 @@
-from . import uis_papl_photo
+from . import uis_ap_photo

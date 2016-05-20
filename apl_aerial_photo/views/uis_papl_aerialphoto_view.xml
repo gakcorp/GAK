@@ -1,6 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        
+    <record model="ir.ui.view" id="uis_ap_photo_list">
+		<field name="name">Photo List</field>
+		<field name="model">uis.ap.photo</field>
+		<field name="arch" type="xml">
+			<tree string="List of Photos" editable="top" create="false" edit="false">
+				<field name="id"/>
+				<field name="name"/>
+				<field name="image_date"/>
+				<field name="latitude"/>
+				<field name="longitude"/>
+				<field name="image"/>
+				<field name="thumbnail"/>
+			</tree>
+	  </field>
+	</record>
+	<record id="uis_ap_photo_form" model="ir.ui.view">
+	  <field name="name">Photo form view</field>
+	  <field name="model">uis.ap.photo</field>
+	  <field name="arch" type="xml">
+		<form string="Photo form">
+			<field name="thumbnail" widget="image"/>
+			<field name="image" widget="image"/>
+		</form>
+	  </field>
+	</record>
+
+
+	<record model="ir.ui.view" id="wizard_create_pillar">
+	  <field name="name">Load photos</field>
+	  <field name="type">form</field>
+	  <field name="model">uis.ap.photo.load_hist</field>
+	  <field name="arch" type="xml">
+		<form>
+		  <field name="folder_name"/>
+		  <footer>
+			<button string="Cancel" special="cancel"/>
+			<!--<button name="confirm" string="Apply" class="oe_highlight"/>!-->
+			<button name="load_photos" type="object" string="Load" class="oe_highlight"/>
+		  </footer>
+		</form>
+	  </field>
+	</record>
+	
+    <record id="uis_ap_photo_action_window" model="ir.actions.act_window">
+	  <field name="name">List of Photo</field>
+	  <field name="res_model">uis.ap.photo</field>
+	  <field name="view_type">form</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p class="oe_view_nocontent_create">Create new Photo</p>
+	  </field>
+	</record>
+	<record id="uis_ap_load_photos_action_window" model="ir.actions.act_window">
+	  <field name="name">Load photos</field>
+	  <field name="res_model">uis.ap.photo.load_hist</field>
+	  <field name="view_type">form</field>
+      <field name="view_mode">form</field>
+      <field name="target">new</field>
+	</record>
+    
+    <menuitem name="Photos" id="uis_ap_menu_photo_main" parent="passportvl.uis_papl_menu_root"/>
+	
+	<!--menu categories APLPillar etc!-->
+	<menuitem name="Photos" id="uis_ap_menu_photo" parent="uis_ap_menu_photo_main" action="uis_ap_photo_action_window"
+			sequence="10"/>
+	<menuitem name="Load photos" id="uis_ap_menu_photo_load" parent="uis_ap_menu_photo_main"
+              action="uis_ap_load_photos_action_window"/>
     </data>
 </openerp>

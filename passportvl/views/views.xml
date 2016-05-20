@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
+	<template id="assets_backend" name="src_for_scheme_papl_apl" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!--<link rel="stylesheet" type="text/css" href="/passportvl/static/src/css/joint.css" />
+				<script src="/passportvl/static/src/js/jquery.min.js"></script>
+				<!--<script src="/passportvl/static/src/js/lodash.min.js"></script>
+				<script src="/passportvl/static/src/js/backbone-min.js"></script>
+				<script src="/passportvl/static/src/js/joint.js"></script>!-->
+            </xpath>
+        </template>
+
+	
+	
 	<record id="uis_papl_department_search" model="ir.ui.view">
 	  <field name="name">uis.papl.department.search</field>
 	  <field name="model">uis.papl.department</field>
@@ -116,14 +128,10 @@
 				  var apl_ids=[parseInt(str_id)];
 				</script>
 				
-				<link rel="stylesheet" type="text/css" href="/passportvl/static/src/css/joint.css" />
+				
+				
 				<!--
-				<script src="/passportvl/static/src/js/jquery.min.js"></script>
-				<script src="/passportvl/static/src/js/lodash.min.js"></script>
 				
-				<script src="/passportvl/static/src/js/backbone-min.js"></script>
-				
-				<script src="/passportvl/static/src/js/joint.js"></script>
 
 				<script src="/passportvl/static/src/js/apl-scheme.js"></script>
 				!-->

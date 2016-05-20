@@ -19,10 +19,6 @@
     <body>
         <script>
 			var apl_ids=<t t-raw="apl_ids"/>;
-            <!--var ps_data=<t t-raw="ps_data"/>;!-->
-            <!--var pillar_data=<t t-raw="pillar_data"/>;!-->
-            <!--var pillar_links=<t t-raw="pillar_links"/>;!-->
-            <!--var trans_data=<t t-raw="trans_data"/>;!-->
         </script>
         <div id="scheme_holder"></div>
         <script src="/passportvl/static/src/js/apl-scheme.js"></script>
