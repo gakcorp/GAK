@@ -62,12 +62,12 @@ class uis_ap_photo_load_hist(models.Model):
 				for tag in tags.keys():
 					if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
 						print "Key: %s, value %s" % (tag, tags[tag])
-				im=f.read()
-				im_b64=base64.b64encode(im)
+				#im=f.read()
+				im_b64=base64.b64encode(f.read())
 				np=re_photos.create({'name':str(file)})
 				np.latitude=plat
 				np.longitude=plong
 				np.image_filename=file
-				np.image=im
+				np.image=im_b64
 				np.thumbnail=tags['JPEGThumbnail']
 				

@@ -21,7 +21,8 @@
 	  <field name="model">uis.ap.photo</field>
 	  <field name="arch" type="xml">
 		<form string="Photo form">
-			<field name="thumbnail" widget="image"/>
+			<fiels name="name"/>
+			<field name="image" widget="binary" filename="name"  height="480"/>
 			<field name="image" widget="image"/>
 		</form>
 	  </field>
