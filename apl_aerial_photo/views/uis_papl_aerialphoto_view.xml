@@ -24,6 +24,7 @@
 			<fiels name="name"/>
 			<field name="image" widget="binary" filename="name"  height="480"/>
 			<field name="image" widget="image"/>
+			<field name="thumbnail" widget="image"/>
 		</form>
 	  </field>
 	</record>

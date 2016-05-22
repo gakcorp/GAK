@@ -5,6 +5,7 @@ import os, exifread
 import re
 from PIL import Image
 import base64
+import psycopg2
 from openerp import models, fields, api
 
 def dms2dd(degrees,minutes,seconds, direction):
@@ -49,25 +50,29 @@ class uis_ap_photo_load_hist(models.Model):
 			path=val.folder_name
 		for file in os.listdir(path):
 			if file.endswith(".JPG"):
-				f=open(path+'/'+file,'rb')
-				print (file)
-				tags=exifread.process_file(f)
-				dms_longitude=tags["GPS GPSLongitude"]
-				dms_longitude_ref=tags["GPS GPSLongitudeRef"]
-				plong=parse_dms(str(dms_longitude),dms_longitude_ref)
-				dms_latitude=tags["GPS GPSLatitude"]
-				dms_latitude_ref=tags["GPS GPSLatitudeRef"]
-				plat=parse_dms(str(dms_latitude),dms_latitude_ref)
-				print plat,plong
-				for tag in tags.keys():
-					if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
-						print "Key: %s, value %s" % (tag, tags[tag])
-				#im=f.read()
-				im_b64=base64.b64encode(f.read())
-				np=re_photos.create({'name':str(file)})
-				np.latitude=plat
-				np.longitude=plong
-				np.image_filename=file
-				np.image=im_b64
-				np.thumbnail=tags['JPEGThumbnail']
+				with open(path+'/'+file,'rb') as f:
+					print (file)
+					tags=exifread.process_file(f)
+					dms_longitude=tags["GPS GPSLongitude"]
+					dms_longitude_ref=tags["GPS GPSLongitudeRef"]
+					plong=parse_dms(str(dms_longitude),dms_longitude_ref)
+					dms_latitude=tags["GPS GPSLatitude"]
+					dms_latitude_ref=tags["GPS GPSLatitudeRef"]
+					plat=parse_dms(str(dms_latitude),dms_latitude_ref)
+					print plat,plong
+					for tag in tags.keys():
+						if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
+							print "Key: %s, value %s" % (tag, tags[tag])
+					im=f.read()
+					#jpgfile = Image.open(f)
+					#im_b64=base64.b64encode(f.read())
+					#im_b64=base64.encodestring(im)
+					im_b64=base64.encodestring(f.read())
+					
+					np=re_photos.create({'name':str(file)})
+					np.latitude=plat
+					np.longitude=plong
+					np.image_filename=file
+					np.image=im_b64
+					np.thumbnail=base64.b64encode(tags['JPEGThumbnail'])
 				
