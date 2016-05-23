@@ -9,10 +9,14 @@
 				<field name="id"/>
 				<field name="name"/>
 				<field name="image_date"/>
+				<field name="image_length"/>
+				<field name="image_width"/>
+				<field name="focal_length"/>
 				<field name="latitude"/>
 				<field name="longitude"/>
-				<field name="image"/>
-				<field name="thumbnail"/>
+				<field name="altitude"/>
+				<field name="image" filename="name"/>
+				
 			</tree>
 	  </field>
 	</record>
