@@ -25,10 +25,32 @@
 	  <field name="model">uis.ap.photo</field>
 	  <field name="arch" type="xml">
 		<form string="Photo form">
-			<fiels name="name"/>
-			<field name="image" widget="binary" filename="name"  height="480"/>
-			<field name="image" widget="image"/>
-			<field name="thumbnail" widget="image"/>
+			<group>
+				<group>
+					<field name="name"/>
+					<field name="image" widget="binary" filename="name"  height="480"/>
+					<field name="image" widget="image"/>
+					<field name="image_800" widget="image"/>
+				</group>
+				<group>
+					<notebook>
+						<page string="Objects">
+						<group>
+							<field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="near_apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="near_transformer_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+						</group>
+						</page>
+						<page string='ExifData'>
+							<group>
+								<field name="latitude"/>
+								<field name="longitude"/>
+								<field name="altitude"/>
+							</group>
+						</page>
+					</notebook>
+				</group>
+			</group>
 		</form>
 	  </field>
 	</record>
