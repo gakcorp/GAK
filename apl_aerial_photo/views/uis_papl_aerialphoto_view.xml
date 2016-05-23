@@ -30,7 +30,7 @@
 					<field name="name"/>
 					<field name="image" widget="binary" filename="name"  height="480"/>
 					<field name="image" widget="image"/>
-					<field name="image_800" widget="image"/>
+					<field name="image_800" widget="image" />
 				</group>
 				<group>
 					<notebook>

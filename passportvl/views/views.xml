@@ -5,9 +5,10 @@
             <xpath expr="." position="inside">
                 <!--<link rel="stylesheet" type="text/css" href="/passportvl/static/src/css/joint.css" />
 				<script src="/passportvl/static/src/js/jquery.min.js"></script>
-				<!--<script src="/passportvl/static/src/js/lodash.min.js"></script>
+				<script src="/passportvl/static/src/js/lodash.min.js"></script>
 				<script src="/passportvl/static/src/js/backbone-min.js"></script>
 				<script src="/passportvl/static/src/js/joint.js"></script>!-->
+				<link rel="stylesheets" type="text/css" href="/passportvl/static/src/css/img_scheme.css"/>
             </xpath>
         </template>
 
@@ -118,6 +119,7 @@
 				<div id="scheme_holder"></div>
 				<div id="scheme_id_apls">
 				  <field name="id"/>
+				  <field name="scheme_image" widget="image" class="imagescheme"/>
 				</div>
 				
 				<script>

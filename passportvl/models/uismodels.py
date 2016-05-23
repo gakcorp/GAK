@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 import math, urllib, json, time
 from openerp import models, fields, api
+from PIL import Image, ImageDraw
+from . import schemeAPL
+
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 class uis_papl_substation(models.Model):
 	_name='uis.papl.substation'
@@ -323,6 +330,18 @@ class uis_papl_apl(models.Model):
 	status=fields.Char()
 	url_maps=fields.Char(compute='_apl_get_url_maps')
 	url_scheme=fields.Char(compute='_apl_get_url_scheme')
+	image_file=fields.Char(string="Scheme File Name", compute='_get_scheme_image_file_name')
+	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image')
+	
+	def _get_scheme_image(self,cr,uid,ids,context=None):
+		for apl in self.browse(cr,uid,ids,context=context):
+			img = Image.new("RGBA", (schemeAPL.scheme_width,schemeAPL.scheme_height), (255,255,255,0))
+			#draw = ImageDraw.Draw(img)
+			draw = schemeAPL.drawScheme(img,apl)
+			draw.ellipse ((190,90,210,110),fill="red", outline="blue")
+			background_stream=StringIO.StringIO()
+			img.save(background_stream, format="PNG")
+			apl.scheme_image=background_stream.getvalue().encode('base64')
 	
 	@api.depends('short_name','apl_type','feeder_num','voltage','sup_substation_id')
 	def _get_apl_name(self):
