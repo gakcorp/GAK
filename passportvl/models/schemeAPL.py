@@ -110,7 +110,7 @@ def getSchemedata(apl_id):
                 'name':apl_pillar_ids[0].name,
                 'num_by_vl':apl_pillar_ids[0].num_by_vl,
                 'start_tap_id':0,
-                'start_tap':pillar_data["counter_main"]+1,
+                'start_tap':pillar_data["counter_main"],
                 'y_shift':0
             })
     if pp:
