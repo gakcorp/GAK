@@ -13,24 +13,40 @@ function photolib(apl_ids,map) {
         xhr.open(method,path,async);
         xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
         xhr.send(JSON.stringify(indata));
-        return xhr.onload = function (e){
-            var resp=JSON.parse(this.response);
-            return resp
+        return xhr
+        
+        };
+        
+    
+    this.show_photo_count=function(){
+        document.getElementById('photo_count_badge').innerHTML=this.photo_count;    
+    }
+    this.get_photo_count=function(){
+
+        var data={};
+        var res='';
+        data['apl_ids']=this.apl_ids
+        xhr_res=this.req_xhr_json('POST','/apiv1/photo/count',true,data);
+        xhr_res.onload=function(e){
+            var res=JSON.parse(this.response);
+            pcd=JSON.parse(res.result.count_data);
+            photo_count=pcd.count;
+            show_photo_count();
         }
         
     }
-    this.get_photo_count=function(){
-        var data={};
-        data['apl_ids']=this.apl_ids
-        res=req_xhr_json('POST','/apiv1/photo/count',true,data);
-        pcd=JSON.parse(res);
-        this.photo_count=pcd.count;
-        document.getElementById('photo_count_badge').innerHTML=photo_count;
+    this.get_photo_count_hash=function(){
+        
     }
-}
+    this.refresher=function(){
+        console.debug('Photo refresher')
+        this.get_photo_count_hash();
+        this.get_photo_count();
+    }
+};
 
-var sitephotolib=new photolib(apl_ids,map)
-ref_functions.push(sitephotolib.get_photo_count())
+var sitephotolib=new photolib(apl_ids,map);
+ref_functions.push(sitephotolib.refresher());
 
 /*
 var photo_count='n/a';
