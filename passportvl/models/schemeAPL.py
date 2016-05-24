@@ -39,24 +39,25 @@ def getSchemedata(apl_id):
         })
     apl_pillar_ids=apl_id.pillar_id
     apl_pillar_ids=apl_pillar_ids.sorted(key=lambda r:r.num_by_vl)
-    if apl_pillar_ids[0]:
-        pillar_data["counter"]=pillar_data["counter"]+1;
-        pillar_data["pillars"].append({
-                    'id':apl_pillar_ids[0].id,
-                    'sid':'P'+str(apl_pillar_ids[0].id),
-                    'name':apl_pillar_ids[0].name,
-                    'num_by_vl':apl_pillar_ids[0].num_by_vl,
-                    'start_tap_id':0,
-                    'start_tap':0,
-                    'y_shift':0
-                })
-        pp=apl_pillar_ids[0]
-        if ps_data["counter"]>0:
-            pillar_links["counter"]=pillar_links["counter"]+1
-            pillar_links["links"].append({
-                'source_id':str(ps_data["ps"][0]["sid"]),
-                'target_id':'P'+str(apl_pillar_ids[0].id)
-                })
+    if apl_pillar_ids:
+        if apl_pillar_ids[0]:
+            pillar_data["counter"]=pillar_data["counter"]+1;
+            pillar_data["pillars"].append({
+                        'id':apl_pillar_ids[0].id,
+                        'sid':'P'+str(apl_pillar_ids[0].id),
+                        'name':apl_pillar_ids[0].name,
+                        'num_by_vl':apl_pillar_ids[0].num_by_vl,
+                        'start_tap_id':0,
+                        'start_tap':0,
+                        'y_shift':0
+                    })
+            pp=apl_pillar_ids[0]
+            if ps_data["counter"]>0:
+                pillar_links["counter"]=pillar_links["counter"]+1
+                pillar_links["links"].append({
+                    'source_id':str(ps_data["ps"][0]["sid"]),
+                    'target_id':'P'+str(apl_pillar_ids[0].id)
+                    })
     tap_ids=apl_id.tap_ids
     s_tap_ids=tap_ids.sorted(key=lambda r:r.num_by_vl)
     for tap in s_tap_ids:
@@ -102,23 +103,24 @@ def getSchemedata(apl_id):
                 })
             pp=tap.conn_pillar_id
     apl_pillar_ids=apl_pillar_ids.sorted(key=lambda r:r.num_by_vl, reverse=True)
-    if apl_pillar_ids[0]:
-        pillar_data["counter"]=pillar_data["counter"]+1;
-        pillar_data["pillars"].append({
-                'id':apl_pillar_ids[0].id,
-                'sid':'P'+str(apl_pillar_ids[0].id),
-                'name':apl_pillar_ids[0].name,
-                'num_by_vl':apl_pillar_ids[0].num_by_vl,
-                'start_tap_id':0,
-                'start_tap':pillar_data["counter_main"],
-                'y_shift':0
+    if apl_pillar_ids:
+        if apl_pillar_ids[0]:
+            pillar_data["counter"]=pillar_data["counter"]+1;
+            pillar_data["pillars"].append({
+                    'id':apl_pillar_ids[0].id,
+                    'sid':'P'+str(apl_pillar_ids[0].id),
+                    'name':apl_pillar_ids[0].name,
+                    'num_by_vl':apl_pillar_ids[0].num_by_vl,
+                    'start_tap_id':0,
+                    'start_tap':pillar_data["counter_main"]+1,
+                    'y_shift':0
+                })
+        if pp:
+            pillar_links["counter"]=pillar_links["counter"]+1
+            pillar_links["links"].append({
+                'source_id':'P'+str(pp.id),
+                'target_id':'P'+str(apl_pillar_ids[0].id)
             })
-    if pp:
-        pillar_links["counter"]=pillar_links["counter"]+1
-        pillar_links["links"].append({
-            'source_id':'P'+str(pp.id),
-            'target_id':'P'+str(apl_pillar_ids[0].id)
-        })
     for trans in apl_id.transformer_ids:
         y_shift=-2
         if (trans.tap_id.num_by_vl//2)*2-trans.tap_id.num_by_vl<0:
