@@ -120,19 +120,55 @@ def drawpillar(draw,x,y,text):
     draw.ellipse (points,fill="grey", outline="black")
     #fnt = ImageFont.truetype("arial.ttf", 15)
     #fnt = ImageFont.load("arial.pil")
-    draw.text((int(x-pillar_radius/2),int(y-pillar_radius)), text, fill=(255,0,0,128))
+    draw.text((int(x-2*pillar_radius),int(y+pillar_radius)), text, fill=(0,0,0,128))
 
+def drawtrans(draw,x,y,text):
+    x1=int(x-trans_size/2)
+    x2=int(x+trans_size/2)
+    y1=int(y-trans_size/2)
+    y2=int(y+trans_size/2)
+    print x1,x2,y1,y2
+    draw.rectangle(((x1,y1),(x2,y2)), fill="white", outline ="black")
+    draw.line((x1,y1,x,y2), fill="black")
+    draw.line((x,y2,x2,y1), fill="black")
+    draw.text((x2+10, y), text, fill=(0,0,0,128))
+
+def drawlines(draw,x1,y1,x2,y2):
+    draw.line((x1,y1,x2,y2), fill="black")
+    
 def drawScheme(img,apl_id):
     points={}
     draw = ImageDraw.Draw(img)
-    draw.ellipse ((90,90,110,110),fill="red", outline="blue")
+    #draw.ellipse ((90,90,110,110),fill="red", outline="blue")
     pillar_data, trans_data, pillar_links = getSchemedata(apl_id)
-    dx=int(scheme_width/pillar_data["counter"])
+    dx=int(scheme_width/(pillar_data["counter_main"]+5))
+    print dx
     my=int(scheme_height/2)
     dy=int(my/3)
+    my=int(my-dy/2)
     for pil in pillar_data["pillars"]:
-        cx=dx*pil["start_tap"]
+        cx=dx*(pil["start_tap"]+2)
         cy=my+pil["y_shift"]*dy
-        drawpillar(draw,cx,cy,str(pil["num_by_vl"]))
+        #drawpillar(draw,cx,cy,str(pil["num_by_vl"]))
         points[pil["sid"]]=(cx,cy)
+    for trans in trans_data["transformers"]:
+        cx=dx*(trans["tap"]+2)
+        cy=my+trans["y_shift"]*dy
+        #drawtrans(draw,cx,cy,str(trans["name"]))
+        points[trans["sid"]]=(cx,cy)
+    
+    for line in pillar_links["links"]:
+        source_id=line["source_id"]
+        target_id=line["target_id"]
+        x1,y1=points[source_id]
+        x2,y2=points[target_id]
+        drawlines(draw,x1,y1,x2,y2)
+    for pil in pillar_data["pillars"]:
+        sid=pil["sid"]
+        cx,cy=points[sid]
+        drawpillar(draw,cx,cy,str(pil["num_by_vl"]))
+    for trans in trans_data["transformers"]:
+        sid=trans["sid"]
+        cx,cy=points[sid]
+        drawtrans(draw,cx,cy,str(trans["name"]))
     return draw

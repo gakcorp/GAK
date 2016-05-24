@@ -338,7 +338,7 @@ class uis_papl_apl(models.Model):
 			img = Image.new("RGBA", (schemeAPL.scheme_width,schemeAPL.scheme_height), (255,255,255,0))
 			#draw = ImageDraw.Draw(img)
 			draw = schemeAPL.drawScheme(img,apl)
-			draw.ellipse ((190,90,210,110),fill="red", outline="blue")
+			#draw.ellipse ((190,90,210,110),fill="red", outline="blue")
 			background_stream=StringIO.StringIO()
 			img.save(background_stream, format="PNG")
 			apl.scheme_image=background_stream.getvalue().encode('base64')
