@@ -1,0 +1,14 @@
+<openerp>
+    <data>
+    <record model="ir.actions.server" id="uis_ap_photo_load_action">
+        <field name="name">Res Partner Server Action</field>
+        <field name="res_model">uis.ap.photo</field>
+        <field name="type">ir.actions.server</field>
+        <field name="code">
+            print self, object
+        </field>
+    </record>
+    <menuitem name="Load from Folder" id="uis_papl_menu_load" parent="uis_papl_menu_photo_main" action="uis_ap_photo_load_action"
+			sequence="10"/>
+    </data>
+</openerp>

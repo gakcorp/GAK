@@ -118,16 +118,15 @@
 			  <page string="Scheme">
 				<div id="scheme_holder"></div>
 				<div id="scheme_id_apls">
-				  <field name="id"/>
-				  <field name="scheme_image" widget="image" class="imagescheme"/>
+				  <field name="scheme_image" widget="image" class="imagescheme" options='{"size":[800,400]}'/>
 				</div>
 				
 				<script>
-				  var elem_apl_ids=document.getElementById('scheme_id_apls');
+				  <!--var elem_apl_ids=document.getElementById('scheme_id_apls');
 				  var ce_apl_ids=elem_apl_ids.children;
 				  var spans_apl_ids=elem_apl_ids.getElementsByTagName("span");
 				  var str_id=spans_apl_ids[1].innerHTML;
-				  var apl_ids=[parseInt(str_id)];
+				  var apl_ids=[parseInt(str_id)];!-->
 				</script>
 				
 				

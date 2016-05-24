@@ -93,7 +93,9 @@
                             <h3>I. The circuit schematic</h3>
                         </div>
                         <div class="col-xs-12 text-center">
-                            <img src="/passportvl/static/src/img/scheme_example.png"/>
+                            <!--<img src="/passportvl/static/src/img/scheme_example.png"/>
+                            <img t-att-src="o.scheme_image"/>!-->
+                            <span t-field="o.scheme_image" t-field-options="{&quot;widget&quot;:&quot;image&quot;}"/>
                         </div>
                     </div>
                     <div class="row">
