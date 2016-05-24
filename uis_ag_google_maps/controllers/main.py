@@ -39,7 +39,7 @@ class pillar_google_map(http.Controller):
         pillar_id=pillar_obj.search(cr,uid,domain, context=context)
         print pillar_id
         for record in pillar_obj.browse(cr, uid, pillar_id, context=context):
-            #print record.name
+            print record.name
             record.latitude=g_pillar_lat
             record.longitude=g_pillar_lng
     
