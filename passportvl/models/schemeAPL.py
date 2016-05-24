@@ -4,8 +4,17 @@ scheme_width=800
 scheme_height=400
 pillar_radius=10
 trans_size=20
+ps_x_size=40
+ps_y_size=80
+fontPath ="/usr/share/fonts/truetype/verdana/verdana.ttf"
+font12= ImageFont.truetype (fontPath,12)
+font10= ImageFont.truetype (fontPath,10)
 
 def getSchemedata(apl_id):
+    ps_data={
+        "counter":0,
+        "ps":[]
+    }
     pillar_data={
         "counter":0,
         "counter_main":0,
@@ -19,6 +28,15 @@ def getSchemedata(apl_id):
         "counter":0,
         "transformers":[]
     }
+    ps_id=apl_id.sup_substation_id
+    if ps_id:
+        ps_data["counter"]=ps_data["counter"]+1
+        ps_data["ps"].append({
+            'id':ps_id.id,
+            'name':ps_id.name,
+            'sid':'PS'+str(ps_id.id),
+            'fid':str(apl_id.feeder_num)
+        })
     apl_pillar_ids=apl_id.pillar_id
     apl_pillar_ids=apl_pillar_ids.sorted(key=lambda r:r.num_by_vl)
     if apl_pillar_ids[0]:
@@ -33,6 +51,12 @@ def getSchemedata(apl_id):
                     'y_shift':0
                 })
         pp=apl_pillar_ids[0]
+        if ps_data["counter"]>0:
+            pillar_links["counter"]=pillar_links["counter"]+1
+            pillar_links["links"].append({
+                'source_id':str(ps_data["ps"][0]["sid"]),
+                'target_id':'P'+str(apl_pillar_ids[0].id)
+                })
     tap_ids=apl_id.tap_ids
     s_tap_ids=tap_ids.sorted(key=lambda r:r.num_by_vl)
     for tap in s_tap_ids:
@@ -113,14 +137,14 @@ def getSchemedata(apl_id):
                 'source_id':'P'+str(trans.pillar_id.id),
                 'target_id':'T'+str(trans.id)
             })
-    return pillar_data, trans_data, pillar_links    
+    return ps_data,pillar_data, trans_data, pillar_links    
 
 def drawpillar(draw,x,y,text):
     points=(int(x-pillar_radius/2),int(y-pillar_radius/2),int(x+pillar_radius/2),int(y+pillar_radius/2))
     draw.ellipse (points,fill="grey", outline="black")
     #fnt = ImageFont.truetype("arial.ttf", 15)
     #fnt = ImageFont.load("arial.pil")
-    draw.text((int(x-2*pillar_radius),int(y+pillar_radius)), text, fill=(0,0,0,128))
+    draw.text((int(x-2*pillar_radius),int(y+pillar_radius)), text, font=font12, fill=(0,0,0,128))
 
 def drawtrans(draw,x,y,text):
     x1=int(x-trans_size/2)
@@ -131,7 +155,18 @@ def drawtrans(draw,x,y,text):
     draw.rectangle(((x1,y1),(x2,y2)), fill="white", outline ="black")
     draw.line((x1,y1,x,y2), fill="black")
     draw.line((x,y2,x2,y1), fill="black")
-    draw.text((x2+10, y), text, fill=(0,0,0,128))
+    draw.text((x2+10, y), text, font=font12, fill=(0,0,0,128))
+
+def drawps(draw,x,y,text,fid):
+    x1=x-ps_x_size
+    y1=int(y-ps_y_size/2)
+    x2=x
+    y2=int(y+ps_y_size/2)
+    draw.rectangle(((x1,y1),(x2,y2)), fill="white", outline="black")
+    draw.rectangle(((x-3,y-3),(x+3,y+3)),fill="white", outline="black")
+    draw.text((x+5,y-10),fid, fill=(0,0,0,128))
+    draw.text((x1,y1-20), text, font=font10, fill=(0,0,0,128))
+    
 
 def drawlines(draw,x1,y1,x2,y2):
     draw.line((x1,y1,x2,y2), fill="black")
@@ -140,12 +175,16 @@ def drawScheme(img,apl_id):
     points={}
     draw = ImageDraw.Draw(img)
     #draw.ellipse ((90,90,110,110),fill="red", outline="blue")
-    pillar_data, trans_data, pillar_links = getSchemedata(apl_id)
+    ps_data, pillar_data, trans_data, pillar_links = getSchemedata(apl_id)
     dx=int(scheme_width/(pillar_data["counter_main"]+5))
     print dx
     my=int(scheme_height/2)
     dy=int(my/3)
     my=int(my-dy/2)
+    for ps in ps_data["ps"]:
+        cx=dx
+        cy=my
+        points[ps["sid"]]=(cx,cy)
     for pil in pillar_data["pillars"]:
         cx=dx*(pil["start_tap"]+2)
         cy=my+pil["y_shift"]*dy
@@ -163,6 +202,10 @@ def drawScheme(img,apl_id):
         x1,y1=points[source_id]
         x2,y2=points[target_id]
         drawlines(draw,x1,y1,x2,y2)
+    for ps in ps_data["ps"]:
+        sid=ps["sid"]
+        cx,cy=points[sid]
+        drawps(draw,cx,cy,ps["name"],ps["fid"])
     for pil in pillar_data["pillars"]:
         sid=pil["sid"]
         cx,cy=points[sid]
@@ -170,5 +213,5 @@ def drawScheme(img,apl_id):
     for trans in trans_data["transformers"]:
         sid=trans["sid"]
         cx,cy=points[sid]
-        drawtrans(draw,cx,cy,str(trans["name"]))
+        drawtrans(draw,cx,cy,trans["name"])
     return draw
