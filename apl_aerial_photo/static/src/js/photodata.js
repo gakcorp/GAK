@@ -34,5 +34,11 @@ function get_photo_data(a) {
 }
 
 function photo_get_photo_count(apl_ids) {
+    var old_val=photo_count
     get_photo_count(apl_ids)
+    if (old_val != photo_count) {
+        get_photo_data(apl_ids)
+    }
 }
+
+ref_functions.push(photo_get_photo_count)

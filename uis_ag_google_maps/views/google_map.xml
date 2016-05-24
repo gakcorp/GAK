@@ -22,6 +22,7 @@
 			var ktp_data=<t t-raw="ktp_data"/>
 			var odoo_pillar_data = <t t-raw="pillar_data"/>;
         </script>
+		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/refresher.js"></script>
 		<div id="wrapper">
 			<div id="sidebar-wrapper">
 				<div>
