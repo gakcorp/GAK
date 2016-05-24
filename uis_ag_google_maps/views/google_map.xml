@@ -89,6 +89,7 @@
 		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/bootstrap.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/left_menu.js"></script>
+		<div id="postjs"></div>
 		<script>
 		$("#menu-toggle").click(function(e) {
         e.preventDefault();

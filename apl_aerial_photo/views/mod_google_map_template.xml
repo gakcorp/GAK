@@ -5,14 +5,16 @@
             <xpath expr="//head" position="inside">
             
             </xpath>
+			<xpath expr="//div[@id='postjs']" position="inside">
+				<script type="text/javascript" src="/apl_aerial_photo/static/src/js/photodata.js"></script>
+			</xpath>
             <xpath expr="//ul[@id='map_objects']" position="inside">
-                <script type="text/javascript" src="/apl_aerial_photo/static/src/js/photodata.js"></script>
+                
                 <li class="list-group-item leftbar_list_group" id="photo_li">
 						<span class="glyphicon glyphicon-camera"></span>
 						Photo
 						<span class="badge" id="photo_count_badge"></span>
 				</li>
-                <script>photo_get_photo_count(apl_ids);</script>
             </xpath>
         </template>
     </data>
