@@ -7,6 +7,30 @@ class uis_papl_transformation_type(models.Model):
 	name=fields.Char(string='Name')
 
 
+def distance2points(lat1,long1,lat2,long2):
+	dist=0
+	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
+		rad=6372795
+		#Convert to radians
+		la1=lat1*math.pi/180
+		la2=lat2*math.pi/180
+		lo1=long1*math.pi/180
+		lo2=long2*math.pi/180
+		#calculate sin and cos
+		cl1=math.cos(la1)
+		cl2=math.cos(la2)
+		sl1=math.sin(la1)
+		sl2=math.sin(la2)
+		delta=lo2-lo1
+		cdelta=math.cos(delta)
+		sdelta=math.sin(delta)
+		#calculate circle len
+		y = math.sqrt(math.pow(cl2*sdelta,2)+math.pow(cl1*sl2-sl1*cl2*cdelta,2))
+		x = sl1*sl2+cl1*cl2*cdelta
+		ad = math.atan2(y,x)
+		dist = ad*rad
+	return dist
+
 class uis_papl_transformation_t_type(models.Model):
 	_name='uis.papl.transformer.t_type'
 	_description='Transformer Types'
@@ -124,27 +148,10 @@ class uis_papl_transformation(models.Model):
 				if pillar:
 					lat2=pillar.latitude
 					long2=pillar.longitude
+					
 					dist=0
 					if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0) and (abs(lat1-lat2)<0.1) and (abs(long1-long2)<0.1):
-						rad=6372795
-						#Convert to radians
-						la1=lat1*math.pi/180
-						la2=lat2*math.pi/180
-						lo1=long1*math.pi/180
-						lo2=long2*math.pi/180
-						#calculate sin and cos
-						cl1=math.cos(la1)
-						cl2=math.cos(la2)
-						sl1=math.sin(la1)
-						sl2=math.sin(la2)
-						delta=lo2-lo1
-						cdelta=math.cos(delta)
-						sdelta=math.sin(delta)
-						#calculate circle len
-						y = math.sqrt(math.pow(cl2*sdelta,2)+math.pow(cl1*sl2-sl1*cl2*cdelta,2))
-						x = sl1*sl2+cl1*cl2*cdelta
-						ad = math.atan2(y,x)
-						dist = ad*rad
+						dist=distance2points(lat1,long1,lat2,long2)
 					if (dist<max_dist) and (dist>0):
 						near_pillars.append(pillar)
 						near_pillars_ids.append(pillar.id)

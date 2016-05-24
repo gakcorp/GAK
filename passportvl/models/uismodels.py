@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 import math, urllib, json, time
 from openerp import models, fields, api
+from PIL import Image, ImageDraw
+from . import schemeAPL
+
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 class uis_papl_substation(models.Model):
 	_name='uis.papl.substation'
@@ -281,11 +288,15 @@ class uis_papl_tap(models.Model):
 					cp=np
 				i=i+1
 			
+class uis_papl_apl_cable(models.Model):
+	_name='uis.papl.apl.cable'
+	name=fields.Char(string="Name")
 	
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
 	short_name=fields.Char(string="Short name")
+	locality=fields.Char(string="Locality")
 	apl_type=fields.Char(string="Type APL")
 	feeder_num=fields.Integer(string="Feeder")
 	voltage=fields.Integer(string="Voltage (kV)")
@@ -293,21 +304,44 @@ class uis_papl_apl(models.Model):
 	bld_year =fields.Char(string="Building year")
 	startexp_date = fields.Date(string="Start operations date")
 	build_company = fields.Many2one('res.company',string='construction installation company')
+	cable_ids=fields.Many2many('uis.papl.apl.cable',
+								relation='cable_ids',
+								column1='apl_id',
+								column2='cable_id'
+								)
 	line_len=fields.Float(digits=(3,2))
 	line_len_calc=fields.Float(digits=(6,2), compute='_apl_get_len')
 	prol_max_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_med_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_min_len=fields.Float(digits=(2,2), compute='_apl_get_len')
+	sag_max=fields.Float(digits=(3,2), string="Sag maximum")
+	sag_med=fields.Float(digits=(3,2), string="Sag medium")
+	sag_min=fields.Float(digits=(3,2), string="Sag minimum")
 	count_circ=fields.Char(string="Number of circuits")
 	climatic_conditions=fields.Char(string="Climatic conditions")
+	sw_point=fields.Char(string="Switching point")
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply substation")
+	transformer_ids=fields.One2many('uis.papl.transformer','apl_id', string="Transformers")
 	tap_text=fields.Char(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
 	url_maps=fields.Char(compute='_apl_get_url_maps')
+	url_scheme=fields.Char(compute='_apl_get_url_scheme')
+	image_file=fields.Char(string="Scheme File Name", compute='_get_scheme_image_file_name')
+	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image')
+	
+	def _get_scheme_image(self,cr,uid,ids,context=None):
+		for apl in self.browse(cr,uid,ids,context=context):
+			img = Image.new("RGBA", (schemeAPL.scheme_width,schemeAPL.scheme_height), (255,255,255,0))
+			#draw = ImageDraw.Draw(img)
+			draw = schemeAPL.drawScheme(img,apl)
+			draw.ellipse ((190,90,210,110),fill="red", outline="blue")
+			background_stream=StringIO.StringIO()
+			img.save(background_stream, format="PNG")
+			apl.scheme_image=background_stream.getvalue().encode('base64')
 	
 	@api.depends('short_name','apl_type','feeder_num','voltage','sup_substation_id')
 	def _get_apl_name(self):
@@ -395,13 +429,29 @@ class uis_papl_apl(models.Model):
 			#'url':'http://www.yandex.ru'
 			}
 	
+	@api.multi
+	def act_show_scheme(self):
+		print "Debug info. Start Show_map"
+		print self.url_maps
+		return{
+			'name': 'Scheme',
+			'res_model':'ir.actions.act_url',
+			'type':'ir.actions.act_url',
+			'target':'new',
+			'url':self.url_scheme,
+			#'url':'http://www.yandex.ru'
+			}
+	
 	@api.depends('pillar_id')
 	def _apl_get_url_maps(self):
 		for record in self:
 			record.url_maps="/apl_map/?apl_ids="+unicode(str(record.id))
-			#record.url_maps='Do iframe:<br><iframe src="/apl_map/?apl_ids='+unicode(str(record.id))+'" width="100%" height="600" marginwidth="0" marginheight="0" frameborder="no" scrolling="no" style="border-width:0px;"></iframe>'
-			#record.url_maps='<a href="/apl_map/?apl_ids=1">Link</a><br>Do object:<br><div><object type="text/html" data="/apl_map/?apl_ids='+unicode(str(record.id))+'" width="100%" height="600" marginwidth="0" marginheight="0" frameborder="no" scrolling="no" style="border-width:0px;"></object></div>'
-	#@api.depends('pillar_id')
+	
+	@api.depends('pillar_id')
+	def _apl_get_url_scheme(self):
+		for record in self:
+			record.url_scheme="/apl_scheme/?apl_ids="+unicode(str(record.id))
+
 	def _apl_get_len(self):
 		for record in self:
 			vsum=0

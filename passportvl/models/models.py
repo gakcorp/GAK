@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 import math
 from openerp import models, fields, api
+from PIL import Image, ImageDraw
+
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
+
 class uis_papl_substation(models.Model):
 	_name='uis.papl.substation'
 	_description='Substation model'
@@ -101,9 +108,23 @@ class uis_papl_apl(models.Model):
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply Substation")
-	code_maps=fields.Text()
+	scheme_image=fields.binary(string="Scheme", compute='_get_scheme_image')
+    image_file=fields.Char(string="Scheme File Name", compute='_get_scheme_image_file_name')
+    code_maps=fields.Text()
 	status=fields.Char()
 	
+    def _get_scheme_image_file_name(mo)
+	def _get_scheme_image(self,cr,uid,ids,context=None):
+		for apl in self.browse(cr,uid,ids,context=context):
+			trans.full_code=str(trans.tap_id.full_code)+'.'+str(trans.code)
+			img = Image.new("RGBA", (800,400), (0,0,0,0))
+			draw = ImageDraw.Draw(image)
+			draw.ellipse ((190,90,210,110),fill="red", outline="blue")
+			background_stream=StringIO.StringIO()
+			image.save(background_stream, 'JPG')
+			apl.scheme_image=background_stream.getvalue().encode(encoding)
+
+
 	#@api.depends('pillar_id')
 	def _apl_get_len(self):
 		for record in self:

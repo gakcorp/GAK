@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
+	<template id="assets_backend" name="src_for_scheme_papl_apl" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!--<link rel="stylesheet" type="text/css" href="/passportvl/static/src/css/joint.css" />
+				<script src="/passportvl/static/src/js/jquery.min.js"></script>
+				<script src="/passportvl/static/src/js/lodash.min.js"></script>
+				<script src="/passportvl/static/src/js/backbone-min.js"></script>
+				<script src="/passportvl/static/src/js/joint.js"></script>!-->
+				<link rel="stylesheets" type="text/css" href="/passportvl/static/src/css/img_scheme.css"/>
+            </xpath>
+        </template>
+
+	
+	
 	<record id="uis_papl_department_search" model="ir.ui.view">
 	  <field name="name">uis.papl.department.search</field>
 	  <field name="model">uis.papl.department</field>
@@ -62,15 +75,19 @@
 	  <field name="model">uis.papl.apl</field>
 	  <field name="arch" type="xml">
 		<form string="APL form" context="{apl_is=1}">
-		  <header>
-			<b>Information about APL</b>
-			<button name="act_show_map" string="Map" type="object" class="oe_highlight"/>
-		  </header>
 		  <sheet string="Details">
 			<div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+			  <button class="oe_inline" name="act_show_scheme" type="object" 
+                       icon="fa-object-group">
+                       Scheme
+                   </button>
+			   <button class="oe_inline" name="act_show_map" type="object" 
+                       icon="fa-map">
+                       Map
+                   </button><br/>
 			</div>
 			<!--<label for="name" string="Name of APL:"/>!-->
-				<h1>
+				<h1 style="position:absolute;">
 				  <field name="name"/>
 				</h1>
 				
@@ -81,6 +98,7 @@
 			<group>
 			  <group>
 				<!--<label for="bld_year" class="oe_edit_only"/>!-->
+				<field name="locality"/>
 				<field name="bld_year"/>
 				<!--<label for="startexp_date" class="oe_edit_only"/>!-->
 				<field name="startexp_date"/>
@@ -97,10 +115,34 @@
 			  </group>
 			</group>
 			<notebook>
+			  <page string="Scheme">
+				<div id="scheme_holder"></div>
+				<div id="scheme_id_apls">
+				  <field name="id"/>
+				  <field name="scheme_image" widget="image" class="imagescheme"/>
+				</div>
+				
+				<script>
+				  var elem_apl_ids=document.getElementById('scheme_id_apls');
+				  var ce_apl_ids=elem_apl_ids.children;
+				  var spans_apl_ids=elem_apl_ids.getElementsByTagName("span");
+				  var str_id=spans_apl_ids[1].innerHTML;
+				  var apl_ids=[parseInt(str_id)];
+				</script>
+				
+				
+				
+				<!--
+				
+
+				<script src="/passportvl/static/src/js/apl-scheme.js"></script>
+				!-->
+			  </page>
 			  <page string="Main details">
 				<group>
 				  <group>
 					<!--<label for="line_len"/>!-->
+					<field name="cable_ids" widget="many2many_tags"/>
 					<field name="line_len"/>
 					<!--<label for="line_len_calc"/>!-->
 					<field name="line_len_calc"/>
@@ -110,10 +152,14 @@
 					<field name="prol_med_len"/>
 					<!--<label for="prol_min_len"/>!-->
 					<field name="prol_min_len"/>
+					<field name="sag_max"/>
+					<field name="sag_med"/>
+					<field name="sag_min"/>
 				  </group>
 				  <group>
 					<field name="count_circ"/>
 					<field name="climatic_conditions"/>
+					<field name="sw_point"/>
 					<field name="tap_text"/>
 				  </group>
 				  <!--<field name="tap_text"/>!-->
