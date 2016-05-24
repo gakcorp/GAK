@@ -16,6 +16,8 @@
     </head>
     <body> <!--t-att-data-partner-url="pillar_url or ''"!-->
         <script>
+			var apl_ids=<t t-raw="apl_ids"/>
+			
             var lines_data=<t t-raw="lines_data"/>;
 			var ktp_data=<t t-raw="ktp_data"/>
 			var odoo_pillar_data = <t t-raw="pillar_data"/>;
@@ -46,7 +48,7 @@
 						</div>
 					</div>
 					</div>
-				<ul class="sidebar-nav list-group">
+				<ul class="sidebar-nav list-group" id="map_objects">
 					<li class="list-group-item leftbar_list_group">
 						<span class="glyphicon glyphicon-transfer"></span>
 						APL

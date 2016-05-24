@@ -206,7 +206,8 @@ class pillar_google_map(http.Controller):
             #'partner_url': post.get('partner_url'),
             'pillar_data': json.dumps(pillar_data),
             'lines_data': json.dumps(lines_data),
-            'ktp_data': json.dumps(ktp_data)
+            'ktp_data': json.dumps(ktp_data),
+            'apl_ids':json.dumps(clean_ids)
         }
         return request.render("uis_ag_google_maps.uis_google_map", values)
 '''
