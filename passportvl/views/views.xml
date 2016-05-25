@@ -108,7 +108,8 @@
 			  </group>
 			  <group>
 				<!--<label for="sup_substation_id" class="oe_edit_only"/>!-->
-                <field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
+                <field name="department_id"/>
+				<field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
 				<field name="apl_type"/>
 				<field name="feeder_num"/>
 				<field name="voltage"/>

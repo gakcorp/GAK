@@ -8,45 +8,75 @@ function photolib(apl_ids,map) {
     
     
     //Define functions
-    this.req_xhr_json=function(method,path,async,indata){
-        var xhr=new XMLHttpRequest();
-        xhr.open(method,path,async);
-        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
-        xhr.send(JSON.stringify(indata));
-        return xhr
+    this.show_photo_markers=function(){
         
-        };
-        
-    
-    this.show_photo_count=function(){
-        document.getElementById('photo_count_badge').innerHTML=this.photo_count;    
     }
     this.get_photo_count=function(){
-
         var data={};
-        var res='';
         data['apl_ids']=this.apl_ids
-        xhr_res=this.req_xhr_json('POST','/apiv1/photo/count',true,data);
-        xhr_res.onload=function(e){
-            var res=JSON.parse(this.response);
-            pcd=JSON.parse(res.result.count_data);
-            photo_count=pcd.count;
-            show_photo_count();
-        }
-        
+        xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/photo/count',true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        that=this;
+        xhr.onload=function(e){
+            var res=JSON.parse(this.response)
+            var pcd=JSON.parse(res.result.count_data);
+            that.photo_count=pcd.count;
+            document.getElementById('photo_count_badge').innerHTML=that.photo_count;  
+            };
+    }
+    this.get_photo_data=function(){
+        var data={};
+        data['apl_ids']=this.apl_ids
+        xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/photo/data',true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        that=this;
+        xhr.onload=function(e){
+            var res=JSON.parse(this.response)
+            var pcd=JSON.parse(res.result.photo_data);
+            that.photo_data=pcd.photo_data;
+            that.show_photo_markers();
+            };
     }
     this.get_photo_count_hash=function(){
-        
+        var data={};
+        data['apl_ids']=this.apl_ids;
+        xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/photo/photo_count_hash',true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+        xhr.onload=function(e){
+            var res=JSON.parse(this.response)
+            var pcd=JSON.parse(res.result.res);
+            if (pcd.photo_count_hash != this.photo_count_hash) {
+                that.photo_count_hash=pcd.photo_count_hash;
+                that.get_photo_count();
+                that.get_photo_data();
+            }
+            
+            };
     }
+    
     this.refresher=function(){
         console.debug('Photo refresher')
-        this.get_photo_count_hash();
-        this.get_photo_count();
+        var r1=this.get_photo_count_hash();
+        var r2=this.get_photo_count();
+        return 1;
     }
 };
 
+
 var sitephotolib=new photolib(apl_ids,map);
-ref_functions.push(sitephotolib.refresher());
+//var photo_ref=new sitephotolib.refresher();
+function photo_ref() {
+    sitephotolib.get_photo_count_hash();
+    sitephotolib.get_photo_count();
+};
+ref_functions.push(photo_ref);
 
 /*
 var photo_count='n/a';

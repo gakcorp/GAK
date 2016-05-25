@@ -291,7 +291,8 @@ class uis_papl_tap(models.Model):
 class uis_papl_apl_cable(models.Model):
 	_name='uis.papl.apl.cable'
 	name=fields.Char(string="Name")
-	
+
+    
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
@@ -301,6 +302,7 @@ class uis_papl_apl(models.Model):
 	feeder_num=fields.Integer(string="Feeder")
 	voltage=fields.Integer(string="Voltage (kV)")
 	inv_num = fields.Char()
+	department_id=fields.Many2one('uis.papl.department', string="Department")
 	bld_year =fields.Char(string="Building year")
 	startexp_date = fields.Date(string="Start operations date")
 	build_company = fields.Many2one('res.company',string='construction installation company')

@@ -137,7 +137,7 @@ class uis_ap_photo(models.Model):
 			for pil in photo.near_pillar_ids:
 				print pil.name
 				print pil.apl_id.id
-				if pil.apl_id not in apl_ids:
+				if pil.apl_id.id not in apl_ids:
 					apl_ids.append(pil.apl_id.id)
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
