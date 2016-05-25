@@ -5,11 +5,61 @@ function photolib(apl_ids,map) {
     this.photo_count_hash='n/a';
     this.photo_data=[];
     this.photo_data_hash='';
+    this.photos=[];
+    this.markers=[];
     
     
     //Define functions
-    this.show_photo_markers=function(){
+    this.show_photo_full=function(id){
+        /*var phle=document.getElementById("photo_full_frame");
+        phle.innerHTML='<div><right><a href="#" id="frame_close_but"><span class="glyphicon glyphicon-remove-circle" width="20"></span></a><right></div>'
+        cur_photo=this.photos[id];
+        phle.innerHTML=phle.innerHTML+
+            '<center><img src="'+cur_photo.url_image+'" width="95%"/></center>';
+        $("#photo_full_frame").addClass("visible");
+        $("#photo_full_frame").removeClass("hidden");*/
+    }
+    
+    this.show_marker=function(id){
+        this.markers[id].setVisible(true);
+        this.map.panTo(this.markers[id].position);
         
+    }
+    this.hide_marker=function(id){
+        this.markers[id].setVisible(false);
+    }
+    this.set_photo_markers=function(){
+        for (var i=0;i<this.photo_data.count; i++) {
+            cur_photo=this.photo_data.photos[i];
+            if (cur_photo.lat && cur_photo.long) {
+            var location = new google.maps.LatLng(cur_photo.lat,cur_photo.long);
+            }
+            this.markers[cur_photo.id]= new google.maps.Marker({
+                map: this.map,
+                draggable: true,
+                position: location,
+                visible:false
+                });
+            this.photos[cur_photo.id]=cur_photo;
+            //var imagecur=pillar_image;
+            
+        }
+    }
+    this.set_photo_tumb=function(){
+        var phle=document.getElementById("photo_list");
+        phle.innerHTML="<b>Images</b>"
+        console.debug(this.photo_data);
+        for (var i = 0; i < this.photo_data.count; i++) {
+            cur_photo=this.photo_data.photos[i];
+            phle.innerHTML=phle.innerHTML+
+            '<div id="dit_'+cur_photo.id+'" class="div_img_thumb" '+
+            'onmouseover="sitephotolib.show_marker('+cur_photo.id+')" '+
+            'onmouseout="sitephotolib.hide_marker('+cur_photo.id+')" '+
+            'ondblclick="sitephotolib.show_photo_full('+cur_photo.id+')"> '+
+            
+            '<img src="'+cur_photo.thumbnail+'"/>';
+        }
+    
     }
     this.get_photo_count=function(){
         var data={};
@@ -18,7 +68,7 @@ function photolib(apl_ids,map) {
         xhr.open('POST','/apiv1/photo/count',true);
         xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
         xhr.send(JSON.stringify(data));
-        that=this;
+        var that=this;
         xhr.onload=function(e){
             var res=JSON.parse(this.response)
             var pcd=JSON.parse(res.result.count_data);
@@ -33,12 +83,13 @@ function photolib(apl_ids,map) {
         xhr.open('POST','/apiv1/photo/data',true);
         xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
         xhr.send(JSON.stringify(data));
-        that=this;
+        var that=this;
         xhr.onload=function(e){
             var res=JSON.parse(this.response)
             var pcd=JSON.parse(res.result.photo_data);
-            that.photo_data=pcd.photo_data;
-            that.show_photo_markers();
+            that.photo_data=pcd;
+            that.set_photo_markers();
+            that.set_photo_tumb();
             };
     }
     this.get_photo_count_hash=function(){
@@ -52,7 +103,8 @@ function photolib(apl_ids,map) {
         xhr.onload=function(e){
             var res=JSON.parse(this.response)
             var pcd=JSON.parse(res.result.res);
-            if (pcd.photo_count_hash != this.photo_count_hash) {
+            if (pcd.photo_count_hash != that.photo_count_hash) {
+                console.debug(pcd.photo_count_hash+'!='+that.photo_count_hash)
                 that.photo_count_hash=pcd.photo_count_hash;
                 that.get_photo_count();
                 that.get_photo_data();

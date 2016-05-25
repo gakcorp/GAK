@@ -1,0 +1,21 @@
+#right_bar{
+    position: absolute;
+    right: 0px;
+    top:0px;
+    height: 100%;
+    visibility: visible;
+    background: #000;
+    width:12px;
+    overflow-x:hidden;
+    opacity: 0.7;
+}
+#right_bar:hover{
+    width:250px;
+}
+#right_bar.fixed{
+    width:250px;
+    opacity: 1.0;
+}
+#right_bar.fixed:hover{
+    width:250px;
+}

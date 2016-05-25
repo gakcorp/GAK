@@ -33,14 +33,14 @@ class data_json(http.Controller):
                 if nai.id in clean_ids:
                     p_id.append(ph.id)
         
-        for ph in photo_obj.browse(cr,uid,p_id,context=context):
+        for ph in photo_obj.browse(cr,uid,p_id,context=context).sorted(key=lambda r:r.image_date):
             photo_data["count"]=photo_data["count"]+1
             photo_data["photos"].append({
                 'id':ph.id,
                 'lat':ph.latitude,
                 'long':ph.longitude,
                 'alt':ph.altitude,
-                'thumbnail':ph.thumbnail,
+                'thumbnail':'/web/image?model=uis.ap.photo&id='+str(ph.id)+'&field=thumbnail',
                 'url_image':'/web/image?model=uis.ap.photo&id='+str(ph.id)+'&field=image'
             })
             

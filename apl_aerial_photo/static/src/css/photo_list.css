@@ -1,0 +1,19 @@
+#photolist{
+    position:relative;
+    max-height:50%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-top:12px;
+}
+
+#photo_full_frame{
+    position: fixed;
+    background: #fff;
+    width: 80%;
+    height: 80%;
+    z-index: 1100;
+    top: 5%;
+    left: 10%;
+    border-radius: 5px;
+    opacity:1;
+}
