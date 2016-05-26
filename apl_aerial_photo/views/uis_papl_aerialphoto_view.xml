@@ -47,6 +47,7 @@
 								<field name="latitude"/>
 								<field name="longitude"/>
 								<field name="altitude"/>
+								<field name="rotation"/>
 							</group>
 						</page>
 					</notebook>

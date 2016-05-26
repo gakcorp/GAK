@@ -26,10 +26,10 @@
 				<div id="photo_list"></div>
 			</xpath>
 			<xpath expr="//div[@id='wrapper']" position="inside">
-				<div id="photo_full_frame" class="hidden">
-					
+				<div id="photo_full_frame" class="novis">
 				</div>
-				
+				<div id="photo_preview_frame" class="novis">
+				</div>
 			</xpath>
         </template>
     </data>

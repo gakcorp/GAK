@@ -35,13 +35,25 @@ class data_json(http.Controller):
         
         for ph in photo_obj.browse(cr,uid,p_id,context=context).sorted(key=lambda r:r.image_date):
             photo_data["count"]=photo_data["count"]+1
+            pill_data={
+                "count":0,
+                "pillars":[]
+            }
+            for pil in ph.near_pillar_ids:
+                pill_data["count"]=pill_data["count"]+1
+                pill_data["pillars"].append({
+                    'id':pil.id,
+                    'num_by_vl':pil.num_by_vl
+                    })
             photo_data["photos"].append({
                 'id':ph.id,
                 'lat':ph.latitude,
                 'long':ph.longitude,
                 'alt':ph.altitude,
                 'thumbnail':'/web/image?model=uis.ap.photo&id='+str(ph.id)+'&field=thumbnail',
-                'url_image':'/web/image?model=uis.ap.photo&id='+str(ph.id)+'&field=image'
+                'url_image':'/web/image?model=uis.ap.photo&id='+str(ph.id)+'&field=image',
+                'rotation':ph.rotation,
+                'pillar_data':pill_data
             })
             
         values ={

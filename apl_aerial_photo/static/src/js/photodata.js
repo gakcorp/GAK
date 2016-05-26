@@ -8,9 +8,40 @@ function photolib(apl_ids,map) {
     this.photos=[];
     this.markers=[];
     
-    
+    this.get_path_camera_icon=function(dig){
+        var pci={
+            path:'M20 48 L20 64 L44 64 L44 48 L36 48 L64 0 L0 0 L28 48 Z',
+            fillColor:'white',
+            fillOpacity:0.5,
+            scale:0.7,
+            strokeColor:'black',
+            strokeWeight:1,
+            anchor: new google.maps.Point(32,64),
+            rotation: dig
+        }
+        return pci;
+    }
     //Define functions
+    
+    this.hide_photo_preview=function(){
+        $("#photo_preview_frame").addClass("novis");
+    }
+    this.show_photo_preview=function(id){
+        cur_photo=this.photos[id];
+        ppf=document.getElementById("photo_preview_frame");
+        ppf.innerHTML='<center><img src="'+cur_photo.url_image+'" width="100%"/></center>'
+        $("#photo_preview_frame").removeClass("novis");
+
+    }
+    this.hide_photo_full=function(id){
+        $("#photo_full_frame").addClass("novis");
+    }
+    
     this.show_photo_full=function(id){
+        cur_photo=this.photos[id];
+        phf=document.getElementById("photo_full_frame");
+        phf.innerHTML='<center><img src="'+cur_photo.url_image+'" height="100%" onclick="sitephotolib.hide_photo_full();"/></center>'
+        $("#photo_full_frame").removeClass("novis");
         /*var phle=document.getElementById("photo_full_frame");
         phle.innerHTML='<div><right><a href="#" id="frame_close_but"><span class="glyphicon glyphicon-remove-circle" width="20"></span></a><right></div>'
         cur_photo=this.photos[id];
@@ -34,11 +65,13 @@ function photolib(apl_ids,map) {
             if (cur_photo.lat && cur_photo.long) {
             var location = new google.maps.LatLng(cur_photo.lat,cur_photo.long);
             }
+            
             this.markers[cur_photo.id]= new google.maps.Marker({
                 map: this.map,
                 draggable: true,
                 position: location,
-                visible:false
+                visible:false,
+                icon:this.get_path_camera_icon(cur_photo.rotation)
                 });
             this.photos[cur_photo.id]=cur_photo;
             //var imagecur=pillar_image;
@@ -55,12 +88,16 @@ function photolib(apl_ids,map) {
             '<div id="dit_'+cur_photo.id+'" class="div_img_thumb" '+
             'onmouseover="sitephotolib.show_marker('+cur_photo.id+')" '+
             'onmouseout="sitephotolib.hide_marker('+cur_photo.id+')" '+
-            'ondblclick="sitephotolib.show_photo_full('+cur_photo.id+')"> '+
-            
+            'ondblclick="sitephotolib.show_photo_full('+cur_photo.id+')" '+
+            'onmousedown="sitephotolib.show_photo_preview('+cur_photo.id+')" '+
+            'onmouseup="sitephotolib.hide_photo_preview()"> '/*+
             '<img src="'+cur_photo.thumbnail+'"/>';
+            for (var i=0;i<length(cur_photo.pillardata.pillars);i++){
+                phle.innerHTML=phle.innerHTML+'<span class="badge">'+cur_photo.pillardata.pillars[i].num_by_vl+'</span>'
+                }*/
+            }
         }
     
-    }
     this.get_photo_count=function(){
         var data={};
         data['apl_ids']=this.apl_ids
@@ -128,95 +165,6 @@ function photo_ref() {
     sitephotolib.get_photo_count_hash();
     sitephotolib.get_photo_count();
 };
+photo_ref();
 ref_functions.push(photo_ref);
 
-/*
-var photo_count='n/a';
-var photo_data=[];
-function get_photo_count(a) {
-    var data={};
-    data['apl_ids']=a;
-
-    var xhr=new XMLHttpRequest();
-    xhr.open('POST', '/apiv1/photo/count/',true);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    xhr.send(JSON.stringify(data));
-    
-    xhr.onload = function(e) {
-    var resp = JSON.parse(this.response);
-    pcd=JSON.parse(resp.result.count_data);
-    photo_count=pcd.count;
-    document.getElementById('photo_count_badge').innerHTML=photo_count;
-    }
-}
-
-function get_photo_data(a) {
-    var data={};
-    data['apl_ids']=a;
-
-    var xhr=new XMLHttpRequest();
-    xhr.open('POST', '/apiv1/photo/data/',true);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    xhr.send(JSON.stringify(data));
-    
-    xhr.onload = function(e) {
-    var resp = JSON.parse(this.response);
-    photo_data=JSON.parse(resp.result.photo_data);
-    }
-}
-
-function photo_get_photo_count(apl_ids) {
-    var old_val=photo_count
-    get_photo_count(apl_ids)
-    if (old_val != photo_count) {
-        get_photo_data(apl_ids)
-    }
-}
-*/
-//ref_functions.push(photo_get_photo_count)
-
-
-/*var photo_count='n/a'
-var photo_data=[]
-
-function get_photo_count(a) {
-    var data={};
-    data['apl_ids']=a;
-
-    var xhr=new XMLHttpRequest();
-    xhr.open('POST', '/apiv1/photo/count/',true);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    xhr.send(JSON.stringify(data));
-    
-    xhr.onload = function(e) {
-    var resp = JSON.parse(this.response);
-    pcd=JSON.parse(resp.result.count_data);
-    photo_count=pcd.count;
-    document.getElementById('photo_count_badge').innerHTML=photo_count;
-    }
-}
-
-function get_photo_data(a) {
-    var data={};
-    data['apl_ids']=a;
-
-    var xhr=new XMLHttpRequest();
-    xhr.open('POST', '/apiv1/photo/data/',true);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    xhr.send(JSON.stringify(data));
-    
-    xhr.onload = function(e) {
-    var resp = JSON.parse(this.response);
-    photo_data=JSON.parse(resp.result.photo_data);
-    }
-}
-
-function photo_get_photo_count(apl_ids) {
-    var old_val=photo_count
-    get_photo_count(apl_ids)
-    if (old_val != photo_count) {
-        get_photo_data(apl_ids)
-    }
-}
-
-ref_functions.push(photo_get_photo_count)*/
