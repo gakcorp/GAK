@@ -90,11 +90,13 @@ function photolib(apl_ids,map) {
             'onmouseout="sitephotolib.hide_marker('+cur_photo.id+')" '+
             'ondblclick="sitephotolib.show_photo_full('+cur_photo.id+')" '+
             'onmousedown="sitephotolib.show_photo_preview('+cur_photo.id+')" '+
-            'onmouseup="sitephotolib.hide_photo_preview()"> '/*+
+            'onmouseup="sitephotolib.hide_photo_preview()"> '+
             '<img src="'+cur_photo.thumbnail+'"/>';
-            for (var i=0;i<length(cur_photo.pillardata.pillars);i++){
-                phle.innerHTML=phle.innerHTML+'<span class="badge">'+cur_photo.pillardata.pillars[i].num_by_vl+'</span>'
-                }*/
+            for (var j=0;j<cur_photo.pillar_data.count;j++){
+                console.debug(j);
+                phle.innerHTML=phle.innerHTML+'<span class="badge">'+cur_photo.pillar_data.pillars[j].num_by_vl+'</span>';
+                //phle.innerHTML=phle.innerHTML+'<span class="badge">'+cur_photo.pillar_data.pillars[j].num_by_vl+'</span>'
+               }
             }
         }
     
