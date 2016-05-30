@@ -4,9 +4,15 @@
         <template id="mod_uis_google_map" inherit_id="uis_ag_google_maps.uis_google_map">
             <xpath expr="//head" position="inside">
 				<link rel="stylesheet" type="text/css" href="/apl_aerial_photo/static/src/css/photo_list.css" />
+				<!-- Correct and update!-->
+				<script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+				<link rel="stylesheet" type="text/css" href="/apl_aerial_photo/static/src/css/magnify.css"/>
+				
             </xpath>
 			<xpath expr="//div[@id='postjs']" position="inside">
+				<script type="text/javascript" src="/apl_aerial_photo/static/src/js/jquery.magnify.js"></script>
 				<script type="text/javascript" src="/apl_aerial_photo/static/src/js/photodata.js"></script>
+				
 				<script>
 					$("#frame_close_but").click(function(e){
 						e.preventDefault();

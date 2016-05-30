@@ -24,24 +24,33 @@ function photolib(apl_ids,map) {
     //Define functions
     
     this.hide_photo_preview=function(){
+        
         $("#photo_preview_frame").addClass("novis");
     }
     this.show_photo_preview=function(id){
+        this.hide_photo_full();
         cur_photo=this.photos[id];
         ppf=document.getElementById("photo_preview_frame");
         ppf.innerHTML='<center><img src="'+cur_photo.url_image+'" width="100%"/></center>'
         $("#photo_preview_frame").removeClass("novis");
 
     }
-    this.hide_photo_full=function(id){
+    this.hide_photo_full=function(){
+        console.debug('Start hide photo full');
         $("#photo_full_frame").addClass("novis");
     }
     
     this.show_photo_full=function(id){
         cur_photo=this.photos[id];
         phf=document.getElementById("photo_full_frame");
-        phf.innerHTML='<center><img src="'+cur_photo.url_image+'" height="100%" onclick="sitephotolib.hide_photo_full();"/></center>'
+        phf.innerHTML='<center><img src="'+cur_photo.url_image+'" class="zoom" data-magnify-src="'+cur_photo.url_image+'" width="100%" onclick="sitephotolib.hide_photo_full();"/></center>'
         $("#photo_full_frame").removeClass("novis");
+        $('.zoom').magnify();
+        that=this;
+        $('.magnify-lens').click(function(){
+            console.debug('Clic');
+            that.hide_photo_full();
+        });
         /*var phle=document.getElementById("photo_full_frame");
         phle.innerHTML='<div><right><a href="#" id="frame_close_but"><span class="glyphicon glyphicon-remove-circle" width="20"></span></a><right></div>'
         cur_photo=this.photos[id];
