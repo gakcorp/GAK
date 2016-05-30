@@ -40,11 +40,13 @@ class data_json(http.Controller):
                 "pillars":[]
             }
             for pil in ph.near_pillar_ids:
-                pill_data["count"]=pill_data["count"]+1
-                pill_data["pillars"].append({
-                    'id':pil.id,
-                    'num_by_vl':pil.num_by_vl
-                    })
+                print '[uis_api_controllers.api_v1_photo_data] Return for APL %r Photo %r near Pillar %r' % (pil.apl_id.id, ph.id, pil.name)
+                if pil.apl_id.id in clean_ids:
+                    pill_data["count"]=pill_data["count"]+1
+                    pill_data["pillars"].append({
+                        'id':pil.id,
+                        'num_by_vl':pil.num_by_vl
+                        })
             photo_data["photos"].append({
                 'id':ph.id,
                 'lat':ph.latitude,

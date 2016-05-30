@@ -1,3 +1,6 @@
+.div_img_thumb{
+    overflow-y: overlay;
+}
 #photolist{
     position:relative;
     max-height:50%;
@@ -40,4 +43,10 @@
     visibility: hidden;
     width:0px;
     height:0px;
+}
+.img_photo_thumb{
+    float:left;
+}
+.img_photo_thumb:hover{
+    filter:grayscale(100%);
 }

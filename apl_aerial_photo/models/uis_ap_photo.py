@@ -159,6 +159,7 @@ class uis_ap_photo(models.Model):
 					dist=0
 					if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0) and (abs(lat1-lat2)<0.1) and (abs(long1-long2)<0.1):
 						dist=distance2points(lat1,long1,lat2,long2)
+					#print "[uis_ap_photo.get_near_photo_pillar] Photo (%r) to pillar %r (%r, APL=%r) distance=%r)" % (photo.name, pillar.id, pillar.name, pillar.apl_id,dist)
 					if (dist<max_dist) and (dist>0):
 						near_pillars.append(pillar)
 						near_pillars_ids.append(pillar.id)

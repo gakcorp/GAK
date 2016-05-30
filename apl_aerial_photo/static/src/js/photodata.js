@@ -78,6 +78,13 @@ function photolib(apl_ids,map) {
             
         }
     }
+    this.show_pillar_badge=function(cf){
+        var str='';
+        for (var j=0;j<cur_photo.pillar_data.count;j++){
+            str=str+'<span class="badge">'+cf.pillar_data.pillars[j].num_by_vl+'</span>';
+            }
+        return str;
+    }
     this.set_photo_tumb=function(){
         var phle=document.getElementById("photo_list");
         phle.innerHTML="<b>Images</b>"
@@ -91,12 +98,9 @@ function photolib(apl_ids,map) {
             'ondblclick="sitephotolib.show_photo_full('+cur_photo.id+')" '+
             'onmousedown="sitephotolib.show_photo_preview('+cur_photo.id+')" '+
             'onmouseup="sitephotolib.hide_photo_preview()"> '+
-            '<img src="'+cur_photo.thumbnail+'"/>';
-            for (var j=0;j<cur_photo.pillar_data.count;j++){
-                console.debug(j);
-                phle.innerHTML=phle.innerHTML+'<span class="badge">'+cur_photo.pillar_data.pillars[j].num_by_vl+'</span>';
-                //phle.innerHTML=phle.innerHTML+'<span class="badge">'+cur_photo.pillar_data.pillars[j].num_by_vl+'</span>'
-               }
+            '<div><img src="'+cur_photo.thumbnail+'" class="img_photo_thumb"></div>'+
+            this.show_pillar_badge(cur_photo)+
+            '</div>';
             }
         }
     
