@@ -16,7 +16,7 @@
 		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     </head>
-    <body> <!--t-att-data-partner-url="pillar_url or ''"!-->
+    <body style="overflow-x: hidden;"> <!--t-att-data-partner-url="pillar_url or ''"!-->
          <script>
 			var apl_ids=<t t-raw="apl_ids"/>;
             var lines_data=<t t-raw="lines_data"/>;

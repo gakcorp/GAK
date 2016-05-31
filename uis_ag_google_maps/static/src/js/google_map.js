@@ -261,6 +261,14 @@ function pillar_window_info(div,pillar) {
               //'APL_ID:'+pillar.apl_id+'<br>'+
               //'TAP_ID:'+pillar.tap_id+'<br>'+
               '<canvas id="chart_pillar_'+pillar.id+'" width="300" height="5"></canvas>';
+              $('#pillar_wizard').show();
+              $('#apl_info').hide();
+              $('#pillar_wizard').click(
+                function(){
+                $(this).hide();
+                console.debug('Hide pillar form');
+                }
+                )
               
     //code
 }
@@ -290,7 +298,7 @@ function pillar_window_info(div,pillar) {
         pillar_window_info(p2wd,pillar2);
         
         var pwd=document.getElementById("g_b2_pillar");
-        pwd.innerHTML='<canvas id="chart_pillar" width="400" height="180"></canvas>';
+        pwd.innerHTML='<canvas id="chart_pillar" width="600" height="180"></canvas>';
         
         var elevator=new google.maps.ElevationService;
 
@@ -316,7 +324,7 @@ function pillar_window_info(div,pillar) {
                         labels: labels,
                         datasets: [{
                                 label: "Elevation",
-                                fillColor: "rgba(100,100,100,0.5)",
+                                fillColor: "rgba(255,255,255,0.5)",
                                 strokeColor: "rgba(0,0,0,1)",
                                 pointColor: "rgba(220,220,220,1)",
                                 pointStrokeColor: "#fff",
@@ -434,7 +442,15 @@ var onKtpDragend = function(){
               //'Elevation:'+pillar.elevation+'<br>'+
               'APL_ID:'+ctap.apl_id+'<br>'+
               //'TAP_ID:'+pillar.tap_id+'<br>'+
-              '<canvas id="Chart_APL" width="400" height="200"></canvas>';
+              '<canvas id="Chart_APL" width="600" height="200"></canvas>';
+               $('#pillar_wizard').hide();
+               $('#apl_info').show();
+                $('#apl_info').click(
+                function(){
+                $(this).hide();
+                console.debug('Hide apl form');
+                }
+                )
               
         /*TapinfoWindow.setContent(
         //      '<div class="marker">'+
@@ -465,7 +481,7 @@ var onKtpDragend = function(){
                 labels: labels,
                 datasets: [{
                         label: "Elevation",
-                        fillColor: "rgba(100,100,100,0.5)",
+                        fillColor: "rgba(255,255,255,0.5)",
                         strokeColor: "rgba(0,0,0,1)",
                         pointColor: "rgba(220,220,220,1)",
                         pointStrokeColor: "#fff",
