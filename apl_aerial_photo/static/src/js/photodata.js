@@ -174,7 +174,7 @@ function photolib(apl_ids,map) {
 };
 
 
-var sitephotolib=new photolib(apl_ids,map);
+var sitephotolib=new photolib(apl_ids,sitemapslib.map);
 //var photo_ref=new sitephotolib.refresher();
 function photo_ref() {
     sitephotolib.get_photo_count_hash();

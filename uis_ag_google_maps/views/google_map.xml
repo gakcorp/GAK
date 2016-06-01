@@ -54,17 +54,17 @@
 					<li class="list-group-item leftbar_list_group">
 						<span class="glyphicon glyphicon-transfer"></span>
 						APL
-						<span class="badge"><script>document.write(ktp_data.counter)</script></span>
+						<span class="badge" id="apl_count_badge"></span>
 					</li>
 					<li class="list-group-item">
 						<span class="glyphicon glyphicon-record"></span>
 						Pillars
-						<span class="badge"><script>document.write(odoo_pillar_data.counter)</script></span>
+						<span class="badge" id="pillar_count_badge"></span>
 					</li>
 					<li class="list-group-item">
 						<span class="glyphicon glyphicon-flash"></span>
 						Transformers
-						<span class="badge"><script>document.write(ktp_data.counter)</script></span>
+						<span class="badge" id="trans_count_badge"></span>
 					</li>
 				</ul>
 				</div>
@@ -75,6 +75,7 @@
 					</div>
 					<div id="screen">
 						<div id="odoo-google-map"></div>
+						<div id="site-map"></div>
 						<div id="pillar_wizard">
 							<div id="w_pillar_1"></div>
 							<div id="w_pillar_2"></div>
@@ -93,7 +94,8 @@
         <script src="http://maps.google.com/maps/api/js?key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"></script>
 		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/Chart.js"></script>
         <script type="text/javascript" src="/uis_ag_google_maps/static/src/js/markerclusterer_compiled.js"></script>
-        <script type="text/javascript" src="/uis_ag_google_maps/static/src/js/google_map.js"></script>
+        <!--<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/google_map.js"></script>!-->
+		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/uis_maps.js"></script>
 		<script src="/uis_ag_google_maps/static/src/js/jquery.js"></script>
 		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/left_menu.js"></script>
