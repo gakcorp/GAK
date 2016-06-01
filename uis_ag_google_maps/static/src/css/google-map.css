@@ -21,35 +21,41 @@ body {
     height: 100%;
 }
 #pillar_wizard{
-    width: 400px;
+    width: 100%;
     max-height: 800px;
     position: absolute;
-    top: 10px;
+    /* top: 10px; */
+    left: 250px;
+    bottom: 0px;
     z-index: 1000;
-    background-color: white;
-    border-radius: 3px;
-    opacity: 0.9;
+    background-color: black;
+    border-radius: 0px;
+    opacity: 0.8;
     right: 10px;
     font-size: 11px;
     font-family: Roboto, Arial, sans-serif;
     padding: 8px;
-    box-shadow: rgba(0,0,0,0.29) 0px 1px 4px -1px;
+    box-shadow: rgba(255,255,255,0.29) 0px 1px 4px -1px;
+    color: white;
     
 }
 #apl_info{
-    width:400px;
-    max-height: 500px;
-    position:absolute;
-    bottom:150px;
-    z-index:1010;
-     background-color: white;
-    border-radius: 3px;
-    opacity: 0.9;
+    width: 100%;
+    max-height: 800px;
+    position: absolute;
+    /* top: 10px; */
+    left: 250px;
+    bottom: 0px;
+    z-index: 1000;
+    background-color: black;
+    border-radius: 0px;
+    opacity: 0.8;
     right: 10px;
     font-size: 11px;
     font-family: Roboto, Arial, sans-serif;
     padding: 8px;
-    box-shadow: rgba(0,0,0,0.29) 0px 1px 4px -1px;
+    box-shadow: rgba(255,255,255,0.29) 0px 1px 4px -1px;
+    color: white;
     
 }
 .marker {

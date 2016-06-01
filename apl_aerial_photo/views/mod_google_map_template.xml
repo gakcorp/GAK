@@ -3,17 +3,40 @@
     <data>
         <template id="mod_uis_google_map" inherit_id="uis_ag_google_maps.uis_google_map">
             <xpath expr="//head" position="inside">
-            
+				<link rel="stylesheet" type="text/css" href="/apl_aerial_photo/static/src/css/photo_list.css" />
+				<!-- Correct and update!-->
+				<script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+				<link rel="stylesheet" type="text/css" href="/apl_aerial_photo/static/src/css/magnify.css"/>
+				
             </xpath>
+			<xpath expr="//div[@id='postjs']" position="inside">
+				<script type="text/javascript" src="/apl_aerial_photo/static/src/js/jquery.magnify.js"></script>
+				<script type="text/javascript" src="/apl_aerial_photo/static/src/js/photodata.js"></script>
+				
+				<script>
+					$("#frame_close_but").click(function(e){
+						e.preventDefault();
+						$("#photo_full_frame").addClass("hidden");
+						$("#photo_full_frame").removeClass("visible");
+					});
+				</script>
+			</xpath>
             <xpath expr="//ul[@id='map_objects']" position="inside">
-                <script type="text/javascript" src="/apl_aerial_photo/static/src/js/photodata.js"></script>
                 <li class="list-group-item leftbar_list_group" id="photo_li">
 						<span class="glyphicon glyphicon-camera"></span>
 						Photo
 						<span class="badge" id="photo_count_badge"></span>
 				</li>
-                <script>photo_get_photo_count(apl_ids);</script>
             </xpath>
+			<xpath expr="//div[@id='right_bar']" position="inside">
+				<div id="photo_list"></div>
+			</xpath>
+			<xpath expr="//div[@id='wrapper']" position="inside">
+				<div id="photo_full_frame" class="novis">
+				</div>
+				<div id="photo_preview_frame" class="novis">
+				</div>
+			</xpath>
         </template>
     </data>
 </openerp>

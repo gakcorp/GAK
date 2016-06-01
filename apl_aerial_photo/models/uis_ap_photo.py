@@ -78,6 +78,7 @@ class uis_ap_photo(models.Model):
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
 	altitude=fields.Float(digits=(2,4), string='Altitude')
+	rotation=fields.Float(digits=(2,4),string='Rotation')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='photo_near_pillar',
 									 column1='photo_id',
@@ -135,9 +136,7 @@ class uis_ap_photo(models.Model):
 		for photo in self.browse(cr,uid,ids,context=context):
 			apl_ids=[]
 			for pil in photo.near_pillar_ids:
-				print pil.name
-				print pil.apl_id.id
-				if pil.apl_id not in apl_ids:
+				if pil.apl_id.id not in apl_ids:
 					apl_ids.append(pil.apl_id.id)
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
@@ -160,6 +159,7 @@ class uis_ap_photo(models.Model):
 					dist=0
 					if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0) and (abs(lat1-lat2)<0.1) and (abs(long1-long2)<0.1):
 						dist=distance2points(lat1,long1,lat2,long2)
+					#print "[uis_ap_photo.get_near_photo_pillar] Photo (%r) to pillar %r (%r, APL=%r) distance=%r)" % (photo.name, pillar.id, pillar.name, pillar.apl_id,dist)
 					if (dist<max_dist) and (dist>0):
 						near_pillars.append(pillar)
 						near_pillars_ids.append(pillar.id)

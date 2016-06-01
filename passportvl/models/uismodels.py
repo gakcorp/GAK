@@ -291,7 +291,8 @@ class uis_papl_tap(models.Model):
 class uis_papl_apl_cable(models.Model):
 	_name='uis.papl.apl.cable'
 	name=fields.Char(string="Name")
-	
+
+    
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
@@ -301,6 +302,7 @@ class uis_papl_apl(models.Model):
 	feeder_num=fields.Integer(string="Feeder")
 	voltage=fields.Integer(string="Voltage (kV)")
 	inv_num = fields.Char()
+	department_id=fields.Many2one('uis.papl.department', string="Department")
 	bld_year =fields.Char(string="Building year")
 	startexp_date = fields.Date(string="Start operations date")
 	build_company = fields.Many2one('res.company',string='construction installation company')
@@ -325,7 +327,7 @@ class uis_papl_apl(models.Model):
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply substation")
 	transformer_ids=fields.One2many('uis.papl.transformer','apl_id', string="Transformers")
-	tap_text=fields.Char(compute='_get_tap_text_for_apl', string="Taps")
+	tap_text=fields.Html(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
 	url_maps=fields.Char(compute='_apl_get_url_maps')
@@ -398,12 +400,12 @@ class uis_papl_apl(models.Model):
 				
 	def _get_tap_text_for_apl(self):
 		for apl in self:
-			res=''
+			hres=''
 			for tap in apl.tap_ids:
 				if not(tap.is_main_line):
 					taplen=tap.line_len_calc;
-					res=res+tap.name+' - '+str(taplen)+' (m); '
-			apl.tap_text=res
+					hres=hres+str(tap.num_by_vl)+' ('+str(tap.conn_pillar_id.num_by_vl)+') - '+str(taplen)+ '(m); <br/>'
+			apl.tap_text=hres
 	
 	@api.depends('tap_ids','pillar_id')
 	def _get_cnt_pillar_wo_tap(self):

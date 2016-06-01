@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 9.0c\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-17 15:04+0000\n"
-"PO-Revision-Date: 2016-04-19 23:40+0300\n"
+"POT-Creation-Date: 2016-05-27 09:54+0000\n"
+"PO-Revision-Date: 2016-05-31 16:15+0500\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,9 +18,101 @@ msgstr ""
 "X-Generator: Poedit 1.8.7\n"
 
 #. module: passportvl
-#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
-msgid "<b>Information about APL</b>"
-msgstr "<b>Information about APL</b>"
+#: model:ir.ui.view,arch_db:passportvl.uis_apl_scheme
+msgid "&lt;!DOCTYPE html&gt;"
+msgstr "&lt;!DOCTYPE html&gt;"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "1(a). Lenght calculated (m):"
+msgstr "1(a). Lenght calculated (m):"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "1. General characteristics"
+msgstr "1. Основные данные"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "1. Lenght (km):"
+msgstr "1.Протяженность (km):"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "2. Span lenght (m):"
+msgstr "2. Длина пролета (m):"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "3. Cable:"
+msgstr "3. Марка провода:"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "4. Sag (m):"
+msgstr "4. Стрела провеса (m):"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "5. Number of circuits:"
+msgstr "5. Число цепей на опоре:"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "6. Climatic conditions:"
+msgstr "6. Климатические условия (принятые при расчете):"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "7. Switching point:"
+msgstr "7. Переключательные пункты и их местонахождение:"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "8. Taps:"
+msgstr "8. Отпайки и их длина:"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_deprtment_form
+msgid "<b>Information about Department</b>"
+msgstr "<b>Information about Department</b>"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid ""
+"<br/>\n"
+"                            Date:"
+msgstr ""
+"<br/>\n"
+"                            Дата:"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid ""
+"<br/>\n"
+"                            Department:"
+msgstr ""
+"<br/>\n"
+"                            Подразделение:"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid ""
+"<br/>\n"
+"                            Substation:"
+msgstr ""
+"<br/>\n"
+"                            Подстанция:"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "<br/><br/><br/>Passport VL"
+msgstr "<br/><br/><br/>Паспорт ВЛ"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "<strong>Name of APL:</strong><br/>"
+msgstr "<strong>Наименование ВЛ:</strong><br/>"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_apl_id
@@ -36,6 +128,7 @@ msgid "APL Management"
 msgstr "АктивГИС"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_apl_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_apl_id
 msgid "APL Name"
 msgstr "Наименование ВЛ"
@@ -58,6 +151,11 @@ msgid "APLs"
 msgstr "ВЛ"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_address
+msgid "Address"
+msgstr "Адрес"
+
+#. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_apl
 msgid "Air power line (APL)"
 msgstr "Воздушная линия"
@@ -73,14 +171,24 @@ msgid "Build Year"
 msgstr "Год постройки"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_bld_year
+msgid "Build year"
+msgstr "Год постройки"
+
+#. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_bld_year
 msgid "Building year"
 msgstr "Год постройки"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable_ids
+msgid "Cable ids"
+msgstr "Cable ids"
+
+#. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_calc_med_dist
 msgid "Calc med dist"
-msgstr "сред. растояние"
+msgstr "Calc med dist"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_list
@@ -93,9 +201,22 @@ msgid "Cancel"
 msgstr "Отмена"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_climatic
+msgid "Climatic"
+msgstr "Climatic"
+
+#. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_climatic_conditions
 msgid "Climatic conditions"
-msgstr "Климатические условия"
+msgstr ""
+"Климатические условия\n"
+" (принятые при расчете):"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_code
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_code
+msgid "Code"
+msgstr "Код"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_code_maps
@@ -108,9 +229,21 @@ msgid "Connect Pilar"
 msgstr "Connect Pilar"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_conn_group
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_conn_group
+msgid "Connection group"
+msgstr "Connection group"
+
+#. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
 msgid "Connections"
-msgstr "Connections"
+msgstr "Соединение проводов"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_control_summ
+msgid "Control summ"
+msgstr "Control summ"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_count_pillar
@@ -149,11 +282,17 @@ msgid "Create new power substation"
 msgstr "Create new power substation"
 
 #. module: passportvl
+#: model:ir.actions.act_window,help:passportvl.uis_papl_transformer_action_window
+msgid "Create new transformer"
+msgstr "Create new transformer"
+
+#. module: passportvl
 #: model:ir.actions.act_window,help:passportvl.uis_papl_apl_action_window
 msgid "Create passport of APL"
 msgstr "Create passport of APL"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable_create_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_create_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_create_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_create_uid
@@ -161,11 +300,15 @@ msgstr "Create passport of APL"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_type_create_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation_create_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_create_uid
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_create_uid
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t_type_create_uid
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_type_create_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_create_uid
 msgid "Created by"
 msgstr "Создано"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable_create_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_create_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_create_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_create_date
@@ -173,6 +316,9 @@ msgstr "Создано"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_type_create_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation_create_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_create_date
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_create_date
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t_type_create_date
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_type_create_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_create_date
 msgid "Created on"
 msgstr "Создан"
@@ -180,10 +326,20 @@ msgstr "Создан"
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
 msgid "Crossing"
-msgstr "Crossing"
+msgstr "Переходы и пересечения"
 
 #. module: passportvl
-#: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_substation_ids
+#: selection:uis.papl.transformer,state:0
+msgid "DEFECT"
+msgstr "DEFECT"
+
+#. module: passportvl
+#: selection:uis.papl.transformer,state:0
+msgid "DRAFT"
+msgstr "DRAFT"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_department_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation_department_id
 msgid "Department"
 msgstr "Подразделение"
@@ -199,11 +355,19 @@ msgid "Departments"
 msgstr "Подразделения"
 
 #. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_department_graph
+msgid "Departments stat"
+msgstr "Departments stat"
+
+#. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_deprtment_form
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
 msgid "Details"
 msgstr "Подробная информация"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable_display_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_display_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_display_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_display_name
@@ -211,6 +375,9 @@ msgstr "Подробная информация"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_type_display_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation_display_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_display_name
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_display_name
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t_type_display_name
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_type_display_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_display_name
 msgid "Display Name"
 msgstr "Отображаемое Имя"
@@ -226,11 +393,16 @@ msgid "Distance between pillars"
 msgstr "Distance between pillars"
 
 #. module: passportvl
+#: selection:uis.papl.transformer,state:0
+msgid "EXPLOITATION"
+msgstr "EXPLOITATION"
+
+#. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_elevation
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_pillar_list
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_tap_list
 msgid "Elevation"
-msgstr "Elevation"
+msgstr "ВЫСОТНАЯ ОТМЕТКА"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.wizard_create_pillar
@@ -243,6 +415,17 @@ msgid "End pillar"
 msgstr "End pillar"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_exist
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_exist
+msgid "Exist"
+msgstr "Exist"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
+msgid "Exploitation"
+msgstr "Exploitation"
+
+#. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_feeder_num
 msgid "Feeder"
 msgstr "Feeder"
@@ -250,7 +433,7 @@ msgstr "Feeder"
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
 msgid "Fittings"
-msgstr "Fittings"
+msgstr "Арматура"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.wizard_create_pillar
@@ -263,12 +446,28 @@ msgid "Full name"
 msgstr "Full name"
 
 #. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
+msgid "Geo Data"
+msgstr "Geo Data"
+
+#. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_search
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_pillar_search
 msgid "Group By"
 msgstr "Группировать по"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_height
+msgid "Height (m)"
+msgstr "Height (m)"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "I. The circuit schematic"
+msgstr "I. Принципиальная схема"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_id
@@ -276,38 +475,76 @@ msgstr "Группировать по"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_type_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_id
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_id
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t_type_id
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_type_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_id
 msgid "ID"
 msgstr "ID"
 
 #. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "II. Main details"
+msgstr "II. Основные данные"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_install_date
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_install_date
+msgid "Install date"
+msgstr "Install date"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Installation company"
+msgstr ""
+"Наименование строительно\n"
+"-монтажной организации"
+
+#. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
 msgid "Insulators"
-msgstr "Insulators"
+msgstr "Изоляторы"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_inv_num
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_inv_num
 msgid "Inv num"
-msgstr "Inv num"
+msgstr "Инвентарный номер"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_list
 msgid "Inventory Num"
-msgstr "Inventory Num"
+msgstr "Инвентарный номер"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_inv_num
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_inv_num
+msgid "Inventory num"
+msgstr "Инвентарный номер"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Inventory number"
+msgstr "Инвентарный номер"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl___last_update
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable___last_update
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department___last_update
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar___last_update
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_material___last_update
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_type___last_update
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation___last_update
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap___last_update
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer___last_update
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t_type___last_update
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_type___last_update
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars___last_update
 msgid "Last Modified on"
 msgstr "Последний раз изменено"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable_write_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_write_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_write_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_material_write_uid
@@ -315,11 +552,15 @@ msgstr "Последний раз изменено"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_write_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation_write_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_write_uid
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t_type_write_uid
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_type_write_uid
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_write_uid
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_write_uid
 msgid "Last Updated by"
 msgstr "Последний раз обновлено"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable_write_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_write_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_write_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_material_write_date
@@ -327,6 +568,9 @@ msgstr "Последний раз обновлено"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_write_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation_write_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_write_date
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t_type_write_date
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_type_write_date
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_write_date
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_write_date
 msgid "Last Updated on"
 msgstr "Последний раз обновлено"
@@ -343,8 +587,9 @@ msgstr "Lat2"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_latitude
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_latitude
 msgid "Latitude"
-msgstr "Latitude"
+msgstr "Широта"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_len_prev_pillar
@@ -357,6 +602,11 @@ msgid "Lenght to prev pillar (m)"
 msgstr "Lenght to prev pillar (m)"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_length
+msgid "Length (m)"
+msgstr "Length (m)"
+
+#. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_list
 msgid "Line Lengt (km)"
 msgstr "Длина (км)"
@@ -365,18 +615,18 @@ msgstr "Длина (км)"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_line_len
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_line_len
 msgid "Line len"
-msgstr "Line len"
+msgstr "Длина линии (м)"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_line_len_calc
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_line_len_calc
 msgid "Line len calc"
-msgstr "Line len calc"
+msgstr "Расчетная длина линии"
 
 #. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_apl_list
 msgid "List of APL"
-msgstr "List of APL"
+msgstr "Список ВЛ"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_list
@@ -390,6 +640,7 @@ msgstr "List of Department"
 
 #. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_department_list
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_department_list
 msgid "List of Departments"
 msgstr "List of Departments"
 
@@ -417,6 +668,17 @@ msgid "List of Tap"
 msgstr "List of Tap"
 
 #. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_view
+msgid "List of Transformer"
+msgstr "List of Transformer"
+
+#. module: passportvl
+#: model:ir.actions.act_window,name:passportvl.uis_papl_transformer_action_window
+#: model:ir.ui.menu,name:passportvl.uis_papl_menu_transformer_list
+msgid "List of Transformers"
+msgstr "List of Transformers"
+
+#. module: passportvl
 #: model:ir.actions.act_window,name:passportvl.uis_papl_apl_action_window
 msgid "List of air power line"
 msgstr "List of air power line"
@@ -432,6 +694,16 @@ msgid "List of substations"
 msgstr "List of substations"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_locality
+msgid "Locality"
+msgstr "Населенный Пункт"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Locality:"
+msgstr "Населенный пункт:"
+
+#. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_long1
 msgid "Long1"
 msgstr "Long1"
@@ -443,13 +715,43 @@ msgstr "Long2"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_longitude
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_longitude
 msgid "Longitude"
-msgstr "Longitude"
+msgstr "Долгота"
+
+#. module: passportvl
+#: selection:uis.papl.transformer,state:0
+msgid "MAINTENANCE"
+msgstr "MAINTENANCE"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
 msgid "Main details"
-msgstr "Main details"
+msgstr "Основные данные"
+
+#. module: passportvl
+#: model:ir.ui.menu,name:passportvl.uis_papl_menu_management
+msgid "Management"
+msgstr "Управление"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_manufacturer
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_manufacturer
+msgid "Manufacturer"
+msgstr "Производитель"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_manuf_num
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_manuf_num
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_manuf_num
+msgid "Manufacturer code"
+msgstr "Manufacturer code"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_manuf_date
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_manuf_date
+msgid "Manufacturing date"
+msgstr "Manufacturing date"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
@@ -467,9 +769,25 @@ msgstr "Material"
 #. module: passportvl
 #: model:ir.model,name:passportvl.model_uis_papl_pillar_material
 msgid "Materials of pillar"
-msgstr "Materials of pillar"
+msgstr "Материал опоры"
 
 #. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Maximum (m):"
+msgstr "Максимальная (m):"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Medium (m):"
+msgstr "Средняя (m):"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Minimum (m):"
+msgstr "Минимальная (m):"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cable_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_material_name
@@ -477,9 +795,28 @@ msgstr "Materials of pillar"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_type_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_substation_name
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_name
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_name
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t_type_name
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_type_name
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_list
 msgid "Name"
 msgstr "Наименование"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Name of air power line:<br/>"
+msgstr "Диспетчерское наименование ВЛ:<br/>"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_near_pillar_ids
+msgid "Near pillar ids"
+msgstr "Near pillar ids"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_nl_current
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_nl_current
+msgid "No-load current"
+msgstr "No-load current"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_tap_list
@@ -499,7 +836,7 @@ msgstr "Номер"
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_count_circ
 msgid "Number of circuits"
-msgstr "Number of circuits"
+msgstr "Число цепей на опоре"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_pillar_list
@@ -507,9 +844,21 @@ msgid "Number pillar on power line"
 msgstr "Number pillar on power line"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_oil_weight
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_oil_weight
+msgid "Oil weight (kg)"
+msgstr "Oil weight (kg)"
+
+#. module: passportvl
 #: model:ir.model,name:passportvl.model_uis_papl_department
 msgid "Organisation structure for Department"
 msgstr "Organisation structure for Department"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_out_weight
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_out_weight
+msgid "Outer weight (kg)"
+msgstr "Outer weight (kg)"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_parent_department_id
@@ -517,19 +866,35 @@ msgid "Parent Department"
 msgstr "Вышестоящее подразделение"
 
 #. module: passportvl
-#: model:ir.ui.menu,name:passportvl.uis_papl_menu_pillar
-msgid "Pillar"
-msgstr "Pillar"
+#: model:ir.actions.report.xml,name:passportvl.action_report_apl_report_passport
+msgid "Passport (PDF)"
+msgstr "Паспорт (PDF)"
 
 #. module: passportvl
+#: model:ir.actions.report.xml,name:passportvl.action_report_apl_report_passport_web
+msgid "Passport (web)"
+msgstr "Паспорт (web)"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_telephone
+msgid "Phone num"
+msgstr "Телефонный номер"
+
+#. module: passportvl
+#: model:ir.ui.menu,name:passportvl.uis_papl_menu_pillar
+msgid "Pillar"
+msgstr "Опора"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_pillar_id
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_pillar_list
 msgid "Pillar Name"
-msgstr "Pillar Name"
+msgstr "Наименование опоры"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_pillar_list
 msgid "Pillar Type"
-msgstr "Pillar Type"
+msgstr "Тип опоры"
 
 #. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_pillar_wiz
@@ -544,7 +909,7 @@ msgstr "Pillar count"
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_pillar_list
 msgid "Pillar material"
-msgstr "Pillar material"
+msgstr "Материал опоры"
 
 #. module: passportvl
 #: model:ir.model,name:passportvl.model_uis_papl_pillar
@@ -558,7 +923,7 @@ msgstr "Pillar models"
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_list
 msgid "Pillars"
-msgstr "Pillars"
+msgstr "Опоры"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_cnt_pillar_wo_tap
@@ -569,6 +934,12 @@ msgstr "Pillars wo TAP"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_cnt_np
 msgid "Pillars wo prev"
 msgstr "Pillars wo prev"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_power
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_power
+msgid "Power (kVA)"
+msgstr "Мощность (кВА)"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_prev_latitude
@@ -589,22 +960,76 @@ msgstr "Prev pillar"
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_prol_max_len
 msgid "Prol max len"
-msgstr "Prol max len"
+msgstr "Максимальная длина пролета"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_prol_med_len
 msgid "Prol med len"
-msgstr "Prol med len"
+msgstr "Средняя длина пролета"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_prol_min_len
 msgid "Prol min len"
-msgstr "Prol min len"
+msgstr "Минимальная длина пролета"
+
+#. module: passportvl
+#: selection:uis.papl.transformer,state:0
+msgid "READY TO EXPLOITATION"
+msgstr "READY TO EXPLOITATION"
+
+#. module: passportvl
+#: selection:uis.papl.transformer,state:0
+msgid "REPAIRS"
+msgstr "REPAIRS"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_current
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_current
+msgid "Rated current (A)"
+msgstr "Rated current (A)"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_voltage
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_voltage
+msgid "Rated voltage (kV)"
+msgstr "Rated voltage (kV)"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
+msgid "Ready to Exploitation"
+msgstr "Ready to Exploitation"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
 msgid "Resistance wire"
-msgstr "Resistance wire"
+msgstr "Сопротивление провода"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_sag_max
+msgid "Sag maximum"
+msgstr "Стрела провеса максимальная"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_sag_med
+msgid "Sag medium"
+msgstr "Стрела провеса средняя"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_sag_min
+msgid "Sag minimum"
+msgstr "Стрела провеса минимальная"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_scheme_image
+#: model:ir.ui.view,arch_db:passportvl.uis_apl_scheme
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
+msgid "Scheme"
+msgstr "Принципиальная схема ВЛ"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_image_file
+msgid "Scheme File Name"
+msgstr "Scheme File Name"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_search
@@ -616,6 +1041,12 @@ msgstr "Search Pillar"
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_settings
 msgid "Settings"
 msgstr "Настройки"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_sc_voltage
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_sc_voltage
+msgid "Short circuit voltage"
+msgstr "Short circuit voltage"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_short_name
@@ -638,9 +1069,14 @@ msgid "Start number"
 msgstr "Start number"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_start_exp_year
+msgid "Start of operation"
+msgstr "Start of operation"
+
+#. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_startexp_date
 msgid "Start operations date"
-msgstr "Start operations date"
+msgstr "Дата ввода в эксплуатацию"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_pillar1_id
@@ -648,19 +1084,45 @@ msgid "Start pillar"
 msgstr "Start pillar"
 
 #. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Start-up date"
+msgstr "Дата ввода в эксплуатацию"
+
+#. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_status
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_state
 msgid "Status"
 msgstr "Статус"
 
 #. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
+msgid "Step-down transformer"
+msgstr "Step-down transformer"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
+msgid "Step-down transformer 1"
+msgstr "Step-down transformer 1"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
+msgid "Step-down transformer 2"
+msgstr "Step-down transformer 2"
+
+#. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_substation
 msgid "Substation"
-msgstr "Substation"
+msgstr "Подстанция"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_substation_list
 msgid "Substation Name"
-msgstr "Substation Name"
+msgstr "Наименование подстанции"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_substation_ids
+msgid "Substations"
+msgstr "Подстанции"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_department_substation_count
@@ -684,6 +1146,13 @@ msgid "Sustation model"
 msgstr "Sustation model"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_sw_point
+msgid "Switching point"
+msgstr ""
+"Переключательные пункты\n"
+" и их местонахождение:"
+
+#. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_pillar_search
 msgid "TAP"
 msgstr "TAP"
@@ -695,6 +1164,7 @@ msgid "Tap"
 msgstr "Tap"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_tap_id
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_wizard_create_pillars_tap_id
 msgid "Tap Name"
 msgstr "Tap Name"
@@ -705,7 +1175,12 @@ msgstr "Tap Name"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_tap_id
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_form
 msgid "Taps"
-msgstr "Taps"
+msgstr "Отпайки и их длина"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_form
+msgid "To Draft"
+msgstr "To Draft"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_pillar_cnt
@@ -713,9 +1188,37 @@ msgid "Total pillars"
 msgstr "Total pillars"
 
 #. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_transformer_search
+msgid "Transformation Search"
+msgstr "Transformation Search"
+
+#. module: passportvl
+#: model:ir.model,name:passportvl.model_uis_papl_transformer
+#: model:ir.ui.menu,name:passportvl.uis_papl_menu_transformer
+msgid "Transformer"
+msgstr "Transformer"
+
+#. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_tp
 msgid "Transformer Station"
 msgstr "Transformer Station"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_type
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_type
+msgid "Transformer Type"
+msgstr "Transformer Type"
+
+#. module: passportvl
+#: model:ir.model,name:passportvl.model_uis_papl_transformer_t_type
+#: model:ir.model,name:passportvl.model_uis_papl_transformer_type
+msgid "Transformer Types"
+msgstr "Transformer Types"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_transformer_ids
+msgid "Transformers"
+msgstr "Transformers"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_pillar_type_id
@@ -726,12 +1229,23 @@ msgstr "Тип"
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_apl_type
 msgid "Type APL"
-msgstr "Тип ВЛ"
+msgstr "Type APL"
 
 #. module: passportvl
 #: model:ir.model,name:passportvl.model_uis_papl_pillar_type
 msgid "Type of pillar"
-msgstr "Тип опоры"
+msgstr "Type of pillar"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_trans_type
+msgid "Type of transformer substation"
+msgstr "Type of transformer substation"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_full_code
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_full_code
+msgid "UniCode"
+msgstr "UniCode"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_url_maps
@@ -741,19 +1255,54 @@ msgid "Url maps"
 msgstr "Url maps"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_url_scheme
+msgid "Url scheme"
+msgstr "Url scheme"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_voltage
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_search
 msgid "Voltage"
-msgstr "Voltage"
+msgstr "Класс напряжения"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_voltage
 msgid "Voltage (kV)"
-msgstr "Voltage (kV)"
+msgstr "Класс напряжения (кВ)"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_reg_voltage
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_reg_voltage
+msgid "Voltage regulator"
+msgstr "Voltage regulator"
+
+#. module: passportvl
+#: selection:uis.papl.transformer,state:0
+msgid "WRITE-OFF"
+msgstr "WRITE-OFF"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_weight
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t2_weight
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_weight
+msgid "Weight (kg)"
+msgstr "Weight (kg)"
+
+#. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_width
+msgid "Width (m)"
+msgstr "Width (m)"
+
+#. module: passportvl
+#: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_report_passport
+msgid "Year of building"
+msgstr "Год постройки"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_build_company
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_manufacturer
 msgid "construction installation company"
-msgstr "construction installation company"
+msgstr "Наименование строительно-монтажной организации"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_tap_is_main_line
@@ -761,9 +1310,19 @@ msgid "is main line"
 msgstr "is main line"
 
 #. module: passportvl
+#: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_str_pillar_ids
+msgid "pillar ids str"
+msgstr "pillar ids str"
+
+#. module: passportvl
 #: model:ir.model,name:passportvl.model_uis_papl_apl
 msgid "uis.papl.apl"
 msgstr "uis.papl.apl"
+
+#. module: passportvl
+#: model:ir.model,name:passportvl.model_uis_papl_apl_cable
+msgid "uis.papl.apl.cable"
+msgstr "uis.papl.apl.cable"
 
 #. module: passportvl
 #: model:ir.model,name:passportvl.model_uis_papl_tap
