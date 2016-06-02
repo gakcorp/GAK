@@ -5,6 +5,25 @@ from openerp.tools import html_escape as escape
 import json
 
 class maps_data_json(http.Controller):
+    @http.route('/apiv1/pillar/newcoord', type="json", auth="public", csfr=False)
+    def api_v1_pillar_data(self, *arg, **post):
+        print 'POST Newcoord json data (PILLAR)'
+        cr, uid, context=request.cr, request.uid, request.context
+        pillar_obj = request.registry['uis.papl.pillar']
+        data=json.loads(json.dumps(request.jsonrequest))
+        pid=data['pillar_id']
+        new_latitude=data['new_latitude']
+        new_longitude=data['new_longitude']
+        domain=[("id","in",[pid])]
+        pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
+        for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
+            pil.latitude=new_latitude
+            pil.longitude=new_longitude
+        values ={
+            'result':1
+        }
+        return values
+    
     @http.route('/apiv1/pillar/data', type="json", auth="public", csfr=False)
     def api_v1_pillar_data(self, *arg, **post):
         print 'GET json data (PILLAR)'

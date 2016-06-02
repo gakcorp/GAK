@@ -1,22 +1,46 @@
 function mapslib(apl_ids, div_id) {
     this.center_loc='';
+    this.first_load=true;
     this.apl_ids=apl_ids;
     this.pillar_data=[];
     this.layers=[];
+    this.markers=[];
+    this.markers['P']=[];
     this.showpillar=false;
     this.ahowpillarzoom=10;
+	this.editable_pillar=true;
     this.bounds=new google.maps.LatLngBounds();
-    var center_loc = [];
+    this.center_loc = new google.maps.LatLng(56,56);
     this.map=new google.maps.Map(document.getElementById(div_id), {
         zoom: 13,
-        //center: center_loc,
-        //mapTypeId: google.maps.MapTypeId.HYBRID,
+        center: this.center_loc,
+        mapTypeId: google.maps.MapTypeId.HYBRID,
         mapTypeControlOptions:{
             mapTypeIds: [google.maps.MapTypeId.HYBRID, google.maps.MapTypeId.ROADMAP],
             style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
         }
        });
-    
+	thatlib=this;
+    //Devine events
+	var onPillarDragend = function(){
+        if (thatlib.editable_pillar){
+			var marker =this
+			var point= marker.getPosition();
+			id=marker.id;
+			new_latitude=point.lat();
+			new_longitude=point.lng();
+			console.debug('Modified id: '+id+' New_latitude:'+new_latitude+' New longitude:' +new_longitude);
+			var data={};
+			data['pillar_id']=id;
+			data['new_latitude']=new_latitude;
+			data['new_longitude']=new_longitude;
+			xhr=new XMLHttpRequest();
+			xhr.open('POST','/apiv1/pillar/newcoord',true);
+			xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+			xhr.send(JSON.stringify(data));
+		}
+        
+    };
     //Define functions
     this.set_map_center=function(slat,slong){
         this.center_loc=new google.maps.LatLng(slat,slong)
@@ -30,7 +54,43 @@ function mapslib(apl_ids, div_id) {
         this.bounds.extend(location);
     }
     this.set_pillar_markers=function(){
-        
+        for (var i=0;i<this.pillar_data.counter; i++) {
+            cur_pillar=this.pillar_data.pillars[i];
+            if (cur_pillar.latitude && cur_pillar.longitude) {
+                var location = new google.maps.LatLng(cur_pillar.latitude,cur_pillar.longitude);
+            }
+            if (typeof this.markers['P'][cur_pillar.id] != "undefined") {
+				cur_marker=this.markers['P'][cur_pillar.id];
+				if (cur_marker.position != location) {
+					this.markers['P'][cur_pillar.id].setPosition(location);
+				}
+				if (cur_marker.elevation != cur_pillar.elevation) {
+					this.markers['P'][cur_pillar.id].elevation=cur_pillar.elevation;
+				}
+			}
+			else{
+				this.markers['P'][cur_pillar.id]= new google.maps.Marker({
+                id:cur_pillar.id,
+				map: this.map,
+                draggable: true,
+                position: location,
+                visible:true,
+                elevation:cur_pillar.elevation,
+                name:cur_pillar.name,
+                prev_id:cur_pillar.prev_id,
+				apl:cur_pillar.apl,
+				apl_id:cur_pillar.apl_id,
+				num_by_vl:cur_pillar.num_by_vl,
+				tap_id:cur_pillar.tap_id
+                //icon:this.get_path_camera_icon(cur_photo.rotation)
+                });
+				google.maps.event.addListener(this.markers['P'][cur_pillar.id], 'dragend', onPillarDragend);
+			}
+            
+			this.markers['P'][cur_pillar.id].setPosition(location)
+            //var imagecur=pillar_image;
+            
+        }
     }
     this.get_pillar_data=function(){
         var data={};
@@ -45,6 +105,12 @@ function mapslib(apl_ids, div_id) {
             var pd=JSON.parse(res.result.pillar_data);
             that.pillar_data=pd;
             that.set_pillar_markers();
+            if (that.first_load==true) {
+                that.set_map_center(that.pillar_data.latitude,that.pillar_data.longitude);
+                that.set_bounds();
+				that.first_load=false;
+                that.map.fitBounds(that.bounds);
+			}
             //that.set_bounds();
             //that.set_photo_tumb();
             };
