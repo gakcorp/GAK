@@ -1,5 +1,6 @@
-function photolib(apl_ids,map) {
-    this.map=map;
+function photolib(apl_ids,sitemaplib) {
+    this.map=sitemaplib.map;
+    this.sitemaplib=sitemaplib;
     this.apl_ids=apl_ids;
     this.photo_count='n/a';
     this.photo_count_hash='n/a';
@@ -58,21 +59,30 @@ function photolib(apl_ids,map) {
             '<center><img src="'+cur_photo.url_image+'" width="95%"/></center>';
         $("#photo_full_frame").addClass("visible");
         $("#photo_full_frame").removeClass("hidden");*/
-    }
+    };
     
     this.show_marker=function(id){
         this.markers[id].setVisible(true);
         this.map.panTo(this.markers[id].position);
+        for (var i=0;i<this.photos[id].pillar_data.count;i++){
+            this.sitemaplib.mark_pillar(this.photos[id].pillar_data.pillars[i].id,true);
+        }
         
-    }
+        
+    };
+    
     this.hide_marker=function(id){
         this.markers[id].setVisible(false);
-    }
+        for (var i=0;i<this.photos[id].pillar_data.count;i++){
+            this.sitemaplib.mark_pillar(this.photos[id].pillar_data.pillars[i].id,false);
+        }
+    };
+    
     this.set_photo_markers=function(){
         for (var i=0;i<this.photo_data.count; i++) {
             cur_photo=this.photo_data.photos[i];
             if (cur_photo.lat && cur_photo.long) {
-            var location = new google.maps.LatLng(cur_photo.lat,cur_photo.long);
+                var location = new google.maps.LatLng(cur_photo.lat,cur_photo.long);
             }
             
             this.markers[cur_photo.id]= new google.maps.Marker({
@@ -174,7 +184,7 @@ function photolib(apl_ids,map) {
 };
 
 
-var sitephotolib=new photolib(apl_ids,sitemapslib.map);
+var sitephotolib=new photolib(apl_ids,sitemapslib);
 //var photo_ref=new sitephotolib.refresher();
 function photo_ref() {
     sitephotolib.get_photo_count_hash();
