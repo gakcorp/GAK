@@ -5,9 +5,17 @@
  */
 
 /* Toggle Styles */
-
+#left_info_bar{
+    font-family: Roboto;
+    color: whitesmoke;
+    font-size: smaller;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top-width: 1px;
+    border-top-style: dashed;
+}
 #menu_button_bar{
-    padding-left: 30px;
+    padding-left: 10px;
 }
 .menu_button{
     border: none;

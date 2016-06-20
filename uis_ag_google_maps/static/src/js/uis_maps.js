@@ -9,6 +9,7 @@ function mapslib(apl_ids, div_id) {
     this.pillar_data=[];
     this.apl_data=[];
     this.lines_data=[];
+    this.trans_data=[];
     this.layers=[];
     this.markers=[];
     this.lines=[];
@@ -36,7 +37,7 @@ function mapslib(apl_ids, div_id) {
 			id=marker.id;
 			new_latitude=point.lat();
 			new_longitude=point.lng();
-			console.debug('Modified id: '+id+' New_latitude:'+new_latitude+' New longitude:' +new_longitude);
+			//console.debug('Modified id: '+id+' New_latitude:'+new_latitude+' New longitude:' +new_longitude);
 			var data={};
 			data.pillar_id=id;
 			data.new_latitude=new_latitude;
@@ -45,9 +46,66 @@ function mapslib(apl_ids, div_id) {
 			xhr.open('POST','/apiv1/pillar/newcoorddrop',true);
 			xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
 			xhr.send(JSON.stringify(data));
+            xhr.onload=function(){
+                thatlib.get_apl_lines_data();    
+            };
+            
 		}
         
     };
+    var onPillarMouseOver = function(){
+        var marker=this;
+        console.debug('OnMouseOver Pillar'+marker.id);
+        var code_str='';
+        code_str='Pillar ID : '+marker.id+'</br>';
+        code_str=code_str+'APL : '+marker.apl+'</br>';
+        code_str=code_str+'Num by VL : '+marker.num_by_vl+'</br>';
+        code_str=code_str+'Full name : '+marker.name+'</br>';
+        code_str=code_str+'Type : '+marker.type_id+'</br>';
+        code_str=code_str+'Elevation : '+marker.elevation+'</br>';
+        code_str=code_str+'Rotation : '+marker.rotation+'</br>';
+        open_def=Math.round(Math.random()*100);
+        closed_def=Math.round(Math.random()*100);
+        total_def=open_def+closed_def;
+        code_str=code_str+'1 year Defects (open/closed/total): '+open_def+'/'+closed_def+'/'+total_def+'</br>';
+        code_str=code_str+'<canvas id="pillar_stat_'+marker.id+'" width="50" height="50"></canvas>';
+        thatlib.show_info_bar(code_str);
+        
+        var data = {
+            datasets: [{
+                data: [open_def,closed_def,total_def],
+                backgroundColor: ["#FF0000","#00FF00","#0000FF"],
+                label: '1Y Deffects' 
+            }],
+            labels: ['open','closed','total']
+            };
+        var ctx = $("#pillar_stat_"+marker.id);
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: data,
+            options:{},
+            animation:{
+                animateScale:true
+            }
+        });
+        
+        /*position: location,
+                visible:true,
+                elevation:cur_pillar.elevation,
+                name:cur_pillar.name,
+                prev_id:cur_pillar.prev_id,
+				apl:cur_pillar.apl,
+				apl_id:cur_pillar.apl_id,
+				num_by_vl:cur_pillar.num_by_vl,
+				tap_id:cur_pillar.tap_id,
+                type_id:cur_pillar.type_id,
+                rotation:cur_pillar.rotation,
+                state:cur_pillar.state,*/
+    };
+    //Define info functions
+    this.show_info_bar=function(code){
+        $("#left_info_bar").html(code);
+    }
     //Define functions
     this.set_map_center=function(slat,slong){
         this.center_loc=new google.maps.LatLng(slat,slong);
@@ -130,6 +188,7 @@ function mapslib(apl_ids, div_id) {
                 map: this.map
                 });
             }
+         $("#apl_count_badge").html(this.apl_data.counter);
     };
     
     this.set_pillar_markers=function(){
@@ -169,6 +228,7 @@ function mapslib(apl_ids, div_id) {
                 icon:this.get_pillar_icon(cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
                 });
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragend', onPillarDragend);
+                google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mouseover', onPillarMouseOver);
 			}
             
 			this.markers.pillars[cur_pillar.id].setPosition(location);
@@ -309,7 +369,8 @@ var sitemapslib=new mapslib(apl_ids,'site-map');
 sitemapslib.init();
 //var photo_ref=new sitephotolib.refresher();
 function map_ref() {
-    sitemapslib.init();
+    sitemapslib.get_pillar_data();
+    sitemapslib.get_apl_lines_data();
     }
 
 map_ref();
