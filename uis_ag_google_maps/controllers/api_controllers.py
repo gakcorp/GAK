@@ -32,10 +32,19 @@ class maps_data_json(http.Controller):
         domain=[("id","in",clean_ids)]
         apl_ids=apl_obj.search(cr, uid, domain, context=context)
         for apl_id in apl_obj.browse(cr, uid, apl_ids, context=context):
+            pil_count=0;
             apl_data["counter"]=apl_data["counter"]+1
             apl_data["apls"].append({
                     'id':apl_id.id,
-                    'name':apl_id.name
+                    'name':apl_id.name,
+                    'type':apl_id.apl_type,
+                    'feeder_num':apl_id.feeder_num,
+                    'voltage':apl_id.voltage,
+                    'inv_num':apl_id.inv_num,
+                    'line_len':apl_id.line_len_calc,
+                    'status':apl_id.status,
+                    'pillar_count':"N/A", #Change to counter
+                    'tap_count':"N/A" #Change to counter
                     })
             apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
             for pillar_id in apl_id.pillar_id:
@@ -43,6 +52,7 @@ class maps_data_json(http.Controller):
                     parentid=pillar_id.parent_id
                     lines_data["counter"]=lines_data["counter"]+1
                     lines_data["lines"].append({
+                        'line_id':str(parentid.id)+"_"+str(pillar_id.id),
                         'lat1':pillar_id.latitude,
                         'long1':pillar_id.longitude,
                         'lat2':parentid.latitude,

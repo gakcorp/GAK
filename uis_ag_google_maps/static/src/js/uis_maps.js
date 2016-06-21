@@ -30,6 +30,19 @@ function mapslib(apl_ids, div_id) {
        });
 	thatlib=this;
     //Devine events
+    var onLineMouseOver = function(){
+        var line=this;
+        thatlib.mark_apl(line.apl_id,true);
+        var code_str='';
+        //Prepare code string
+        thatlib.show_info_bar(code_str);
+    };
+    
+    var onLineMouseOut = function(){
+        var line=this;
+        thatlib.mark_apl(line.apl_id,false);
+    };
+    
 	var onPillarDragend = function(){
         if (thatlib.editable_pillar){
             var marker =this;
@@ -53,9 +66,13 @@ function mapslib(apl_ids, div_id) {
 		}
         
     };
+    var onPillarMouseOut=function(){
+        var marker=this;
+        thatlib.mark_pillar(marker.id, false);
+    };
+    
     var onPillarMouseOver = function(){
         var marker=this;
-        console.debug('OnMouseOver Pillar'+marker.id);
         var code_str='';
         code_str='Pillar ID : '+marker.id+'</br>';
         code_str=code_str+'APL : '+marker.apl+'</br>';
@@ -66,46 +83,72 @@ function mapslib(apl_ids, div_id) {
         code_str=code_str+'Rotation : '+marker.rotation+'</br>';
         open_def=Math.round(Math.random()*100);
         closed_def=Math.round(Math.random()*100);
-        total_def=open_def+closed_def;
-        code_str=code_str+'1 year Defects (open/closed/total): '+open_def+'/'+closed_def+'/'+total_def+'</br>';
-        code_str=code_str+'<canvas id="pillar_stat_'+marker.id+'" width="50" height="50"></canvas>';
+        repairs_def=Math.round(Math.random()*closed_def);
+        code_str=code_str+'1 year Defects (open/closed/repairs): '+open_def+'/'+closed_def+'/'+repairs_def+'</br>';
+        code_str=code_str+'<div><div id="pillar_pie_stat"><canvas id="pillar_stat_'+marker.id+'" width="60" height="60"></canvas></div>';
+        code_str=code_str+'<div id="pillar_bar_stat"><canvas id="pillar_stat_bar_'+marker.id+'" width="120" height="60"></canvas></div></div>';
         thatlib.show_info_bar(code_str);
-        
+        thatlib.mark_pillar(marker.id, true);
         var data = {
             datasets: [{
-                data: [open_def,closed_def,total_def],
+                data: [open_def,closed_def,repairs_def],
                 backgroundColor: ["#FF0000","#00FF00","#0000FF"],
                 label: '1Y Deffects' 
             }],
-            labels: ['open','closed','total']
+            labels: ['open','closed','repairs']
             };
-        var ctx = $("#pillar_stat_"+marker.id);
-        var myDoughnutChart = new Chart(ctx, {
-            type: 'doughnut',
+        //var ctx = $("#pillar_stat_"+marker.id);
+        var options={
+            cutoutPercentage:70,
+            legend:{
+                display:false
+            }
+            };
+        var ctx1 = document.getElementById("pillar_stat_"+marker.id)/*.getContext("2d")*/;
+        var Chart1 = new Chart(ctx1, {
+            type: 'pie',
             data: data,
-            options:{},
+            options:options/*,
             animation:{
                 animateScale:true
-            }
+            }*/
         });
-        
-        /*position: location,
-                visible:true,
-                elevation:cur_pillar.elevation,
-                name:cur_pillar.name,
-                prev_id:cur_pillar.prev_id,
-				apl:cur_pillar.apl,
-				apl_id:cur_pillar.apl_id,
-				num_by_vl:cur_pillar.num_by_vl,
-				tap_id:cur_pillar.tap_id,
-                type_id:cur_pillar.type_id,
-                rotation:cur_pillar.rotation,
-                state:cur_pillar.state,*/
+        var data2={
+            labels:["01","02","03","04","05","06"],
+            datasets:[
+                {
+                    label:"Defects",
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    borderColor: "rgba(255,255,255,0.8)",
+                    borderWidth: 1,
+                    hoverBackgroundColor: "rgba(255,255,255,1)",
+                    hoverBorderColor: "rgba(255,255,255,1)",
+                    data:[Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20)]
+                }
+            ]
+        };
+        var options2={
+            scales:{
+                xAxes:[{
+                    display:false
+                    }]
+                },
+            legend:{
+                display:false
+                }
+            };
+        var ctx2 = document.getElementById("pillar_stat_bar_"+marker.id);
+        var Bar1= new Chart(ctx2, {
+            type: 'bar',
+            data: data2,
+            options:options2
+            });
     };
     //Define info functions
     this.show_info_bar=function(code){
         $("#left_info_bar").html(code);
-    }
+    };
+    
     //Define functions
     this.set_map_center=function(slat,slong){
         this.center_loc=new google.maps.LatLng(slat,slong);
@@ -123,6 +166,16 @@ function mapslib(apl_ids, div_id) {
     this.mark_pillar=function(pid, mark){
         cm=this.markers.pillars[pid];
         this.markers.pillars[pid].setIcon(this.get_pillar_icon(cm.type_id,cm.rotation,cm.state,mark));
+    };
+    this.mark_apl=function(apl_id,mark){
+        for (var i=0;i<this.lines_data.counter;i++){
+            line=this.lines[i];
+            if (line.apl_id===apl_id){
+                this.lines[i].setOptions({
+                    strokeColor:this.get_line_color(mark)
+                });
+            }
+        }
     };
     
     this.get_pillar_icon=function(type,rotation,state,selectable){
@@ -161,6 +214,14 @@ function mapslib(apl_ids, div_id) {
         return pci;
     };
     
+    this.get_line_color=function(selectable){
+        var color="#0000FF";
+        if (selectable){
+            color="#00FFFF";
+        }
+        return color;
+    };
+    
     this.set_show_pillar=function(vis) {
         for (var i = 0; i < thatlib.pillar_data.counter; i++) {
                 if (typeof thatlib.markers.pillars[thatlib.pillar_data.pillars[i].id] != "undefined") {
@@ -182,13 +243,28 @@ function mapslib(apl_ids, div_id) {
                     new google.maps.LatLng(line.lat1, line.long1), 
                     new google.maps.LatLng(line.lat2, line.long2)
                 ],
-                strokeColor: "#0000FF",
+                strokeColor: this.get_line_color(false),//"#0000FF",
                 strokeOpacity: 1.0,
-                strokeWeight: 2,
-                map: this.map
+                strokeWeight: 3,
+                map: this.map,
+                apl_id: line.apl_id
                 });
+            google.maps.event.addListener(this.lines[i],'mouseover', onLineMouseOver);
+            google.maps.event.addListener(this.lines[i],'mouseout', onLineMouseOut);
             }
          $("#apl_count_badge").html(this.apl_data.counter);
+         /*
+             'id':apl_id.id,
+                    'name':apl_id.name,
+                    'type':apl_id.apl_type,
+                    'feeder_num':apl_id.feeder_num,
+                    'voltage':apl_id.voltage,
+                    'inv_num':apl_id.inv_num,
+                    'line_len':apl_id.line_len_calc,
+                    'status':apl_id.status,
+                    'pillar_count':"N/A", #Change to counter
+                    'tap_count':"N/A" #Change to counter
+                    })*/
     };
     
     this.set_pillar_markers=function(){
@@ -229,6 +305,7 @@ function mapslib(apl_ids, div_id) {
                 });
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragend', onPillarDragend);
                 google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mouseover', onPillarMouseOver);
+                google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mouseout', onPillarMouseOut);
 			}
             
 			this.markers.pillars[cur_pillar.id].setPosition(location);
@@ -277,6 +354,7 @@ function mapslib(apl_ids, div_id) {
 				that.first_load=false;
                 that.map.fitBounds(that.bounds);
 			}
+            
             //that.set_bounds();
             //that.set_photo_tumb();
             };

@@ -5,10 +5,26 @@
  */
 
 /* Toggle Styles */
+#pillar_pie_stat{
+    width: 70px;
+    height: 70px;
+    position: absolute;
+    z-index:1000;
+}
+
+#pillar_bar_stat{
+    height: 100px;
+    width: 200px;
+    position: absolute;
+    padding-left: 75px;
+    z-index:500;
+    }
+    
+    
 #left_info_bar{
     font-family: Roboto;
     color: whitesmoke;
-    font-size: smaller;
+    font-size: x-small;
     padding-left: 10px;
     padding-right: 10px;
     border-top-width: 1px;
