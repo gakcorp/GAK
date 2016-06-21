@@ -22,10 +22,10 @@
 				</script>
 			</xpath>
             <xpath expr="//ul[@id='map_objects']" position="inside">
-                <li class="list-group-item leftbar_list_group" id="photo_li">
+                <li class="cust_menu_item list-group-item leftbar_list_group" id="photo_li">
 						<span class="glyphicon glyphicon-camera"></span>
 						Photo
-						<span class="badge" id="photo_count_badge"></span>
+						<span class="cust_badge badge" id="photo_count_badge"></span>
 				</li>
             </xpath>
 			<xpath expr="//div[@id='right_bar']" position="inside">

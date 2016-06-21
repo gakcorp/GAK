@@ -5,6 +5,15 @@
  */
 
 /* Toggle Styles */
+.cust_badge{
+    padding-top: 3px;
+    margin-top: 10px;
+}
+.cust_menu_item{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
 #pillar_pie_stat{
     width: 70px;
     height: 70px;

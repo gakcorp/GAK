@@ -13,6 +13,7 @@ function mapslib(apl_ids, div_id) {
     this.layers=[];
     this.markers=[];
     this.lines=[];
+    this.apls=[];
     this.markers.pillars=[];
     this.showpillar=false;
     this.showpillarzoom=14;
@@ -32,10 +33,58 @@ function mapslib(apl_ids, div_id) {
     //Devine events
     var onLineMouseOver = function(){
         var line=this;
+        var apl_id=line.apl_id;
+        var apl_info=thatlib.apls[apl_id];
         thatlib.mark_apl(line.apl_id,true);
         var code_str='';
-        //Prepare code string
+        code_str='APL ID : '+apl_info.id+'</br>';
+        code_str=code_str+'Name : '+apl_info.name+'</br>';
+        code_str=code_str+'Feeder : '+apl_info.feeder_num+'</br>';
+        code_str=code_str+'Voltage : '+apl_info.voltage+'</br>';
+        code_str=code_str+'Line Length : '+Math.round(apl_info.line_len*100)/100+'</br>';
+        code_str=code_str+'Pillars count : '+apl_info.pillar_count+'</br>';
+        code_str=code_str+'Tap count : '+apl_info.tap_count+'</br>';
+        open_def=Math.round(Math.random()*100);
+        closed_def=Math.round(Math.random()*100);
+        repairs_def=Math.round(Math.random()*closed_def);
+        code_str=code_str+'1 year Defects (open/closed/repairs): '+open_def+'/'+closed_def+'/'+repairs_def+'</br>';
+        code_str=code_str+'<div id="apl_bar_stat"><canvas id="apl_stat_'+apl_info.id+'" width="250" height="100"></canvas></div>';
         thatlib.show_info_bar(code_str);
+        var options={
+            legend:{
+                display:false
+            }
+            };
+        var data = {
+        labels: ["01", "02", "03", "04", "05", "06"],
+        datasets: [
+            {
+                label: "New defects",
+                backgroundColor: "rgba(255,0,0,0.5)",
+                borderColor: "rgba(255,0,0,1)",
+                borderWidth: 1,
+                hoverBackgroundColor: "rgba(255,0,0,1)",
+                hoverBorderColor: "rgba(255,255,255,1)",
+                data: [Math.random()*20, Math.random()*20, Math.random()*20, Math.random()*20, Math.random()*20, Math.random()*20]
+            },
+            {
+                label: "Closed defects",
+                backgroundColor: "rgba(0,255,0,0.5)",
+                borderColor: "rgba(0,255,0,1)",
+                borderWidth: 1,
+                hoverBackgroundColor: "rgba(0,255,0,1)",
+                hoverBorderColor: "rgba(255,255,255,1)",
+                data: [Math.random()*20, Math.random()*20, Math.random()*20, Math.random()*20, Math.random()*20, Math.random()*20]
+            }
+            ]
+        };
+        var ctx = document.getElementById("apl_stat_"+apl_info.id);
+        var apl_stats_bar=new Chart(ctx, {
+            type: "bar",
+            data: data,
+            options: options
+            }
+            );
     };
     
     var onLineMouseOut = function(){
@@ -233,6 +282,21 @@ function mapslib(apl_ids, div_id) {
     
     //SET markers and lines functions
     this.set_lines=function(){
+        for (var j=0; j<this.apl_data.counter;j++){
+            apl=this.apl_data.apls[j];
+            this.apls[apl.id]={
+                id: apl.id,
+                name: apl.name,
+                type: apl.type,
+                feeder_num: apl.feeder_num,
+                voltage: apl.voltage,
+                inv_num: apl.inv_num,
+                line_len: apl.line_len,
+                status: apl.status,
+                pillar_count: apl.pillar_count,
+                tap_count: apl.tap_count
+                };
+            }
         for (var i=0;i<this.lines_data.counter;i++){
             line=this.lines_data.lines[i];
             if (typeof this.lines[i] != "undefined"){
