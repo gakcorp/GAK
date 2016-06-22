@@ -88,7 +88,11 @@ class maps_data_json(http.Controller):
             'result':1
         }
         return values
-    
+    @http.route('/apiv1/trans/data', type="json", auth="public", csfr=False)
+    def api_v1_trans_data(self, *arg, **post):
+        print 'GET json data (TRANS)'
+        cr, uid, context=request.cr, request.uid, request.context
+        #add code
     @http.route('/apiv1/pillar/data', type="json", auth="public", csfr=False)
     def api_v1_pillar_data(self, *arg, **post):
         print 'GET json data (PILLAR)'

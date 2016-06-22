@@ -51,17 +51,17 @@
 					</div>
 					</div>
 				<ul class="sidebar-nav list-group" id='map_objects'>
-					<li class="cust_menu_item list-group-item leftbar_list_group">
+					<li class="cust_menu_item list-group-item leftbar_list_group"  id="apl_button">
 						<span class="glyphicon glyphicon-transfer"></span>
 						APL
 						<span class="badge cust_badge" id="apl_count_badge"></span>
 					</li>
-					<li class="cust_menu_item list-group-item">
+					<li class="cust_menu_item list-group-item" id="pillar_button">
 						<span class="glyphicon glyphicon-record"></span>
 						Pillars
 						<span class="badge cust_badge" id="pillar_count_badge"></span>
 					</li>
-					<li class="cust_menu_item list-group-item">
+					<li class="cust_menu_item list-group-item" id="trans_button">
 						<span class="glyphicon glyphicon-flash"></span>
 						Transformers
 						<span class="badge cust_badge" id="trans_count_badge"></span>

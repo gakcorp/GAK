@@ -48,7 +48,7 @@ function mapslib(apl_ids, div_id) {
         closed_def=Math.round(Math.random()*100);
         repairs_def=Math.round(Math.random()*closed_def);
         code_str=code_str+'1 year Defects (open/closed/repairs): '+open_def+'/'+closed_def+'/'+repairs_def+'</br>';
-        code_str=code_str+'<div id="apl_bar_stat"><canvas id="apl_stat_'+apl_info.id+'" width="250" height="100"></canvas></div>';
+        code_str=code_str+'<div id="apl_bar_stat"><canvas id="apl_stat_'+apl_info.id+'" width="200" height="100"></canvas></div>';
         thatlib.show_info_bar(code_str);
         var options={
             legend:{
@@ -109,7 +109,8 @@ function mapslib(apl_ids, div_id) {
 			xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
 			xhr.send(JSON.stringify(data));
             xhr.onload=function(){
-                thatlib.get_apl_lines_data();    
+                thatlib.get_apl_lines_data();
+                thatlib.get_pillar_data();
             };
             
 		}
@@ -193,6 +194,40 @@ function mapslib(apl_ids, div_id) {
             options:options2
             });
     };
+    
+    var onPillarButtonClick=function(){
+        console.debug('Click pillar button');
+        code_str="";
+        for (var i = 0; i < thatlib.pillar_data.counter; i++) {
+            var marker=thatlib.markers.pillars[thatlib.pillar_data.pillars[i].id];
+            code_str=code_str+'<div class="marker_list" id="pil_info_'+marker.id+'" idvalue="'+marker.id+'"><div class="marker_list_name">'+marker.name+'</div><div class="marker_list_bar">'+
+            '<div class="progress" style="height: 8px; background:none">'+
+			'<div class="progress-bar progress-bar-success" style="width:'+Math.round(Math.random()*33)+'%"></div>'+
+			'<div class="progress-bar progress-bar-warning" style="width:'+Math.round(Math.random()*33)+'%"></div>'+
+            '<div class="progress-bar progress-bar-danger" style="width:'+Math.round(Math.random()*33)+'%"></div></div>'+
+            '</div></div>';
+            }
+        thatlib.show_info_bar(code_str);
+        for (var j=0;j<thatlib.pillar_data.counter;j++){
+            var marker=thatlib.markers.pillars[thatlib.pillar_data.pillars[j].id];
+            mid=marker.id;
+            console.debug(mid);
+            $("#pil_info_"+mid).mouseover(function(){
+                var id=this.getAttribute("idvalue");
+                thatlib.mark_pillar(id,true);
+                //thatlib.map.panTo(thatlib.markers.pillars[id].position);
+                });
+            $("#pil_info_"+mid).mouseout(function(){
+                var id=this.getAttribute("idvalue");
+                thatlib.mark_pillar(id,false);
+                });
+            $("#pil_info_"+mid).click(function(){
+                var id=this.getAttribute("idvalue");
+                thatlib.mark_pillar(id,true);
+                thatlib.map.panTo(thatlib.markers.pillars[id].position);
+                });
+        }
+    };
     //Define info functions
     this.show_info_bar=function(code){
         $("#left_info_bar").html(code);
@@ -227,6 +262,42 @@ function mapslib(apl_ids, div_id) {
         }
     };
     
+    this.get_trans_icon=function(state,selectable){
+        //Add Icon trans function
+        //var s=10;
+        var color='blue';
+        switch (state){
+            case 'DRAFT':
+                color='grey';
+                break;
+            case 'EXPLOITATION':
+                color='black';
+                break;
+            case 'DEFECT':
+                color='yellow';
+                break;
+            case 'MAINTENANCE':
+                color='blue';
+                break;
+            case 'REPAIRS':
+                color='red';
+                break;
+        }
+        var fillOpacity=0;
+        if (selectable){
+            fillOpacity=1;
+        }
+        var pci={
+            path: 'M 0,0 10,0 10,10 0,10 0,0 5,10 0,10 z',
+            fillColor:'red',
+            fillOpacity:fillOpacity,
+            scale:4,
+            strokeColor:color,
+            strokeWeight:3,
+            anchor: new google.maps.Point(0,0),
+        };
+        return pci;
+    };
     this.get_pillar_icon=function(type,rotation,state,selectable){
         var color='blue';
         switch (state){
@@ -280,7 +351,8 @@ function mapslib(apl_ids, div_id) {
         }
     };
     
-    //SET markers and lines functions
+    //SET markers, transformators and lines functions
+    
     this.set_lines=function(){
         for (var j=0; j<this.apl_data.counter;j++){
             apl=this.apl_data.apls[j];
@@ -330,7 +402,36 @@ function mapslib(apl_ids, div_id) {
                     'tap_count':"N/A" #Change to counter
                     })*/
     };
-    
+    this.set_trans_markers=function(){
+        for (var i=0;i<this.trans_data.counter; i++){
+            cur_trans=this.trans_data.trans[i];
+            var location={};
+            if (cur_trans.latitude && cur_trans.longitude){
+                location = new google.maps.LatLng(cur_trans.latitude, cur_trans.longitude);
+                }
+            if (typeof this.markers.trans[cur_trans.id] != 'undefined'){
+                cur_marker=this.markers.trans[cur_trans.id];
+                if (cur_marker.position != location){
+                    this.markers.trans[cur_trans.id].setPosition(location);
+                }
+            }
+            else{
+                this.markers.trans[cur_trans.id]=new google.maps.Marker({
+                   id: cur_trans.id,
+                   map:this.map,
+                   draggable:true,
+                   position: location,
+                   visible: true,
+                   state:cur_trans.state,
+                   icon:this.get_trans_icon(cur_trans.state,false)
+                });
+                google.maps.event.addListener(this.markers.trans[cur_trans.id],'dragend', onTransDragend);
+                google.maps.event.addListener(this.markers.trans[cur_trans.id],'mouseover', onTransMouseOver);
+                google.maps.event.addListener(this.markers.trans[cur_trans.id],'mouseout', onTransMouseOut);
+            }
+        }
+        $("#trans_count_badge").html(this.trans_data.counter);
+    };
     this.set_pillar_markers=function(){
         for (var i=0;i<this.pillar_data.counter; i++) {
             cur_pillar=this.pillar_data.pillars[i];
@@ -372,7 +473,7 @@ function mapslib(apl_ids, div_id) {
                 google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mouseout', onPillarMouseOut);
 			}
             
-			this.markers.pillars[cur_pillar.id].setPosition(location);
+			//this.markers.pillars[cur_pillar.id].setPosition(location);
             //var imagecur=pillar_image;
             
         }
@@ -398,7 +499,21 @@ function mapslib(apl_ids, div_id) {
 
             };
     };
-    
+    this.get_trans_data=function(){
+        var data={};
+        data.apl_ids=this.apl_ids;
+        xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/trans/data',true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+        xhr.onload=function(e){
+            var res=JSON.parse(this.response);
+            var td=JSON.parse(res.result.trans_data);
+            that.trans_data=td;
+            that.set_trans_markers();
+            };
+    };
     this.get_pillar_data=function(){
         var data={};
         data.apl_ids=this.apl_ids;
@@ -426,9 +541,11 @@ function mapslib(apl_ids, div_id) {
     
     this.init=function(){
         this.get_pillar_data();
+        this.get_trans_data();
         this.get_apl_lines_data();
         //console.debug(this.pillar_data);
         this.init_rosreestr_map();
+        this.init_buttons();
         that=this;
         google.maps.event.addListener(thatlib.map, 'zoom_changed', function() {
             var zoom = thatlib.map.getZoom();
@@ -460,6 +577,12 @@ function mapslib(apl_ids, div_id) {
         if (this.layers[layer_name].vis===0) {
             this.map.overlayMapTypes.clear();
         }
+    };
+    
+    this.init_buttons=function(){
+        $("#pillar_button").click(function(){
+            onPillarButtonClick();
+        });
     };
     
     this.init_rosreestr_map=function(){
@@ -513,6 +636,7 @@ sitemapslib.init();
 function map_ref() {
     sitemapslib.get_pillar_data();
     sitemapslib.get_apl_lines_data();
+    sitemapslib.get_trans_data();
     }
 
 map_ref();
