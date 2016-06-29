@@ -15,6 +15,7 @@ function mapslib(apl_ids, div_id) {
     this.lines=[];
     this.apls=[];
     this.markers.pillars=[];
+    this.markers.trans=[];
     this.showpillar=false;
     this.showpillarzoom=14;
 	this.editable_pillar=true;
@@ -116,6 +117,35 @@ function mapslib(apl_ids, div_id) {
 		}
         
     };
+    var onTransDragend = function(){
+        if (thatlib.editable_pillar){
+            var marker =this;
+			var point= marker.getPosition();
+			id=marker.id;
+			new_latitude=point.lat();
+			new_longitude=point.lng();
+			//console.debug('Modified id: '+id+' New_latitude:'+new_latitude+' New longitude:' +new_longitude);
+			var data={};
+			data.trans_id=id;
+			data.new_latitude=new_latitude;
+			data.new_longitude=new_longitude;
+			xhr=new XMLHttpRequest();
+			xhr.open('POST','/apiv1/trans/newcoorddrop',true);
+			xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+			xhr.send(JSON.stringify(data));
+            xhr.onload=function(){
+                thatlib.get_apl_lines_data();
+                thatlib.get_trans_data();
+            };
+            
+		}
+    };
+    var onTransMouseOver=function(){
+        
+    };
+    var onTransMouseOut=function(){
+        
+    };
     var onPillarMouseOut=function(){
         var marker=this;
         thatlib.mark_pillar(marker.id, false);
@@ -194,6 +224,10 @@ function mapslib(apl_ids, div_id) {
             options:options2
             });
     };
+    var onTransButtonClick=function(){
+        console.debug('Click trans button');
+        
+        };
     
     var onPillarButtonClick=function(){
         console.debug('Click pillar button');
@@ -266,7 +300,7 @@ function mapslib(apl_ids, div_id) {
         //Add Icon trans function
         //var s=10;
         var color='blue';
-        switch (state){
+        switch (state.toUpperCase()){
             case 'DRAFT':
                 color='grey';
                 break;
@@ -288,13 +322,13 @@ function mapslib(apl_ids, div_id) {
             fillOpacity=1;
         }
         var pci={
-            path: 'M 0,0 10,0 10,10 0,10 0,0 5,10 0,10 z',
+            path: 'M 0,0 10,0 5,10 0,0 0,10 10,10 10,0 z',
             fillColor:'red',
             fillOpacity:fillOpacity,
-            scale:4,
+            scale:2,
             strokeColor:color,
-            strokeWeight:3,
-            anchor: new google.maps.Point(0,0),
+            strokeWeight:2,
+            anchor: new google.maps.Point(5,10),
         };
         return pci;
     };
@@ -413,6 +447,9 @@ function mapslib(apl_ids, div_id) {
                 cur_marker=this.markers.trans[cur_trans.id];
                 if (cur_marker.position != location){
                     this.markers.trans[cur_trans.id].setPosition(location);
+                }
+                if (cur_marker.state != cur_trans.state){
+                    this.markers.trans[cur_trans.id].setIcon(this.get_trans_icon(cur_trans.state,false));
                 }
             }
             else{
@@ -582,6 +619,9 @@ function mapslib(apl_ids, div_id) {
     this.init_buttons=function(){
         $("#pillar_button").click(function(){
             onPillarButtonClick();
+        });
+        $("#trans_button").click(function(){
+            onTransButtonClick();
         });
     };
     
