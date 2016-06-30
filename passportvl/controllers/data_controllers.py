@@ -16,7 +16,7 @@ class data_json(http.Controller):
             try:
                 i=int(s)
                 clean_ids.append(i)
-                print i
+                #print i
             except ValueError:
                 pass
         domain=[("id","in",clean_ids)]
@@ -58,7 +58,7 @@ class data_json(http.Controller):
             tap_ids=apl_id.tap_ids
             s_tap_ids=tap_ids.sorted(key=lambda r:r.num_by_vl)
             for tap in s_tap_ids:
-                print tap.name
+                #print tap.name
                 if tap.conn_pillar_id:
                     pillar_data["counter"]=pillar_data["counter"]+1
                     pillar_data["counter_main"]=pillar_data["counter_main"]+1

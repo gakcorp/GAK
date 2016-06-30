@@ -3,16 +3,16 @@
 	<data>
 
         <!-- Top menu item -->
-        <menuitem name="Maintenance"
+        <!--<menuitem name="Maintenance"
             id="base.menu_mro_root"
             groups="asset.group_mro_customer"
-            sequence="80"/>
+            sequence="80"/>!-->
 
         <!-- Maintenance menu -->
-        <menuitem name="Maintenance"
+        <!--<menuitem name="Maintenance"
             id="menu_mro_maintenance"
             parent="base.menu_mro_root"
-            sequence="1"/>
+            sequence="1"/>!-->
          
         <!-- Maintenance order menu -->
         <record id="mro_defect_tree_view" model="ir.ui.view">
