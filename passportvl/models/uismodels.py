@@ -28,7 +28,7 @@ class uis_papl_substation(models.Model):
 	@api.multi
 	def act_show_map(self):
 		print "Debug info. Start Show_map for substation"
-		print self.url_maps
+		#print self.url_maps
 		return{
 			'name': 'Maps',
 			'res_model':'ir.actions.act_url',
@@ -74,11 +74,11 @@ class uis_papl_pillar(models.Model):
 			lng=record.longitude
 			if (lat<>0) and (lng<>0):
 				url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"
-				print url
+				#print url
 				el=0
 				response = urllib.urlopen(url)
 				data = json.loads(response.read())
-				print data
+				#print data
 				if data["status"]=="OK":
 					el=data["results"][0]["elevation"]
 				else:
@@ -86,7 +86,7 @@ class uis_papl_pillar(models.Model):
 					time.sleep (100.0 / 1000.0)
 					response = urllib.urlopen(url)
 					data = json.loads(response.read())
-					print data
+					#print data
 					if data["status"]=="OK":
 						el=data["results"][0]["elevation"]
 				record.elevation=el
@@ -380,22 +380,22 @@ class uis_papl_apl(models.Model):
 							conpil=pil.parent_id.num_by_vl
 							tap.conn_pillar_id=pil.parent_id
 					cpillar.append(conpil)
-			print taps
-			print cpillar
+			#print taps
+			#print cpillar
 			sortcpillar=sorted(cpillar)
-			print sortcpillar
+			#print sortcpillar
 			cn_tap=1
 			i=0
 			for num in sortcpillar:
 				i=i+1
 				if num>0:
 					ind=cpillar.index(num)
-					print ind
+					#print ind
 					cpillar[ind]=-2
 					taps[ind].num_by_vl=cn_tap
 					cn_tap=cn_tap+1
-					print 'current num by vl for tap'+str(cn_tap)
-				print num
+					#print 'current num by vl for tap'+str(cn_tap)
+				#print num
 			#tap.num_by_vl=0
 				
 	def _get_tap_text_for_apl(self):
@@ -421,7 +421,7 @@ class uis_papl_apl(models.Model):
 	@api.multi
 	def act_show_map(self):
 		print "Debug info. Start Show_map"
-		print self.url_maps
+		#print self.url_maps
 		return{
 			'name': 'Maps',
 			'res_model':'ir.actions.act_url',
