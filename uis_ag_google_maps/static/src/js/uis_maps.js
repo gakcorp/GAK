@@ -329,7 +329,6 @@ function mapslib(apl_ids, div_id) {
         var x2=4;
         var z=this.map.getZoom();
         var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
-        console.debug(scalez);
         var pci={
             path: 'M 0,0 10,0 5,10 0,0 0,10 10,10 10,0 z',
             fillColor:'red',
@@ -364,19 +363,20 @@ function mapslib(apl_ids, div_id) {
         if (selectable){
             fillOpacity=1;
         }
-        var z1=12;
+        var z1=14;
         var z2=19;
         var x1=0.2;
-        var x2=4;
+        var x2=6;
         var z=this.map.getZoom();
         var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
+        console.debug(scalez);
         var pci={
             path:google.maps.SymbolPath.CIRCLE,
             fillColor:'red',
             fillOpacity:fillOpacity,
-            scale:4,
+            scale:scalez,
             strokeColor:color,
-            strokeWeight:3,
+            strokeWeight:scalez-2,
             anchor: new google.maps.Point(0,0),
             rotation: rotation
         };
@@ -503,6 +503,7 @@ function mapslib(apl_ids, div_id) {
             
             if (typeof this.markers.pillars[cur_pillar.id] != "undefined") {
 				cur_marker=this.markers.pillars[cur_pillar.id];
+                this.markers.pillars[cur_pillar.id].setIcon(this.get_pillar_icon(cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false));
 				if (cur_marker.position != location) {
 					this.markers.pillars[cur_pillar.id].setPosition(location);
 				}
@@ -611,6 +612,7 @@ function mapslib(apl_ids, div_id) {
         google.maps.event.addListener(thatlib.map, 'zoom_changed', function() {
             var zoom = thatlib.map.getZoom();
             that.set_trans_markers();
+            that.set_pillar_markers();
             if (zoom <= that.showpillarzoom) {
                that.set_show_pillar(false);
             } else {
