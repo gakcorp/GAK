@@ -17,7 +17,7 @@ class apl_schemas(http.Controller):
             try:
                 i=int(s)
                 clean_ids.append(i)
-                print i
+                #print i
             except ValueError:
                 pass
         values = {

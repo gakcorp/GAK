@@ -160,10 +160,10 @@ class uis_papl_transformation(models.Model):
 							nstr=str(pillar.id)
 						if (nstr!=''):
 							nstr=nstr+','+str(pillar.id)
-							print str(pillar.id)+':'+nstr
+							#print str(pillar.id)+':'+nstr
 			nstr='['+nstr+']'
 			trans.str_pillar_ids=nstr
-			print trans.str_pillar_ids
+			#print trans.str_pillar_ids
 
 	def ready_to_exploitation(self,cr,uid,ids,context=None):
 		for trans in self.browse(cr,uid,ids,context=context):

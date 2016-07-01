@@ -6,8 +6,108 @@
 
 /* Toggle Styles */
 
+::-webkit-scrollbar {
+    width: 8px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(100,100,100,0.3); 
+    border-radius: 5px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5); 
+}
+.marker_list{
+    white-space: nowrap;
+    height: 20px;
+    border-top-color: grey;
+    border-top-width: 1px;
+    border-top-style: dotted;
+    padding-top: 4px;
+    display: flex;
+}
+.marker_list_name{
+    width:100px;
+    display: inline-block;
+}
+.marker_list_bar{
+    display:inline-block;
+    width: 140px;
+    top:3px;
+}
+#apl_button{
+    padding-top: 0px;
+    padding-bottom: 0px;
+    cursor:pointer;
+}
+
+
+#pillar_button{
+    padding-top: 0px;
+    padding-bottom: 0px;
+    cursor:pointer;
+}
+
+#trans_button{
+    padding-top: 0px;
+    padding-bottom: 0px;
+    cursor: pointer;
+}
+
+#photo_button{
+    padding-top: 0px;
+    padding-bottom: 0px;
+    cursor:pointer;
+}
+
+.cust_badge{
+    padding-top: 3px;
+    margin-top: 10px;
+}
+.cust_menu_item{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+.cust_menu_item:hover{
+    background: lightgray;
+}
+
+#pillar_pie_stat{
+    width: 70px;
+    height: 70px;
+    position: absolute;
+    z-index:1000;
+}
+
+#pillar_bar_stat{
+    height: 100px;
+    width: 200px;
+    position: absolute;
+    padding-left: 75px;
+    z-index:500;
+    }
+    
+    
+#left_info_bar{
+    font-family: Roboto;
+    color: whitesmoke;
+    font-size: x-small;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top-width: 1px;
+    border-top-style: dashed;
+    position:absolute;
+    bottom:1px;
+    height: 300px;
+    max-height: 300px;
+    overflow-y: auto;
+    left: 1px;
+    right: 1px;
+}
 #menu_button_bar{
-    padding-left: 30px;
+    padding-left: 10px;
 }
 .menu_button{
     border: none;
@@ -58,6 +158,7 @@
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
+    overflow-x: hidden;
 }
 
 #wrapper.toggled #sidebar-wrapper {

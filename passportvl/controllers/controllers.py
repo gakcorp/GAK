@@ -62,9 +62,9 @@ class pillar_api(http.Controller):
             prevpillar=pillar_obj.search(cr,uid,domain,context=context)
             if prevpillar:
                 val['parent_id']=prev_id
-        print val
+        #print val
         newpillar=pillar_obj.create(cr,uid,val,context=context);
-        print newpillar
+        #print newpillar
         #return {'newpillar':newpillar.id}
         #return {"newpillar_id": newpillar.id}
         

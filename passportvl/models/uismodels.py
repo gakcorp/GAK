@@ -28,7 +28,7 @@ class uis_papl_substation(models.Model):
 	@api.multi
 	def act_show_map(self):
 		print "Debug info. Start Show_map for substation"
-		print self.url_maps
+		#print self.url_maps
 		return{
 			'name': 'Maps',
 			'res_model':'ir.actions.act_url',
@@ -74,11 +74,11 @@ class uis_papl_pillar(models.Model):
 			lng=record.longitude
 			if (lat<>0) and (lng<>0):
 				url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"
-				print url
+				#print url
 				el=0
 				response = urllib.urlopen(url)
 				data = json.loads(response.read())
-				print data
+				#print data
 				if data["status"]=="OK":
 					el=data["results"][0]["elevation"]
 				else:
@@ -86,7 +86,7 @@ class uis_papl_pillar(models.Model):
 					time.sleep (100.0 / 1000.0)
 					response = urllib.urlopen(url)
 					data = json.loads(response.read())
-					print data
+					#print data
 					if data["status"]=="OK":
 						el=data["results"][0]["elevation"]
 				record.elevation=el
@@ -195,9 +195,9 @@ class uis_papl_tap(models.Model):
 			
 	def _get_num_by_vl(self):
 		for tap in self:
-			print tap.name
+			#print tap.name
 			tap.apl_id.define_taps_num()
-			print tap.apl_id.name
+			#print tap.apl_id.name
 	
 	def _tap_get_len(self):
 		for tap in self:
@@ -271,15 +271,15 @@ class uis_papl_tap(models.Model):
 				max_num=pillar.num_by_vl
 				max_id=pillar.id
 				last_pillar=pillar
-				print last_pillar
-				print max_num
+				#print last_pillar
+				#print max_num
 		if pillar_cnt>0:
 			i=0
 			cp=last_pillar
 			np=last_pillar.parent_id
 			n_id=np.id
 			while (n_id>0) and (pillar_cnt-i>=1):
-				print "Set to Pillar id:"+str(cp.id)+" num_by_vl value is "+str(pillar_cnt-i)
+				#print "Set to Pillar id:"+str(cp.id)+" num_by_vl value is "+str(pillar_cnt-i)
 				cp.num_by_vl=pillar_cnt-i
 				np=cp.parent_id
 				n_id=np.id
@@ -291,7 +291,8 @@ class uis_papl_tap(models.Model):
 class uis_papl_apl_cable(models.Model):
 	_name='uis.papl.apl.cable'
 	name=fields.Char(string="Name")
-	
+
+    
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
@@ -301,6 +302,7 @@ class uis_papl_apl(models.Model):
 	feeder_num=fields.Integer(string="Feeder")
 	voltage=fields.Integer(string="Voltage (kV)")
 	inv_num = fields.Char()
+	department_id=fields.Many2one('uis.papl.department', string="Department")
 	bld_year =fields.Char(string="Building year")
 	startexp_date = fields.Date(string="Start operations date")
 	build_company = fields.Many2one('res.company',string='construction installation company')
@@ -325,7 +327,7 @@ class uis_papl_apl(models.Model):
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply substation")
 	transformer_ids=fields.One2many('uis.papl.transformer','apl_id', string="Transformers")
-	tap_text=fields.Char(compute='_get_tap_text_for_apl', string="Taps")
+	tap_text=fields.Html(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
 	url_maps=fields.Char(compute='_apl_get_url_maps')
@@ -378,32 +380,32 @@ class uis_papl_apl(models.Model):
 							conpil=pil.parent_id.num_by_vl
 							tap.conn_pillar_id=pil.parent_id
 					cpillar.append(conpil)
-			print taps
-			print cpillar
+			#print taps
+			#print cpillar
 			sortcpillar=sorted(cpillar)
-			print sortcpillar
+			#print sortcpillar
 			cn_tap=1
 			i=0
 			for num in sortcpillar:
 				i=i+1
 				if num>0:
 					ind=cpillar.index(num)
-					print ind
+					#print ind
 					cpillar[ind]=-2
 					taps[ind].num_by_vl=cn_tap
 					cn_tap=cn_tap+1
-					print 'current num by vl for tap'+str(cn_tap)
-				print num
+					#print 'current num by vl for tap'+str(cn_tap)
+				#print num
 			#tap.num_by_vl=0
 				
 	def _get_tap_text_for_apl(self):
 		for apl in self:
-			res=''
+			hres=''
 			for tap in apl.tap_ids:
 				if not(tap.is_main_line):
 					taplen=tap.line_len_calc;
-					res=res+tap.name+' - '+str(taplen)+' (m); '
-			apl.tap_text=res
+					hres=hres+str(tap.num_by_vl)+' ('+str(tap.conn_pillar_id.num_by_vl)+') - '+str(taplen)+ '(m); <br/>'
+			apl.tap_text=hres
 	
 	@api.depends('tap_ids','pillar_id')
 	def _get_cnt_pillar_wo_tap(self):
@@ -419,7 +421,7 @@ class uis_papl_apl(models.Model):
 	@api.multi
 	def act_show_map(self):
 		print "Debug info. Start Show_map"
-		print self.url_maps
+		#print self.url_maps
 		return{
 			'name': 'Maps',
 			'res_model':'ir.actions.act_url',

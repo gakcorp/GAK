@@ -61,7 +61,7 @@ def getSchemedata(apl_id):
     tap_ids=apl_id.tap_ids
     s_tap_ids=tap_ids.sorted(key=lambda r:r.num_by_vl)
     for tap in s_tap_ids:
-        print tap.name
+        #print tap.name
         if tap.conn_pillar_id:
             pillar_data["counter"]=pillar_data["counter"]+1
             pillar_data["counter_main"]=pillar_data["counter_main"]+1
@@ -153,7 +153,7 @@ def drawtrans(draw,x,y,text):
     x2=int(x+trans_size/2)
     y1=int(y-trans_size/2)
     y2=int(y+trans_size/2)
-    print x1,x2,y1,y2
+    #print x1,x2,y1,y2
     draw.rectangle(((x1,y1),(x2,y2)), fill="white", outline ="black")
     draw.line((x1,y1,x,y2), fill="black")
     draw.line((x,y2,x2,y1), fill="black")
@@ -179,7 +179,7 @@ def drawScheme(img,apl_id):
     #draw.ellipse ((90,90,110,110),fill="red", outline="blue")
     ps_data, pillar_data, trans_data, pillar_links = getSchemedata(apl_id)
     dx=int(scheme_width/(pillar_data["counter_main"]+5))
-    print dx
+    #print dx
     my=int(scheme_height/2)
     dy=int(my/3)
     my=int(my-dy/2)

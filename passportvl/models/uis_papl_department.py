@@ -90,7 +90,7 @@ class uis_papl_department(models.Model):
 			depart.url_maps=url
 	@api.multi
 	def act_show_map(self):
-		print self.url_maps
+		#print self.url_maps
 		return{
 			'name': 'Maps',
 			'res_model':'ir.actions.act_url',
