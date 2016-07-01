@@ -28,7 +28,8 @@ class apl_mro_defect(osv.osv):
         ('confirmed', 'CONFIRMED'),
         ('planed', 'PLANED'),
         ('work', 'WORK'),
-        ('done', 'DONE')
+        ('done', 'DONE'),
+        ('cancel', 'CANCELED')
     ]
 
     DEFECT_CATEGORY = [
@@ -37,8 +38,14 @@ class apl_mro_defect(osv.osv):
         ('2', 'Normal'),
         ('3', 'Not critical')
     ]
-  
+    def _defect_total_labor(self,cr,uid,ids,field_name,arg,context=None):
+        res =dict.fromkeys(ids,0)
+        for defect in self.browse(cr,uid,ids,context=context):
+            res[defect.id]=defect.labor_cost*defect.qnty
+        return res
+    
     _columns = {
+        'number': fields.char('Defect No', readonly=True),
         'name': fields.char('Defect name', size=64),
         #'defect_type':fields.many2one('uis.papl.mro.defect.type','Defect type',required=False, readonly=True, states={'draft': [('readonly', False)]}),
         'apl_id': fields.many2one('uis.papl.apl', 'Air power line', readonly=True, required=False, states={'draft': [('readonly', False)]}),
@@ -47,10 +54,14 @@ class apl_mro_defect(osv.osv):
         'transformer_id': fields.many2one('uis.papl.transformer','Transformer',required=False, readonly=True, domain="[('apl_id','in',[apl_id])]",states={'draft':[('readonly',False)]}),
         'unicode': fields.char('UniCode'),
         'state': fields.selection(STATE_SELECTION, 'Status', readonly=True),
+        'category': fields.selection(DEFECT_CATEGORY,'Category', readonly=True),
         'qnty':fields.integer('Qnt'),
-        'labor_cost':fields.integer('Labor Cost'),
+        'labor_cost':fields.integer('Labor Cost per defect'),
+        'total_labor_cost':fields.function(_defect_total_labor, string='Total laborcost', type='integer'),
         'defect_description': fields.text('Defect Description'),
     }
     _defaults = {
-        'state': lambda *a: 'draft'
+        'state': lambda *a: 'draft',
+        'qnty':1,
+        'category': lambda *a: '2'
     }
