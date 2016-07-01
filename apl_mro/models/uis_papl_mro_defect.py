@@ -28,7 +28,7 @@ class apl_mro_defect(osv.osv):
         ('confirmed', 'CONFIRMED'),
         ('planed', 'PLANED'),
         ('work', 'WORK'),
-        ('DONE', 'DONE')
+        ('done', 'DONE')
     ]
 
     DEFECT_CATEGORY = [
@@ -44,7 +44,7 @@ class apl_mro_defect(osv.osv):
         'apl_id': fields.many2one('uis.papl.apl', 'Air power line', readonly=True, required=False, states={'draft': [('readonly', False)]}),
         'tap_id': fields.many2one('uis.papl.tap', 'Tap of APL', required=False, readonly=True, states={'draft':[('readonly',False)]}),
         'pillar_id': fields.many2one('uis.papl.pillar', 'Pillar',required=False, readonly=True, states={'draft':[('readonly',False)]}),
-        'transformer_id': fields.many2one('uis.papl.transformer','Transformer',required=False, readonly=True, states={'draft':[('readonly',False)]}),
+        'transformer_id': fields.many2one('uis.papl.transformer','Transformer',required=False, readonly=True, domain="[('apl_id','in',[apl_id])]",states={'draft':[('readonly',False)]}),
         'unicode': fields.char('UniCode'),
         'state': fields.selection(STATE_SELECTION, 'Status', readonly=True),
         'qnty':fields.integer('Qnt'),

@@ -265,6 +265,11 @@
 								<kanban>
 									<field name="transformer_id"/>
 									<field name="apl_id"/>
+									<templates>
+										<t t-name="kanban-box">
+											APL:<field name="apl_id"></field>
+										</t>
+									</templates>
 								</kanban>
 							</page>
                         </notebook>

@@ -107,7 +107,7 @@ function photolib(apl_ids,sitemaplib) {
     this.set_photo_tumb=function(){
         var phle=document.getElementById("photo_list");
         phle.innerHTML="<b>Images</b>"
-        console.debug(this.photo_data);
+        //console.debug(this.photo_data);
         for (var i = 0; i < this.photo_data.count; i++) {
             cur_photo=this.photo_data.photos[i];
             phle.innerHTML=phle.innerHTML+
@@ -166,7 +166,7 @@ function photolib(apl_ids,sitemaplib) {
             var res=JSON.parse(this.response)
             var pcd=JSON.parse(res.result.res);
             if (pcd.photo_count_hash != that.photo_count_hash) {
-                console.debug(pcd.photo_count_hash+'!='+that.photo_count_hash)
+                //console.debug(pcd.photo_count_hash+'!='+that.photo_count_hash)
                 that.photo_count_hash=pcd.photo_count_hash;
                 that.get_photo_count();
                 that.get_photo_data();

@@ -22,6 +22,10 @@ function mapslib(apl_ids, div_id) {
 	this.editable_pillar=true;
     this.bounds=new google.maps.LatLngBounds();
     this.center_loc = new google.maps.LatLng(56,56);
+    this.hash=[];
+    this.hash.apl_data='n/d';
+    this.hash.pillar_data='n/d';
+    this.hash.trans_data='n/d';
     this.map=new google.maps.Map(document.getElementById(div_id), {
         zoom: 13,
         center: this.center_loc,
@@ -246,7 +250,7 @@ function mapslib(apl_ids, div_id) {
         for (var j=0;j<thatlib.pillar_data.counter;j++){
             var marker=thatlib.markers.pillars[thatlib.pillar_data.pillars[j].id];
             mid=marker.id;
-            console.debug(mid);
+            //console.debug(mid);
             $("#pil_info_"+mid).mouseover(function(){
                 var id=this.getAttribute("idvalue");
                 thatlib.mark_pillar(id,true);
@@ -275,7 +279,7 @@ function mapslib(apl_ids, div_id) {
     };
     
     this.set_bounds=function(){
-        console.debug(this.pillar_data.minlat,this.pillar_data.minlong);
+        //console.debug(this.pillar_data.minlat,this.pillar_data.minlong);
         var location = new google.maps.LatLng(this.pillar_data.minlat,this.pillar_data.minlong);
         this.bounds.extend(location);
         location=new google.maps.LatLng(this.pillar_data.maxlat,this.pillar_data.maxlong);
@@ -369,7 +373,7 @@ function mapslib(apl_ids, div_id) {
         var x2=6;
         var z=this.map.getZoom();
         var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
-        console.debug(scalez);
+        //console.debug(scalez);
         var pci={
             path:google.maps.SymbolPath.CIRCLE,
             fillColor:'red',
@@ -542,6 +546,50 @@ function mapslib(apl_ids, div_id) {
         $("#pillar_count_badge").html(this.pillar_data.counter);
     };
     //Get data functions
+    this.get_hash=function(){
+        var data={};
+        data.apl_ids=this.apl_ids;
+        xhr_apl=new XMLHttpRequest();
+        xhr_apl.open('POST','/apiv1/apl/data/hash',true);
+        xhr_apl.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr_apl.send(JSON.stringify(data));
+        var that=this;
+        xhr_apl.onload=function(e){
+            var res=JSON.parse(this.response);
+            var hash=JSON.parse(res.result.hash_apl);
+            //console.debug(hash);
+            if (that.hash.apl_data!=hash){
+                that.hash.apl_data=hash;
+                that.get_apl_lines_data();
+            }
+        };
+        xhr_pillar=new XMLHttpRequest();
+        xhr_pillar.open('POST','/apiv1/pillar/data/hash',true);
+        xhr_pillar.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr_pillar.send(JSON.stringify(data));
+        xhr_pillar.onload=function(e){
+            var res=JSON.parse(this.response);
+            var hash=JSON.parse(res.result.hash_pillar);
+            //console.debug(hash);
+            if (that.hash.pillar_data!=hash){
+                that.hash.pillar_data=hash;
+                that.get_pillar_data();
+            }
+        };
+        xhr_trans=new XMLHttpRequest();
+        xhr_trans.open('POST','/apiv1/trans/data/hash',true);
+        xhr_trans.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr_trans.send(JSON.stringify(data));
+        xhr_trans.onload=function(e){
+            var res=JSON.parse(this.response);
+            var hash=JSON.parse(res.result.hash_trans);
+            //console.debug(hash);
+            if (that.hash.trans_data!=hash){
+                that.hash.trans_data=hash;
+                that.get_trans_data();
+            }
+        };
+    }
     this.get_apl_lines_data=function(){
         var data={};
         data.apl_ids=this.apl_ids;
@@ -602,9 +650,11 @@ function mapslib(apl_ids, div_id) {
     };
     
     this.init=function(){
-        this.get_pillar_data();
+        
+        //this.get_pillar_data();
         this.get_trans_data();
-        this.get_apl_lines_data();
+        this.get_hash();
+        //this.get_apl_lines_data();
         //console.debug(this.pillar_data);
         this.init_rosreestr_map();
         this.init_buttons();
@@ -706,9 +756,10 @@ var sitemapslib=new mapslib(apl_ids,'site-map');
 sitemapslib.init();
 //var photo_ref=new sitephotolib.refresher();
 function map_ref() {
-    sitemapslib.get_pillar_data();
-    sitemapslib.get_apl_lines_data();
-    sitemapslib.get_trans_data();
+    sitemapslib.get_hash();
+    //sitemapslib.get_pillar_data();
+    //sitemapslib.get_apl_lines_data();
+    //sitemapslib.get_trans_data();
     }
 
 map_ref();

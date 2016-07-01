@@ -195,9 +195,9 @@ class uis_papl_tap(models.Model):
 			
 	def _get_num_by_vl(self):
 		for tap in self:
-			print tap.name
+			#print tap.name
 			tap.apl_id.define_taps_num()
-			print tap.apl_id.name
+			#print tap.apl_id.name
 	
 	def _tap_get_len(self):
 		for tap in self:
@@ -271,15 +271,15 @@ class uis_papl_tap(models.Model):
 				max_num=pillar.num_by_vl
 				max_id=pillar.id
 				last_pillar=pillar
-				print last_pillar
-				print max_num
+				#print last_pillar
+				#print max_num
 		if pillar_cnt>0:
 			i=0
 			cp=last_pillar
 			np=last_pillar.parent_id
 			n_id=np.id
 			while (n_id>0) and (pillar_cnt-i>=1):
-				print "Set to Pillar id:"+str(cp.id)+" num_by_vl value is "+str(pillar_cnt-i)
+				#print "Set to Pillar id:"+str(cp.id)+" num_by_vl value is "+str(pillar_cnt-i)
 				cp.num_by_vl=pillar_cnt-i
 				np=cp.parent_id
 				n_id=np.id

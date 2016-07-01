@@ -2,11 +2,15 @@ from openerp import http
 from openerp.http import request
 from openerp.tools import html_escape as escape
 import json
+import logging
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
 
 class data_json(http.Controller):
     @http.route('/apiv1/photo/data', type="json", auth="public", csfr=False)
     def api_v1_photo_data(self, *arg, **post):
-        print 'GET json data (PHOTO)'
+        _logger.info('GET json data (PHOTO)')
         cr, uid, context=request.cr, request.uid, request.context
         photo_obj=request.registry['uis.ap.photo']
         data=json.loads(json.dumps(request.jsonrequest))
@@ -40,7 +44,7 @@ class data_json(http.Controller):
                 "pillars":[]
             }
             for pil in ph.near_pillar_ids:
-                print '[uis_api_controllers.api_v1_photo_data] Return for APL %r Photo %r near Pillar %r' % (pil.apl_id.id, ph.id, pil.name)
+                _logger.debug('Return for APL %r Photo %r near Pillar %r' % (pil.apl_id.id, ph.id, pil.name))
                 if pil.apl_id.id in clean_ids:
                     pill_data["count"]=pill_data["count"]+1
                     pill_data["pillars"].append({
@@ -65,7 +69,7 @@ class data_json(http.Controller):
             
     @http.route('/apiv1/photo/count', type="json", auth="public", csrf=False)
     def api_v1_photo_count(self, *arg, **post):
-        print 'GET json data (APL_IDS)'
+        _logger.info('GET json data (APL_IDS)')
         cr, uid, context = request.cr, request.uid, request.context
         photo_obj=request.registry['uis.ap.photo']
         data=json.loads(json.dumps(request.jsonrequest))
@@ -81,7 +85,7 @@ class data_json(http.Controller):
         domain=[]
         p_id=[]
         photo_ids=photo_obj.search(cr, uid, domain, context=context)
-        print photo_ids
+        _logger.debug(photo_ids)
         
         count_data={
             "count":0
@@ -103,7 +107,7 @@ class data_json(http.Controller):
     
     @http.route('/apiv1/photo/photo_count_hash',type="json", auth="public", csfr=False)
     def api_v1_photo_count_hash(self, *arg, **post):
-        print 'GET(POST) json data PHOTO_COUNT_HASH'
+        _logger.info('GET(POST) json data PHOTO_COUNT_HASH')
         cr, uid, context = request.cr, request.uid, request.context
         photo_obj=request.registry['uis.ap.photo']
         data=json.loads(json.dumps(request.jsonrequest))
@@ -119,7 +123,7 @@ class data_json(http.Controller):
         domain=[]
         p_id=[]
         photo_ids=photo_obj.search(cr, uid, domain, context=context)
-        print photo_ids
+        _logger.debug(photo_ids)
         out=hash(str(photo_ids))
         hash_data={
             "photo_count_hash":out

@@ -2,18 +2,15 @@
 from openerp import http
 from openerp.http import request
 from openerp.tools import html_escape as escape
+import datetime
 import json
+import logging
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
 
 class maps_data_json(http.Controller):
-    @http.route('/apiv1/apl/data',type="json", auth="public", csfr=False)
-    def api_v1_apl_data(self, *arg, **post):
-        print 'GET json data (APL and lines)'
-        cr, uid, context=request.cr, request.uid, request.context
-        pillar_obj=request.registry['uis.papl.pillar'];
-        apl_obj=request.registry['uis.papl.apl'];
-        trans_obj=request.registry['uis.papl.transformer'];
-        tap_obj=request.registry['uis.papl.tap'];
-        data=json.loads(json.dumps(request.jsonrequest));
+    def _get_clean_apl_ids(self,data):
         clean_ids=[]
         for s in data['apl_ids']:
             try:
@@ -21,6 +18,11 @@ class maps_data_json(http.Controller):
                 clean_ids.append(i)
             except ValueError:
                 pass
+        return clean_ids
+    
+    def _get_apl_lines_data(self,clean_ids):
+        cr, uid,context=request.cr,request.uid,request.context
+        apl_obj=request.registry['uis.papl.apl']
         apl_data={
             "counter":0,
             "apls":[]
@@ -78,98 +80,13 @@ class maps_data_json(http.Controller):
                         'apl_name':pillarid.apl_id.name,
                         'tap_name':pillarid.tap_id.name
                     })
-        values ={
-            'apl_data':json.dumps(apl_data),
-            'lines_data':json.dumps(lines_data)
-        }
-        
-        return values
+        #'Return for APL %r Photo %r near Pillar %r' % (pil.apl_id.id, ph.id, pil.name)
+        return apl_data,lines_data
     
-    @http.route('/apiv1/pillar/newcoorddrop', type="json", auth="public", csfr=False)
-    def api_v1_pillar_new_coordinate_drop(self, *arg, **post):
-        print 'POST Newcoord json data (PILLAR)'
-        cr, uid, context=request.cr, request.uid, request.context
-        pillar_obj = request.registry['uis.papl.pillar']
-        data=json.loads(json.dumps(request.jsonrequest))
-        pid=data['pillar_id']
-        new_latitude=data['new_latitude']
-        new_longitude=data['new_longitude']
-        domain=[("id","in",[pid])]
-        pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
-        for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
-            pil.latitude=new_latitude
-            pil.longitude=new_longitude
-        values ={
-            'result':1
-        }
-        return values
-    @http.route('/apiv1/trans/newcoorddrop', type="json", auth="public", csfr=False)
-    def api_v1_trans_new_coordinate_drop(self, *arg, **post):
-        print 'POST Newcoord json data (TRANS)'
-        cr, uid, context=request.cr, request.uid, request.context
-        trans_obj = request.registry['uis.papl.transformer']
-        data=json.loads(json.dumps(request.jsonrequest))
-        pid=data['trans_id']
-        new_latitude=data['new_latitude']
-        new_longitude=data['new_longitude']
-        domain=[("id","in",[pid])]
-        trans_ids=trans_obj.search(cr, uid, domain, context=context)
-        for trans in trans_obj.browse(cr, uid, trans_ids, context=context):
-            trans.latitude=new_latitude
-            trans.longitude=new_longitude
-        values ={
-            'result':1
-        }
-        return values
-    @http.route('/apiv1/trans/data', type="json", auth="public", csfr=False)
-    def api_v1_trans_data(self, *arg, **post):
-        print 'GET json data (TRANS)'
-        cr, uid, context=request.cr, request.uid, request.context
-        #trans_obj =request.registry['uis.papl.transmormer']
+    def _get_pillar_data(self,clean_ids):
+        cr, uid,context=request.cr,request.uid,request.context
+        #code _get_pillar_data
         apl_obj=request.registry['uis.papl.apl']
-        data=json.loads(json.dumps(request.jsonrequest))
-        clean_ids=[]
-        for s in data['apl_ids']:
-            try:
-                i=int(s)
-                clean_ids.append(i)
-            except ValueError:
-                pass
-        trans_data={
-            "counter":0,
-            "trans":[]
-        }
-        domain=[("id","in",clean_ids)]
-        apl_ids=apl_obj.search(cr,uid,domain,context=context)
-        for apl in apl_obj.browse(cr,uid,apl_ids, context=context):
-            for trans in apl.transformer_ids:
-                trans_data["counter"]=trans_data["counter"]+1
-                trans_data["trans"].append({
-                    'id':trans.id,
-                    'name':trans.name,
-                    'state':trans.state,
-                    'longitude':trans.longitude,
-                    'latitude':trans.latitude
-                })
-        values ={
-            'trans_data':json.dumps(trans_data)
-        }
-        return values
-        
-    @http.route('/apiv1/pillar/data', type="json", auth="public", csfr=False)
-    def api_v1_pillar_data(self, *arg, **post):
-        print 'GET json data (PILLAR)'
-        cr, uid, context=request.cr, request.uid, request.context
-        pillar_obj = request.registry['uis.papl.pillar']
-        apl_obj=request.registry['uis.papl.apl']
-        data=json.loads(json.dumps(request.jsonrequest))
-        clean_ids=[]
-        for s in data['apl_ids']:
-            try:
-                i=int(s)
-                clean_ids.append(i)
-            except ValueError:
-                pass
         pillar_data={
             "counter":0,
             "latitude":0,
@@ -220,7 +137,160 @@ class maps_data_json(http.Controller):
         pillar_data["maxlat"]=maxlat
         pillar_data["minlong"]=minlong
         pillar_data["maxlong"]=maxlong
+        #end code _pillar_data
+        return pillar_data
+    
+    def _get_trans_data(self,clean_ids):
+        cr, uid,context=request.cr,request.uid,request.context
+        trans_data={
+            "counter":0,
+            "trans":[]
+        }
+        apl_obj=request.registry['uis.papl.apl']
+        domain=[("id","in",clean_ids)]
+        apl_ids=apl_obj.search(cr,uid,domain,context=context)
+        for apl in apl_obj.browse(cr,uid,apl_ids, context=context):
+            for trans in apl.transformer_ids:
+                trans_data["counter"]=trans_data["counter"]+1
+                trans_data["trans"].append({
+                    'id':trans.id,
+                    'name':trans.name,
+                    'state':trans.state,
+                    'longitude':trans.longitude,
+                    'latitude':trans.latitude
+                })
+        return trans_data
+    
+    #Define API hash functions
+    @http.route('/apiv1/apl/data/hash',type='json', auth="public", csfr=False)
+    def api_v1_apl_data_hash(self, *arg, **post):
+        start=datetime.datetime.now()
+        #cr,uid,context=request.cr, request.uid, request.context
+        data=json.loads(json.dumps(request.jsonrequest))
+        clean_ids=self._get_clean_apl_ids(data)
+        apl_data,lines_data=self._get_apl_lines_data(clean_ids)
+        out=hash(str(apl_data)+str(lines_data))
+        values ={
+            'hash_apl':json.dumps(out)
+        }
+        stop=datetime.datetime.now()
+        elapsed=stop-start
+        _logger.info('Generate APL data HASH in %r seconds'%elapsed.total_seconds())
+        return values
+    
+    @http.route('/apiv1/pillar/data/hash', type='json', auth="public", csfr=False)
+    def api_v1_pillar_data_hash(self, *arg, **post):
+        start=datetime.datetime.now()
+        #cr,uid,context=request.cr, request.uid, request.context
+        data=json.loads(json.dumps(request.jsonrequest))
+        clean_ids=self._get_clean_apl_ids(data)
+        pillar_data=self._get_pillar_data(clean_ids)
+        out=hash(str(pillar_data))
+        values ={
+            'hash_pillar':json.dumps(out)
+        }
+        stop=datetime.datetime.now()
+        elapsed=stop-start
+        _logger.info('Generate PILLAR data HASH in %r seconds'%elapsed.total_seconds())
+        return values
+    
+    @http.route('/apiv1/trans/data/hash',type='json', auth="public", csfr=False)
+    def api_v1_trans_data_hash(self, *arg, **post):
+        start=datetime.datetime.now()
+        data=json.loads(json.dumps(request.jsonrequest))
+        clean_ids=self._get_clean_apl_ids(data)
+        trans_data=self._get_trans_data(clean_ids)
+        out=hash(str(trans_data))
+        values ={
+            'hash_trans':json.dumps(out)
+        }
+        stop=datetime.datetime.now()
+        elapsed=stop-start
+        _logger.info('Generate TRANS data HASH in %r seconds'%elapsed.total_seconds())
+        return values
+    
+    #Define Data functions
+    @http.route('/apiv1/apl/data',type="json", auth="public", csfr=False)
+    def api_v1_apl_data(self, *arg, **post):
+        start=datetime.datetime.now()
+        data=json.loads(json.dumps(request.jsonrequest))
+        clean_ids=self._get_clean_apl_ids(data)
+        apl_data,lines_data=self._get_apl_lines_data(clean_ids)
+        values ={
+            'apl_data':json.dumps(apl_data),
+            'lines_data':json.dumps(lines_data)
+        }
+        stop=datetime.datetime.now()
+        elapsed=stop-start
+        _logger.info('Generate APL data in %r seconds'%elapsed.total_seconds())
+        return values
+    
+    @http.route('/apiv1/pillar/data', type="json", auth="public", csfr=False)
+    def api_v1_pillar_data(self, *arg, **post):
+        start=datetime.datetime.now()
+        #cr, uid, context=request.cr, request.uid, request.context
+        data=json.loads(json.dumps(request.jsonrequest))
+        clean_ids=self._get_clean_apl_ids(data)
+        pillar_data=self._get_pillar_data(clean_ids)
         values ={
             'pillar_data':json.dumps(pillar_data)
         }
+        stop=datetime.datetime.now()
+        elapsed=stop-start
+        _logger.info('Generate PILLAR data in %r seconds'%elapsed.total_seconds())
         return values
+    
+    @http.route('/apiv1/trans/data', type="json", auth="public", csfr=False)
+    def api_v1_trans_data(self, *arg, **post):
+        start=datetime.datetime.now()
+        #cr, uid, context=request.cr, request.uid, request.context
+        #trans_obj =request.registry['uis.papl.transmormer']
+        data=json.loads(json.dumps(request.jsonrequest))
+        clean_ids=self._get_clean_apl_ids(data)
+        trans_data=self._get_trans_data(clean_ids)
+        values ={
+            'trans_data':json.dumps(trans_data)
+        }
+        stop=datetime.datetime.now()
+        elapsed=stop-start
+        _logger.info('Generate TRANS data in %r seconds'%elapsed.total_seconds())
+        return values
+    
+    #Define Newcoord data
+    @http.route('/apiv1/pillar/newcoorddrop', type="json", auth="public", csfr=False)
+    def api_v1_pillar_new_coordinate_drop(self, *arg, **post):
+        _logger.info('POST Newcoord json data for pillar (PILLAR)')
+        cr, uid, context=request.cr, request.uid, request.context
+        pillar_obj = request.registry['uis.papl.pillar']
+        data=json.loads(json.dumps(request.jsonrequest))
+        pid=data['pillar_id']
+        new_latitude=data['new_latitude']
+        new_longitude=data['new_longitude']
+        domain=[("id","in",[pid])]
+        pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
+        for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
+            pil.latitude=new_latitude
+            pil.longitude=new_longitude
+        values ={
+            'result':1
+        }
+        return values
+    @http.route('/apiv1/trans/newcoorddrop', type="json", auth="public", csfr=False)
+    def api_v1_trans_new_coordinate_drop(self, *arg, **post):
+        _logger.info('POST Newcoord json data for transformator (TRANS)')
+        cr, uid, context=request.cr, request.uid, request.context
+        trans_obj = request.registry['uis.papl.transformer']
+        data=json.loads(json.dumps(request.jsonrequest))
+        pid=data['trans_id']
+        new_latitude=data['new_latitude']
+        new_longitude=data['new_longitude']
+        domain=[("id","in",[pid])]
+        trans_ids=trans_obj.search(cr, uid, domain, context=context)
+        for trans in trans_obj.browse(cr, uid, trans_ids, context=context):
+            trans.latitude=new_latitude
+            trans.longitude=new_longitude
+        values ={
+            'result':1
+        }
+        return values
+    
