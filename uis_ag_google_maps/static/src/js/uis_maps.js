@@ -1,6 +1,9 @@
 $.getScript("../uis_ag_google_maps/static/src/js/uis_maps_pillars.js",function(){
     console.debug('./uis_maps_pillars.js loaded but not necessarily executed.');
 });
+$.getScript("../uis_ag_google_maps/static/src/js/mod/uis_tap_profile.js",function(){
+    console.debug('uis_tap_profile.js is loaded');
+    })
 
 function mapslib(apl_ids, div_id) {
     this.center_loc='';
@@ -96,6 +99,12 @@ function mapslib(apl_ids, div_id) {
     var onLineMouseOut = function(){
         var line=this;
         thatlib.mark_apl(line.apl_id,false);
+    };
+    
+    var onLineMouseClick = function(){
+        var line=this;
+        console.debug(line.tap_id);
+        show_tap_profile(thatlib,line.tap_id);
     };
     
 	var onPillarDragend = function(){
@@ -444,10 +453,12 @@ function mapslib(apl_ids, div_id) {
                 strokeOpacity: 1.0,
                 strokeWeight: 3,
                 map: this.map,
-                apl_id: line.apl_id
+                apl_id: line.apl_id,
+                tap_id: line.tap_id
                 });
             google.maps.event.addListener(this.lines[i],'mouseover', onLineMouseOver);
             google.maps.event.addListener(this.lines[i],'mouseout', onLineMouseOut);
+            google.maps.event.addListener(this.lines[i],'click',onLineMouseClick);
             }
          $("#apl_count_badge").html(this.apl_data.counter);
          /*

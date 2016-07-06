@@ -10,6 +10,16 @@ _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
 class maps_data_json(http.Controller):
+    def _get_clean_tap_ids(self,data):
+        clean_ids=[]
+        for s in data['tap_ids']:
+            try:
+                i=int(s)
+                clean_ids.append(i)
+            except ValueError:
+                pass
+        return clean_ids
+    
     def _get_clean_apl_ids(self,data):
         clean_ids=[]
         for s in data['apl_ids']:
@@ -20,6 +30,7 @@ class maps_data_json(http.Controller):
                 pass
         return clean_ids
     
+
     def _get_apl_lines_data(self,clean_ids):
         cr, uid,context=request.cr,request.uid,request.context
         apl_obj=request.registry['uis.papl.apl']
@@ -160,8 +171,55 @@ class maps_data_json(http.Controller):
                     'latitude':trans.latitude
                 })
         return trans_data
-    
+    def _get_tap_elevation_data(self,clean_ids):
+        cr,uid,context=request.cr,request.uid,request.context
+        total_point=100
+        elevation_data={
+            "counter":0,
+            "x_axis":[],
+            "e_data":[],
+            "p_data":[]
+        }
+        tap_obj=request.registry['uis.papl.tap']
+        domain=[("id","in",[clean_ids])]
+        tap_ids=tap_obj.search(cr,uid,domain,context=context)
+        for tap in tap_obj.browse(cr,uid,tap_ids,context=context):
+            pil_count=len(tap.pillar_ids)
+            tap_len=tap.line_len_calc
+            dx=tap_len/total_point
+            #_logger.debug('Tap %r / Count of pillar is %r / Tap calc lenght is %r m'%(tap.name,pil_count,tap_len))
+            tlen=0
+            cx=0
+            pils=[]
+            for pil in tap.pillar_ids.sorted(key=lambda r: r.num_by_vl):
+                if pil.parent_id:
+                   tlen=tlen+pil.len_prev_pillar
+                
+                #_logger.debug(pils)
+                _logger.debug('Pillar %r with num_by_vl %r total len by start TAP is %r m'%(pil.name,pil.num_by_vl,tlen))
+            while cx<tap_len:
+                elevation_data["counter"]=elevation_data["counter"]+1;
+                elevation_data["x_axis"].append(cx);
+                cx=cx+dx
+        #code for generate elevation_data
+        return elevation_data
     #Define API hash functions
+    @http.route('/apiv1/tap/elevation_data',type='json', auth="public", csfr=False)
+    def api_v1_tap_elevation_data(self, *arg, **post):
+        start=datetime.datetime.now()
+        data=json.loads(json.dumps(request.jsonrequest))
+        #code elevation data
+        #_logger.debug(data)
+        clean_ids=data['tap_ids']
+        elevation_data=self._get_tap_elevation_data(clean_ids)
+        values={
+            'elevation_data':json.dumps(elevation_data)
+        }
+        stop=datetime.datetime.now()
+        elapsed=stop-start
+        _logger.info('Generate TAP elevation data in %r seconds'%elapsed.total_seconds())
+        return values
+    
     @http.route('/apiv1/apl/data/hash',type='json', auth="public", csfr=False)
     def api_v1_apl_data_hash(self, *arg, **post):
         start=datetime.datetime.now()
