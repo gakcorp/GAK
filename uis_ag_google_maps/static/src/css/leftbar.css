@@ -19,6 +19,13 @@
     border-radius: 5px;
     -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5); 
 }
+.apl_list{
+    font-size: small;
+    white-space: nowrap;
+    display: flex;
+    padding-top: 4px;
+    height: 20px;
+}
 .marker_list{
     white-space: nowrap;
     height: 20px;

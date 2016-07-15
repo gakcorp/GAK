@@ -25,8 +25,8 @@
     'data': [
         # 'security/ir.model.access.csv',
         'views/views.xml',
-        'views/templates.xml',
         'views/department.xml',
+        'views/templates.xml',
         'views/transformation.xml',
         'views/reports/uis_papl_apl_report.xml',
         'views/reports/uis_papl_apl_report_passport.xml',

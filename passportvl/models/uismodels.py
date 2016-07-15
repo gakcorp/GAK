@@ -9,6 +9,30 @@ try:
 except ImportError:
     import StringIO
 
+def distance2points(lat1,long1,lat2,long2):
+	dist=0
+	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
+		rad=6372795
+		#Convert to radians
+		la1=lat1*math.pi/180
+		la2=lat2*math.pi/180
+		lo1=long1*math.pi/180
+		lo2=long2*math.pi/180
+		#calculate sin and cos
+		cl1=math.cos(la1)
+		cl2=math.cos(la2)
+		sl1=math.sin(la1)
+		sl2=math.sin(la2)
+		delta=lo2-lo1
+		cdelta=math.cos(delta)
+		sdelta=math.sin(delta)
+		#calculate circle len
+		y = math.sqrt(math.pow(cl2*sdelta,2)+math.pow(cl1*sl2-sl1*cl2*cdelta,2))
+		x = sl1*sl2+cl1*cl2*cdelta
+		ad = math.atan2(y,x)
+		dist = ad*rad
+	return dist
+
 class uis_papl_substation(models.Model):
 	_name='uis.papl.substation'
 	_description='Substation model'
@@ -63,8 +87,38 @@ class uis_papl_pillar(models.Model):
 	elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
 	tap_id=fields.Many2one('uis.papl.tap', string='Taps')
-	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar')
+	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
+	near_pillar_ids=fields.Many2many('uis.papl.pillar',
+									 relation='near_pillar_ids',
+									 column1='trans_id',
+									 column2='pillar_id',
+									 compute='_get_near_pillar'
+									 )
 	
+	@api.depends('latitude','longitude')
+	def _get_near_pillar(self,cr,uid,ids,context=None):
+		for pil in self.browse(cr,uid,ids,context=context):
+			lat1=pil.latitude
+			long1=pil.longitude
+			delta=0.01
+			max_dist=300
+			npillars = self.pool.get('uis.papl.pillar').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
+			near_pillars=[]
+			near_pillars_ids=[]
+			for pid in npillars:
+				npil=self.pool.get('uis.papl.pillar').browse(cr,uid,[pid],context=context)
+				if npil:
+					if npil.id != pil.id:
+						lat2=npil.latitude
+						long2=npil.longitude
+						dist=0
+						if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0) and (abs(lat1-lat2)<delta) and (abs(long1-long2)<delta):
+							dist=distance2points(lat1,long1,lat2,long2)
+						if (dist<max_dist) and (dist>0):
+							near_pillars.append(npil)
+							near_pillars_ids.append(npil.id)
+							pil.near_pillar_ids=[(4,npil.id,0)]
+
 	@api.multi
 	@api.depends('longitude','latitude')
 	def _get_elevation(self):
@@ -73,7 +127,7 @@ class uis_papl_pillar(models.Model):
 			lat=record.latitude
 			lng=record.longitude
 			if (lat<>0) and (lng<>0):
-				url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"
+				url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI"
 				#print url
 				el=0
 				response = urllib.urlopen(url)
@@ -139,7 +193,10 @@ class uis_papl_pillar(models.Model):
 				#calculate start azimut
 				x = (cl1*sl2) - (sl1*cl2*cdelta)
 				y = sdelta*cl2
-				z = math.degrees(math.atan(-y/x))
+				try:
+					z = math.degrees(math.atan(-y/x))
+				except ZeroDivisionError:
+					z=0
 				if (x < 0):
 					z = z+180.
 				z2 = (z+180.) % 360. - 180.

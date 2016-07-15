@@ -176,7 +176,7 @@ class maps_data_json(http.Controller):
     def _get_elevation(self,lat,lng):
         el=0
         if (lat<>0) and (lng<>0):
-            url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI"
+            url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"
             response=urllib.urlopen(url)
             data=json.loads(response.read())
             if data["status"]=="OK":
@@ -306,22 +306,7 @@ class maps_data_json(http.Controller):
         elapsed=stop-start
         _logger.info('Generate TRANS data HASH in %r seconds'%elapsed.total_seconds())
         return values
-    #Define List functions
-    @http.route('/apiv1/apl/list',type="json", auth="public", csfr=False)
-    def api_v1_apl_list(self,*arg, **post):
-        start=datetime.datetime.now()
-        data=json.loads(json.dumps(request.jsonrequest))
-        apl_ids=apl_obj.search(cr,uid,domain,context=context)
-        clean_ids=[]
-        for apl in apl_obj.browse(cr,uid,apl_ids, context=context):
-            clean_ids.append(apl.id)
-        apl_data,lines_data=self._get_apl_lines_data(clean_ids)
-        values ={
-            'apl_data':json.dumps(apl_data)
-        }
-        stop=datetime.datetime.now()
-        elapsed=stop-start_logger.info('Generate APL list in %r seconds'%elapsed.total_seconds())
-        return values
+    
     #Define Data functions
     @http.route('/apiv1/apl/data',type="json", auth="public", csfr=False)
     def api_v1_apl_data(self, *arg, **post):

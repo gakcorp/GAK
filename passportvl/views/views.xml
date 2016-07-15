@@ -69,7 +69,64 @@
         </tree>
 		</field>
     </record>
-		
+	<record id="uis_papl_pillar_form" model="ir.ui.view">
+		<field name="name">Pillar form view</field>
+		<field name="model">uis.papl.pillar</field>
+		<field name="arch" type="xml">
+			<form string="Pillar form">
+			<sheet string="Details">
+				<h1>
+					<field name="name"/>
+				</h1>
+				<h2>
+					<field name="apl_id"/>
+					<field name="tap_id"/>
+				</h2>
+				<notebook>
+					<page string="Main">
+						<group>
+							<group>
+								<field name="num_by_vl"/>
+								<field name="latitude"/>
+								<field name="longitude"/>
+								<field name="elevation"/>
+								<field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}" invisible="1"/>
+								<field name="parent_id"/>
+								<field name="azimut_from_prev"/>
+							</group>
+							<group>
+								<field name="pillar_material_id"/>
+								<field name="pillar_type_id"/>
+							</group>
+						</group>
+					</page>
+					<page string="Details">
+					</page>
+	   		</notebook>
+			</sheet>
+			</form>
+		</field>
+	</record>
+	<!--
+	num_by_vl = fields.Integer()
+	pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
+	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
+	longitude=fields.Float(digits=(2,6))
+	latitude=fields.Float(digits=(2,6))
+	prev_longitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
+	prev_latitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
+	len_prev_pillar=fields.Float(digits=(5,2), compute='_pillar_get_len')
+	azimut_from_prev=fields.Float(digits=(3,2), compute='_pillar_get_len')
+	elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
+	apl_id=fields.Many2one('uis.papl.apl', string='APL')
+	tap_id=fields.Many2one('uis.papl.tap', string='Taps')
+	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
+	near_pillar_ids=fields.Many2many('uis.papl.pillar',
+									 relation='near_pillar_ids',
+									 column1='trans_id',
+									 column2='pillar_id',
+									 compute='_get_near_pillar'
+									 )!-->
 	<record id="uis_papl_apl_form" model="ir.ui.view">
 	  <field name="name">APL form view</field>
 	  <field name="model">uis.papl.apl</field>
@@ -461,9 +518,8 @@
 	<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>
 !-->
     <!-- actions -->
-     <menuitem name="List of Departments" id="uis_papl_menu_department_list" parent="uis_papl_menu_department"
-              action="uis_papl_department_action_window"/>
-    <menuitem name="List of APL" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
+
+	<menuitem name="List of APL" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
               action="uis_papl_apl_action_window"/>
 	<menuitem name="List of Tap" id="uis_papl_menu_tap_list" parent="uis_papl_menu_apl"
               action="uis_papl_tap_action_window"/>

@@ -19,9 +19,9 @@
     <body style="overflow-x: hidden;"> <!--t-att-data-partner-url="pillar_url or ''"!-->
          <script>
 			var apl_ids=<t t-raw="apl_ids"/>;
-            var lines_data=<t t-raw="lines_data"/>;
+            <!--var lines_data=<t t-raw="lines_data"/>;
 			var ktp_data=<t t-raw="ktp_data"/>;
-			var odoo_pillar_data = <t t-raw="pillar_data"/>;
+			var odoo_pillar_data = <t t-raw="pillar_data"/>;!-->
         </script>
 		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/refresher.js"></script>
 		<div id="wrapper">

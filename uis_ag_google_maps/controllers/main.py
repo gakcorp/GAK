@@ -125,7 +125,7 @@ class pillar_google_map(http.Controller):
                 }
                 max_num=0
                 for pillar in tap.pillar_ids:
-                    if pillar.num_by_vl>max_num:
+                    if pillar.num_by_vl>=max_num:
                         max_num=pillar.num_by_vl
                         end_pillar=pillar
                 i=0

@@ -21,6 +21,7 @@ class uis_mro_mod_uis_papl_transformer(osv.Model):
     
         defects=self.pool['uis.papl.mro.defect']
         for trans in self.browse(cr,uid,ids,context=context):
+            res = dict.fromkeys(ids,0)
             defect_count=defects.search_count(cr,uid,[('transformer_id','=',trans.id)], context=context)
             if defect_count>0:
                 print trans.state

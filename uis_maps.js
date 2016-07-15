@@ -242,42 +242,7 @@ function mapslib(apl_ids, div_id) {
         console.debug('Click trans button');
         
         };
-    var onAPLButtonClick=function(){
-        console.debug('Click APL button');
-        code_str="";
-        for (var i = 0; i<thatlib.apl_data.counter; i++){
-            var apl=thatlib.apl_data.apls[i];
-            code_str=code_str+'<div class="apl_list" id="apl_info_'+apl.id+' "idvalue="'+apl.id+'">'+
-            '<label class="checkbox-inline"><input type="checkbox" value="'+apl.id+'" id="apl_chb_'+apl.id+'"'+
-            console.debug($.inArray(apl.id,thatlib.apl_ids));
-            if ($.inArray(apl.id,thatlib.apl_ids)>=0) {
-                code_str=code_str+' checked';
-                }
-            code_str=code_str+'>'+apl.name+'</label>&nbsp;<span class="glyphicon glyphicon-fullscreen" style="cursor:pointer;" id="apl_goto_'+apl.id+'">'+
-            '&nbsp;<span class="glyphicon glyphicon-save-file" style="cursor:pointer;" id="apl_goto_'+apl.id+'">'+
-            '</div>';
-            //'<div class="apl_list_name">'+apl.name+'</div></div>';
-        }
-        thatlib.show_info_bar(code_str);
-        for (var j=0;j<thatlib.apl_data.counter;j++){
-            var napl=thatlib.apl_data.apls[j];
-            var naid=napl.id;
-            $('#apl_chb_'+naid).change(function(){
-                console.debug(this.value+' is '+ this.checked);
-                if (this.checked){
-                    thatlib.apl_ids.push(Math.round(this.value));
-                }
-                else {
-                    remid=Math.round(this.value);
-                    
-                    /*thatlib.apl_ids=jQuery(thatlib.apl_ids,function(value){
-                        return value == remid;
-                    });*/
-                }
-                console.debug(thatlib.apl_ids);
-            });
-        }
-    };
+    
     var onPillarButtonClick=function(){
         console.debug('Click pillar button');
         code_str="";
@@ -750,9 +715,6 @@ function mapslib(apl_ids, div_id) {
         });
         $("#trans_button").click(function(){
             onTransButtonClick();
-        });
-        $("#apl_button").click(function(){
-            onAPLButtonClick();
         });
     };
     
