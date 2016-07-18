@@ -13,6 +13,12 @@ $("#earth_button").click(function(e){
 
 $("#rosreestr_button").click(function(e){
     e.preventDefault();
-    sitemapslib.toggle_layer('rosreestr')
+    sitemapslib.toggle_layer('rosreestr');
     $("#rosreestr_button").toggleClass("selected_button");
+});
+
+$("#yandex_satelite_button").click(function(e){
+        e.preventDefault();
+        sitemapslib.toggle_layer('yandex');
+        $("#yandex_satelite_button").toggleClass("selected_button");
 });

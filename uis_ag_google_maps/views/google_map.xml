@@ -32,9 +32,10 @@
 				<div>
 					<div id="menu_button_bar">
 						Select Map Type<br/>
-						<img src="/uis_ag_google_maps/static/src/img/site_icons/map_ico_120.png" class="img-circle menu_button" alt="Map" width="60" height="60" id="map_button"/>
-						<img src="/uis_ag_google_maps/static/src/img/site_icons/earth_ico_120.png" class="img-circle menu_button" alt="Map" width="60" height="60" id="earth_button"/>
-						<img src="/uis_ag_google_maps/static/src/img/site_icons/rosreestr_ico_120.png" class="img-circle menu_button" alt="Map" width="60" height="60" id="rosreestr_button"/>
+						<img src="/uis_ag_google_maps/static/src/img/site_icons/map_ico_120.png" class="img-circle menu_button" alt="Map" width="50" height="50" id="map_button"/>
+						<img src="/uis_ag_google_maps/static/src/img/site_icons/earth_ico_120.png" class="img-circle menu_button" alt="Map" width="50" height="50" id="earth_button"/>
+						<img src="/uis_ag_google_maps/static/src/img/site_icons/rosreestr_ico_120.png" class="img-circle menu_button" alt="Map" width="50" height="50" id="rosreestr_button"/>
+						<img src="/uis_ag_google_maps/static/src/img/site_icons/yandex_sat_120.png" class="img-circle menu_button" alt="Yandex Satelite" width="50" height="50" id="yandex_satelite_button"/>
 					</div>
 					<div>
 						Status 

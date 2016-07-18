@@ -703,6 +703,7 @@ function mapslib(apl_ids, div_id) {
         //this.get_apl_lines_data();
         //console.debug(this.pillar_data);
         this.init_rosreestr_map();
+        this.init_yandex_map();
         this.init_buttons();
         that=this;
         google.maps.event.addListener(thatlib.map, 'zoom_changed', function() {
@@ -775,17 +776,12 @@ function mapslib(apl_ids, div_id) {
             //var bbox = gBl.lng() + "," + gBl.lat() + "," + gTr.lng() + "," + gTr.lat();
             var bbox = "{xmin:"+gBl.lng() + ",ymin:" + gBl.lat() + ",xmax:" + gTr.lng() + ",ymax:" + gTr.lat()+",spatialReference:{wkid:4326}}";
             var url= "http://maps.rosreestr.ru/arcgis/rest/services/Cadastre/Cadastre/MapServer/export?";
-            url = url+"dpi=96";
-            url=url+"&transparent=true";
-            url=url+"&format=png32";
-            //url=url+"&bboxSR=102100";
+            url = url+"dpi=96&transparent=true&format=png32";
             url=url+"&bboxSR=4326";
-            //url=url+"&imageSR=102100";
             url=url+"&imageSR=102100";
             url=url+"&size=256,256";
             url=url+"&f=image";
             url=url+"&bbox="+bbox;
-            //console.debug(bbox);
             return url;
         },
         tileSize: new google.maps.Size(256,256),
@@ -796,6 +792,31 @@ function mapslib(apl_ids, div_id) {
         opacity: 1
         });
         this.vis_layer('rosreestr');
+    };
+    
+    this.init_yandex_map=function(){
+        this.layers.yandex=[];
+        this.layers.yandex.vis=0;
+        this.layers.yandex.type='ImageMapType';
+        this.layers.yandex.name='Yandex Satelite';
+        that=this;
+        this.layers.yandex.ImageMap=new google.maps.ImageMapType({
+        getTileUrl: function (coord,zoom){
+            console.debug(coord.x,coord.y);
+            var url="http://sat01.maps.yandex.net/tiles?l=sat";
+            url=url+"&x="+coord.x;
+            url=url+"&y="+coord.y;
+            url=url+"&z="+zoom-1;
+            return url;
+        },
+        tileSize: new google.maps.Size(256,256),
+        isPng: false,
+        alt: "Yandex Satelite Layer",
+        name: "Yandex.Satelite",
+        maxZoom:19,
+        opacity:1
+        });
+        this.vis_layer('yandex');
     };
     
     
