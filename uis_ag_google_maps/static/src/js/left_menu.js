@@ -22,3 +22,8 @@ $("#yandex_satelite_button").click(function(e){
         sitemapslib.toggle_layer('yandex');
         $("#yandex_satelite_button").toggleClass("selected_button");
 });
+$("#esri_button").click(function(e){
+        e.preventDefault();
+        sitemapslib.toggle_layer('esri');
+        $("#esri_button").toggleClass("selected_button");
+});

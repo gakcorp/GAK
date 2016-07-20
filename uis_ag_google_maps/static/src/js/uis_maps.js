@@ -29,8 +29,10 @@ function mapslib(apl_ids, div_id) {
     this.hash.apl_data='n/d';
     this.hash.pillar_data='n/d';
     this.hash.trans_data='n/d';
+    thatlib=this;
     this.map=new google.maps.Map(document.getElementById(div_id), {
         zoom: 13,
+        maxZoom:20,
         center: this.center_loc,
         mapTypeId: google.maps.MapTypeId.HYBRID,
         mapTypeControlOptions:{
@@ -38,7 +40,7 @@ function mapslib(apl_ids, div_id) {
             style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
         }
        });
-	thatlib=this;
+
     //Devine events
     var onLineMouseOver = function(){
         var line=this;
@@ -312,6 +314,12 @@ function mapslib(apl_ids, div_id) {
         }
     };
     //Define info functions
+    this.show_status_bar=function(){
+        var czoom=this.map.getZoom();
+        code="Zoom:"+czoom;
+        console.debug(code);
+        $("#left_status_bar").html(code);
+    };
     this.show_info_bar=function(code){
         $("#left_info_bar").html(code);
     };
@@ -704,12 +712,14 @@ function mapslib(apl_ids, div_id) {
         //console.debug(this.pillar_data);
         this.init_rosreestr_map();
         this.init_yandex_map();
+        this.init_esri_map();
         this.init_buttons();
         that=this;
         google.maps.event.addListener(thatlib.map, 'zoom_changed', function() {
             var zoom = thatlib.map.getZoom();
             that.set_trans_markers();
             that.set_pillar_markers();
+            that.show_status_bar();
             if (zoom <= that.showpillarzoom) {
                that.set_show_pillar(false);
             } else {
@@ -738,7 +748,8 @@ function mapslib(apl_ids, div_id) {
     
     this.vis_layer=function(layer_name){
         if (this.layers[layer_name].vis===1) {
-            this.map.overlayMapTypes.push(this.layers[layer_name].ImageMap);
+            //this.map.overlayMapTypes.push(this.layers[layer_name].ImageMap);
+            this.map.overlayMapTypes.insertAt(0, this.layers[layer_name].ImageMap);
         }
         if (this.layers[layer_name].vis===0) {
             this.map.overlayMapTypes.clear();
@@ -793,7 +804,37 @@ function mapslib(apl_ids, div_id) {
         });
         this.vis_layer('rosreestr');
     };
-    
+    this.init_esri_map=function(){
+        this.layers.esri=[];
+        this.layers.esri.vis=0;
+        this.layers.esri.type='ImageMapType';
+        this.layers.esri.name='Esri';
+        that=this;
+        this.layers.esri.ImageMap=new google.maps.ImageMapType({
+            getTileUrl:function(coord,zoom){
+               var url="http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/";
+               pz=zoom;
+               url=url+pz+"/"+coord.y+"/"+coord.x;
+               if (zoom>17){
+                url = null;
+               }
+                var ddy=0;
+                elem=$('.gm-style:first-child').children().first().children().first().children().first();
+                strtop=ddy+'px';
+                elem.css({top:strtop});
+               //console.debug(url);
+               return url;
+               //GetURLBase+inttostr(GetZ-1)+'/'+inttostr(GetY)+'/'+inttostr(GetX);
+            },
+            tileSize: new google.maps.Size(256,256),
+            isPng: false,
+            alt: "Esri Layer",
+            name: "Esri images",
+            maxZoom:17,
+            opacity:1 
+        });
+        this.vis_layer('esri');
+    };
     this.init_yandex_map=function(){
         this.layers.yandex=[];
         this.layers.yandex.vis=0;
@@ -802,15 +843,57 @@ function mapslib(apl_ids, div_id) {
         that=this;
         this.layers.yandex.ImageMap=new google.maps.ImageMapType({
         getTileUrl: function (coord,zoom){
-            console.debug(coord.x,coord.y);
-            var url="http://sat01.maps.yandex.net/tiles?l=sat";
+            //console.debug(coord.x,coord.y);
+            //var url="http://sat01.maps.yandex.net/tiles?l=sat";
+            var url="http://sat01.maps.yandex.net/tiles?l=sat&lang=en_US";
+            var dy=0;
+            if (zoom>10){
+                dy=Math.pow(2,zoom-10)
+            };
+            var ddy=0;
+            switch(zoom){
+                case 11:
+                    ddy=46;
+                    break;
+                case 12:
+                    ddy=88;
+                    break;
+                case 13:
+                    ddy=-82;
+                    dy=dy-1;
+                    break;
+                case 14:
+                    ddy=94;
+                    dy=dy-1;
+                    break;
+                case 15:
+                    ddy=-22;
+                    dy=dy-3;
+                    break;
+                case 16:
+                    dy=dy-6;
+                    ddy=-30;
+                    break;
+                case 17:
+                    dy=dy+12;
+                    ddy=-50;
+                case 18:
+                    dy=dy-23;
+                    ddy=95;
+            }
+            elem=$('.gm-style:first-child').children().first().children().first().children().first();
+            strtop=ddy+'px';
+            elem.css({top:strtop});
+            var ya_zoom=zoom;
+            var ya_y=coord.y+dy;
             url=url+"&x="+coord.x;
-            url=url+"&y="+coord.y;
-            url=url+"&z="+zoom-1;
+            url=url+"&y="+ya_y;
+            url=url+"&z="+ya_zoom;
+            if (zoom>18){url=null};
             return url;
         },
         tileSize: new google.maps.Size(256,256),
-        isPng: false,
+        isPng: true,
         alt: "Yandex Satelite Layer",
         name: "Yandex.Satelite",
         maxZoom:19,
