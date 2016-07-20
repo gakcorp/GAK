@@ -72,31 +72,46 @@ class uis_papl_pillar_material(models.Model):
 	_description='Materials of pillar'
 	name=fields.Char('Name')
 	code=fields.Char('Code')
-	
+
+class uis_papl_pillar_cut(models.Model):
+    _name='uis.papl.pillar.cut'
+    _description='Pillar cut'
+    name=fields.Char('Pillar cut')
+    code=fields.Char('Code')
+    
 class uis_papl_pillar(models.Model):
-	_name='uis.papl.pillar'
-	_description='Pillar models'
-	name = fields.Char('Name', compute='_get_pillar_full_name')
-	num_by_vl = fields.Integer()
-	pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
-	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
-	longitude=fields.Float(digits=(2,6))
-	latitude=fields.Float(digits=(2,6))
-	prev_longitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
-	prev_latitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
-	len_prev_pillar=fields.Float(digits=(5,2), compute='_pillar_get_len')
-	azimut_from_prev=fields.Float(digits=(3,2), compute='_pillar_get_len')
-	elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
-	apl_id=fields.Many2one('uis.papl.apl', string='APL')
-	tap_id=fields.Many2one('uis.papl.tap', string='Taps')
-	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
-	near_pillar_ids=fields.Many2many('uis.papl.pillar',
-									 relation='near_pillar_ids',
-									 column1='trans_id',
-									 column2='pillar_id',
-									 compute='_get_near_pillar'
-									 )
-	
+    _name='uis.papl.pillar'
+    _description='Pillar models'
+    name = fields.Char('Name', compute='_get_pillar_full_name')
+    num_by_vl = fields.Integer()
+    pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
+    pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
+    pillar_cut_id=fields.Many2one('uis.papl.pillar.cut', string="Cut")
+    pillar_stay_rotation=fields.Float(digits(3,2), string="Stay_rotation"
+    pillar_icon_code=fields.Char(string='Pillar icon code', compute='_pillar_icon_code')
+    longitude=fields.Float(digits=(2,6))
+    latitude=fields.Float(digits=(2,6))
+    prev_longitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
+    prev_latitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
+    len_prev_pillar=fields.Float(digits=(5,2), compute='_pillar_get_len')
+    azimut_from_prev=fields.Float(digits=(3,2), compute='_pillar_get_len')
+    elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
+    apl_id=fields.Many2one('uis.papl.apl', string='APL')
+    tap_id=fields.Many2one('uis.papl.tap', string='Taps')
+    parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
+    near_pillar_ids=fields.Many2many('uis.papl.pillar',
+    								 relation='near_pillar_ids',
+    								 column1='trans_id',
+    								 column2='pillar_id',
+    								 compute='_get_near_pillar'
+    								 )
+
+    def _pillar_icon_code(self):
+        for pil in self:
+            res=str(pil.pillar_type_id.id)+'_'+str(pil.pillar_cut_id.id)
+            #Add additional conf. If res(code) ambsence in model uis_settings_pillar_icon then return Default
+            pil.pillar_icon_code=res
+
 	@api.depends('latitude','longitude')
 	def _get_near_pillar(self,cr,uid,ids,context=None):
 		for pil in self.browse(cr,uid,ids,context=context):
@@ -125,7 +140,7 @@ class uis_papl_pillar(models.Model):
 	@api.depends('longitude','latitude')
 	def _get_elevation(self):
 		for record in self:
-			print 'Get Elevation for '+str(record.id)
+			#print 'Get Elevation for '+str(record.id)
 			lat=record.latitude
 			lng=record.longitude
 			if (lat<>0) and (lng<>0):

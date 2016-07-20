@@ -97,6 +97,8 @@
 							<group>
 								<field name="pillar_material_id"/>
 								<field name="pillar_type_id"/>
+								<field name="pillar_cut_id"/>
+								<field name="pillar_stay_rotation"/>
 							</group>
 						</group>
 					</page>
