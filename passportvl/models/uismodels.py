@@ -65,12 +65,14 @@ class uis_papl_pillar_type(models.Model):
 	_name='uis.papl.pillar.type'
 	_description='Type of pillar'
 	name=fields.Char('Name')
+	code=fields.Char('Code')
 
 class uis_papl_pillar_material(models.Model):
 	_name='uis.papl.pillar.material'
 	_description='Materials of pillar'
 	name=fields.Char('Name')
-
+	code=fields.Char('Code')
+	
 class uis_papl_pillar(models.Model):
 	_name='uis.papl.pillar'
 	_description='Pillar models'
