@@ -1,5 +1,6 @@
 <openerp>
     <data>
+		<!--Actions items!-->
 		<record id="uis_main_settings_action_window" model="ir.actions.act_window">
 			<field name="name">Main Settings</field>
 			<field name="res_model">uis.settings</field>
@@ -18,8 +19,25 @@
 				<p class="oe_view_nocontent_create">Create new icon</p>
 			</field>
 		</record>
+		<!-- Menu items!-->
         <menuitem name="aGIS Settings" id="uis_settings_menu_root"/>
 		<menuitem name="Main Settings" id="uis_main_settings_menu" parent="uis_settings_menu_root" action="uis_main_settings_action_window"/>
 		<menuitem name="Pillar Icons" id="uis_pillar_icon_settings_menu" parent="uis_settings_menu_root" action="uis_icon_settings_action_window"/>
+		<!-- views !-->
+		<record model="ir.ui.view" id="uis_pillar_icon_list">
+			<field name="name">Pillar icon list</field>
+			<field name="model">uis.icon.settings.pillar</field>
+			<field name="arch" type="xml">
+				<tree string="List of Pillar Icons" editable="top" create="false" edit="false">
+					<field name="id"/>
+					<field name="pillar_icon_code"/>
+					<field name="pillar_type_id"/>
+					<field name="pillar_cut_id"/>
+					<field name="pillar_icon_path"/>
+					<field name="stroke_color" widget="color"/>
+					<field name="fill_color" widget="color"/>
+				</tree>
+			</field>
+		</record>
     </data>
 </openerp>

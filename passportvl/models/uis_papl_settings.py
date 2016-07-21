@@ -25,6 +25,9 @@ class uis_settings_pillar_icon(models.Model):
 	pillar_icon_path=fields.Char(string="Icon SVG path")
 	fill_path=fields.Boolean(string="Fill Path")
 	fill_color=fields.Char(string="Fill Color")
+	stroke_width=fields.Integer(string="Stroke width")
+	stroke_color=fields.Char(string="Stroke Color")
+	anchor=fields.Char(string="Ancor Point")
 	
 	def _def_icon_code(self):
 		for spi in self:

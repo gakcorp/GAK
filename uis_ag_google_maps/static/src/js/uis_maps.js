@@ -392,7 +392,7 @@ function mapslib(apl_ids, div_id) {
             scale:scalez,
             strokeColor:color,
             strokeWeight:2,
-            anchor: new google.maps.Point(5,10),
+            anchor: new google.maps.Point(5,10)
         };
         return pci;
     };
