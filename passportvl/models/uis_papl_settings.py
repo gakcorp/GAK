@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from openerp import models, fields, api
+
 class uis_licenses(models.Model):
 	_name='uis.licenses'
 	_description='Licenses of AG System'
@@ -13,12 +16,15 @@ class uis_settings(models.Model):
 	google_elevation_API=fields.Char(string='Google elevation API')
 
 class uis_settings_pillar_icon(models.Model):
-	_name='uis.settings.pillar.cut'
+	_name='uis.icon.settings.pillar'
 	_description='Icons and SVG path for pillars'
 	def_icon=fields.Boolean(string='Default icon')
 	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
 	pillar_cut_id=fields.Many2one('uis.papl.pillar.cut', string="Cut")
 	pillar_icon_code=fields.Char(string="Icon code", compute="_def_icon_code")
+	pillar_icon_path=fields.Char(string="Icon SVG path")
+	fill_path=fields.Boolean(string="Fill Path")
+	fill_color=fields.Char(string="Fill Color")
 	
 	def _def_icon_code(self):
 		for spi in self:

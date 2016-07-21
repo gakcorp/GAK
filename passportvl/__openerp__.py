@@ -28,6 +28,7 @@
         'views/department.xml',
         'views/templates.xml',
         'views/transformation.xml',
+        'views/settings.xml',
         'views/reports/uis_papl_apl_report.xml',
         'views/reports/uis_papl_apl_report_passport.xml',
         'views/schemas/apl_scheme.xml',

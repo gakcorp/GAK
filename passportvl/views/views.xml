@@ -501,7 +501,7 @@
 
     <!--menu new categories!-->
 	<menuitem name="Management" id="uis_papl_menu_management" parent="uis_papl_menu_root"/>
-	<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>
+	<!--<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>!-->
 	
 	<!--menu categories APLPillar etc!-->
 	<menuitem name="Air power line (APL)" id="uis_papl_menu_apl" parent="uis_papl_menu_management"/>

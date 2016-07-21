@@ -1,0 +1,25 @@
+<openerp>
+    <data>
+		<record id="uis_main_settings_action_window" model="ir.actions.act_window">
+			<field name="name">Main Settings</field>
+			<field name="res_model">uis.settings</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Create new Settings for user</p>
+			</field>
+		</record>
+		<record id="uis_icon_settings_action_window" model="ir.actions.act_window">
+			<field name="name">Pilar icon settings</field>
+			<field name="res_model">uis.icon.settings.pillar</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Create new icon</p>
+			</field>
+		</record>
+        <menuitem name="aGIS Settings" id="uis_settings_menu_root"/>
+		<menuitem name="Main Settings" id="uis_main_settings_menu" parent="uis_settings_menu_root" action="uis_main_settings_action_window"/>
+		<menuitem name="Pillar Icons" id="uis_pillar_icon_settings_menu" parent="uis_settings_menu_root" action="uis_icon_settings_action_window"/>
+    </data>
+</openerp>
