@@ -19,6 +19,8 @@ function mapslib(apl_ids, div_id) {
     this.apls=[];
     this.markers.pillars=[];
     this.markers.trans=[];
+    this.settings=[];
+    this.settings.pillar_icon=[];
     this.showpillar=false;
     this.showpillarzoom=14;
     this.showtranszoom=12;
@@ -398,6 +400,7 @@ function mapslib(apl_ids, div_id) {
     };
     this.get_pillar_icon=function(pic,type,rotation,state,selectable){
         var color='blue';
+        //if (!this.settings.pillar_icon[pic].stroke_color){color=this.settings.pillar_icon[pic].stroke_color;}
         switch (state){
             case 'DRAFT':
                 color='grey';
@@ -415,25 +418,34 @@ function mapslib(apl_ids, div_id) {
                 color='red';
                 break;
         }
+        ///!!!stroke_width
         var fillOpacity=0;
+        var fillColor='black';
+        if (this.settings.pillar_icon[pic].fill_path){fillOpacity=1;}
+        if (this.settings.pillar_icon[pic].fill_color!==''){fillColor=this.settings.pillar_icon[pic].fill_color;}
+
         if (selectable){
             fillOpacity=1;
+            fillColor='red';  //NUPD Change to read value from settings
         }
-        var z1=14;
+        var z1=12;
         var z2=19;
-        var x1=0.2;
-        var x2=10;
+        var x1=0.1;
+        var x2=1;
         var z=this.map.getZoom();
         var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
-        //console.debug(scalez);
+        var strokeWeight=2;  //NUPD Change to read DEF value
+        if (this.settings.pillar_icon[pic].stroke_width>0){strokeWeight=this.settings.pillar_icon[pic].stroke_width}
+        var pth=this.settings.pillar_icon[pic].path;
         var pci={
-            path:google.maps.SymbolPath.CIRCLE,
-            fillColor:'red',
+            //path:google.maps.SymbolPath.CIRCLE,
+            path:pth,//this.settings.pillar_icon[pic].path,
+            fillColor:fillColor,
             fillOpacity:fillOpacity,
             scale:scalez,
             strokeColor:color,
-            strokeWeight:scalez-2,
-            anchor: new google.maps.Point(0,0),
+            strokeWeight:strokeWeight,
+            anchor: new google.maps.Point(5,5),
             rotation: rotation
         };
         return pci;
@@ -585,7 +597,7 @@ function mapslib(apl_ids, div_id) {
 				tap_id:cur_pillar.tap_id,
                 type_id:cur_pillar.type_id,
                 rotation:cur_pillar.rotation,
-				pillar_icon_code:cur_pillar.rotation,
+				pillar_icon_code:cur_pillar.pillar_icon_code,
                 state:cur_pillar.state,
                 icon:this.get_pillar_icon(cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
                 });
@@ -703,9 +715,27 @@ function mapslib(apl_ids, div_id) {
             //that.set_photo_tumb();
             };
     };
-    
+    this.get_settings_icon_list=function(){
+        var data={}
+        xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/settings/pillar_icon_list',true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+        xhr.onload=function(e){
+            var res=JSON.parse(this.response);
+            var pil=JSON.parse(res.result.pi_data);
+            for (var i=0;i<pil.counter; i++) {
+                cur_pi=pil.pis[i];
+                that.settings.pillar_icon[cur_pi.code]=cur_pi;
+            }
+        };
+    };    
+    this.load_settings=function(){
+       this.get_settings_icon_list(); 
+    };
     this.init=function(){
-        
+        this.load_settings();
         //this.get_pillar_data();
         this.get_trans_data();
         this.get_hash();

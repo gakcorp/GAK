@@ -39,5 +39,33 @@
 				</tree>
 			</field>
 		</record>
+		<record id="uis_papl_icon_list_form" model="ir.ui.view">
+		<field name="name">Pillar Icon list</field>
+		<field name="model">uis.icon.settings.pillar</field>
+		<field name="arch" type="xml">
+			<form string="Pillar icon form">
+			<sheet string="Details">
+				<h1>
+					<field name="pillar_icon_code"/>
+				</h1>
+				<field name="def_icon"/><label for="def_icon" string="default icon"/>
+				<group>
+					<group>
+						<field name="pillar_type_id"/>
+						<field name="pillar_cut_id"/>
+					</group>
+					<group>
+						<field name="pillar_icon_path"/>
+						<field name="stroke_color"/>
+						<field name="stroke_width"/>
+						<field name="fill_path"/>
+						<field name="fill_color" attrs="{'invisible':[('fill_path', '=', False)]}"/>
+						<field name="anchor"/>
+					</group>
+				</group>
+			</sheet>
+			</form>
+		</field>
+		</record>
     </data>
 </openerp>

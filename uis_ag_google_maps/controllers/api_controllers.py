@@ -311,6 +311,7 @@ class maps_data_json(http.Controller):
 	def api_v1_pillar_icon_list(self,*arg,**post):
 		start=datetime.datetime.now()
 		data=json.loads(json.dumps(request.jsonrequest))
+		cr,uid,context=request.cr,request.uid,request.context
 		pi_obj=request.registry['uis.icon.settings.pillar']
 		domain=[]
 		pi_ids=pi_obj.search(cr,uid,domain,context=context)
@@ -324,7 +325,7 @@ class maps_data_json(http.Controller):
 			pi_data["pis"].append({
 				'code':pi.pillar_icon_code,
 				'path':pi.pillar_icon_path,
-				'fill_path':pi.pill_path,
+				'fill_path':pi.fill_path,
 				'fill_color':pi.fill_color,
 				'stroke_width':pi.stroke_width,
 				'stroke_color':pi.stroke_color,
@@ -334,7 +335,8 @@ class maps_data_json(http.Controller):
 			'pi_data':json.dumps(pi_data)
 		}
 		stop=datetime.datetime.now()
-		elapsed=stop-start_logger.info('Generate Pillar icon list in %r seconds'%elapsed.total_seconds())
+		elapsed=stop-start
+		_logger.info('Generate Pillar icon list in %r seconds'%elapsed.total_seconds())
 		return values
 			
 	#Define List functions
