@@ -110,7 +110,6 @@ class pillar_google_map(http.Controller):
         minlong=120
         maxlong=0
         for apl_id in apl_obj.browse(cr, uid, apl_ids, context=context):
-            print apl_id.name
             apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
             for tap in apl_id.tap_ids:
                 lines_data["counter"]=lines_data["counter"]+1
@@ -132,9 +131,8 @@ class pillar_google_map(http.Controller):
                 np=end_pillar
                 n_id=np.id
                 pillar_cnt=tap.pillar_cnt
-                print tap.name+"_"+str(pillar_cnt)
+                #print tap.name+"_"+str(pillar_cnt)
                 while (n_id>0) and (pillar_cnt-i>=0):
-                    print np.name
                     line["counter"]=line["counter"]+1
                     line["coord"].append({
                         'ltd':np.latitude,
@@ -148,7 +146,6 @@ class pillar_google_map(http.Controller):
                     np=np.parent_id
                     n_id=np.id
                     i=i+1
-                    print i
                 lines_data["taps"].append({
                     'id':tap.id,
                     'name': tap.name,

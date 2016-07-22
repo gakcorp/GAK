@@ -338,6 +338,7 @@
       <field name="arch" type="xml">
         <tree string="List of Pillar" editable="top" create="true" edit="false">
           <field name="id"/>
+					<field name="pillar_icon_code"/>
           <field name="name" string="Pillar Name"/>
           <field name="num_by_vl" string ="Number pillar on power line"/>
 		  <field name="pillar_type_id" string="Pillar Type" widget='many2one'/>

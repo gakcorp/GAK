@@ -340,7 +340,7 @@ function mapslib(apl_ids, div_id) {
     
     this.mark_pillar=function(pid, mark){
         cm=this.markers.pillars[pid];
-        this.markers.pillars[pid].setIcon(this.get_pillar_icon(cm.type_id,cm.rotation,cm.state,mark));
+        this.markers.pillars[pid].setIcon(this.get_pillar_icon(cm.pillar_icon_code,cm.type_id,cm.rotation,cm.state,mark));
     };
     
     this.mark_apl=function(apl_id,mark){
@@ -396,7 +396,7 @@ function mapslib(apl_ids, div_id) {
         };
         return pci;
     };
-    this.get_pillar_icon=function(type,rotation,state,selectable){
+    this.get_pillar_icon=function(pic,type,rotation,state,selectable){
         var color='blue';
         switch (state){
             case 'DRAFT':
@@ -422,7 +422,7 @@ function mapslib(apl_ids, div_id) {
         var z1=14;
         var z2=19;
         var x1=0.2;
-        var x2=6;
+        var x2=10;
         var z=this.map.getZoom();
         var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
         //console.debug(scalez);
@@ -561,7 +561,7 @@ function mapslib(apl_ids, div_id) {
             
             if (typeof this.markers.pillars[cur_pillar.id] != "undefined") {
 				cur_marker=this.markers.pillars[cur_pillar.id];
-                this.markers.pillars[cur_pillar.id].setIcon(this.get_pillar_icon(cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false));
+                this.markers.pillars[cur_pillar.id].setIcon(this.get_pillar_icon(cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false));
 				if (cur_marker.position != location) {
 					this.markers.pillars[cur_pillar.id].setPosition(location);
 				}
@@ -585,8 +585,9 @@ function mapslib(apl_ids, div_id) {
 				tap_id:cur_pillar.tap_id,
                 type_id:cur_pillar.type_id,
                 rotation:cur_pillar.rotation,
+				pillar_icon_code:cur_pillar.rotation,
                 state:cur_pillar.state,
-                icon:this.get_pillar_icon(cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
+                icon:this.get_pillar_icon(cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
                 });
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragend', onPillarDragend);
                 google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mouseover', onPillarMouseOver);

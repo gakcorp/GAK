@@ -107,9 +107,14 @@ class uis_papl_pillar(models.Model):
 									 )
 
 	@api.depends('pillar_type_id','pillar_cut_id')
-	def _pillar_icon_code(self):
-		for pil in self:
+	def _pillar_icon_code(self,cr,uid,ids,context=None):
+		pi_obj=self.pool.get('uis.icon.settings.pillar')
+		for pil in self.browse(cr,uid,ids,context=context):
 			res=str(pil.pillar_type_id.id)+'_'+str(pil.pillar_cut_id.id)
+			domain=[("pillar_icon_code","in",[res])]
+			pi_ids=pi_obj.search(cr,uid,domain,context=context)
+			if not(pi_ids):
+				res="DEF"
 			#Add additional conf. If res(code) ambsence in model uis_settings_pillar_icon then return Default
 			pil.pillar_icon_code=res
 

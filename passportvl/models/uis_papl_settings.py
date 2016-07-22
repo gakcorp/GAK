@@ -21,7 +21,7 @@ class uis_settings_pillar_icon(models.Model):
 	def_icon=fields.Boolean(string='Default icon')
 	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
 	pillar_cut_id=fields.Many2one('uis.papl.pillar.cut', string="Cut")
-	pillar_icon_code=fields.Char(string="Icon code", compute="_def_icon_code")
+	pillar_icon_code=fields.Char(string="Icon code", compute="_def_icon_code", store=True)
 	pillar_icon_path=fields.Char(string="Icon SVG path")
 	fill_path=fields.Boolean(string="Fill Path")
 	fill_color=fields.Char(string="Fill Color")
@@ -29,6 +29,7 @@ class uis_settings_pillar_icon(models.Model):
 	stroke_color=fields.Char(string="Stroke Color")
 	anchor=fields.Char(string="Ancor Point")
 	
+	@api.depends('pillar_type_id','pillar_cut_id')
 	def _def_icon_code(self):
 		for spi in self:
 			spi.pillar_icon_code=str(spi.pillar_type_id.id)+'_'+str(spi.pillar_cut_id.id)
