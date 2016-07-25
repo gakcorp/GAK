@@ -1,0 +1,31 @@
+<openerp>
+    <data>
+		<!--Actions items!-->
+		<record id="uis_layers_settings_action_window" model="ir.actions.act_window">
+			<field name="name">Layers settings</field>
+			<field name="res_model">uis.settings.layers</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Create new layer</p>
+			</field>
+		</record>
+		<!-- Menu items!-->
+		<menuitem name="Layers" id="uis_layers_settings_menu" parent="uis_settings_menu_root" action="uis_layers_settings_action_window"/>
+		<!-- views !-->
+		<record model="ir.ui.view" id="uis_pillar_icon_list">
+			<field name="name">Layers list</field>
+			<field name="model">uis.settings.layers</field>
+			<field name="arch" type="xml">
+				<tree string="List of layers (for map)" editable="top" create="false" edit="false">
+					<field name="name"/>
+					<field name="enabled"/>
+					<field name="shown"/>
+					<field name="minzoom"/>
+					<field name="maxzoom"/>]
+				</tree>
+			</field>
+		</record>
+		
+    </data>
+</openerp>
