@@ -24,15 +24,22 @@ class uis_cache_layers(models.Model):
 	_descrition='Cache'
 	name=fields.Char(string="name", compute="_def_cache_name", store=True)
 	layer=fields.Many2one('uis.settings.layers', string="Layer")
+	layer_name=fields.Char(string="Layear Name", compute="_def_layer_name", store=True)
 	x=fields.Integer(string="X tile")
 	y=fields.Integer(string="Y tile")
 	z=fields.Integer(string="zoom layer")
+	tile=fields.Binary(string="tile")
 	origin_url=fields.Char(string="origin URL string")
 	cache_date=fields.Date(string="Cache date")
 	cache_end_life=fields.Date(string="Cache end life date")
 	is_stretch_tile=fields.Boolean(string="is stretch tile")
 	req_cnt=fields.Integer(string="Requests count")
 	
+	@api.depends('layer')
+	def _def_layer_name(self):
+		for cl in self:
+			cl.layer_name=cl.layer.name
+
 	@api.depends('layer','x','y','z')
 	def _def_cache_name(self):
 		for cl in self:
