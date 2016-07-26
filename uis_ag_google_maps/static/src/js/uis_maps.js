@@ -854,7 +854,8 @@ function mapslib(apl_ids, div_id) {
                 strtop=ddy+'px';
                 elem.css({top:strtop});
                //console.debug(url);
-               return url;
+			   	url="/maps/esri_imagery/"+pz+"/"+coord.x+"/"+coord.y;
+				return url;
                //GetURLBase+inttostr(GetZ-1)+'/'+inttostr(GetY)+'/'+inttostr(GetX);
             },
             tileSize: new google.maps.Size(256,256),

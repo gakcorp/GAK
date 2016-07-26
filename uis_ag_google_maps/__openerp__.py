@@ -13,6 +13,7 @@ information for which information is availeble in Activ.GIS system
     'depends': ['passportvl','base_geolocalize'],
     'data': [
         'views/google_map.xml',
+        'views/layers_views.xml'
     ],
     'installable': True,
     'auto_install': False,

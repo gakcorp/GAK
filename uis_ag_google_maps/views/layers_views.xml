@@ -10,10 +10,17 @@
 				<p class="oe_view_nocontent_create">Create new layer</p>
 			</field>
 		</record>
+		<record id="uis_layers_cache_action_window" model="ir.actions.act_window">
+			<field name="name">Layers settings</field>
+			<field name="res_model">uis.cache.layers</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
 		<!-- Menu items!-->
-		<menuitem name="Layers" id="uis_layers_settings_menu" parent="uis_settings_menu_root" action="uis_layers_settings_action_window"/>
+		<menuitem name="Layers" id="uis_layers_settings_menu" parent="passportvl.uis_settings_menu_root" action="uis_layers_settings_action_window"/>
+		<menuitem name="Cache" id="uis_cache_layers_menu" parent="passportvl.uis_settings_menu_root" action="uis_layers_cache_action_window"/>
 		<!-- views !-->
-		<record model="ir.ui.view" id="uis_pillar_icon_list">
+		<record model="ir.ui.view" id="uis_layers_settings_list">
 			<field name="name">Layers list</field>
 			<field name="model">uis.settings.layers</field>
 			<field name="arch" type="xml">
@@ -22,10 +29,27 @@
 					<field name="enabled"/>
 					<field name="shown"/>
 					<field name="minzoom"/>
-					<field name="maxzoom"/>]
+					<field name="maxzoom"/>
 				</tree>
 			</field>
 		</record>
 		
+		<record model="ir.ui.view" id="uis_layers_settings_list">
+			<field name="name">Cache list</field>
+			<field name="model">uis.cache.layers</field>
+			<field name="arch" type="xml">
+				<tree string="List of cache (for map)" editable="top" create="false" edit="false">
+					<field name="name"/>
+					<field name="layer"/>
+					<field name="z"/>
+					<field name="x"/>
+					<field name="y"/>
+					<field name="cache_date"/>
+					<field name="cache_end_life"/>
+					<field name="req_cnt"/>
+					<field name="is_stretch_tile"/>
+				</tree>
+			</field>
+		</record>
     </data>
 </openerp>
