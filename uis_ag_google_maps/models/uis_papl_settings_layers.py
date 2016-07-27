@@ -43,4 +43,4 @@ class uis_cache_layers(models.Model):
 	@api.depends('layer','x','y','z')
 	def _def_cache_name(self):
 		for cl in self:
-			cl.name=cl.layer.name+'/'+str(sl.z)+'/'+str(sl.x)+'/'+str(sl.y)
+			cl.name=str(cl.layer.name)+'/'+str(cl.z)+'/'+str(cl.x)+'/'+str(cl.y)

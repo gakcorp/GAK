@@ -506,7 +506,7 @@ function mapslib(apl_ids, div_id) {
                 ],
                 strokeColor: this.get_line_color(false),//"#0000FF",
                 strokeOpacity: 1.0,
-                strokeWeight: 3,
+                strokeWeight: 2,
                 map: this.map,
                 apl_id: line.apl_id,
                 tap_id: line.tap_id
@@ -824,6 +824,8 @@ function mapslib(apl_ids, div_id) {
             url=url+"&size=256,256";
             url=url+"&f=image";
             url=url+"&bbox="+bbox;
+			pz=zoom;
+			url="/maps/rosreestr_cadastre/"+pz+"/"+coord.x+"/"+coord.y;
             return url;
         },
         tileSize: new google.maps.Size(256,256),

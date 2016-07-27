@@ -66,6 +66,7 @@ class uis_papl_pillar_type(models.Model):
 	_description='Type of pillar'
 	name=fields.Char('Name')
 	code=fields.Char('Code')
+	base=fields.Boolean('Base pillar')
 
 class uis_papl_pillar_material(models.Model):
 	_name='uis.papl.pillar.material'
