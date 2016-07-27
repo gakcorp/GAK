@@ -21,6 +21,7 @@ function mapslib(apl_ids, div_id) {
     this.markers.trans=[];
     this.settings=[];
     this.settings.pillar_icon=[];
+	this.settings.layers=[];
     this.showpillar=false;
     this.showpillarzoom=14;
     this.showtranszoom=12;
@@ -715,8 +716,24 @@ function mapslib(apl_ids, div_id) {
             //that.set_photo_tumb();
             };
     };
+	this.get_settings_layers=function(){
+		var data={};
+		xhr=new XMLHttpRequest();
+		xhr.open('POST','/apiv1/settings/layers',true);
+		xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+		xhr.onload=function(e){
+			/*var res=JSON.parse(this.responce);
+			var lr=JSON.parse(res.result.lr_data);
+			for (var i=0;i<lr.counter;i++){
+				cur_lr=lr.lrs[i];
+				that.settings.layers[cur_lr.name]=cur.lr;*/
+			}
+		};
+	};
     this.get_settings_icon_list=function(){
-        var data={}
+        var data={};
         xhr=new XMLHttpRequest();
         xhr.open('POST','/apiv1/settings/pillar_icon_list',true);
         xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
@@ -732,7 +749,8 @@ function mapslib(apl_ids, div_id) {
         };
     };    
     this.load_settings=function(){
-       this.get_settings_icon_list(); 
+       this.get_settings_layers();
+	   this.get_settings_icon_list(); 
     };
     this.init=function(){
         this.load_settings();

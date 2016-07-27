@@ -6,6 +6,7 @@ import datetime
 import logging
 import base64
 import urllib
+import urllib2
 import math
 import requests
 import shutil
@@ -36,6 +37,7 @@ def tile2lat(y,z):
 
 class maps_data_json(http.Controller):
 	def _check_cache(self, lname='',z=0,x=0,y=0):
+		start=datetime.datetime.now()
 		cr, uid,context=request.cr,request.uid,request.context
 		cache_obj=request.registry['uis.cache.layers']
 		needupdate=True
@@ -52,6 +54,10 @@ class maps_data_json(http.Controller):
 			'''if cache.cache_end_life:
 				if cache.cache_end_life<datetime.datetime.now():
 					needupdate=False'''
+			stop=datetime.datetime.now()
+			elapsed=stop-start
+			ts=elapsed.total_seconds()
+			cache.med_delay=(cache.med_delay*rc+ts)/(rc+1)
 		return exist,needupdate,image
 	def _download_cache(self,lname='',z=0,x=0,y=0):
 		cr, uid,context=request.cr,request.uid,request.context
@@ -75,8 +81,12 @@ class maps_data_json(http.Controller):
 			#print urllib.urlopen(str(url)).read()
 			#r = requests.post(url,'')
 			#print r
-			f=StringIO.StringIO(urllib.urlopen(url).read())
-			print urllib.urlopen(url).read();
+			user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+			headers = { 'User-Agent' : user_agent }
+			imgRequest = urllib2.Request(url, headers=headers)
+			f=StringIO.StringIO(urllib2.urlopen(imgRequest).read())
+			#print urllib.urlopen(url).read();
+			#print imgData
 			has_error=False
 			try:
 				img=Image.open(f)

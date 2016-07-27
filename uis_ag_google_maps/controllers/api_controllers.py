@@ -306,7 +306,33 @@ class maps_data_json(http.Controller):
 		_logger.info('Generate TRANS data HASH in %r seconds'%elapsed.total_seconds())
 		return values
 		#Define Settings Functions
-	
+	@http.route('/apiv1/settings/layers',type="json",auth="public",csfr=False)
+	def api_v1_settings_layers(self, *arg, **post):
+		start=datetime.datetime.now()
+		data=json.loads(json.dumps(request.jsonrequest))
+		cr,uid,context=request.cr,request.uid,request.context
+		lr_obj=request.registry['uis.settings.layers']
+		domain=[("shown","=",True)]
+		lr_ids=lr_obj.search(cr,uid,domain,context=context)
+		lr_data={
+			"counter":0,
+			"lrs":[]
+		}
+		for lr in lr_obj.browse(cr,uid,lr_ids,context=context).sorted(key=lambda r:r.order):
+			lr_data["counter"]=lr_data["counter"]+1
+			lr_data["lrs"].append({
+				'name':lr.name,
+				'title':lr.title,
+				'alt':lr.alt,
+				'opacity':lr.opacity,
+				'order':lr.order
+			})
+		values={
+			'lr_data':json.dumps(lr_data)
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate layers list in %r seconds'%elapsed.total_seconds())
 	@http.route('/apiv1/settings/pillar_icon_list',type="json", auth="public", csfr=False)
 	def api_v1_pillar_icon_list(self,*arg,**post):
 		start=datetime.datetime.now()

@@ -10,6 +10,7 @@ class uis_settings_layers(models.Model):
 	icon=fields.Binary(string="Icon image")
 	enabled=fields.Boolean(string="enabled")
 	shown=fields.Boolean(string="show layer")
+	opacity=fields.Float(digits=(3,2), string="Opacity")
 	order=fields.Integer(string="order")
 	maxzoom=fields.Integer(string="Layer Max Zoom")
 	minzoom=fields.Integer(string="Layer Min Zoom")
@@ -34,7 +35,7 @@ class uis_cache_layers(models.Model):
 	cache_end_life=fields.Date(string="Cache end life date")
 	is_stretch_tile=fields.Boolean(string="is stretch tile")
 	req_cnt=fields.Integer(string="Requests count")
-	
+	med_delay=fields.Float(digits=(3,2), string="Medium delay")
 	@api.depends('layer')
 	def _def_layer_name(self):
 		for cl in self:

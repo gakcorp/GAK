@@ -48,6 +48,7 @@
 					<field name="cache_end_life"/>
 					<field name="req_cnt"/>
 					<field name="is_stretch_tile"/>
+					<field name="med_delay"/>
 				</tree>
 			</field>
 		</record>
