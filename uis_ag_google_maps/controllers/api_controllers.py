@@ -136,7 +136,7 @@ class maps_data_json(http.Controller):
 					'prev_id':pillar_id.parent_id.id,
 					'type_id':pillar_id.pillar_type_id.id,
 					'pillar_icon_code':pillar_id.pillar_icon_code,
-					'rotation':pillar_id.pillar_stay_rotation,  #Add direction pillar
+					'rotation':pillar_id.pillar_stay_rotation,  
 					'state':'EXPLOTATION' #Add state from MRO
 					#'prevlatitude': escape(str(pillar_id.prev_latitude)),
 					#'prevlangitude': escape(str(pillar_id.prev_longitude))
@@ -325,7 +325,8 @@ class maps_data_json(http.Controller):
 				'title':lr.title,
 				'alt':lr.alt,
 				'opacity':lr.opacity,
-				'order':lr.order
+				'order':lr.order,
+				'url_icon':'/web/image?model=uis.settings.layers&id='+str(lr.id)+'&field=icon',
 			})
 		values={
 			'lr_data':json.dumps(lr_data)
@@ -333,6 +334,7 @@ class maps_data_json(http.Controller):
 		stop=datetime.datetime.now()
 		elapsed=stop-start
 		_logger.info('Generate layers list in %r seconds'%elapsed.total_seconds())
+		return values
 	@http.route('/apiv1/settings/pillar_icon_list',type="json", auth="public", csfr=False)
 	def api_v1_pillar_icon_list(self,*arg,**post):
 		start=datetime.datetime.now()
@@ -430,6 +432,40 @@ class maps_data_json(http.Controller):
 		return values
 
 	#Define Newcoord data
+	@http.route('/apiv1/pillar/cycle_type',type="json", auth="public", csfr=False)
+	def api_v1_pillar_cycle_type(self,*arg,**ppost):
+		_logger.info('POST pillar cycle change type (PILLAR)')
+		cr, uid, context=request.cr, request.uid, request.context
+		pillar_obj = request.registry['uis.papl.pillar']
+		pillar_type_obj=request.registry['uis.papl.pillar.type']
+		data=json.loads(json.dumps(request.jsonrequest))
+		pid=data['pillar_id']
+		domainpil=[("id","in",[pid])]
+		pillar_ids=pillar_obj.search(cr,uid,domainpil,context=context)
+		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
+			ptid=pil.pillar_type_id
+			domainpt=[]
+			pt_ids=pillar_type_obj.search(cr,uid,domainpt,context=context)
+			pts=pillar_type_obj.browse(cr,uid,pt_ids,context=context)
+			print pts
+			ti=len(pts)
+			cp=0
+			npt=[]
+			fixnextpos=False
+			for pt in pts:
+				cp=cp+1
+				if cp==1:
+					npt=pt
+				if fixnextpos:
+					npt=pt
+					fixnextpos=False
+				if pt==ptid:
+					fixnextpos=True
+			pil.pillar_type_id=npt
+		values ={
+			'result':1
+		}
+		return values
 	@http.route('/apiv1/pillar/newcoorddrop', type="json", auth="public", csfr=False)
 	def api_v1_pillar_new_coordinate_drop(self, *arg, **post):
 		_logger.info('POST Newcoord json data for pillar (PILLAR)')

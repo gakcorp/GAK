@@ -10,7 +10,7 @@ $("#earth_button").click(function(e){
     console.debug('Earth button Click');
     sitemapslib.map.setMapTypeId(google.maps.MapTypeId.HYBRID);
 });
-
+/*
 $("#rosreestr_button").click(function(e){
     e.preventDefault();
     sitemapslib.toggle_layer('rosreestr');
@@ -27,3 +27,4 @@ $("#esri_button").click(function(e){
         sitemapslib.toggle_layer('esri');
         $("#esri_button").toggleClass("selected_button");
 });
+*/
