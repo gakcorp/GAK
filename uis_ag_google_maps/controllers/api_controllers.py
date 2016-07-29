@@ -57,6 +57,7 @@ class maps_data_json(http.Controller):
 					'inv_num':apl_id.inv_num,
 					'line_len':apl_id.line_len_calc,
 					'status':apl_id.status,
+					'rec_layer':apl_id.rec_layer_id.name,
 					'pillar_count':"N/A", #Change to counter
 					'tap_count':"N/A" #Change to counter
 					})
@@ -169,7 +170,8 @@ class maps_data_json(http.Controller):
 					'name':trans.name,
 					'state':trans.state,
 					'longitude':trans.longitude,
-					'latitude':trans.latitude
+					'latitude':trans.latitude,
+					'rotation':trans.trans_stay_rotation
 				})
 		return trans_data
 	def _get_elevation(self,lat,lng):
@@ -468,7 +470,7 @@ class maps_data_json(http.Controller):
 		return values
 	@http.route('/apiv1/pillar/newcoorddrop', type="json", auth="public", csfr=False)
 	def api_v1_pillar_new_coordinate_drop(self, *arg, **post):
-		_logger.info('POST Newcoord json data for pillar (PILLAR)')
+		start=datetime.datetime.now()
 		cr, uid, context=request.cr, request.uid, request.context
 		pillar_obj = request.registry['uis.papl.pillar']
 		data=json.loads(json.dumps(request.jsonrequest))
@@ -480,9 +482,16 @@ class maps_data_json(http.Controller):
 		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
 			pil.latitude=new_latitude
 			pil.longitude=new_longitude
+			if not(pil.pillar_type_id.base):
+				pil.tap_id.sys_pil_fix_lpp()
+			if (pil.pillar_type_id.base):
+				pil.tap_id.do_normal_magni(cr,uid,[pil.tap_id.id],context=context)
 		values ={
 			'result':1
 		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate newcoord (data) drop in %r seconds'%elapsed.total_seconds())
 		return values
 	
 	@http.route('/apiv1/trans/newcoorddrop', type="json", auth="public", csfr=False)

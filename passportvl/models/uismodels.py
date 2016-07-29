@@ -3,11 +3,15 @@ import math, urllib, json, time
 from openerp import models, fields, api
 from PIL import Image, ImageDraw
 from . import schemeAPL
+import logging
 
 try:
     import cStringIO as StringIO
 except ImportError:
     import StringIO
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
 
 def distance2points(lat1,long1,lat2,long2):
 	dist=0
@@ -95,6 +99,7 @@ class uis_papl_pillar(models.Model):
 	prev_longitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
 	prev_latitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
 	len_prev_pillar=fields.Float(digits=(5,2), compute='_pillar_get_len')
+	fix_lpp=fields.Float(digits=(5,2), string="SysFixlen to prev pillar")
 	azimut_from_prev=fields.Float(digits=(3,2), compute='_pillar_get_len')
 	elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
@@ -106,7 +111,11 @@ class uis_papl_pillar(models.Model):
 									 column2='pillar_id',
 									 compute='_get_near_pillar'
 									 )
-
+	
+	def sys_fix_lpp(self):
+		for pil in self:
+			pil.fix_lpp=pil.len_prev_pillar
+	
 	@api.depends('pillar_type_id','pillar_cut_id')
 	def _pillar_icon_code(self,cr,uid,ids,context=None):
 		pi_obj=self.pool.get('uis.icon.settings.pillar')
@@ -150,10 +159,10 @@ class uis_papl_pillar(models.Model):
 			#print 'Get Elevation for '+str(record.id)
 			lat=record.latitude
 			lng=record.longitude
+			el=0
 			if (lat<>0) and (lng<>0):
 				url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI"
 				#print url
-				el=0
 				response = urllib.urlopen(url)
 				data = json.loads(response.read())
 				#print data
@@ -366,7 +375,51 @@ class uis_papl_tap(models.Model):
 					#if np.
 					cp=np
 				i=i+1
-			
+
+	def sys_pil_fix_lpp(self):
+		for tap in self:
+			for pil in tap.pillar_ids:
+				pil.sys_fix_lpp()
+	
+	@api.multi
+	def do_normal_magni(self,cr,uid,ids,context=None):
+		for tap in self:
+			tap.act_normalize_num()
+			#basepillars_ids=tap.pillar_ids.search(cr,uid,[],context=context)
+			base_pills=[]
+			for pil in tap.pillar_ids.filtered(lambda r: r.pillar_type_id.base == True).sorted(key=lambda r: r.num_by_vl, reverse=True):
+				base_pills.append(pil)
+			if tap.conn_pillar_id:
+				base_pills.append(tap.conn_pillar_id)
+			cnt_base_pills=len(base_pills)
+			for i in range(0,cnt_base_pills-1):
+				cp=base_pills[i]
+				tdist=0
+				while not(cp==base_pills[i+1]):
+					if cp.fix_lpp:
+						tdist=tdist+cp.fix_lpp
+					if not(cp.fix_lpp):
+						tdist=tdist+cp.len_prev_pillar
+					cp=cp.parent_id
+				d=distance2points(base_pills[i].latitude,base_pills[i].longitude,base_pills[i+1].latitude,base_pills[i+1].longitude)
+				k=d/tdist
+				tdlat=base_pills[i+1].latitude-base_pills[i].latitude
+				tdlng=base_pills[i+1].longitude-base_pills[i].longitude
+				tdlatpm=tdlat/d
+				tdlngpm=tdlng/d
+				cp=base_pills[i]
+				cdist=0
+				while not(cp==base_pills[i+1]):
+					if cp.fix_lpp:
+						cdist=cdist+cp.fix_lpp
+					if not(cp.fix_lpp):
+						cdist=cdist+cp.len_prev_pillar
+					latitude=base_pills[i].latitude+tdlatpm*cdist*k
+					longitude=base_pills[i].longitude+tdlngpm*cdist*k
+					cp.parent_id.latitude=latitude
+					cp.parent_id.longitude=longitude
+					cp=cp.parent_id
+			tap.sys_pil_fix_lpp()
 class uis_papl_apl_cable(models.Model):
 	_name='uis.papl.apl.cable'
 	name=fields.Char(string="Name")

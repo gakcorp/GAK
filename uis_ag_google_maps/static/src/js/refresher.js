@@ -1,4 +1,4 @@
-var ref_time=10000;
+var ref_time=60000;
 var ref_functions=[]
 
 var res_shed=setInterval(ref_timer_fun,ref_time);

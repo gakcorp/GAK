@@ -109,6 +109,7 @@
 					<group>
 					  <field name="latitude"/>
 					  <field name="longitude"/>
+						<field name="trans_stay_rotation"/>
 					</group>
 				  </page>
 				  <page string="Connections">

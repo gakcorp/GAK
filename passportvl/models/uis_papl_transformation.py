@@ -58,6 +58,7 @@ class uis_papl_transformation(models.Model):
 	#GEODATA
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
+	trans_stay_rotation=fields.Float(digits=(3,2), string="Stay rotation", compute='_get_trans_state_rotation')
 	str_pillar_ids=fields.Char(string="pillar ids str", compute='_get_near_pillar')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='near_pillar_ids',
@@ -120,6 +121,10 @@ class uis_papl_transformation(models.Model):
 	t2_out_weight=fields.Float(digits=(4,2), string='Outer weight (kg)')
 	t2_reg_voltage=fields.Char(string='Voltage regulator')
 	#near_pillar_ids=fields.function(_get_near_pillar_ids,type='many2one',obj="uis.papl.pillar",method=True,string='Near pillars id'),
+	
+	def _get_trans_state_rotation(self,cr,uid,ids,context=None):
+		for trans in self.browse(cr,uid,ids,context=context):
+			trans.trans_stay_rotation=trans.pillar_id.azimut_from_prev
 	
 	@api.depends('code')
 	def _get_unicode(self,cr,uid,ids,context=None):
