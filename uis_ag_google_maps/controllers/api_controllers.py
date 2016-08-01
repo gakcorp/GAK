@@ -124,6 +124,13 @@ class maps_data_json(http.Controller):
 					maxlong=pillar_id.longitude
 				if pillar_id.longitude<minlong:
 					minlong=pillar_id.longitude
+				rotation=0
+				if pillar_id.pillar_type_id.auto_rotate:
+					rotation=pillar_id.azimut_from_prev+pillar_id.pillar_type_id.auto_rotate_delta
+				if pillar_id.pillar_type_id.auto_rotate_formula:
+					exec pillar_id.pillar_type_id.auto_rotate_formula
+				if pillar_id.pillar_stay_rotation:
+					rotation=pillar_id.pillar_stay_rotation
 				pillar_data["pillars"].append({
 					'id':pillar_id.id,
 					'name':pillar_id.name,
@@ -137,7 +144,8 @@ class maps_data_json(http.Controller):
 					'prev_id':pillar_id.parent_id.id,
 					'type_id':pillar_id.pillar_type_id.id,
 					'pillar_icon_code':pillar_id.pillar_icon_code,
-					'rotation':pillar_id.pillar_stay_rotation,  
+					'rotation':rotation,
+					'base_pillar':pillar_id.pillar_type_id.base,
 					'state':'EXPLOTATION' #Add state from MRO
 					#'prevlatitude': escape(str(pillar_id.prev_latitude)),
 					#'prevlangitude': escape(str(pillar_id.prev_longitude))

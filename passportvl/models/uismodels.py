@@ -71,6 +71,10 @@ class uis_papl_pillar_type(models.Model):
 	name=fields.Char('Name')
 	code=fields.Char('Code')
 	base=fields.Boolean('Base pillar')
+	auto_rotate=fields.Boolean('Auto rotate pillar')
+	auto_rotate_delta=fields.Integer('Delta rotate (grad)')
+	auto_rotate_formula=fields.Text(string="Def rotate formula", help="example: rotate=")
+	
 
 class uis_papl_pillar_material(models.Model):
 	_name='uis.papl.pillar.material'
@@ -191,7 +195,7 @@ class uis_papl_pillar(models.Model):
 			mname=new_name+"."+unicode(tap_name)
 			record.name=mname
 
-	@api.depends('longitude','latitude','parent_id')
+	#@api.depends('longitude','latitude','parent_id')
 	def _pillar_get_len(self):
 		for record in self:
 			lat2=record.latitude

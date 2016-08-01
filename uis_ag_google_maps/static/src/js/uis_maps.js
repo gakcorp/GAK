@@ -3,7 +3,7 @@ $.getScript("../uis_ag_google_maps/static/src/js/uis_maps_pillars.js",function()
 });
 $.getScript("../uis_ag_google_maps/static/src/js/mod/uis_tap_profile.js",function(){
     console.debug('uis_tap_profile.js is loaded');
-    })
+    });
 
 function mapslib(apl_ids, div_id) {
     this.center_loc='';
@@ -32,6 +32,15 @@ function mapslib(apl_ids, div_id) {
     this.hash.apl_data='n/d';
     this.hash.pillar_data='n/d';
     this.hash.trans_data='n/d';
+	px1=0;
+	px2=0;
+	py1=0;
+	py2=0;
+	px4=0;
+	py4=0;
+	pk=0;
+	pk2=0;
+	pb=0;
     thatlib=this;
     this.map=new google.maps.Map(document.getElementById(div_id), {
         zoom: 13,
@@ -111,7 +120,40 @@ function mapslib(apl_ids, div_id) {
         console.debug(line.tap_id);
         show_tap_profile(thatlib,line.tap_id);
     };
-    
+	var onPillarDragStart = function(e){
+		if (thatlib.editable_pillar){
+			var marker=this;
+			if (marker.base_pillar === false){
+				point1=marker.getPosition();
+				pid=marker.prev_id;
+				point2=thatlib.markers.pillars[pid].getPosition();
+				px1=point1.lat();
+				px2=point2.lat();
+				py1=point1.lng();
+				py2=point2.lng();
+				pk=(py2-py1)/(px2-px1);
+				pk2=-1/pk;
+				pb=py1-px1*(py2-py1)/(px2-px1);	
+			}				
+		}
+	};
+    var onPillarDrag = function(e){
+		if (thatlib.editable_pillar){
+			//console.debug(e);
+			var marker=this;
+			if (marker.base_pillar===false){
+				var point3=marker.getPosition();
+				var px3=point3.lat();
+				var py3=point3.lng();
+				var pb2=py3-pk2*px3;
+				px4=(pb2-pb)/(pk-pk2);
+				py4=pk2*px4+pb2;
+				//console.debug('k='+pb2+'p3='+'('+px3+';'+py3+') p4.lat='+px4+';lng='+py4);
+				var location = new google.maps.LatLng(px4,py4);
+				thatlib.markers.pillars[cur_pillar.id].setPosition(location);
+			}
+		}
+	};
 	var onPillarDragend = function(){
         if (thatlib.editable_pillar){
             var marker =this;
@@ -119,6 +161,10 @@ function mapslib(apl_ids, div_id) {
 			id=marker.id;
 			new_latitude=point.lat();
 			new_longitude=point.lng();
+			if (marker.base_pillar === false){
+				new_latitude=px4;
+				new_longitude=py4;
+			}
 			//console.debug('Modified id: '+id+' New_latitude:'+new_latitude+' New longitude:' +new_longitude);
 			var data={};
 			data.pillar_id=id;
@@ -607,7 +653,7 @@ function mapslib(apl_ids, div_id) {
 					console.debug('change icon code');
 				}
 				if (cur_marker.rotation != cur_pillar.rotation){
-					this.markers.pillar[cur_pillar.id].rotation=cur_pillar.rotation;
+					this.markers.pillars[cur_pillar.id].rotation=cur_pillar.rotation;
 				}
 				if (cur_marker.position != location) {
 					this.markers.pillars[cur_pillar.id].setPosition(location);
@@ -633,10 +679,13 @@ function mapslib(apl_ids, div_id) {
                 type_id:cur_pillar.type_id,
                 rotation:cur_pillar.rotation,
 				pillar_icon_code:cur_pillar.pillar_icon_code,
+				base_pillar:cur_pillar.base_pillar,
                 state:cur_pillar.state,
                 icon:this.get_pillar_icon(cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
                 });
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragend', onPillarDragend);
+				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragstart',onPillarDragStart);
+				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'drag', onPillarDrag);
                 google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mouseover', onPillarMouseOver);
                 google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mouseout', onPillarMouseOut);
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dblclick', onPillarDoubleClick);
