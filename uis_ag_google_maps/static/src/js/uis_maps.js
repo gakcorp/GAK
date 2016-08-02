@@ -7,6 +7,7 @@ $.getScript("../uis_ag_google_maps/static/src/js/mod/uis_tap_profile.js",functio
 
 function mapslib(apl_ids, div_id) {
     this.center_loc='';
+	this.map_div_id=div_id;
     this.first_load=true;
     this.apl_ids=apl_ids;
     this.pillar_data=[];
@@ -200,6 +201,93 @@ function mapslib(apl_ids, div_id) {
 	var onPillarMouseWheel = function(e){
 		show_info_bar('Test');
 	};
+	var setContextMenuXY=function(latLng){
+		var mapWidth = $('#'+thatlib.map_div_id).width();
+		var mapHeight = $('#'+thatlib.map_div_id).height();
+		var menuWidth = $('.map_contextmenu').width();
+		var menuHeight = $('.map_contextmenu').height();
+		var clickedPosition = getCanvasXY(latLng);
+		var x = clickedPosition.x ;
+		var y = clickedPosition.y ;
+		console.debug(mapWidth,mapHeight,menuWidth,menuHeight,x,y);
+	    if((mapWidth - x ) < menuWidth)//if to close to the map border, decrease x position
+		    x = x - menuWidth;
+		if((mapHeight - y ) < menuHeight)//if to close to the map border, decrease y position
+		    y = y - menuHeight;
+	    $('.map_contextmenu').css('left',x  );
+		$('.map_contextmenu').css('top',y );
+	};
+	var getCanvasXY=function(latLng){
+		var scale = Math.pow(2, thatlib.map.getZoom());
+		var nw = new google.maps.LatLng(
+			thatlib.map.getBounds().getNorthEast().lat(),
+			thatlib.map.getBounds().getSouthWest().lng()
+		);
+		var worldCoordinateNW = thatlib.map.getProjection().fromLatLngToPoint(nw);
+		var worldCoordinate = thatlib.map.getProjection().fromLatLngToPoint(latLng);
+		var currentLatLngOffset = new google.maps.Point(
+          Math.floor((worldCoordinate.x - worldCoordinateNW.x) * scale),
+          Math.floor((worldCoordinate.y - worldCoordinateNW.y) * scale)
+		);
+		return currentLatLngOffset;
+	};
+	var hide_context_menu=function(){
+		$('.map_contextmenu').remove();
+	};
+	var show_pillar_context_menu=function(e,marker){
+		var projection;
+		var map_contextmenuDir;
+		var id=marker.id;
+		projection=thatlib.map.getProjection();
+		$('.map_contextmenu').remove();
+		map_contextmenuDir=document.createElement("div");
+		map_contextmenuDir.className='map_contextmenu';
+		map_contextmenuDir.innerHTML='<a id="cm_create_new_tap" idvalue="'+id+'"><div class="menu_context">Create new tap</div></a>'
+									+'<a id="cm_create_add_pillar" idvalue="'+id+'"><div class="menu_context">Add pillars to previous</div></a>'
+									+'<a id="cm_change_type_pillar" idvalue="'+id+'"><div class="menu_context">Change pillar type</div></a>'
+									+'<a id="cm_change_cut_pillar" idvalue="'+id+'"><div class="menu_context">Change pillar cut</div></a>'
+									+'<a id="cm_delete_pillar" idvalue="'+id+'"><div class="menu_context">Delete pillar</div></a>'
+									+'<a id="cm_close"><div class="menu_context">Close</div></a>';
+		$(thatlib.map.getDiv()).append(map_contextmenuDir);
+		setContextMenuXY(e.latLng);
+		map_contextmenuDir.style.visibility="visible";
+		
+		$('#cm_close').click(function(){
+                hide_context_menu();
+                });
+		$('#cm_create_new_tap').click(function(){
+				var id=this.getAttribute("idvalue");
+				thatlib.create_new_child_pillar(id);
+				hide_context_menu();
+				});
+		$('#cm_create_add_pillar').click(function(){
+				var id=this.getAttribute("idvalue");
+				hide_context_menu();
+				map_contextmenuDir=document.createElement("div");
+				map_contextmenuDir.className='map_contextmenu';
+				map_contextmenuDir.innerHTML='<div id="cm_add_new_pils" idvalue="'+id+'" class="menu_context"><center><br>'
+											+'Add <input type="number" id="cm_cnp_count_edit" value="2" style="width: 50px;"> pillars <br><br>'
+											+'<button type="button" class="btn btn-success" id="cm_cnp_button">Create</button>'
+											+'<button type="button" class="btn btn-danger" id="cm_cnp_cancel_button">Cancel</button></center>'
+											+'</div>';
+				$(thatlib.map.getDiv()).append(map_contextmenuDir);
+				setContextMenuXY(e.latLng);
+				map_contextmenuDir.style.visibility="visible";
+				$('#cm_cnp_button').click(function(){
+					id=$('#cm_add_new_pils').attr("idvalue");
+					cnt=$('#cm_cnp_count_edit').val();
+					thatlib.add_pillars_to_prev(id,cnt);
+					hide_context_menu();
+				});
+				$('#cm_cnp_cancel_button').click(function(){
+					hide_context_menu();
+				});
+		})
+	};
+	var onPillarRightClick = function(e){
+		var marker=this;
+		show_pillar_context_menu(e,marker);
+	};
     var onTransDragend = function(){
         if (thatlib.editable_pillar){
             var marker =this;
@@ -384,7 +472,6 @@ function mapslib(apl_ids, div_id) {
     this.show_status_bar=function(){
         var czoom=this.map.getZoom();
         code="Zoom:"+czoom;
-        console.debug(code);
         $("#left_status_bar").html(code);
     };
     this.show_info_bar=function(code){
@@ -661,6 +748,9 @@ function mapslib(apl_ids, div_id) {
 				if (cur_marker.elevation != cur_pillar.elevation) {
 					this.markers.pillars[cur_pillar.id].elevation=cur_pillar.elevation;
 				}
+				if (cur_marker.base_pillar != cur_pillar.base_pillar){
+					this.markers.pillars[cur_pillar.id].base_pillar=cur_pillar.base_pillar;
+				}
 			}
 			else{
 				this.markers.pillars[cur_pillar.id]= new google.maps.Marker({
@@ -690,6 +780,7 @@ function mapslib(apl_ids, div_id) {
                 google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mouseout', onPillarMouseOut);
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dblclick', onPillarDoubleClick);
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mousewheel', onPillarMouseWheel);
+				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'rightclick', onPillarRightClick);
 			}
             
 			//this.markers.pillars[cur_pillar.id].setPosition(location);
@@ -699,7 +790,35 @@ function mapslib(apl_ids, div_id) {
         $("#pillar_count_badge").html(this.pillar_data.counter);
     };
     //Get data functions
-    this.get_hash=function(){
+	this.add_pillars_to_prev=function(id,cnt){
+		console.debug(id,cnt);
+		var data={};
+		data.pillar_id=id;
+		data.pillar_cnt=cnt;
+		xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/pillar/add_pillar_to_prev', true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+        xhr.onload=function(e){
+            that.get_apl_lines_data();
+            that.get_pillar_data();
+            };
+	};
+    this.create_new_child_pillar=function(pid){
+		var data={};
+		data.pillar_id=pid;
+		xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/pillar/new_child_pillar', true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+        xhr.onload=function(e){
+            that.get_apl_lines_data();
+            that.get_pillar_data();
+            };
+	};
+	this.get_hash=function(){
         var data={};
         data.apl_ids=this.apl_ids;
         xhr_apl=new XMLHttpRequest();
@@ -880,7 +999,8 @@ function mapslib(apl_ids, div_id) {
         this.init_buttons();
         that=this;
         google.maps.event.addListener(thatlib.map, 'zoom_changed', function() {
-            var zoom = thatlib.map.getZoom();
+            hide_context_menu();
+			var zoom = thatlib.map.getZoom();
             that.set_trans_markers();
             that.set_pillar_markers();
             that.show_status_bar();

@@ -4,6 +4,7 @@ from openerp import models, fields, api
 from PIL import Image, ImageDraw
 from . import schemeAPL
 import logging
+import datetime
 
 try:
     import cStringIO as StringIO
@@ -116,6 +117,32 @@ class uis_papl_pillar(models.Model):
 									 compute='_get_near_pillar'
 									 )
 	
+	def create_new_child(self, tap_id=False, parent_id=False,latlngdelta=0.0001,pillar_type_id=False, pillar_cut_id=False, latitude=0, longitude=0, num_by_vl=-1):
+		for pil in self:
+			nlat,nlng=latitude,longitude
+			if (nlat==0) or (nlng==0):
+				nlat,nlng=pil.latitude+latlngdelta,pil.longitude+latlngdelta
+			_logger.debug('new latitude,longitude is (%r,%r)'%(nlat,nlng))
+			now=datetime.datetime.now()
+			np=self.create({'name':'NewCNC PIllar DT'+str(now)})
+			np.latitude,np.longitude=nlat,nlng
+			np.tap_id=pil.tap_id
+			np.apl_id=pil.apl_id
+			if tap_id:
+				np.tap_id=tap_id
+				np.apl_id=tap_id.apl_id
+			np.parent_id=pil
+			if parent_id:
+				np.parent_id=parent_id
+			np.num_by_vl=pil.num_by_vl+1
+			if num_by_vl>0:
+				np.num_by_vl=num_by_vl
+			if pillar_type_id:
+				np.pillar_type_id=pillar_type_id
+			if pillar_cut_id:
+				np.pillar_cut_id=pillar_cut_id
+			np.tap_id.act_normalize_num()
+			return np
 	def sys_fix_lpp(self):
 		for pil in self:
 			pil.fix_lpp=pil.len_prev_pillar
@@ -260,6 +287,13 @@ class uis_papl_tap(models.Model):
 	code=fields.Integer(string='Code', compute='_get_unicode')
 	full_code=fields.Char(string='UniCode', compute='_get_unicode')
 	
+	def create_new_tap(self):
+		for tap in self:
+			now=datetime.datetime.now()
+			nt=self.create({'name':'NewCNC PIllar DT'+str(now)})
+			nt.apl_id=self.apl_id
+		return nt
+		
 	@api.depends('code')
 	def _get_unicode(self,cr,uid,ids,context=None):
 		for tap in self.browse(cr,uid,ids,context=context):
@@ -363,8 +397,8 @@ class uis_papl_tap(models.Model):
 				max_num=pillar.num_by_vl
 				max_id=pillar.id
 				last_pillar=pillar
-				#print last_pillar
-				#print max_num
+				_logger.debug('Last pillar is %r'%last_pillar)
+				_logger.debug('Max number is %r'%max_num)
 		if pillar_cnt>0:
 			i=0
 			cp=last_pillar

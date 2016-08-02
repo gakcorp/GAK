@@ -476,6 +476,55 @@ class maps_data_json(http.Controller):
 			'result':1
 		}
 		return values
+	
+	@http.route('/apiv1/pillar/add_pillar_to_prev',type="json", auth="public", csfr=False)
+	def api_v1_pillar_add_pillar_to_prev(self, *arg, **post):
+		start=datetime.datetime.now()
+		cr, uid, context=request.cr, request.uid, request.context
+		pillar_obj = request.registry['uis.papl.pillar']
+		data=json.loads(json.dumps(request.jsonrequest))
+		pid=data['pillar_id']
+		cnt=data['pillar_cnt']
+		domain=[("id","in",[pid])]
+		pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
+		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
+			pp=pil.parent_id;
+			dlat=(pil.latitude-pp.latitude)/(1+int(cnt))
+			dlng=(pil.longitude-pp.longitude)/(1+int(cnt))
+			i=1
+			cp=pp;
+			while i<=int(cnt):
+				np=cp.create_new_child(num_by_vl=cp.num_by_vl+1,parent_id=cp,latitude=dlat+cp.latitude,longitude=dlng+cp.longitude,tap_id=pil.tap_id)
+				cp=np
+				i=i+1
+			pil.parent_id=cp
+			pil.num_by_vl=cp.num_by_vl+1
+		values={
+			'result':1
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate new pillars in %r seconds'%elapsed.total_seconds())
+		return values
+	@http.route('/apiv1/pillar/new_child_pillar', type="json", auth="public", csfr=False)
+	def api_v1_pillar_new_child_pillar(self, *arg, **post):
+		start=datetime.datetime.now()
+		cr, uid, context=request.cr, request.uid, request.context
+		pillar_obj = request.registry['uis.papl.pillar']
+		data=json.loads(json.dumps(request.jsonrequest))
+		pid=data['pillar_id']
+		domain=[("id","in",[pid])]
+		pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
+		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
+			nt=pil.tap_id.create_new_tap()
+			pil.create_new_child(num_by_vl=1000,tap_id=nt)
+		values ={
+			'result':1
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate new pillar in %r seconds'%elapsed.total_seconds())
+		return values
 	@http.route('/apiv1/pillar/newcoorddrop', type="json", auth="public", csfr=False)
 	def api_v1_pillar_new_coordinate_drop(self, *arg, **post):
 		start=datetime.datetime.now()
