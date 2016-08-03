@@ -1,10 +1,15 @@
 .map_contextmenu{
-  visibility:hidden;
-  background:#ffffff;
-  border:1px solid #8888FF;
-  z-index: 10;
-  position: relative;
-  width: 140px;
+    visibility: hidden;
+    background: #ffffff;
+    border: 1px solid #000000;
+    z-index: 10;
+    position: relative;
+    width: 200px;
+    font-family: Roboto;
+    font-size: x-small;
+    border-radius: 7px;
+    border-top-left-radius: 0px;
+    padding: 5px;
 }
 .map_contextmenu div{
 padding-left: 5px

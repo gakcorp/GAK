@@ -61,7 +61,7 @@ class maps_data_json(http.Controller):
 					'pillar_count':"N/A", #Change to counter
 					'tap_count':"N/A" #Change to counter
 					})
-			apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
+			#apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
 			for pillar_id in apl_id.pillar_id:
 				if pillar_id.parent_id:
 					parentid=pillar_id.parent_id
@@ -112,7 +112,7 @@ class maps_data_json(http.Controller):
 		domain=[("id","in",clean_ids)]
 		apl_ids=apl_obj.search(cr, uid, domain, context=context)
 		for apl_id in apl_obj.browse(cr, uid, apl_ids, context=context):
-			apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
+			#apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
 			for pillar_id in apl_id.pillar_id:
 				#print "Do pillar"+pillar_id.name
 				pillar_data["counter"]=pillar_data["counter"]+1
@@ -143,6 +143,7 @@ class maps_data_json(http.Controller):
 					'num_by_vl':pillar_id.num_by_vl,
 					'prev_id':pillar_id.parent_id.id,
 					'type_id':pillar_id.pillar_type_id.id,
+					'cut_id':pillar_id.pillar_cut_id.id,
 					'pillar_icon_code':pillar_id.pillar_icon_code,
 					'rotation':rotation,
 					'base_pillar':pillar_id.pillar_type_id.base,
@@ -345,6 +346,56 @@ class maps_data_json(http.Controller):
 		elapsed=stop-start
 		_logger.info('Generate layers list in %r seconds'%elapsed.total_seconds())
 		return values
+	@http.route('/apiv1/settings/pillar_type_list',type="json",auth="public", csfr=False)
+	def api_v1_pillar_type_list(self, *arg, **post):
+		start=datetime.datetime.now()
+		data=json.loads(json.dumps(request.jsonrequest))
+		cr,uid,context=request.cr,request.uid,request.context
+		pt_obj=request.registry['uis.papl.pillar.type']
+		domain=[]
+		pt_ids=pt_obj.search(cr,uid,domain,context=context)
+		pt_data={
+			"counter":0,
+			"pts":[]
+		}
+		for pt in pt_obj.browse(cr,uid,pt_ids,context=context):
+			pt_data["counter"]=pt_data["counter"]+1
+			pt_data["pts"].append({
+				'id':pt.id,
+				'name':pt.name
+				})
+		values={
+			'pt_data':json.dumps(pt_data)
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate Pillar type list in %r seconds'%elapsed.total_seconds())
+		return values
+	@http.route('/apiv1/settings/pillar_cut_list',type="json",auth="public", csfr=False)
+	def api_v1_pillar_cut_list(self, *arg, **post):
+		start=datetime.datetime.now()
+		data=json.loads(json.dumps(request.jsonrequest))
+		cr,uid,context=request.cr,request.uid,request.context
+		pc_obj=request.registry['uis.papl.pillar.cut']
+		domain=[]
+		pc_ids=pc_obj.search(cr,uid,domain,context=context)
+		pc_data={
+			"counter":0,
+			"pcs":[]
+		}
+		for pc in pc_obj.browse(cr,uid,pc_ids,context=context):
+			pc_data["counter"]=pc_data["counter"]+1
+			pc_data["pcs"].append({
+				'id':pc.id,
+				'name':pc.name
+				})
+		values={
+			'pc_data':json.dumps(pc_data)
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate Pillar cut list in %r seconds'%elapsed.total_seconds())
+		return values
 	@http.route('/apiv1/settings/pillar_icon_list',type="json", auth="public", csfr=False)
 	def api_v1_pillar_icon_list(self,*arg,**post):
 		start=datetime.datetime.now()
@@ -381,17 +432,20 @@ class maps_data_json(http.Controller):
 	@http.route('/apiv1/apl/list',type="json", auth="public", csfr=False)
 	def api_v1_apl_list(self,*arg, **post):
 		start=datetime.datetime.now()
+		cr, uid, context=request.cr, request.uid, request.context
+		apl_obj=request.registry['uis.papl.apl']
 		data=json.loads(json.dumps(request.jsonrequest))
-		apl_ids=apl_obj.search(cr,uid,domain,context=context)
+		apl_ids=apl_obj.search(cr,uid,[],context=context)
 		clean_ids=[]
 		for apl in apl_obj.browse(cr,uid,apl_ids, context=context):
 			clean_ids.append(apl.id)
 		apl_data,lines_data=self._get_apl_lines_data(clean_ids)
 		values ={
-			'apl_data':json.dumps(apl_data)
+			'apl_list':json.dumps(apl_data)
 		}
 		stop=datetime.datetime.now()
-		elapsed=stop-start_logger.info('Generate APL list in %r seconds'%elapsed.total_seconds())
+		elapsed=stop-start
+		_logger.info('Generate APL list in %r seconds'%elapsed.total_seconds())
 		return values
 
 	#Define Data functions
@@ -442,6 +496,32 @@ class maps_data_json(http.Controller):
 		return values
 
 	#Define Newcoord data
+	@http.route('/apiv1/pillar/change_pillar',type="json", auth="public", csfr=False)
+	def api_v1_pillar_change(self,*arg, **post):
+		_logger.info('Post pillar changes (PILLAR)')
+		cr, uid, context=request.cr, request.uid, request.context
+		pillar_obj = request.registry['uis.papl.pillar']
+		pillar_type_obj=request.registry['uis.papl.pillar.type']
+		pillar_cut_obj=request.registry['uis.papl.pillar.cut']
+		data=json.loads(json.dumps(request.jsonrequest))
+		pid=data['pillar_id']
+		domainpil=[("id","in",[pid])]
+		pillar_ids=pillar_obj.search(cr,uid,domainpil,context=context)
+		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
+			_logger.debug(data)
+			if 'pillar_type_id' in data:
+				domain_pt=[("id","in",[data['pillar_type_id']])]
+				pt_ids=pillar_type_obj.search(cr,uid,domain_pt,context=context)
+				pil.pillar_type_id=pillar_type_obj.browse(cr,uid,pt_ids,context=context)[0]
+			if 'pillar_cut_id' in data:
+				domain_pc=[("id","in",[data['pillar_cut_id']])]
+				pc_ids=pillar_type_obj.search(cr,uid,domain_pc,context=context)
+				pil.pillar_cut_id=pillar_cut_obj.browse(cr,uid,pc_ids,context=context)[0]
+		
+		values ={
+			'result':1
+		}
+		return values	
 	@http.route('/apiv1/pillar/cycle_type',type="json", auth="public", csfr=False)
 	def api_v1_pillar_cycle_type(self,*arg,**ppost):
 		_logger.info('POST pillar cycle change type (PILLAR)')
@@ -482,9 +562,20 @@ class maps_data_json(http.Controller):
 		start=datetime.datetime.now()
 		cr, uid, context=request.cr, request.uid, request.context
 		pillar_obj = request.registry['uis.papl.pillar']
+		pillar_type_obj=request.registry['uis.papl.pillar.type']
+		pillar_cut_obj=request.registry['uis.papl.pillar.cut']
 		data=json.loads(json.dumps(request.jsonrequest))
 		pid=data['pillar_id']
 		cnt=data['pillar_cnt']
+		pt,pc=False,False
+		if 'pillar_type_id' in data:
+			domain_pt=[("id","in",[data['pillar_type_id']])]
+			pt_ids=pillar_type_obj.search(cr,uid,domain_pt,context=context)
+			pt=pillar_type_obj.browse(cr,uid,pt_ids,context=context)[0]
+		if 'pillar_cut_id' in data:
+			domain_pc=[("id","in",[data['pillar_cut_id']])]
+			pc_ids=pillar_type_obj.search(cr,uid,domain_pc,context=context)
+			pc=pillar_cut_obj.browse(cr,uid,pc_ids,context=context)[0]
 		domain=[("id","in",[pid])]
 		pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
 		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
@@ -494,11 +585,12 @@ class maps_data_json(http.Controller):
 			i=1
 			cp=pp;
 			while i<=int(cnt):
-				np=cp.create_new_child(num_by_vl=cp.num_by_vl+1,parent_id=cp,latitude=dlat+cp.latitude,longitude=dlng+cp.longitude,tap_id=pil.tap_id)
+				np=cp.create_new_child(num_by_vl=cp.num_by_vl+1,parent_id=cp,latitude=dlat+cp.latitude,longitude=dlng+cp.longitude,tap_id=pil.tap_id,pillar_type_id=pt, pillar_cut_id=pc)
 				cp=np
 				i=i+1
 			pil.parent_id=cp
 			pil.num_by_vl=cp.num_by_vl+1
+			pil.tap_id.sys_pil_fix_lpp()
 		values={
 			'result':1
 		}
