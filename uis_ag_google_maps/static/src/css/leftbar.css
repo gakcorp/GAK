@@ -19,8 +19,12 @@
     border-radius: 5px;
     -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5); 
 }
+.chb_apl_menu{
+    overflow-x: hidden;
+    width: 190px;
+}
 .apl_list{
-    font-size: small;
+    font-size: x-small;
     white-space: nowrap;
     display: flex;
     padding-top: 4px;

@@ -467,22 +467,36 @@ function mapslib(apl_ids, div_id) {
         code_str="";
         for (var i = 0; i<thatlib.settings.apl_list.counter; i++){
             var apl=thatlib.settings.apl_list.apls[i];
-            code_str=code_str+'<div class="apl_list" id="apl_info_'+apl.id+' "idvalue="'+apl.id+'">'+
-            '<label class="checkbox-inline"><input type="checkbox" value="'+apl.id+'" id="apl_chb_'+apl.id+'"'+
-            console.debug($.inArray(apl.id,thatlib.apl_ids));
-            if ($.inArray(apl.id,thatlib.apl_ids)>=0) {
-                code_str=code_str+' checked';
+			var display_none="display:none;";
+			var checked='';
+			if ($.inArray(apl.id,thatlib.apl_ids)>=0) {
+                checked=' checked';
+				display_none="display:block;"
                 }
-            code_str=code_str+'>'+apl.name+'</label>&nbsp;<span class="glyphicon glyphicon-fullscreen" style="cursor:pointer;" id="apl_goto_'+apl.id+'">'+
-            '&nbsp;<span class="glyphicon glyphicon-save-file" style="cursor:pointer;" id="apl_goto_'+apl.id+'">'+
-            '&nbsp;<span class="glyphicon glyphicon-log-in apl_lb_link_to_system" style="cursor:pointer;" idvalue="'+apl.id+'" id="apl_goto_system_'+apl.id+'">'+
+            code_str=code_str+'<div class="apl_list" id="apl_info_'+apl.id+' "idvalue="'+apl.id+'">'+
+            '<label class="checkbox-inline chb_apl_menu"><input type="checkbox" value="'+apl.id+'" id="apl_chb_'+apl.id+'" ';
+			code_str=code_str+checked;
+            code_str=code_str+'>'+apl.name+'</label>&nbsp;<span class="glyphicon glyphicon-fullscreen apl_lb_bound" idvalue="'+apl.id+'" style="cursor:pointer;'+display_none+'" id="apl_goto_'+apl.id+'"/>'+
+            '&nbsp;<span class="glyphicon glyphicon-save-file" style="cursor:pointer;" id="apl_save_passport_'+apl.id+'"/>'+
+            '&nbsp;<span class="glyphicon glyphicon-log-in apl_lb_link_to_system" style="cursor:pointer;" idvalue="'+apl.id+'" id="apl_goto_system_'+apl.id+'"/>'+
 			//glyphicon glyphicon-log-in
 			'</div>';
             //'<div class="apl_list_name">'+apl.name+'</div></div>';
         }
         thatlib.show_info_bar(code_str);
+		$('.apl_lb_bound').click(function(){
+			id=this.getAttribute('idvalue');
+			thatlib.set_bounds_apl(id);
+			if (thatlib.apls[id].rec_layer!==false){
+				lr_name=thatlib.apls[id].rec_layer;
+				btn_name=lr_name+"_button";
+				thatlib.layers[lr_name].vis=1;
+				thatlib.vis_layer(lr_name);
+				$("#"+btn_name).addClass("selected_button");
+			};
+			
+		});
 		$('.apl_lb_link_to_system').click(function(){
-			console.debug(this);
 			id=this.getAttribute('idvalue');
 			str='/web#id='+id+'&view_type=form&model=uis.papl.apl';
 			window.open(str);
@@ -493,8 +507,10 @@ function mapslib(apl_ids, div_id) {
             $('#apl_chb_'+naid).change(function(){
                 intid=Math.round(this.value);
 				console.debug(this.value+' is '+ this.checked);
-                if (this.checked){
+                $('#apl_goto_'+intid).hide();
+				if (this.checked){
                     thatlib.apl_ids.push(intid);
+					$('#apl_goto_'+intid).show("fast");
                 }
                 else {
                     ind=thatlib.apl_ids.indexOf(intid);
@@ -567,10 +583,31 @@ function mapslib(apl_ids, div_id) {
         location=new google.maps.LatLng(this.pillar_data.maxlat,this.pillar_data.maxlong);
         this.bounds.extend(location);
     };
+	this.set_bounds_apl=function(apl_id){
+		minlat=180;
+		maxlat=0;
+		minlng=180;
+		maxlng=0;
+		this.pillar_data.pillars.forEach(function(item){
+			if (item.apl_id==apl_id){
+				if (item.latitude>maxlat){maxlat=item.latitude};
+				if (item.latitude<minlat){minlat=item.latitude};
+				if (item.longitude>maxlng){maxlng=item.longitude};
+				if (item.longitude<minlng){minlng=item.longitude};
+			};
+			});
+		//console.debug(minlat,maxlat,minlng,maxlng);
+		this.bounds=new google.maps.LatLngBounds();
+		var location = new google.maps.LatLng(minlat,minlng);
+        this.bounds.extend(location);
+        location=new google.maps.LatLng(maxlat,maxlng);
+        this.bounds.extend(location);
+		this.map.fitBounds(this.bounds);
+	};
     
     this.mark_pillar=function(pid, mark){
         cm=this.markers.pillars[pid];
-        this.markers.pillars[pid].setIcon(this.get_pillar_icon(cm.pillar_icon_code,cm.type_id,cm.rotation,cm.state,mark));
+        this.markers.pillars[pid].setIcon(this.get_pillar_icon(cm.apl_id,cm.pillar_icon_code,cm.type_id,cm.rotation,cm.state,mark));
     };
     
     this.mark_apl=function(apl_id,mark){
@@ -627,7 +664,7 @@ function mapslib(apl_ids, div_id) {
         };
         return pci;
     };
-    this.get_pillar_icon=function(pic,type,rotation,state,selectable){
+    this.get_pillar_icon=function(apl_id,pic,type,rotation,state,selectable){
         var color='blue';
         //if (!this.settings.pillar_icon[pic].stroke_color){color=this.settings.pillar_icon[pic].stroke_color;}
         switch (state){
@@ -647,7 +684,7 @@ function mapslib(apl_ids, div_id) {
                 color='red';
                 break;
         }
-        ///!!!stroke_width
+        ///!!!stroke_w
         var fillOpacity=0;
         var fillColor='black';
         if (this.settings.pillar_icon[pic].fill_path){fillOpacity=1;}
@@ -663,6 +700,10 @@ function mapslib(apl_ids, div_id) {
         var x2=1.2;
         var z=this.map.getZoom();
         var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
+		//console.debug(this.apl_ids,apl_id,this.apl_ids.indexOf(apl_id));
+		if (this.apl_ids.indexOf(apl_id)===-1){
+			scalez=0;
+		}
         var strokeWeight=2;  //NUPD Change to read DEF value
         if (this.settings.pillar_icon[pic].stroke_width>0){strokeWeight=this.settings.pillar_icon[pic].stroke_width}
         var pth=this.settings.pillar_icon[pic].path;
@@ -720,7 +761,8 @@ function mapslib(apl_ids, div_id) {
                 line_len: apl.line_len,
                 status: apl.status,
                 pillar_count: apl.pillar_count,
-                tap_count: apl.tap_count
+                tap_count: apl.tap_count,
+				rec_layer:apl.rec_layer
                 };
             }
         for (var i=0;i<this.lines_data.counter;i++){
@@ -796,6 +838,7 @@ function mapslib(apl_ids, div_id) {
         }
         $("#trans_count_badge").html(this.trans_data.counter);
     };
+	
     this.set_pillar_markers=function(){
         for (var i=0;i<this.pillar_data.counter; i++) {
             cur_pillar=this.pillar_data.pillars[i];
@@ -807,7 +850,8 @@ function mapslib(apl_ids, div_id) {
             if (typeof this.markers.pillars[cur_pillar.id] != "undefined") {
 				cur_marker=this.markers.pillars[cur_pillar.id];
                 /**/
-				this.markers.pillars[cur_pillar.id].setIcon(this.get_pillar_icon(cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false));
+				this.markers.pillars[cur_pillar.id].setIcon(this.get_pillar_icon(cur_pillar.apl_id,cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false));
+				//this.markers.pillars[cur_pillar.id].setMap(this.map);
 				if (cur_marker.type_id != cur_pillar.type_id){
 					this.markers.pillars[cur_pillar.id].type_id=cur_pillar.type_id;
 				}
@@ -848,7 +892,7 @@ function mapslib(apl_ids, div_id) {
 				pillar_icon_code:cur_pillar.pillar_icon_code,
 				base_pillar:cur_pillar.base_pillar,
                 state:cur_pillar.state,
-                icon:this.get_pillar_icon(cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
+                icon:this.get_pillar_icon(cur_pillar.apl_id,cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
                 });
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragend', onPillarDragend);
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragstart',onPillarDragStart);
@@ -859,14 +903,15 @@ function mapslib(apl_ids, div_id) {
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'mousewheel', onPillarMouseWheel);
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'rightclick', onPillarRightClick);
 			}
-            this.markers.pillars.forEach(function(item,i){
+            /*this.markers.pillars.forEach(function(item,i){
 				if ($.inArray(item.apl_id,thatlib.apl_ids)<0){
 					console.debug(i);
-					ind=thatlib.markers.pillars.indexOf(item);
-					console.debug(ind);
-					thatlib.markers.pillars.splice(i,1);
+					thatlib.markers.pillars[i].setMap(null);
+					//ind=thatlib.markers.pillars.indexOf(item);
+					//console.debug(ind);
+					//thatlib.markers.pillars.splice(i,1);
 				}
-				});
+				});*/
 			//this.markers.pillars[cur_pillar.id].setPosition(location);
             //var imagecur=pillar_image;
             
@@ -927,7 +972,7 @@ function mapslib(apl_ids, div_id) {
             };
 	};
 	this.get_hash=function(){
-        console.debug('Get hash');
+        //console.debug('Get hash');
 		var data={};
         data.apl_ids=this.apl_ids;
         xhr_apl=new XMLHttpRequest();
@@ -1046,7 +1091,7 @@ function mapslib(apl_ids, div_id) {
 				that.layers[cur_lr.name].vis=0;
 				that.layers[cur_lr.name].type='ImageMapType';
 				that.layers[cur_lr.name].name=cur_lr.name;
-				console.debug(that.layers[cur_lr.name]);
+				//console.debug(that.layers[cur_lr.name]);
 				//ln=cur_lr.name;
 				that.layers[cur_lr.name].ImageMap=new google.maps.ImageMapType({
 					getTileUrl: function(coord,zoom){
@@ -1061,12 +1106,12 @@ function mapslib(apl_ids, div_id) {
 					name: cur_lr.name,
 					opacity: cur_lr.opacity
 				});
-				that.vis_layer(cur_lr.name);
+				//that.vis_layer(cur_lr.name);
 				code='';
 				code='<img src="'+cur_lr.url_icon+'" class="img-circle menu_button" alt="'+cur_lr.name+'" nvalue="'+cur_lr.name+'" width="50" height="50" id="'+cur_lr.name+'_button"/>';
 				$('#menu_button_bar').append(code);
 				$("#"+cur_lr.name+"_button").click(function(e){
-					console.debug(this);
+					//console.debug(this);
 					var nval=this.getAttribute("nvalue");
 					e.preventDefault();
 					that.toggle_layer(nval);
@@ -1141,7 +1186,6 @@ function mapslib(apl_ids, div_id) {
 	   this.get_settings_icon_list();
 	   this.get_settings_pillar_type_list();
 	   this.get_settings_pillar_cut_list();
-	   this.get_settings_layers();
     };
     this.init=function(){
         this.load_settings();
@@ -1154,6 +1198,7 @@ function mapslib(apl_ids, div_id) {
         //this.init_yandex_map();
         //this.init_esri_map();
         this.init_buttons();
+		this.get_settings_layers();
         that=this;
         google.maps.event.addListener(thatlib.map, 'zoom_changed', function() {
             hide_context_menu();
