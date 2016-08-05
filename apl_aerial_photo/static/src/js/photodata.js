@@ -8,6 +8,7 @@ function photolib(apl_ids,sitemaplib) {
     this.photo_data_hash='';
     this.photos=[];
     this.markers=[];
+    this.filter=[];
     
     this.get_path_camera_icon=function(dig){
         var pci={
