@@ -10,6 +10,15 @@
 				<p class="oe_view_nocontent_create">Create new Settings for user</p>
 			</field>
 		</record>
+		<record id="uis_global_settings_action_window" model="ir.actions.act_window">
+			<field name="name">Main Settings</field>
+			<field name="res_model">uis.global.settings</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Create new global settings</p>
+			</field>
+		</record>
 		<record id="uis_icon_settings_action_window" model="ir.actions.act_window">
 			<field name="name">Pilar icon settings</field>
 			<field name="res_model">uis.icon.settings.pillar</field>
@@ -30,10 +39,25 @@
 		</record>
 		<!-- Menu items!-->
         <menuitem name="aGIS Settings" id="uis_settings_menu_root"/>
-		<menuitem name="Main Settings" id="uis_main_settings_menu" parent="uis_settings_menu_root" action="uis_main_settings_action_window"/>
+		<menuitem name="Settings" id="uis_main_settings_menu" parent="uis_settings_menu_root" action="uis_main_settings_action_window"/>
+		<menuitem name="Global Settings" id="uis_global_settings_menu" parent="uis_settings_menu_root" action="uis_global_settings_action_window"/>
 		<menuitem name="Pillar Icons" id="uis_pillar_icon_settings_menu" parent="uis_settings_menu_root" action="uis_icon_settings_action_window"/>
 		<menuitem name="Pillar Types" id="uis_pillar_type_settings_menu" parent="uis_settings_menu_root" action="uis_pillar_type_settings_action_window"/>
 		<!-- views !-->
+		<record model="ir.ui.view" id="uis_global_settings_list">
+			<field name="name">Global settings list</field>
+			<field name="model">uis.global.settings</field>
+			<field name="arch" type="xml">
+				<tree string="List of global settings" editable="top" create="false" edit="false">
+					<field name="id"/>
+					<field name="name"/>
+					<field name="desc"/>
+					<field name="var"/>
+					<field name="value"/>
+					<field name="enabled"/>
+				</tree>
+			</field>
+		</record>
 		<record model="ir.ui.view" id="uis_pillar_icon_list">
 			<field name="name">Pillar icon list</field>
 			<field name="model">uis.icon.settings.pillar</field>
@@ -71,6 +95,7 @@
 						<field name="fill_path"/>
 						<field name="fill_color" attrs="{'invisible':[('fill_path', '=', False)]}"/>
 						<field name="anchor"/>
+						<field name="add_zoom"/>
 					</group>
 				</group>
 			</sheet>

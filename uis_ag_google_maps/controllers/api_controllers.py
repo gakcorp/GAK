@@ -317,6 +317,39 @@ class maps_data_json(http.Controller):
 		_logger.info('Generate TRANS data HASH in %r seconds'%elapsed.total_seconds())
 		return values
 		#Define Settings Functions
+	@http.route('/apiv1/settings/global',type="json", auth="public",csfr=False)
+	def api_v1_settings_global(self, *arg, **post):
+		start=datetime.datetime.now()
+		data=json.loads(json.dumps(request.jsonrequest))
+		_logger.debug(data)
+		cr,uid,context=request.cr,request.uid,request.context
+		gs_obj=request.registry['uis.global.settings']
+		gs_data={
+			"counter":0,
+			"gss":[]
+		}
+		vnames=[];
+		for vname in data['variables']:
+			try:
+				vname=str(vname)
+				vnames.append(vname)
+			except ValueError:
+				pass
+		domain=[("enabled","=",True),("var","in",vnames)]
+		gs_ids=gs_obj.search(cr,uid,domain,context=context)
+		for gs in gs_obj.browse(cr,uid,gs_ids,context=context):
+			gs_data["counter"]=gs_data["counter"]+1
+			gs_data["gss"].append({
+				'varname':gs.var,
+				'value':gs.value
+			})
+		values={
+			'gs_data':json.dumps(gs_data)
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate global settings in %r seconds'%elapsed.total_seconds())
+		return values
 	@http.route('/apiv1/settings/layers',type="json",auth="public",csfr=False)
 	def api_v1_settings_layers(self, *arg, **post):
 		start=datetime.datetime.now()
@@ -418,7 +451,8 @@ class maps_data_json(http.Controller):
 				'fill_color':pi.fill_color,
 				'stroke_width':pi.stroke_width,
 				'stroke_color':pi.stroke_color,
-				'anchor':pi.anchor
+				'anchor':pi.anchor,
+				'azoom':pi.add_zoom
 				})
 		values={
 			'pi_data':json.dumps(pi_data)

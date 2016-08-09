@@ -6,6 +6,15 @@ class uis_licenses(models.Model):
 	_description='Licenses of AG System'
 	name=fields.Char('Name')
 	lic_type=fields.Char('Type')
+
+class uis_global_settings(models.Model):
+	_name='uis.global.settings'
+	_description='Global settings'
+	name=fields.Char(string='Name')
+	var=fields.Char(string='Variable')
+	desc=fields.Text(string='Description')
+	value=fields.Text(string='Value')
+	enabled=fields.Boolean(string="Enabled")
 	
 class uis_settings(models.Model):
 	_name='uis.settings'
@@ -27,7 +36,8 @@ class uis_settings_pillar_icon(models.Model):
 	fill_color=fields.Char(string="Fill Color")
 	stroke_width=fields.Integer(string="Stroke width")
 	stroke_color=fields.Char(string="Stroke Color")
-	anchor=fields.Char(string="Ancor Point")
+	add_zoom=fields.Float(digits=(6,2), string="additional zoom", default=1)
+	anchor=fields.Char(string="Anchor Point")
 	
 	@api.depends('pillar_type_id','pillar_cut_id')
 	def _def_icon_code(self):

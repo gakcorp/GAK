@@ -1,10 +1,93 @@
 $.getScript("../uis_ag_google_maps/static/src/js/uis_maps_pillars.js",function(){
-    console.debug('./uis_maps_pillars.js loaded but not necessarily executed.');
+    //console.debug('./uis_maps_pillars.js loaded but not necessarily executed.');
 });
 $.getScript("../uis_ag_google_maps/static/src/js/mod/uis_tap_profile.js",function(){
-    console.debug('uis_tap_profile.js is loaded');
+    //console.debug('uis_tap_profile.js is loaded');
     });
 
+
+var onPillarMouseOut=function(){
+    var marker=this;
+	console.debug(this);
+    thatlib.mark_pillar(marker.id, false);
+};
+
+var onPillarMouseOver = function(){
+        var marker=this;
+        var code_str='';
+        code_str='Pillar ID : '+marker.id+'</br>';
+        code_str=code_str+'APL : '+marker.apl+'</br>';
+        code_str=code_str+'Num by VL : '+marker.num_by_vl+'</br>';
+        code_str=code_str+'Full name : '+marker.name+'</br>';
+        if (marker.type_id>0){code_str=code_str+'Type : '+ thatlib.settings.pillar_type[marker.type_id].name+'</br>';}
+		else{code_str=code_str+'Type : no data</br>';}
+		if (marker.cut_id>0){code_str=code_str+'Cut : '+ thatlib.settings.pillar_cut[marker.cut_id].name+'</br>';}
+		else{code_str=code_str+'Cut: no data</br>';}
+        code_str=code_str+'Elevation : '+marker.elevation+'</br>';
+        code_str=code_str+'Rotation : '+marker.rotation+'</br>';
+        open_def=Math.round(Math.random()*100);
+        closed_def=Math.round(Math.random()*100);
+        repairs_def=Math.round(Math.random()*closed_def);
+        code_str=code_str+'1 year Defects (open/closed/repairs): '+open_def+'/'+closed_def+'/'+repairs_def+'</br>';
+        code_str=code_str+'<div><div id="pillar_pie_stat"><canvas id="pillar_stat_'+marker.id+'" width="60" height="60"></canvas></div>';
+        code_str=code_str+'<div id="pillar_bar_stat"><canvas id="pillar_stat_bar_'+marker.id+'" width="120" height="60"></canvas></div></div>';
+        thatlib.show_info_bar(code_str);
+        thatlib.mark_pillar(marker.id, true);
+        var data = {
+            datasets: [{
+                data: [open_def,closed_def,repairs_def],
+                backgroundColor: ["#FF0000","#00FF00","#0000FF"],
+                label: '1Y Deffects' 
+            }],
+            labels: ['open','closed','repairs']
+            };
+        //var ctx = $("#pillar_stat_"+marker.id);
+        var options={
+            cutoutPercentage:70,
+            legend:{
+                display:false
+            }
+            };
+        var ctx1 = document.getElementById("pillar_stat_"+marker.id)/*.getContext("2d")*/;
+        var Chart1 = new Chart(ctx1, {
+            type: 'pie',
+            data: data,
+            options:options/*,
+            animation:{
+                animateScale:true
+            }*/
+        });
+        var data2={
+            labels:["01","02","03","04","05","06"],
+            datasets:[
+                {
+                    label:"Defects",
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    borderColor: "rgba(255,255,255,0.8)",
+                    borderWidth: 1,
+                    hoverBackgroundColor: "rgba(255,255,255,1)",
+                    hoverBorderColor: "rgba(255,255,255,1)",
+                    data:[Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20)]
+                }
+            ]
+        };
+        var options2={
+            scales:{
+                xAxes:[{
+                    display:false
+                    }]
+                },
+            legend:{
+                display:false
+                }
+            };
+        var ctx2 = document.getElementById("pillar_stat_bar_"+marker.id);
+        var Bar1= new Chart(ctx2, {
+            type: 'bar',
+            data: data2,
+            options:options2
+            });
+    };
 function mapslib(apl_ids, div_id) {
     this.center_loc='';
 	this.map_div_id=div_id;
@@ -27,6 +110,8 @@ function mapslib(apl_ids, div_id) {
 	this.settings.pillar_type=[];
 	this.settings.pillar_cut=[];
 	this.settings.apl_list=[];
+	this.settings.global=[];
+	this.settings.global_var=[];
     this.showpillar=false;
     this.showpillarzoom=14;
     this.showtranszoom=12;
@@ -155,7 +240,7 @@ function mapslib(apl_ids, div_id) {
 				py4=pk2*px4+pb2;
 				//console.debug('k='+pb2+'p3='+'('+px3+';'+py3+') p4.lat='+px4+';lng='+py4);
 				var location = new google.maps.LatLng(px4,py4);
-				thatlib.markers.pillars[cur_pillar.id].setPosition(location);
+				thatlib.markers.pillars[cur_pillar.id].setPosition(location);//NUPD cur_pillar to marker
 			}
 		}
 	};
@@ -377,87 +462,8 @@ function mapslib(apl_ids, div_id) {
     var onTransMouseOut=function(){
         
     };
-    var onPillarMouseOut=function(){
-        var marker=this;
-        thatlib.mark_pillar(marker.id, false);
-    };
+
     
-    var onPillarMouseOver = function(){
-        var marker=this;
-        var code_str='';
-        code_str='Pillar ID : '+marker.id+'</br>';
-        code_str=code_str+'APL : '+marker.apl+'</br>';
-        code_str=code_str+'Num by VL : '+marker.num_by_vl+'</br>';
-        code_str=code_str+'Full name : '+marker.name+'</br>';
-        if (marker.type_id>0){code_str=code_str+'Type : '+ thatlib.settings.pillar_type[marker.type_id].name+'</br>';}
-		else{code_str=code_str+'Type : no data</br>';}
-		if (marker.cut_id>0){code_str=code_str+'Cut : '+ thatlib.settings.pillar_cut[marker.cut_id].name+'</br>';}
-		else{code_str=code_str+'Cut: no data</br>';}
-        code_str=code_str+'Elevation : '+marker.elevation+'</br>';
-        code_str=code_str+'Rotation : '+marker.rotation+'</br>';
-        open_def=Math.round(Math.random()*100);
-        closed_def=Math.round(Math.random()*100);
-        repairs_def=Math.round(Math.random()*closed_def);
-        code_str=code_str+'1 year Defects (open/closed/repairs): '+open_def+'/'+closed_def+'/'+repairs_def+'</br>';
-        code_str=code_str+'<div><div id="pillar_pie_stat"><canvas id="pillar_stat_'+marker.id+'" width="60" height="60"></canvas></div>';
-        code_str=code_str+'<div id="pillar_bar_stat"><canvas id="pillar_stat_bar_'+marker.id+'" width="120" height="60"></canvas></div></div>';
-        thatlib.show_info_bar(code_str);
-        thatlib.mark_pillar(marker.id, true);
-        var data = {
-            datasets: [{
-                data: [open_def,closed_def,repairs_def],
-                backgroundColor: ["#FF0000","#00FF00","#0000FF"],
-                label: '1Y Deffects' 
-            }],
-            labels: ['open','closed','repairs']
-            };
-        //var ctx = $("#pillar_stat_"+marker.id);
-        var options={
-            cutoutPercentage:70,
-            legend:{
-                display:false
-            }
-            };
-        var ctx1 = document.getElementById("pillar_stat_"+marker.id)/*.getContext("2d")*/;
-        var Chart1 = new Chart(ctx1, {
-            type: 'pie',
-            data: data,
-            options:options/*,
-            animation:{
-                animateScale:true
-            }*/
-        });
-        var data2={
-            labels:["01","02","03","04","05","06"],
-            datasets:[
-                {
-                    label:"Defects",
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    borderColor: "rgba(255,255,255,0.8)",
-                    borderWidth: 1,
-                    hoverBackgroundColor: "rgba(255,255,255,1)",
-                    hoverBorderColor: "rgba(255,255,255,1)",
-                    data:[Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20),Math.round(Math.random()*20)]
-                }
-            ]
-        };
-        var options2={
-            scales:{
-                xAxes:[{
-                    display:false
-                    }]
-                },
-            legend:{
-                display:false
-                }
-            };
-        var ctx2 = document.getElementById("pillar_stat_bar_"+marker.id);
-        var Bar1= new Chart(ctx2, {
-            type: 'bar',
-            data: data2,
-            options:options2
-            });
-    };
     var onTransButtonClick=function(){
         console.debug('Click trans button');
         
@@ -694,12 +700,14 @@ function mapslib(apl_ids, div_id) {
             fillOpacity=1;
             fillColor='red';  //NUPD Change to read value from settings
         }
+		var azoom=1;
+		if (this.settings.pillar_icon[pic].azoom !== ''){azoom=this.settings.pillar_icon[pic].azoom;}
         var z1=12;
         var z2=19;
         var x1=0.12;
         var x2=1.2;
         var z=this.map.getZoom();
-        var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
+        var scalez=azoom*(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
 		//console.debug(this.apl_ids,apl_id,this.apl_ids.indexOf(apl_id));
 		if (this.apl_ids.indexOf(apl_id)===-1){
 			scalez=0;
@@ -1133,6 +1141,26 @@ function mapslib(apl_ids, div_id) {
             that.settings.apl_list=al;
             };
 	};
+	this.get_settings_global=function(){
+		var data={};
+		data.variables=[];
+		this.settings.global_var.forEach(function(item){
+			console.debug(item);
+			data.variables.push(item);
+			});
+		xhr=new XMLHttpRequest();
+		xhr.open('POST','/apiv1/settings/global', true);
+		xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+		xhr.send(JSON.stringify(data));
+		var that=this;
+		xhr.onload=function(e){
+			var res=JSON.parse(this.response);
+			var gs=JSON.parse(res.result.gs_data);
+			for (var i=0;i<gs.counter;i++){
+				that.settings.global_var[gs.gss[i].varname]=gs.gss[i].value;
+			}
+		};
+	};
     this.get_settings_icon_list=function(){
         var data={};
         xhr=new XMLHttpRequest();
@@ -1186,9 +1214,17 @@ function mapslib(apl_ids, div_id) {
 	   this.get_settings_icon_list();
 	   this.get_settings_pillar_type_list();
 	   this.get_settings_pillar_cut_list();
+	   this.get_settings_global();
     };
+	this.init_global_vars=function(){
+		this.settings.global_var.push('auto_refresh_time');
+		this.settings.global_var.auto_refresh_time=60;
+		this.settings.global_var.push('photo_icon_path');
+		this.settings.global_var.photo_icon_path="M20 48 L20 64 L44 64 L44 48 L36 48 L64 0 L0 0 L28 48 Z";
+	};
     this.init=function(){
-        this.load_settings();
+		this.init_global_vars();
+	    this.load_settings();
         //this.get_pillar_data();
         this.get_trans_data();
         this.get_hash();

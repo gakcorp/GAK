@@ -1,3 +1,13 @@
+    __onpmover=onPillarMouseOver;
+    onPillarMouseOver=function(){
+        code=__onpmover.toString();
+        code=code.substring(code.indexOf("{")+1,code.length-1);
+        //console.debug(code);
+        eval(code);
+        console.debug(marker);
+        //return __onpmout(marker);
+    };
+    
 function photolib(apl_ids,sitemaplib) {
     this.map=sitemaplib.map;
     this.sitemaplib=sitemaplib;
@@ -10,15 +20,28 @@ function photolib(apl_ids,sitemaplib) {
     this.markers=[];
     this.filter=[];
     
+
+    //onPillarMouseOver=new function(){
+    //    onpmo();
+    //    console.debug('modified onPillarMouseOver');
+    //};
+    
     this.get_path_camera_icon=function(dig){
+        var z1=12;
+        var z2=19;
+        var x1=0.1;
+        var x2=1;
+        var z=this.map.getZoom();
+        var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
         var pci={
-            path:'M20 48 L20 64 L44 64 L44 48 L36 48 L64 0 L0 0 L28 48 Z',
+            path:sitemaplib.settings.global_var['photo_icon_path'],
             fillColor:'white',
             fillOpacity:0.5,
-            scale:0.7,
-            strokeColor:'black',
+            scale:scalez,
+            strokeColor:'red',
             strokeWeight:1,
-            anchor: new google.maps.Point(32,64),
+            //anchor: new google.maps.Point(32,64),
+            anchor:new google.maps.Point(50,50),
             rotation: dig
         }
         return pci;
@@ -101,8 +124,8 @@ function photolib(apl_ids,sitemaplib) {
     this.show_pillar_badge=function(cf){
         var str='';
         for (var j=0;j<cur_photo.pillar_data.count;j++){
-            str=str+'<span class="badge">'+cf.pillar_data.pillars[j].num_by_vl+'</span>';
-            }
+            str=str+'<span class="badge" id="a_pill_badge_'+cf.pillar_data.pillars[j].id+'">'+cf.pillar_data.pillars[j].num_by_vl+'</span>';
+            };
         return str;
     }
     this.set_photo_tumb=function(){
