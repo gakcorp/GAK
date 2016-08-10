@@ -911,7 +911,7 @@ function mapslib(apl_ids, div_id) {
                 icon:this.get_pillar_icon(cur_pillar.apl_id,cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
                 });
 				this.markers.pillars[cur_pillar.id].infowindow=new google.maps.InfoWindow({
-					content: (cur_pillar.num_by_vl).toString(),
+					content: (cur_pillar.num_by_vl).toString()/*,
 					maxWidth:0,
 					zIndex:null,
 					pixelOffset: new google.maps.Size(-140, 80),
@@ -925,7 +925,7 @@ function mapslib(apl_ids, div_id) {
 					infoBoxClearance: new google.maps.Size(1,1),
 					isHiden:false,
 					pane: "floatPane",
-					enableEventPropagation:false
+					enableEventPropagation:false*/
 				});
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragend', onPillarDragend);
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragstart',onPillarDragStart);
