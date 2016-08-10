@@ -614,6 +614,13 @@ function mapslib(apl_ids, div_id) {
     this.mark_pillar=function(pid, mark){
         cm=this.markers.pillars[pid];
         this.markers.pillars[pid].setIcon(this.get_pillar_icon(cm.apl_id,cm.pillar_icon_code,cm.type_id,cm.rotation,cm.state,mark));
+		if (mark){
+			this.markers.pillars[pid].infowindow.open(this.map,this.markers.pillars[pid]);
+		}
+		if (!mark){
+			//this.markers.pillars[pid].infowindow.close();
+		}
+		
     };
     
     this.mark_apl=function(apl_id,mark){
@@ -900,8 +907,26 @@ function mapslib(apl_ids, div_id) {
 				pillar_icon_code:cur_pillar.pillar_icon_code,
 				base_pillar:cur_pillar.base_pillar,
                 state:cur_pillar.state,
+				title:(cur_pillar.num_by_vl).toString(),
                 icon:this.get_pillar_icon(cur_pillar.apl_id,cur_pillar.pillar_icon_code,cur_pillar.type_id,cur_pillar.rotation,cur_pillar.state, false)
                 });
+				this.markers.pillars[cur_pillar.id].infowindow=new google.maps.InfoWindow({
+					content: (cur_pillar.num_by_vl).toString(),
+					maxWidth:0,
+					zIndex:null,
+					pixelOffset: new google.maps.Size(-140, 80),
+					disableAutoPan:false,
+					boxStyle:{
+						opacity:0.9,
+						width:"40px"
+					},
+					closeBoxMargin: "1px 1px 1px 1px",
+					//closeBoxURL:"images/close.gif",
+					infoBoxClearance: new google.maps.Size(1,1),
+					isHiden:false,
+					pane: "floatPane",
+					enableEventPropagation:false
+				});
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragend', onPillarDragend);
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'dragstart',onPillarDragStart);
 				google.maps.event.addListener(this.markers.pillars[cur_pillar.id], 'drag', onPillarDrag);

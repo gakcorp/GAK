@@ -1,3 +1,15 @@
+    __onpmout=onPillarMouseOut;
+    onPillarMouseOut=function(){
+        code=__onpmout.toString();
+        code=code.substring(code.indexOf("{")+1,code.length-1);
+        eval(code);
+        el=document.getElementById("a_pill_badge_"+marker.id);
+        //console.debug(el);
+        if (el !== null){
+            document.getElementById("right_bar").scrollTop=el.offsetTop-10;
+            $(".a_pbc_"+marker.id).removeClass('b_marked');
+        }
+    }
     __onpmover=onPillarMouseOver;
     onPillarMouseOver=function(){
         code=__onpmover.toString();
@@ -5,6 +17,13 @@
         //console.debug(code);
         eval(code);
         console.debug(marker);
+        el=document.getElementById("a_pill_badge_"+marker.id);
+        //console.debug(el);
+        if (el !== null){
+            document.getElementById("right_bar").scrollTop=el.offsetTop-10;
+            $(".a_pbc_"+marker.id).addClass('b_marked');
+        }
+        
         //return __onpmout(marker);
     };
     
@@ -27,12 +46,13 @@ function photolib(apl_ids,sitemaplib) {
     //};
     
     this.get_path_camera_icon=function(dig){
-        var z1=12;
+        var z1=13;
         var z2=19;
-        var x1=0.1;
-        var x2=1;
+        var x1=0.05;
+        var x2=0.5;
         var z=this.map.getZoom();
         var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
+        console.debug(scalez);
         var pci={
             path:sitemaplib.settings.global_var['photo_icon_path'],
             fillColor:'white',
@@ -87,6 +107,7 @@ function photolib(apl_ids,sitemaplib) {
     
     this.show_marker=function(id){
         this.markers[id].setVisible(true);
+        this.markers[id].setIcon(this.get_path_camera_icon(this.markers[id].rotation));
         this.map.panTo(this.markers[id].position);
         for (var i=0;i<this.photos[id].pillar_data.count;i++){
             this.sitemaplib.mark_pillar(this.photos[id].pillar_data.pillars[i].id,true);
@@ -111,6 +132,7 @@ function photolib(apl_ids,sitemaplib) {
             
             this.markers[cur_photo.id]= new google.maps.Marker({
                 map: this.map,
+                rotation:cur_photo.rotation,
                 draggable: true,
                 position: location,
                 visible:false,
@@ -124,7 +146,7 @@ function photolib(apl_ids,sitemaplib) {
     this.show_pillar_badge=function(cf){
         var str='';
         for (var j=0;j<cur_photo.pillar_data.count;j++){
-            str=str+'<span class="badge" id="a_pill_badge_'+cf.pillar_data.pillars[j].id+'">'+cf.pillar_data.pillars[j].num_by_vl+'</span>';
+            str=str+'<span class="badge a_pbc_'+cf.pillar_data.pillars[j].id+'" id="a_pill_badge_'+cf.pillar_data.pillars[j].id+'">'+cf.pillar_data.pillars[j].num_by_vl+'</span>';
             };
         return str;
     }

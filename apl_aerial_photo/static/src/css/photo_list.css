@@ -1,3 +1,6 @@
+.b_marked{
+    border: 1px solid #f00;
+}
 .div_img_thumb{
     overflow-y: overlay;
 }
