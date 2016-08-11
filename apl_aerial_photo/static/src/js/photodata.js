@@ -16,7 +16,7 @@
         code=code.substring(code.indexOf("{")+1,code.length-1);
         //console.debug(code);
         eval(code);
-        console.debug(marker);
+        //console.debug(marker);
         el=document.getElementById("a_pill_badge_"+marker.id);
         //console.debug(el);
         if (el !== null){
