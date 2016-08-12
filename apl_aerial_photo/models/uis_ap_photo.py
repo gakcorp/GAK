@@ -8,11 +8,15 @@ import base64
 import psycopg2
 from openerp import models, fields, api, tools
 from datetime import datetime
+import logging
 
 try:
     import cStringIO as StringIO
 except ImportError:
     import StringIO
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
 
 def distance2points(lat1,long1,lat2,long2):
 	dist=0
@@ -46,7 +50,20 @@ def dms2dd(degrees,minutes,seconds, direction):
 
 def parse_dms(dms,direction):
 	parts=re.split('[^\d\w]+',dms)
-	dd=dms2dd(parts[1],parts[2],int(parts[3])/int(parts[4]),direction)
+	p1=parts[1]
+	p2=parts[2]
+	p3=parts[3]
+	p4=parts[4]
+	if p1=='':
+		p1=0
+	if p2=='':
+		p2=0
+	if p3=='':
+		p3=0
+	if p4=='':
+		p4=1
+	_logger.debug('Parts of dms is %r,%r,%r,%r'%(p1,p2,p3,p4))
+	dd=dms2dd(p1,p2,int(p3)/int(p4),direction)
 	print parts
 	return dd
 
@@ -190,12 +207,14 @@ class uis_ap_photo_load_hist(models.Model):
 			if filen.endswith(".JPG"):
 				img=file(path+'/'+filen,'rb').read().encode('base64')
 				with open(path+'/'+filen,'rb') as f:
-					print (filen)
+					_logger.debug('load photo from file %r'%filen)
 					tags=exifread.process_file(f)
 					dms_longitude=tags["GPS GPSLongitude"]
+					_logger.debug('Lonngitude from exif is %r'%dms_longitude)
 					dms_longitude_ref=tags["GPS GPSLongitudeRef"]
 					plong=parse_dms(str(dms_longitude),dms_longitude_ref)
 					dms_latitude=tags["GPS GPSLatitude"]
+					_logger.debug('Latitude from exif is %r'%dms_latitude)
 					dms_latitude_ref=tags["GPS GPSLatitudeRef"]
 					plat=parse_dms(str(dms_latitude),dms_latitude_ref)
 					idate=tags["Image DateTime"]
@@ -208,11 +227,9 @@ class uis_ap_photo_load_hist(models.Model):
 					cfl=strdiv(tags["EXIF FocalLength"])
 					#GPS GPSAltitude, value 181921/1000
 					calt=strdiv(tags["GPS GPSAltitude"])
-
-					print plat,plong
 					for tag in tags.keys():
 						if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
-							print "Key: %s, value %s" % (tag, tags[tag])
+							_logger.debug("Key: %s, value %s" % (tag, tags[tag]))
 					idate=parse_date(str(idate))
 					# !!!! Need validate name file
 					np=re_photos.create({'name':str(idate.year)+'_'+str(idate.month)+'_'+str(idate.day)+'_'+str(filen)})

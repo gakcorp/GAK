@@ -178,7 +178,7 @@
 			  <page string="Scheme">
 				<div id="scheme_holder"></div>
 				<div id="scheme_id_apls">
-				  <field name="scheme_image_old" widget="image" class="imagescheme" options='{"size":[800,400]}'/>
+				  <!--<field name="scheme_image_old" widget="image" class="imagescheme" options='{"size":[800,400]}'/>!-->
 					<field name="scheme_image" widget="image" class="imagescheme2" options='{"size":[800,800]}'/>
 				</div>
 				

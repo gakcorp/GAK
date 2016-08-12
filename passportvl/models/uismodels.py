@@ -505,9 +505,9 @@ class uis_papl_apl(models.Model):
 	url_scheme=fields.Char(compute='_apl_get_url_scheme')
 	image_file=fields.Char(string="Scheme File Name", compute='_get_scheme_image_file_name')
 	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image_2')
-	scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
+	#scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
 	
-	def _get_scheme_image(self,cr,uid,ids,context=None):
+	'''def _get_scheme_image(self,cr,uid,ids,context=None):
 		for apl in self.browse(cr,uid,ids,context=context):
 			img = Image.new("RGBA", (schemeAPL.scheme_width,schemeAPL.scheme_height), (255,255,255,0))
 			#draw = ImageDraw.Draw(img)
@@ -515,7 +515,7 @@ class uis_papl_apl(models.Model):
 			#draw.ellipse ((190,90,210,110),fill="red", outline="blue")
 			background_stream=StringIO.StringIO()
 			img.save(background_stream, format="PNG")
-			apl.scheme_image_old=background_stream.getvalue().encode('base64')
+			apl.scheme_image_old=background_stream.getvalue().encode('base64')'''
 	
 	def _get_scheme_image_2(self,cr,uid,ids,context=None):
 		for apl in self.browse(cr,uid,ids,context=context):

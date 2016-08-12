@@ -1,3 +1,6 @@
+/*$.getScript("../uis_ag_google_maps/static/src/js/mod/uis_maps_pillar_events.js",function(){
+	console.debug('uis_maps_pillar_events loaded');
+	});*/
 $.getScript("../uis_ag_google_maps/static/src/js/uis_maps_pillars.js",function(){
     //console.debug('./uis_maps_pillars.js loaded but not necessarily executed.');
 });
@@ -5,7 +8,7 @@ $.getScript("../uis_ag_google_maps/static/src/js/mod/uis_tap_profile.js",functio
     //console.debug('uis_tap_profile.js is loaded');
     });
 $.getScript("../uis_ag_google_maps/static/src/js/infobubble/infobubble.js",function(){});
-$.getScript("../uis_ag_google_maps/static/src/js/mod/uis_maps_pillar_events.js",function(){});
+
 
 function mapslib(apl_ids, div_id) {
     this.center_loc='';
