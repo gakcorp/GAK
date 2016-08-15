@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import math, urllib, json, time
+import math, urllib, json, time, random
 from openerp import models, fields, api
 from PIL import Image, ImageDraw
 from . import schemeAPL
@@ -43,10 +43,53 @@ class uis_papl_substation(models.Model):
 	_name='uis.papl.substation'
 	_description='Substation model'
 	name=fields.Char()
-	apl_id=fields.One2many('uis.papl.apl','sup_substation_id', string="APLs")
 	url_maps=fields.Char(compute='_ss_get_url_maps')
 	department_id=fields.Many2one('uis.papl.department', string="Department")
-	
+	latitude=fields.Float(digits=(2,6))
+	longitude=fields.Float(digits=(2,6))
+	apl_id=fields.One2many('uis.papl.apl','sup_substation_id',string='APLs')
+	near_pillar_ids=fields.Many2many('uis.papl.pillar',
+									 relation='ss_near_pillar_ids',
+									 column1='substation_id',
+									 column2='pillar_id',
+									 compute='_get_near_pillar'
+									 )
+
+
+	def add_apl(self, cr,uid,ids,context=None, apl_name='NDEF', fid=0, apl_type='ВЛ', klass=6):
+		_logger.debug('Start add apl')
+		re_apl=self.pool.get('uis.papl.apl').browse(cr,uid,ids,context=context)
+		#napl=self.pool.get('uis.papl.apl').create(cr,uid,{'name':apl_name},context=context)
+		tlen=len(self.browse(cr,uid,[],context=context))
+		_logger.debug(tlen)
+		for ss in self.browse(cr,uid,ids,context=context):
+			_logger.debug(ss)
+			napl=re_apl.create({'name':apl_name})
+			napl.feeder_num=fid
+			napl.apl_type=apl_type
+			napl.voltage=klass
+			ntap=napl.add_ml()
+			nlatitude,nlongitude=0,0
+			nlatitude2,nlongitude2=0,0
+			base_ang=random.randint(0,360)
+			rad=random.randint(2,5)
+			delta=0.0001
+			if not(ss.latitude==0):
+				nlatitude=ss.latitude+delta*math.cos(math.radians(base_ang*(tlen+1)))
+				nlatitude2=ss.latitude+rad*delta*math.cos(math.radians(base_ang*(tlen+1)))
+			if not(ss.longitude==0):
+				nlongitude=ss.longitude+delta*math.sin(math.radians(base_ang*(tlen+1)))
+				nlongitude2=ss.longitude+rad*delta*math.sin(math.radians(base_ang*(tlen+1)))
+			fpil=ntap.add_pillar(num_by_vl=1,latitude=nlatitude,longitude=nlongitude)
+			spil=fpil.create_new_child(tap_id=False, parent_id=fpil,latitude=nlatitude2,longitude=nlongitude2, num_by_vl=2)
+			fpil.pillar_type_id=1
+			spil.pillar_type_id=1
+			_logger.debug('Create APL %r, Tap %r, Pillar 1 %r , Pillar 2 %r '%(napl,ntap,fpil,spil))
+			ss.apl_id=[(4, napl.id,0)]
+			
+			
+	def _get_near_pillar(self):
+		_logger.debug('Need update')
 	@api.depends('apl_id')
 	def _ss_get_url_maps(self):
 		for record in self:
@@ -57,7 +100,7 @@ class uis_papl_substation(models.Model):
 
 	@api.multi
 	def act_show_map(self):
-		print "Debug info. Start Show_map for substation"
+		_logger.debug ("Debug info. Start Show_map for substation")
 		#print self.url_maps
 		return{
 			'name': 'Maps',
@@ -288,6 +331,25 @@ class uis_papl_tap(models.Model):
 	code=fields.Integer(string='Code', compute='_get_unicode')
 	full_code=fields.Char(string='UniCode', compute='_get_unicode')
 	
+	def add_pillar(self, cr,uid,ids,context=None,latitude=0,longitude=0,num_by_vl=0,parent_id=False):
+		_logger.debug('Start add pillar for tap')
+		re_pillar=self.pool.get('uis.papl.pillar').browse(cr,uid,ids,context=context)
+		for tap in self.browse(cr,uid,ids,context=context):
+			_logger.debug(tap)
+			npil=re_pillar.create({'name':False})
+			if not(latitude==0):
+				npil.latitude=latitude
+			if not(longitude==0):
+				npil.longitude=longitude
+			if not(num_by_vl==0):
+				npil.num_by_vl=num_by_vl
+			if not(parent_id):
+				npil.parent_id=parent_id
+			npil.is_main_line=True
+			npil.apl_id=tap.apl_id
+			tap.pillar_ids=[(4, npil.id,0)]
+		return npil
+	
 	def create_new_tap(self):
 		for tap in self:
 			now=datetime.datetime.now()
@@ -517,6 +579,17 @@ class uis_papl_apl(models.Model):
 			img.save(background_stream, format="PNG")
 			apl.scheme_image_old=background_stream.getvalue().encode('base64')'''
 	
+	def add_ml(self, cr,uid,ids,context=None):
+		_logger.debug('Start add main line for apl')
+		re_tap=self.pool.get('uis.papl.tap').browse(cr,uid,ids,context=context)
+		ntap=re_tap.create({'name':False})
+		ntap.is_main_line=True
+		#napl=self.pool.get('uis.papl.apl').create(cr,uid,{'name':apl_name},context=context)
+		_logger.debug(ntap.name)
+		for apl in self.browse(cr,uid,ids,context=context):
+			_logger.debug(apl)
+			apl.tap_ids=[(4, ntap.id,0)]
+		return ntap
 	def _get_scheme_image_2(self,cr,uid,ids,context=None):
 		for apl in self.browse(cr,uid,ids,context=context):
 			img = Image.new("RGBA", (schemeAPL_v2.scheme_width,schemeAPL_v2.scheme_height), (255,255,255,0))

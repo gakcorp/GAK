@@ -380,7 +380,7 @@
 	  <field name="name">Power Substation List</field>
 	  <field name="model">uis.papl.substation</field>
 	  <field name="arch" type="xml">
-		<tree string="List of Power Substation" editable="top" create="true" edit="true">
+		<tree string="List of Power Substation" editable="false" create="false" edit="false">
 		  <field name="id"/>
 		  <field name="name" string="Substation Name"/>
 		  <field name="apl_id" string="APLs" widget='one2many'/>
@@ -388,6 +388,56 @@
 		</tree>
 	  </field>
 	</record>
+	
+	<record id="uis_papl_substation_form" model="ir.ui.view">
+	  <field name="name">Substation form view</field>
+	  <field name="model">uis.papl.substation</field>
+	  <field name="arch" type="xml">
+		<form string="Substation form">
+			<notebook>
+				<page string="Main details">
+					<sheet string="Details">
+						<div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+							  <button class="oe_inline" name="act_show_map" type="object" 
+			                 icon="fa-map">
+                       Map
+								</button>
+								<button class="oe_inline" name="add_apl" type="object" 
+			                 icon="fa-plus">
+                       Map
+								</button>
+								
+								<br/>
+						</div>
+						<group>
+							<group>
+								<h2 style="position:absolute;">
+								<label for="name"/><field name="name"/>
+								</h2>		
+							</group>
+							<group>
+								<field name="department_id"/>
+							</group>
+						</group>
+						<br/>
+						<label for="apl_id"/>
+						<field name="apl_id"/>
+					</sheet>
+				</page>
+				<page string="Geo data">
+				<group>
+					<group>
+						<field name="latitude"/>
+						<field name="longitude"/>
+					</group>
+				</group>
+				</page>
+			</notebook>
+		</form>
+		</field>
+	</record>
+			
+
 	
 	<record model="ir.ui.view" id="wizard_create_pillar">
 	  <field name="name">Create additional Pillars</field>
