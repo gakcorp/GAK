@@ -38,6 +38,37 @@ def distance2points(lat1,long1,lat2,long2):
 		ad = math.atan2(y,x)
 		dist = ad*rad
 	return dist
+def distangle2points(lat1,long1,lat2,long2):
+	dist=0
+	angle=0
+	dist=distance2points(lat1,long1,lat2,long2)
+	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
+		la1=lat1*math.pi/180
+		la2=lat2*math.pi/180
+		lo1=long1*math.pi/180
+		lo2=long2*math.pi/180
+		#calculate sin and cos
+		cl1=math.cos(la1)
+		cl2=math.cos(la2)
+		sl1=math.sin(la1)
+		sl2=math.sin(la2)
+		delta=lo2-lo1
+		cdelta=math.cos(delta)
+		sdelta=math.sin(delta)
+		#calculate start azimut
+		x = (cl1*sl2) - (sl1*cl2*cdelta)
+		y = sdelta*cl2
+		try:
+			z = math.degrees(math.atan(-y/x))
+		except ZeroDivisionError:
+			z=0
+		if (x < 0):
+			z = z+180.
+		z2 = (z+180.) % 360. - 180.
+		z2 = - math.radians(z2)
+		anglerad2 = z2 - ((2*math.pi)*math.floor((z2/(2*math.pi))) )
+		angle = (anglerad2*180.)/math.pi
+	return dist,angle
 
 class uis_papl_substation(models.Model):
 	_name='uis.papl.substation'
@@ -276,43 +307,8 @@ class uis_papl_pillar(models.Model):
 			record.prev_longitude=lat1
 			record.prev_latitude=lat2
 			dist=0
-			azimut_from_prev=0
 			angledeg=0
-			if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
-				rad=6372795
-				la1=lat1*math.pi/180
-				la2=lat2*math.pi/180
-				lo1=long1*math.pi/180
-				lo2=long2*math.pi/180
-				#calculate sin and cos
-				cl1=math.cos(la1)
-				cl2=math.cos(la2)
-				sl1=math.sin(la1)
-				sl2=math.sin(la2)
-				delta=lo2-lo1
-				cdelta=math.cos(delta)
-				sdelta=math.sin(delta)
-				#calculate circle len
-				y = math.sqrt(math.pow(cl2*sdelta,2)+math.pow(cl1*sl2-sl1*cl2*cdelta,2))
-				x = sl1*sl2+cl1*cl2*cdelta
-				ad = math.atan2(y,x)
-				dist = ad*rad
-				#calculate start azimut
-				x = (cl1*sl2) - (sl1*cl2*cdelta)
-				y = sdelta*cl2
-				try:
-					z = math.degrees(math.atan(-y/x))
-				except ZeroDivisionError:
-					z=0
-				if (x < 0):
-					z = z+180.
-				z2 = (z+180.) % 360. - 180.
-				z2 = - math.radians(z2)
-				anglerad2 = z2 - ((2*math.pi)*math.floor((z2/(2*math.pi))) )
-				angledeg = (anglerad2*180.)/math.pi
-				if (lat1==0) or (long1==0) or (lat2==0) or (long2==0):
-					dist=0
-					azimut_from_prev=0
+			dist,angledeg=distangle2points(lat1,long1,lat2,long2)
 			record.len_prev_pillar=dist
 			record.azimut_from_prev=angledeg
 

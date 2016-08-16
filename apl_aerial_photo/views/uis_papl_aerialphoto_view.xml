@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+	<record model="ir.ui.view" id="uis_ap_photo_kanban">
+		<field name="name">Photo kanban view</field>
+		<field name="model">uis.ap.photo</field>
+		<field name="arch" type="xml">
+			<kanban>
+				<field name="name"/>
+				<templates>
+					<t t-name="kanban-box">
+						<field name="name"/>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>
     <record model="ir.ui.view" id="uis_ap_photo_list">
 		<field name="name">Photo List</field>
 		<field name="model">uis.ap.photo</field>
@@ -78,7 +92,7 @@
 	  <field name="name">List of Photo</field>
 	  <field name="res_model">uis.ap.photo</field>
 	  <field name="view_type">form</field>
-	  <field name="view_mode">tree,form</field>
+	  <field name="view_mode">tree,form,kanban</field>
 	  <field name="help" type="html">
 		<p class="oe_view_nocontent_create">Create new Photo</p>
 	  </field>

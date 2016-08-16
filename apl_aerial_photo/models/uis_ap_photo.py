@@ -41,6 +41,37 @@ def distance2points(lat1,long1,lat2,long2):
 		ad = math.atan2(y,x)
 		dist = ad*rad
 	return dist
+def distangle2points(lat1,long1,lat2,long2):
+	dist=0
+	angle=0
+	dist=distance2points(lat1,long1,lat2,long2)
+	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
+		la1=lat1*math.pi/180
+		la2=lat2*math.pi/180
+		lo1=long1*math.pi/180
+		lo2=long2*math.pi/180
+		#calculate sin and cos
+		cl1=math.cos(la1)
+		cl2=math.cos(la2)
+		sl1=math.sin(la1)
+		sl2=math.sin(la2)
+		delta=lo2-lo1
+		cdelta=math.cos(delta)
+		sdelta=math.sin(delta)
+		#calculate start azimut
+		x = (cl1*sl2) - (sl1*cl2*cdelta)
+		y = sdelta*cl2
+		try:
+			z = math.degrees(math.atan(-y/x))
+		except ZeroDivisionError:
+			z=0
+		if (x < 0):
+			z = z+180.
+		z2 = (z+180.) % 360. - 180.
+		z2 = - math.radians(z2)
+		anglerad2 = z2 - ((2*math.pi)*math.floor((z2/(2*math.pi))) )
+		angle = (anglerad2*180.)/math.pi
+	return dist,angle
 
 def dms2dd(degrees,minutes,seconds, direction):
 	dd=float(degrees)+float(minutes)/60+float(seconds)/(60*60)
@@ -106,7 +137,8 @@ class uis_ap_photo(models.Model):
 							 relation='photo_near_apl',
 							 column1='photo_id',
 							 column2='apl_id',
-							 compute='_get_near_photo_apl')
+							 compute='_get_near_photo_apl',
+							 store=True)
 	near_transformer_ids=fields.Many2many('uis.papl.transformer',
 										  relation='photo_near_trans',
 										  column1='photo_id',

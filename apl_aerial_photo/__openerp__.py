@@ -24,6 +24,7 @@ Main Features
         'views/mod_apl_view.xml',
         'views/mod_pillar_view.xml',
         'views/uis_papl_aerialphoto_view.xml',
+        'views/mod_apl_view.xml',
         'views/mod_google_map_template.xml'
     ],
     'application': True,
