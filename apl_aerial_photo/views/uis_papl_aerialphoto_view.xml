@@ -8,7 +8,7 @@
 			<kanban>
 				<field name="name"/>
 				<templates>
-					<t t-name="kanban-box">
+					<t t-name="kanban-box" create="false"><!--default_group_by="field"!-->
 						<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
 							<a type="open">
 								<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.photo','image',record.id.value)" class="oe_kanban_image"/>
