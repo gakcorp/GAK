@@ -35,8 +35,8 @@ class uis_apl_aerial_photo_mod_uis_papl_apl(osv.Model):
 		return {
 			'domain': "[('near_apl_ids','in',[" + ','.join(map(str, ids)) + "])]",
 			'name': _('Photos'),
-			'view_type': 'form',
-			'view_mode': 'tree,form',
+			'view_type': 'kanban',
+			'view_mode': 'kanban',
 			'res_model': 'uis.ap.photo',
 			'type': 'ir.actions.act_window',
 			'target': 'current'

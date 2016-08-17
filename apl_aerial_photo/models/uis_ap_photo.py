@@ -10,10 +10,11 @@ from openerp import models, fields, api, tools
 from datetime import datetime
 import logging
 
-try:
+'''try:
     import cStringIO as StringIO
-except ImportError:
-    import StringIO
+except ImportError:'''
+import StringIO
+import cStringIO
 
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
@@ -145,12 +146,35 @@ class uis_ap_photo(models.Model):
 										  column2='transformer_id',
 										  compute='_get_near_trans_ids')
 	
-	def _get_800_img(self,cr,uid,ids,context=None):
+	def _get_800_img(self):
+		for ph in self:
+			#img=tools.image.image_resize_image(ph.image, size=(800,600))
+			print 1
+	def _get_800_img_2(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
-			#image_stream=StringIO.StringIO(photo.image.decode('base64'))
+			#_logger.debug('photo image code is %r'%photo.image)
+			#_logger.debug('decode image code is %r'%photo.image.decode('base64'))
+			print photo.thumbnail
+			print self.thumbnail
+			img=tools.image.image_resize_image(photo.thumbnail, size=(800,600))
+			print img
+			photo.image_800=img
+			#image_stream=cStringIO.StringIO(photo.image.decode('base64'))
+			
+	
 			#image=Image.open(image_stream)
-			awi=int(photo.image_width/2)
-			ahe=int(photo.image_length/2)
+			#awi=int(photo.image_width/2)
+			#ahe=int(photo.image_length/2)
+			#back_stream=StringIO.StringIO()
+			#image.save(back_stream,format="PNG")
+			#photo.image_800=back_stream.getvalue().encode('base_64')
+			'''img = Image.new("RGBA", (schemeAPL_v2.scheme_width,schemeAPL_v2.scheme_height), (255,255,255,0))
+			#draw = ImageDraw.Draw(img)
+			draw = schemeAPL_v2.drawScheme(img,apl)
+			#draw.ellipse ((190,90,210,110),fill="red", outline="blue")
+			background_stream=StringIO.StringIO()
+			img.save(background_stream, format="PNG")
+			apl.scheme_image=background_stream.getvalue().encode('base64')'''
 			#size=awi,ahe
 			#if image.size != size:
 			#	image.thumbnail(size, Image.ANTIALIAS)
