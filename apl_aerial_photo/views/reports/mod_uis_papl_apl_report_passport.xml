@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+	<template id="mod_uis_papl_apl_report_passport" inherit_id="passportvl.uis_papl_apl_report_passport">
+		<xpath expr="//div[@name='main_passport']" position="after">
+			<div class="page" name="photo_page">
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <h3>Aero photos</h3>
+                    </div>
+                    <t t-foreach="o.photo_ids" t-as="ph_id">
+                        <div class="row">
+                            <div class="col-xs-8">
+                                <span t-field="ph_id.image_800" t-field-options="{&quot;widget&quot;:&quot;image&quot;}"/>
+                            </div>
+                            <div class="col-xs-1">
+                                <img width="100%" t-att-src="'https://api.qrserver.com/v1/create-qr-code/?data=http://app.uisgis.ru/web/image/uis.ap.photo/%s/image' % ph_id.id"/>
+                            </div>
+                            <div class="col-xs-3">
+                                <span t-field="ph_id.image_filename"/><br/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        Latitude:
+                                    </div>
+                                    <div class="col-xs-6 text-center report-field">
+                                        <span t-field="ph_id.latitude"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        Longitude:
+                                    </div>
+                                    <div class="col-xs-6 text-center report-field">
+                                        <span t-field="ph_id.longitude"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        Altitude:
+                                    </div>
+                                    <div class="col-xs-6 text-center report-field">
+                                        <span t-field="ph_id.altitude"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        Date:
+                                    </div>
+                                    <div class="col-xs-6 text-center report-field">
+                                        <span t-field="ph_id.image_date"/>
+                                    </div>
+                                </div>
+                                <t t-foreach="ph_id.near_pillar_ids" t-as="pil">
+                                    <div class="row">
+                                        <div class="col-xs-2">
+                                            <t t-if="pil.apl_id.id == o.id">
+                                                <span class="glyphicon glyphicon-ok"/>
+                                            </t>
+                                        </div>
+                                        <div class="col-xs-10">
+											<span t-field="pil.name"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+		</xpath>
+	</template>
+</data>
+</openerp>

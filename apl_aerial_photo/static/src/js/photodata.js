@@ -76,7 +76,7 @@ function photolib(apl_ids,sitemaplib) {
         this.hide_photo_full();
         cur_photo=this.photos[id];
         ppf=document.getElementById("photo_preview_frame");
-        ppf.innerHTML='<center><img src="'+cur_photo.url_image+'" width="100%"/></center>'
+        ppf.innerHTML='<center><img src="'+cur_photo.url_image+'_800" width="100%"/></center>'
         $("#photo_preview_frame").removeClass("novis");
 
     }
@@ -88,7 +88,7 @@ function photolib(apl_ids,sitemaplib) {
     this.show_photo_full=function(id){
         cur_photo=this.photos[id];
         phf=document.getElementById("photo_full_frame");
-        phf.innerHTML='<center><img src="'+cur_photo.url_image+'" class="zoom" data-magnify-src="'+cur_photo.url_image+'" width="100%" onclick="sitephotolib.hide_photo_full();"/></center>'
+        phf.innerHTML='<center><img src="'+cur_photo.url_image+'_800" class="zoom" data-magnify-src="'+cur_photo.url_image+'" width="100%" onclick="sitephotolib.hide_photo_full();"/></center>'
         $("#photo_full_frame").removeClass("novis");
         $('.zoom').magnify();
         that=this;

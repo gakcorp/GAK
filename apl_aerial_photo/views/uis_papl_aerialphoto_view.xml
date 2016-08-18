@@ -10,9 +10,10 @@
 				<templates>
 					<t t-name="kanban-box" create="false"><!--default_group_by="field"!-->
 						<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
-							<a type="open">
-								<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.photo','image',record.id.value)" class="oe_kanban_image"/>
-							</a>
+							<!--<a type="open">!-->
+								<!--<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image"/>!-->
+								<img style="max-width:100%;"  t-att-data-magnify-src="kanban_image('uis.ap.photo','image',record.id.value)" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image zoom"/>
+							<!--</a>!-->
 							<div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
 								<h4>
 									<a type="open">
@@ -21,13 +22,14 @@
 								<div name="tags"/>
 								<ul>
 									<li>Date: <field name="image_date"/></li>
-									<li>Alt : <field name="altitude"/></li>
+									<!--<li>Alt : <field name="altitude"/></li>!-->
 								</ul>
 								</h4>
 							</div>
 						</div>
 					</t>
 				</templates>
+				
 			</kanban>
 		</field>
 	</record>

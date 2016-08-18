@@ -114,11 +114,13 @@ def strdiv(strdiv):
 class uis_ap_photo(models.Model):
 	_name='uis.ap.photo'
 	_description='Photo_apl'
+	_order='image_date desc'
 	name=fields.Char('Name')
 	image=fields.Binary(string='Image')
 	image_length=fields.Integer(string='Image Length')
 	image_width=fields.Integer(string='Image Width')
 	image_800=fields.Binary(string='Image800', compute='_get_800_img')
+	image_400=fields.Binary(string='Image400', compute='_get_400_img')
 	focal_length=fields.Float(digits=(2,4), string="Focal Length")
 	thumbnail=fields.Binary(string="Thumbnail")
 	image_filename=fields.Char(string='Image file name')
@@ -146,41 +148,16 @@ class uis_ap_photo(models.Model):
 										  column2='transformer_id',
 										  compute='_get_near_trans_ids')
 	
-	def _get_800_img(self):
-		for ph in self:
-			#img=tools.image.image_resize_image(ph.image, size=(800,600))
-			print 1
-	def _get_800_img_2(self,cr,uid,ids,context=None):
-		for photo in self.browse(cr,uid,ids,context=context):
-			#_logger.debug('photo image code is %r'%photo.image)
-			#_logger.debug('decode image code is %r'%photo.image.decode('base64'))
-			print photo.thumbnail
-			print self.thumbnail
-			img=tools.image.image_resize_image(photo.thumbnail, size=(800,600))
-			print img
-			photo.image_800=img
-			#image_stream=cStringIO.StringIO(photo.image.decode('base64'))
-			
-	
-			#image=Image.open(image_stream)
-			#awi=int(photo.image_width/2)
-			#ahe=int(photo.image_length/2)
-			#back_stream=StringIO.StringIO()
-			#image.save(back_stream,format="PNG")
-			#photo.image_800=back_stream.getvalue().encode('base_64')
-			'''img = Image.new("RGBA", (schemeAPL_v2.scheme_width,schemeAPL_v2.scheme_height), (255,255,255,0))
-			#draw = ImageDraw.Draw(img)
-			draw = schemeAPL_v2.drawScheme(img,apl)
-			#draw.ellipse ((190,90,210,110),fill="red", outline="blue")
-			background_stream=StringIO.StringIO()
-			img.save(background_stream, format="PNG")
-			apl.scheme_image=background_stream.getvalue().encode('base64')'''
-			#size=awi,ahe
-			#if image.size != size:
-			#	image.thumbnail(size, Image.ANTIALIAS)
-			#	sharpener=ImageEnhance.Sharpness(image.convert('RGBA'))
-				
-			#photo.image_800=tools.image_resize_image(photo.image, size=(int(photo.image_length/2),int(photo.image_width/2)), encoding='base64')
+	def _get_800_img(self,cr,uid,ids,context=None):
+		for ph in self.browse(cr,uid,ids,context=context):
+			img=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(800,600))
+			ph.image_800=img
+		return True
+	def _get_400_img(self,cr,uid,ids,context=None):
+		for ph in self.browse(cr,uid,ids,context=context):
+			img=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
+			ph.image_400=img
+		return True
 		
 	@api.depends('latitude', 'longitude')
 	def _get_near_trans_ids(self,cr,uid,ids,context=None):
