@@ -142,6 +142,10 @@ class uis_papl_transformation(models.Model):
 		for trans in self.browse(cr,uid,ids,context=context):
 			lat1=trans.latitude
 			long1=trans.longitude
+			if not(lat1):
+				lat1=0
+			if not (long1):
+				long1=0
 			delta=0.01
 			nstr=''
 			max_dist=200

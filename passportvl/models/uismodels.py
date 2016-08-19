@@ -15,8 +15,17 @@ except ImportError:
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
+UNI_STATE_SELECTION = [
+		('draft', 'DRAFT'),
+		('ready', 'READY TO EXPLOITATION'),
+		('exploitation', 'EXPLOITATION'),
+		('defect','DEFECT'),
+		('maintenance', 'MAINTENANCE'),
+		('repairs', 'REPAIRS'),
+		('write-off','WRITE-OFF')]
+	
 def distance2points(lat1,long1,lat2,long2):
-	dist=0
+	dist=-1
 	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
 		rad=6372795
 		#Convert to radians
@@ -71,6 +80,7 @@ def distangle2points(lat1,long1,lat2,long2):
 	return dist,angle
 
 class uis_papl_substation(models.Model):
+
 	_name='uis.papl.substation'
 	_description='Substation model'
 	name=fields.Char()
@@ -78,15 +88,31 @@ class uis_papl_substation(models.Model):
 	department_id=fields.Many2one('uis.papl.department', string="Department")
 	latitude=fields.Float(digits=(2,6))
 	longitude=fields.Float(digits=(2,6))
+	latlng=fields.Float(digits=(2,6),compute='_get_latlng',string="LatxLng")
+	photo=fields.Binary(string='Photo')
+	state=fields.Selection(UNI_STATE_SELECTION,'Status',readonly=True,default='draft')
+	_logger.debug('add latlng field')
 	apl_id=fields.One2many('uis.papl.apl','sup_substation_id',string='APLs')
+	conn_pillar_ids=fields.Many2many('uis.papl.pillar',
+									 relation='ss_conn_pillar_ids',
+									 column1='substation_id',
+									 column2='pillar_id',
+									 domain="[('id','in',near_pillar_ids[0][2])]",
+									 string="Connected pollars")
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='ss_near_pillar_ids',
 									 column1='substation_id',
 									 column2='pillar_id',
-									 compute='_get_near_pillar'
+									 compute='_get_near_pillar',
+									 string='Near pillars'
 									 )
 
-
+	@api.depends('latitude','longitude')
+	def _get_latlng(self):
+		for ss in self:
+			ss.latlng=ss.latitude*ss.longitude
+		return True
+	
 	def add_apl(self, cr,uid,ids,context=None, apl_name='NDEF', fid=0, apl_type='ВЛ', klass=6):
 		_logger.debug('Start add apl')
 		re_apl=self.pool.get('uis.papl.apl').browse(cr,uid,ids,context=context)
@@ -119,8 +145,37 @@ class uis_papl_substation(models.Model):
 			ss.apl_id=[(4, napl.id,0)]
 			
 			
-	def _get_near_pillar(self):
-		_logger.debug('Need update')
+	def _get_near_pillar(self,cr,uid,ids,context=None):
+		for ps in self.browse(cr,uid,ids,context=context):
+			lat1=ps.latitude
+			long1=ps.longitude
+			_logger.debug('start define near pillars ids')
+			_logger.debug('latitude|longitude  is %r|%r'%(lat1,long1))
+			ps.near_pillar_ids=[(5,None,None)]
+			if (lat1>0) and (long1>0):
+				delta=0.01
+				max_dist=200
+				pillars = self.pool.get('uis.papl.pillar').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
+				near_pillars=[]
+				near_pillars_ids=[]
+				ps.near_pillar_ids=[(5,None,None)]
+				for pid in pillars:
+					pillar=self.pool.get('uis.papl.pillar').browse(cr,uid,[pid],context=context)
+					_logger.debug(pillar)
+					if pillar:
+						lat2=pillar.latitude
+						long2=pillar.longitude
+						dist=-1
+						if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0) and (abs(lat1-lat2)<0.1) and (abs(long1-long2)<0.1):
+							dist=distance2points(lat1,long1,lat2,long2)
+							_logger.debug('Pillar %r distance is %r parent_id is %r'%(pillar,dist,pillar.parent_id))
+						if (dist<max_dist) and (dist>=0) and not(pillar.parent_id):
+							near_pillars.append(pillar)
+							near_pillars_ids.append(pillar.id)
+							ps.near_pillar_ids=[(4,pillar.id,0)]
+			_logger.debug('near_pillar_ids is %r'%ps.near_pillar_ids)
+		return True
+		
 	@api.depends('apl_id')
 	def _ss_get_url_maps(self):
 		for record in self:
