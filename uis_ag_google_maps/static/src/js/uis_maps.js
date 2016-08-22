@@ -1105,8 +1105,11 @@ function mapslib(apl_ids, div_id) {
 	this.init_global_vars=function(){
 		this.settings.global_var.push('auto_refresh_time');
 		this.settings.global_var.auto_refresh_time=60;
-		this.settings.global_var.push('photo_icon_path');
 		this.settings.global_var.photo_icon_path="M20 48 L20 64 L44 64 L44 48 L36 48 L64 0 L0 0 L28 48 Z";
+		this.settings.global_var.push('photo_icon_path');
+		this.settings.global_var.photo_point_icon="M-3,3 3,-3 M-3,-3 3,3"
+		this.settings.global_var.push('photo_point_icon');
+		
 	};
     this.init=function(){
 		this.init_global_vars();

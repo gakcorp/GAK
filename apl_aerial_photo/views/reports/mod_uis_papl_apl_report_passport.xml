@@ -3,7 +3,7 @@
 <data>
 	<template id="mod_uis_papl_apl_report_passport" inherit_id="passportvl.uis_papl_apl_report_passport">
 		<xpath expr="//div[@name='main_passport']" position="after">
-			<div class="page" name="photo_page">
+			<div name="photo_page"> <!--class="page"!-->
                 <div class="row">
                     <div class="col-xs-12 text-center">
                         <h3>Aero photos</h3>

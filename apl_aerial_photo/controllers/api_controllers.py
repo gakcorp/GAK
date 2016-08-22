@@ -44,7 +44,7 @@ class data_json(http.Controller):
                 "pillars":[]
             }
             for pil in ph.near_pillar_ids:
-                _logger.debug('Return for APL %r Photo %r near Pillar %r' % (pil.apl_id.id, ph.id, pil.name))
+                #_logger.debug('Return for APL %r Photo %r near Pillar %r' % (pil.apl_id.id, ph.id, pil.name))
                 if pil.apl_id.id in clean_ids:
                     pill_data["count"]=pill_data["count"]+1
                     pill_data["pillars"].append({
@@ -85,7 +85,7 @@ class data_json(http.Controller):
         domain=[]
         p_id=[]
         photo_ids=photo_obj.search(cr, uid, domain, context=context)
-        _logger.debug(photo_ids)
+        #_logger.debug(photo_ids)
         
         count_data={
             "count":0
@@ -123,7 +123,7 @@ class data_json(http.Controller):
         domain=[]
         p_id=[]
         photo_ids=photo_obj.search(cr, uid, domain, context=context)
-        _logger.debug(photo_ids)
+        #_logger.debug(photo_ids)
         out=hash(str(photo_ids))
         hash_data={
             "photo_count_hash":out

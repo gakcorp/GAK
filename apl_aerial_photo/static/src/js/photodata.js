@@ -37,8 +37,10 @@ function photolib(apl_ids,sitemaplib) {
     this.photo_data_hash='';
     this.photos=[];
     this.markers=[];
+    this.points=[];
     this.filter=[];
-    
+    this.settings=[];
+    phlib=this;
 
     //onPillarMouseOver=new function(){
     //    onpmo();
@@ -63,11 +65,41 @@ function photolib(apl_ids,sitemaplib) {
             //anchor: new google.maps.Point(32,64),
             anchor:new google.maps.Point(50,50),
             rotation: dig
-        }
+        };
         return pci;
-    }
+    };
+    this.get_point_icon=function(dig){
+        var z1=12;
+        var z2=19;
+        var x1=0.2;
+        var x2=1;
+        var z=this.map.getZoom();
+        var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
+        console.debug(scalez);
+        var pci={
+            path:sitemaplib.settings.global_var['photo_point_icon'],
+            strokeColor:'red',
+            scale:scalez,
+            strokeWeight:2,
+            anchor:new google.maps.Point(0,0),
+            rotation:dig
+            };
+        return pci;
+    };
     //Define functions
-    
+    this.show_hide_photo_points=function(){
+        console.debug("Show_hide_photo_points");
+        this.show_photo_points(this.settings.show_photo_points);
+        this.settings.show_photo_points=!(this.settings.show_photo_points);
+    };
+    this.show_photo_points=function(vis){
+        console.debug('start show photo points with value'+vis);
+        this.points.forEach(function(item){
+			console.debug(item);
+            item.setVisible(vis);
+            item.setIcon(phlib.get_point_icon(0));
+			});
+    };
     this.hide_photo_preview=function(){
         
         $("#photo_preview_frame").addClass("novis");
@@ -133,11 +165,19 @@ function photolib(apl_ids,sitemaplib) {
             this.markers[cur_photo.id]= new google.maps.Marker({
                 map: this.map,
                 rotation:cur_photo.rotation,
-                draggable: true,
+                draggable: false,
                 position: location,
                 visible:false,
                 icon:this.get_path_camera_icon(cur_photo.rotation)
                 });
+            this.points[cur_photo.id]=new google.maps.Marker({
+                map:this.map,
+                rotation:0,
+                draggable:false,
+                position: location,
+                visible: false,
+                icon: this.get_point_icon(0)
+                })
             this.photos[cur_photo.id]=cur_photo;
             //var imagecur=pillar_image;
             
@@ -220,6 +260,15 @@ function photolib(apl_ids,sitemaplib) {
             
             };
     }
+    this.init_buttons=function(){
+        $("#photo_button").click(function(){
+            phlib.show_hide_photo_points();
+        });
+    };
+    this.init=function(){
+        this.init_buttons();
+        this.settings.show_photo_points=false;
+    };
     
     this.refresher=function(){
         console.debug('Photo refresher')
@@ -231,6 +280,7 @@ function photolib(apl_ids,sitemaplib) {
 
 
 var sitephotolib=new photolib(apl_ids,sitemapslib);
+sitephotolib.init();
 //var photo_ref=new sitephotolib.refresher();
 function photo_ref() {
     sitephotolib.get_photo_count_hash();

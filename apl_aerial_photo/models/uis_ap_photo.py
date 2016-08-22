@@ -78,6 +78,7 @@ def dms2dd(degrees,minutes,seconds, direction):
 	dd=float(degrees)+float(minutes)/60+float(seconds)/(60*60)
 	if direction == 'S' or direction =='W':
 		dd *=-1
+	_logger.debug('For deg,min,sec,dir (%r,%r,%r,%r) coordinate is (%r)'%(degrees,minutes,seconds,direction,dd))
 	return dd
 
 def parse_dms(dms,direction):
@@ -94,9 +95,9 @@ def parse_dms(dms,direction):
 		p3=0
 	if p4=='':
 		p4=1
-	_logger.debug('Parts of dms is %r,%r,%r,%r'%(p1,p2,p3,p4))
-	dd=dms2dd(p1,p2,int(p3)/int(p4),direction)
-	print parts
+	_logger.debug('Parts of dms %r is %r,%r,%r,%r'%(dms,p1,p2,p3,p4))
+	dd=dms2dd(p1,p2,float(p3)/float(p4),direction)
+	_logger.debug('Parts of coordinates %s'%parts);
 	return dd
 
 def parse_date(str_date):
@@ -105,9 +106,9 @@ def parse_date(str_date):
 	return rdate
 
 def strdiv(strdiv):
-	print strdiv
+	#print strdiv
 	parts=re.findall(r"[\d']+",str(strdiv))
-	print parts
+	#print parts
 	rval=int(parts[0])/int(parts[1])
 	return rval
 	
@@ -181,7 +182,7 @@ class uis_ap_photo(models.Model):
 					if (dist<max_dist) and (dist>0):
 						photo.near_transformer_ids=[(4,transformer.id,0)]
 		
-	@api.depends('near_pillar_ids')
+	@api.depends('near_pillar_ids','latitude','longitude')
 	def _get_near_photo_apl(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
 			apl_ids=[]
@@ -190,14 +191,14 @@ class uis_ap_photo(models.Model):
 					apl_ids.append(pil.apl_id.id)
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
-	@api.depends('latitude','longitude')
+	#@api.depends('latitude','longitude')
 	def _get_near_photo_pillar(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
 			lat1=photo.latitude
 			long1=photo.longitude
 			delta=0.01
 			nstr=''
-			max_dist=50
+			max_dist=40
 			pillars = self.pool.get('uis.papl.pillar').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
@@ -231,7 +232,7 @@ class uis_ap_photo_load_hist(models.Model):
 	
 	def load_photos(self, cr,uid,ids,context=None):
 		re_photos=self.pool.get('uis.ap.photo').browse(cr,uid,ids,context=context)
-		print "Start load photos"
+		_logger.debug("Start load photos")
 		path='/home'
 		val=self.browse(cr,uid,ids,context=context)
 		if val.folder_name != '':
@@ -260,9 +261,9 @@ class uis_ap_photo_load_hist(models.Model):
 					cfl=strdiv(tags["EXIF FocalLength"])
 					#GPS GPSAltitude, value 181921/1000
 					calt=strdiv(tags["GPS GPSAltitude"])
-					for tag in tags.keys():
-						if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
-							_logger.debug("Key: %s, value %s" % (tag, tags[tag]))
+					#for tag in tags.keys():
+					#	if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
+					#		_logger.debug("Key: %s, value %s" % (tag, tags[tag]))
 					idate=parse_date(str(idate))
 					# !!!! Need validate name file
 					np=re_photos.create({'name':str(idate.year)+'_'+str(idate.month)+'_'+str(idate.day)+'_'+str(filen)})
