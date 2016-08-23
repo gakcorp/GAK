@@ -467,6 +467,11 @@
 						<field name="apl_id" widget="many2many_kanban"/>
 					</sheet>
 				</page>
+				<page string="Scheme">
+					<group>
+						<field name="image_scheme" widget="image" options='{"size":[900,900]}' style="width:600px;" nolabel="1"/>
+					</group>
+				</page>
 				<page string="Connections" attrs="{'invisible':[('latlng','=',0)]}">
 					<field name="latlng"/>
 					<group>

@@ -90,6 +90,7 @@ class uis_papl_substation(models.Model):
 	longitude=fields.Float(digits=(2,6))
 	latlng=fields.Float(digits=(2,6),compute='_get_latlng',string="LatxLng")
 	photo=fields.Binary(string='Photo')
+	image_scheme=fields.Binary(string='Scheme')
 	state=fields.Selection(UNI_STATE_SELECTION,'Status',readonly=True,default='draft')
 	_logger.debug('add latlng field')
 	apl_id=fields.One2many('uis.papl.apl','sup_substation_id',string='APLs')
