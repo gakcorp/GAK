@@ -614,6 +614,7 @@ class maps_data_json(http.Controller):
 		pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
 		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
 			pp=pil.parent_id;
+			pp_old_num_by_vl=pp.num_by_vl
 			dlat=(pil.latitude-pp.latitude)/(1+int(cnt))
 			dlng=(pil.longitude-pp.longitude)/(1+int(cnt))
 			i=1
@@ -622,9 +623,12 @@ class maps_data_json(http.Controller):
 				np=cp.create_new_child(num_by_vl=cp.num_by_vl+1,parent_id=cp,latitude=dlat+cp.latitude,longitude=dlng+cp.longitude,tap_id=pil.tap_id,pillar_type_id=pt, pillar_cut_id=pc)
 				cp=np
 				i=i+1
+			if pp.tap_id != cp.tap_id:
+				pp.num_by_vl=pp_old_num_by_vl
 			pil.parent_id=cp
 			pil.num_by_vl=cp.num_by_vl+1
 			pil.tap_id.sys_pil_fix_lpp()
+			pil.tap_id.act_normalize_num()
 		values={
 			'result':1
 		}
@@ -643,7 +647,7 @@ class maps_data_json(http.Controller):
 		pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
 		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
 			nt=pil.tap_id.create_new_tap()
-			pil.create_new_child(num_by_vl=1000,tap_id=nt)
+			pil.create_new_child(num_by_vl=1,tap_id=nt)
 		values ={
 			'result':1
 		}

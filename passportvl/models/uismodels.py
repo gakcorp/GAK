@@ -501,6 +501,12 @@ class uis_papl_tap(models.Model):
 						record.elevation=el
 	
 	@api.multi
+	def do_pillar_apl_id_by_tap(self):
+		for pillar in self.pillar_ids:
+			if pillar.apl_id != self.apl_id:
+				pillar.apl_id=self.apl_id
+				
+	@api.multi
 	def act_normalize_num(self):
 		print "Start normalize process to Tap id="+str(self.id)
 		max_num=0
@@ -519,7 +525,7 @@ class uis_papl_tap(models.Model):
 			cp=last_pillar
 			np=last_pillar.parent_id
 			n_id=np.id
-			while (n_id>0) and (pillar_cnt-i>=1):
+			while (n_id>0) and (pillar_cnt-i>=1) and (cp.tap_id==np.tap_id):
 				#print "Set to Pillar id:"+str(cp.id)+" num_by_vl value is "+str(pillar_cnt-i)
 				cp.num_by_vl=pillar_cnt-i
 				np=cp.parent_id

@@ -276,14 +276,13 @@
 			  </page>
 			  <page string="Pillars">
 				<field name="pillar_id">
-				  <!--<tree context="{'group_by': 'pillar_type_id'}">
-					<field name="tap_id"/>
+				  <tree default_order="num_by_vl, tap_id">
 					<field name="name"/>
 					<field name="num_by_vl"/>
 					<field name="pillar_material_id"/>
 					<field name="pillar_type_id"/>
-					<field name="len_prev_pillar"/>
-				  </tree>!-->
+					<field name="pillar_cut_id"/>
+				  </tree>
 				</field>
 				<!--<search string="Search pillar">
 				
@@ -399,7 +398,40 @@
 		</field>
     </record>
 	
-	
+	<record model="ir.ui.view" id="uis_papl_pillar_kanban">
+		<field name="name">Pillar kanban</field>
+		<field name="model">uis.papl.pillar</field>
+		<field name="arch" type="xml">
+			<kanban default_group_by="pillar_type_id" default_order="apl_id,tap_id,num_by_vl">
+				<field name="name"/>
+				<field name="pillar_type_id"/>
+				<field name="apl_id"/>
+				<field name="tap_id"/>
+				<field name="num_by_vl"/>
+				<templates>
+					<t t-name="kanban-box" create="false">
+						<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:5px; max-width:250px;font-size:x-small;">
+						<!--<img style="max-width:100%;"  t-att-src="kanban_image('uis.papl.apl','scheme_image',record.id.value)" class="oe_kanban_image"/>!-->
+						<div class="oe_kanban_details"> <!--style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">!-->
+							<a type="open">
+								<field name="name"/>
+							</a>
+							<div name="tags"/>
+							<ul>
+								<li>APL: <field name="apl_id"/></li>
+								<li>Tap: <field name="tap_id"/></li>
+								<li>Num by APL: <field name="num_by_vl"/></li>
+								<li>Type: <field name="pillar_type_id"/></li>
+								<li>Cut: <field name="pillar_cut_id"/></li>
+								<li>Material: <field name="pillar_material_id"/></li>
+							</ul>
+						</div>
+						</div>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>
 	<record model="ir.ui.view" id="uis_papl_tap_list">
 	  <field name="name">Tap List</field>
 	  <field name="model">uis.papl.tap</field>
@@ -413,6 +445,7 @@
 		  <field name="pillar_ids" readonly="1" widget="one2many"/>
 		  <button name="act_normalize_num" string="Normalize" type="object" icon="STOCK_REFRESH"/>
 		  <button name="get_elevation" string="Elevation" type="object" icon="STOCK_EXECUTE"/>
+			<button name="do_pillar_apl_id_by_tap" string="Pil apl id by tap id" type="object" icon="STOCK_REFRESH"/>
 		</tree>
 	  </field>
 	</record>
@@ -551,7 +584,7 @@
 		<field name="name">List of pillar</field>
 		<field name="res_model">uis.papl.pillar</field>
 		<field name="view_type">form</field>
-		<field name="view_mode">tree,form</field>
+		<field name="view_mode">tree,form,kanban</field>
 	    <field name="help" type="html">
 			<p class="oe_view_nocontent_create">Create new pillar for APL</p>
 		</field>
