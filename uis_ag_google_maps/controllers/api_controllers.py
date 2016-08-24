@@ -161,7 +161,14 @@ class maps_data_json(http.Controller):
 		pillar_data["maxlong"]=maxlong
 		#end code _pillar_data
 		return pillar_data
-
+	def _get_ps_data(self,clean_ids):
+		cr, uid,context=request.cr,request.uid,request.context
+		ps_data={
+			"counter":0,
+			"ps":[]
+		}
+		#!!!!!!!!!!!!!!!!!!!!!!!!!!
+		return ps_data
 	def _get_trans_data(self,clean_ids):
 		cr, uid,context=request.cr,request.uid,request.context
 		trans_data={
@@ -301,7 +308,20 @@ class maps_data_json(http.Controller):
 		elapsed=stop-start
 		_logger.info('Generate PILLAR data HASH in %r seconds'%elapsed.total_seconds())
 		return values
-
+	@http.route('/apiv1/ps/data/hash',type='json',auth="public",csfr=False)
+	def api_v1_ps_data_hash(self, *arg, **post):
+		start=datetime.datetime.now()
+		data=json.loads(json.dumps(request.jsonrequest))
+		clean_ids=self._get_clean_apl_ids(data)
+		ps_data=self._get_ps_data(clean_ids)
+		out=hash(str(ps_data))
+		values ={
+			'hash_ps':json.dumps(out)
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate PS data HASH in %r seconds'%elapsed.total_seconds())
+		return values
 	@http.route('/apiv1/trans/data/hash',type='json', auth="public", csfr=False)
 	def api_v1_trans_data_hash(self, *arg, **post):
 		start=datetime.datetime.now()
@@ -512,7 +532,19 @@ class maps_data_json(http.Controller):
 		elapsed=stop-start
 		_logger.info('Generate PILLAR data in %r seconds'%elapsed.total_seconds())
 		return values
-
+	@http.route('/apiv1/ps/data',type="json",auth="publc",csfr=False)
+	def api_v1_ps_data(self, *arg, **post):
+		start=datetime.datetime.now()
+		data=json.loads(kson.dumps(request.jsonrequest))
+		clean_ids=self._get_clean_apl_ids(data)
+		ps_data=self._get_ps_data(clean_ids)
+		values={
+			'ps_data':json.dumps(ps_data)
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate PS date in %r seconds'%elapsed.total_seconds())
+		return values
 	@http.route('/apiv1/trans/data', type="json", auth="public", csfr=False)
 	def api_v1_trans_data(self, *arg, **post):
 		start=datetime.datetime.now()
@@ -571,7 +603,6 @@ class maps_data_json(http.Controller):
 			domainpt=[]
 			pt_ids=pillar_type_obj.search(cr,uid,domainpt,context=context)
 			pts=pillar_type_obj.browse(cr,uid,pt_ids,context=context)
-			print pts
 			ti=len(pts)
 			cp=0
 			npt=[]
@@ -591,6 +622,44 @@ class maps_data_json(http.Controller):
 		}
 		return values
 	
+	@http.route('/apiv1/pillar/ch_pillar_to_base', type="json",auth="public",csfr=False)
+	def api_v1_pillar_ch_pillar_to_base(self, *arg, **post):
+		start=datetime.datetime.now()
+		cr, uid, context=request.cr, request.uid, request.context
+		pillar_obj = request.registry['uis.papl.pillar']
+		pillar_type_obj=request.registry['uis.papl.pillar.type']
+		pillar_cut_obj=request.registry['uis.papl.pillar.cut']
+		data=json.loads(json.dumps(request.jsonrequest))
+		pid=data['pillar_id']
+		cnt=data['pillar_cnt']
+		pt,pc=False,False
+		if 'pillar_type_id' in data:
+			domain_pt=[("id","in",[data['pillar_type_id']])]
+			pt_ids=pillar_type_obj.search(cr,uid,domain_pt,context=context)
+			pt=pillar_type_obj.browse(cr,uid,pt_ids,context=context)[0]
+		if 'pillar_cut_id' in data:
+			domain_pc=[("id","in",[data['pillar_cut_id']])]
+			pc_ids=pillar_type_obj.search(cr,uid,domain_pc,context=context)
+			pc=pillar_cut_obj.browse(cr,uid,pc_ids,context=context)[0]
+		domain=[("id","in",[pid])]
+		pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
+		pcnt=0
+		for pil in pillar_obj.browse(cr, uid, pillar_ids, context=context):
+			cp=pil.parent_id
+			while not(cp.pillar_type_id.base) and cp.parent_id:
+				if pt:
+					cp.pillar_type_id=pt
+				if pc:
+					cp.pillar_cut_id=pc
+				cp=cp.parent_id
+				pcnt=pcnt+1
+		values={
+			'result':1
+		}
+		stop=datetime.datetime.now()s
+		elapsed=stop-start
+		_logger.info('Change pillar types (%r) and cut (&r) for %r pillars in %r seconds'%(pt,pc,pcnt,elapsed.total_seconds()))
+		return values
 	@http.route('/apiv1/pillar/add_pillar_to_prev',type="json", auth="public", csfr=False)
 	def api_v1_pillar_add_pillar_to_prev(self, *arg, **post):
 		start=datetime.datetime.now()

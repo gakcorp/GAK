@@ -179,6 +179,7 @@ function mapslib(apl_ids, div_id) {
 									+'<a id="cm_create_add_pillar" idvalue="'+id+'"><div class="menu_context">Add pillars to previous</div></a>'
 									+'<a id="cm_change_type_pillar" idvalue="'+id+'"><div class="menu_context">Change pillar type</div></a>'
 									+'<a id="cm_change_cut_pillar" idvalue="'+id+'"><div class="menu_context">Change pillar cut</div></a>'
+									+'<a id="cm_change_type_cut_pillar_to_base" idvalue="'+id+'"><div class="menu_context">Change cut&type to previous base</div></a>'
 									+'<a id="cm_delete_pillar" idvalue="'+id+'"><div class="menu_context">Delete pillar</div></a>'
 									+'<a id="cm_close"><div class="menu_context">Close</div></a>';
 		$(thatlib.map.getDiv()).append(map_contextmenuDir);
@@ -193,10 +194,42 @@ function mapslib(apl_ids, div_id) {
 				thatlib.create_new_child_pillar(id);
 				hide_context_menu();
 				});
+		$('#cm_change_type_cut_pillar_to_base').click(function(){
+				var id=this.getAttribute("idvalue");
+				map_contextmenuDir=document.createElement("div");
+				map_contextmenuDir.className='map_contextmenu';
+				str='<div id="cm_chptb" idvalue="'+id+'" class="menu_context"><center><br>';
+				str=str+'Change type and cut to base pillar<br>';
+				str=str+'Type: <select class="form-control" id="cm_chptb_pillar_type" style="font-size: inherit;height: 28px;"><option value="" title="Select pillar type...">Select type...</option> ';
+				thatlib.settings.pillar_type.forEach(function(item){
+					str=str+'<option value="'+item.id+'">'+item.name+'</option>';
+					});
+				str=str+'</select><br>Cut: <select class="form-control" id="cm_chptb_pillar_cut" style="font-size: inherit;height: 28px;"><option value="" title="Select pillar cut...">Select cut...</option> ';
+				thatlib.settings.pillar_cut.forEach(function(item){
+					str=str+'<option value="'+item.id+'">'+item.name+'</option>';
+					});
+				str=str+'</select><center><br><button type="button" class="btn btn-success" id="cm_chptb_button">Create</button>';
+				str=str+'<button type="button" class="btn btn-danger" id="cm_chptb_cancel_button">Cancel</button></center>';
+				str=str+'</div>';
+				map_contextmenuDir.innerHTML=str;
+				$(thatlib.map.getDiv()).append(map_contextmenuDir);
+				setContextMenuXY(e.latLng);
+				map_contextmenuDir.style.visibility="visible";
+				$('#cm_chptb_button').click(function(){
+					id=$('#cm_chptb').attr('idvalue');
+					ptid=$('#cm_chptb_pillar_type').val();
+					pcid=$('#cm_chptb_pillar_cut').val();
+					thatlib.change_pillars_to_base(id,ptid,pcid);
+					hide_context_menu();
+				});
+				$('#cm_chptb_cancel_button').click(function(){
+					hide_context_menu();
+				});
+				});
 		$('#cm_create_add_pillar').click(function(){
 				var id=this.getAttribute("idvalue");
 				hide_context_menu();
-				ap_contextmenuDir=document.createElement("div");
+				map_contextmenuDir=document.createElement("div");
 				map_contextmenuDir.className='map_contextmenu';
 				str='<div id="cm_add_new_pils" idvalue="'+id+'" class="menu_context"><center><br>';
 				str=str+'Add <input type="number" id="cm_cnp_count_edit" value="2" style="width: 50px;"> pillars <br></center>';
@@ -209,7 +242,7 @@ function mapslib(apl_ids, div_id) {
 					str=str+'<option value="'+item.id+'">'+item.name+'</option>';
 					});
 				str=str+'</select><center><br><button type="button" class="btn btn-success" id="cm_cnp_button">Create</button>';
-				str=str+'<button type="button" class="btn btn-danger" id="cm_cnp_cancel_button">Cancel</button></center>'
+				str=str+'<button type="button" class="btn btn-danger" id="cm_cnp_cancel_button">Cancel</button></center>';
 				str=str+'</div>';
 				map_contextmenuDir.innerHTML=str;
 				$(thatlib.map.getDiv()).append(map_contextmenuDir);
@@ -219,7 +252,6 @@ function mapslib(apl_ids, div_id) {
 					id=$('#cm_add_new_pils').attr("idvalue");
 					ptid=$('#cm_cnp_pillar_type').val();
 					pcid=$('#cm_cnp_pillar_cut').val();
-					console.debug(ptid,pcid);
 					cnt=$('#cm_cnp_count_edit').val();
 					thatlib.add_pillars_to_prev(id,cnt,ptid,pcid);
 					hide_context_menu();
@@ -447,12 +479,14 @@ function mapslib(apl_ids, div_id) {
 			};
 			});
 		//console.debug(minlat,maxlat,minlng,maxlng);
-		this.bounds=new google.maps.LatLngBounds();
-		var location = new google.maps.LatLng(minlat,minlng);
-        this.bounds.extend(location);
-        location=new google.maps.LatLng(maxlat,maxlng);
-        this.bounds.extend(location);
-		this.map.fitBounds(this.bounds);
+		if (minlat>0 && minlng>0 && maxlat>0 && maxlng>0){
+			this.bounds=new google.maps.LatLngBounds();
+			var location = new google.maps.LatLng(minlat,minlng);
+			this.bounds.extend(location);
+			location=new google.maps.LatLng(maxlat,maxlng);
+			this.bounds.extend(location);
+			this.map.fitBounds(this.bounds);
+		}
 	};
     
     this.mark_pillar=function(pid, mark){
@@ -835,6 +869,20 @@ function mapslib(apl_ids, div_id) {
 		data.pillar_id=id;
 		data.pillar_cut_id=pcid;
 		this.send_change_pillar(data);
+	};
+	this.change_pillars_to_base=function(id,ptid,pcid){
+		var data={};
+		data.pillar_id=id;
+		if (ptid>0){data.pillar_type_id=ptid};
+		if (pcid>0){data.pillar_cut_id=pcid};
+		xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/pillar/ch_pillar_to_base', true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+        xhr.onload=function(e){
+            that.get_pillar_data();
+            };
 	};
 	this.add_pillars_to_prev=function(id,cnt,ptid,pcid){
 		var data={};

@@ -90,9 +90,9 @@ class uis_papl_substation(models.Model):
 	longitude=fields.Float(digits=(2,6))
 	latlng=fields.Float(digits=(2,6),compute='_get_latlng',string="LatxLng")
 	photo=fields.Binary(string='Photo')
-	image_scheme=fields.Binary(string='Scheme')
+	image_scheme=fields.Binary(string='Principal Scheme')
+	apl_scheme=fields.Binary(string="APLs Scheme" compute='_get_apl_scheme')
 	state=fields.Selection(UNI_STATE_SELECTION,'Status',readonly=True,default='draft')
-	_logger.debug('add latlng field')
 	apl_id=fields.One2many('uis.papl.apl','sup_substation_id',string='APLs')
 	conn_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='ss_conn_pillar_ids',
@@ -107,7 +107,11 @@ class uis_papl_substation(models.Model):
 									 compute='_get_near_pillar',
 									 string='Near pillars'
 									 )
-
+	
+	def _get_scheme_image_2(self,cr,uid,ids,context=None):
+		for ss in self.browse(cr,uid,ids,context=context):
+			img = Image.new("RGBA", (schemeAPL_v2.scheme_width,schemeAPL_v2.scheme_height), (255,255,255,0))
+			##Need codeS	
 	@api.depends('latitude','longitude')
 	def _get_latlng(self):
 		for ss in self:
