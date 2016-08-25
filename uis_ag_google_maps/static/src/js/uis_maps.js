@@ -171,6 +171,31 @@ function mapslib(apl_ids, div_id) {
 	var hide_context_menu=function(){
 		$('.map_contextmenu').remove();
 	};
+	var show_ps_context_menu=function(e,marker){
+		var projection;
+		var map_contextmenuDir;
+		var id=marker.id;
+		projection=thatlib.map.getProjection();
+		$('.map_contextmenu').remove();
+		map_contextmenuDir=document.createElement("div");
+		map_contextmenuDir.className='map_contextmenu';
+		map_contextmenuDir.innerHTML='<a id="cm_ps_create_new_apl" idvalue="'+id+'"><div class="menu_context">Create new APL</div></a>'
+									+'<a id="cm_ps_goto_passport" idvalue="'+id+'"><div class="menu_context">Goto passport</div></a>'
+									+'<a id="cm_ps_show_scheme" idvalue="'+id+'"><div class="menu_context">Show scheme</div></a>'
+									+'<a id="cm_ps_show_all_apl" idvalue="'+id+'"><div class="menu_context">Show all APL</div></a>'
+									+'<a id="cm_close"><div class="menu_context">Close</div></a>';
+		$(thatlib.map.getDiv()).append(map_contextmenuDir);
+		setContextMenuXY(e.latLng);
+		map_contextmenuDir.style.visibility="visible";
+		$('#cm_close').click(function(){
+                hide_context_menu();
+                });
+		$('#cm_ps_create_new_apl').click(function(){
+				var id=this.getAttribute("idvalue");
+				thatlib.ps_create_new_apl(id);
+				hide_context_menu();
+				});
+	};
 	var show_pillar_context_menu=function(e,marker){
 		var projection;
 		var map_contextmenuDir;
@@ -313,6 +338,34 @@ function mapslib(apl_ids, div_id) {
 		var marker=this;
 		show_pillar_context_menu(e,marker);
 	};
+	var onPsDragend=function(){
+		if (thatlib.editable_pillar){
+			var marker=this;
+			var point=marker.Position();
+			id=marker.id;
+			lat=point.lat();
+			lng=point.lng();
+			var data={};
+			data.ps_ids.push(id);
+			data.latitude=lat;
+			data.longitude=lng;
+			xhr=new XMLHttpRequest();
+			xhr.open('POST','/apiv1/ps/change',true);
+			xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+			xhr.send(JSON.stringify(data));
+            xhr.onload=function(){
+                thatlib.get_apl_lines_data();
+                thatlib.get_ps_data();
+            };
+		}
+	};
+	var onPsMouseOver=function(){
+        
+    };
+    var onPsMouseOut=function(){
+        
+    };
+
     var onTransDragend = function(){
         if (thatlib.editable_pillar){
             var marker =this;
@@ -771,6 +824,9 @@ function mapslib(apl_ids, div_id) {
 					rotation:cur_ps.rotation,
 					icon:this.get_ps_icon(cur_ps.rotation,cur_ps.state,false)
 				});
+				google.maps.event.addListener(this.markers.ps[cur_ps.id],'dragend', onPsDragend);
+				google.maps.event.addListener(this.markers.ps[cur_ps.id],'mouseover', onPsMouseOver);
+                google.maps.event.addListener(this.markers.ps[cur_ps.id],'mouseout', onPsMouseOut);
 			}
 			
 		}
@@ -992,6 +1048,21 @@ function mapslib(apl_ids, div_id) {
             that.get_pillar_data();
             };
 	};
+	this.ps_create_new_apl=function(pid){
+		var data={};
+		data.ps_ids.push(pid);
+		data.add_new_apl=true;
+		xhr=new XMLHttpRequest();
+        xhr.open('POST','/apiv1/ps/change', true);
+        xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+        xhr.onload=function(e){
+            //return!!!! apl_ids
+			that.get_apl_lines_data();
+            that.get_pillar_data();
+            };
+	}
 	this.get_hash=function(){
         //console.debug('Get hash');
 		var data={};

@@ -12,24 +12,22 @@ _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
 class maps_data_json(http.Controller):
-	def _get_clean_tap_ids(self,data):
+	def _get_clean_ids(self,data):
 		clean_ids=[]
-		for s in data['tap_ids']:
+		for s in data:
 			try:
 				i=int(s)
 				clean_ids.append(i)
 			except ValueError:
 				pass
 		return clean_ids
+	
+	def _get_clean_tap_ids(self,data):
+		clean_ids=_get_clean_ids(data['tap_ids'])
+		return clean_ids
 
 	def _get_clean_apl_ids(self,data):
-		clean_ids=[]
-		for s in data['apl_ids']:
-			try:
-				i=int(s)
-				clean_ids.append(i)
-			except ValueError:
-				pass
+		clean_ids=_get_clean_ids(data['apl_ids'])
 		return clean_ids
 
 	def _get_apl_lines_data(self,clean_ids):
@@ -663,7 +661,6 @@ class maps_data_json(http.Controller):
 		data=json.loads(json.dumps(request.jsonrequest))
 		pid=data['pillar_id']
 		pt,pc=False,False
-		_logger.debug(data)
 		if 'pillar_type_id' in data:
 			domain_pt=[("id","in",[data['pillar_type_id']])]
 			pt_ids=pillar_type_obj.search(cr,uid,domain_pt,context=context)
@@ -801,3 +798,33 @@ class maps_data_json(http.Controller):
 			'result':1
 		}
 		return values
+	
+	@http.route('/apiv1/ps/change',type="json",auth="public",csfr=False)
+	def api_v1_ps_change(self, *arg, **post):
+		start=datetime.datetime.now()
+		cr, uid, context=request.cr, request.uid, request.context
+		ps_obj=request.registry['uis.papl.substation']
+		clean_ids=_get_clean_ids(data['ps_ids'])
+		domain=[("id","in",clean_ids)]
+		ps_ids=apl_obj.search(cr, uid, domain, context=context)
+		lat,lng,add_new_apl,fid_no=False,False,False,None
+		pss=[]
+		if 'latitude' in data:
+			lat=data['latitude']
+		if 'longitude' in data:
+			lng=data['longitude']
+		if 'add_new_apl' in data:
+			add_new_apl=True
+		if 'fid_no' in data:
+			fid_no=data['fid_no']
+		for ps in apl_obj.browse(cr, uid, apl_ids, context=context):
+			pss.append(ps)
+			if lat:
+				ps.latitude=lat
+			if lng:
+				ps.longitude=lng
+			if add_new_apl:
+				apls=ps.add_apl(cr,uid,ids,context=context)
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.debug('Changes in ps (%r) in %r seconds'%(pss,elapsed.total_seconds()))

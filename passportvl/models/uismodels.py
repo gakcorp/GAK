@@ -124,6 +124,7 @@ class uis_papl_substation(models.Model):
 		#napl=self.pool.get('uis.papl.apl').create(cr,uid,{'name':apl_name},context=context)
 		tlen=len(self.browse(cr,uid,[],context=context))
 		_logger.debug(tlen)
+		apls=[]
 		for ss in self.browse(cr,uid,ids,context=context):
 			_logger.debug(ss)
 			napl=re_apl.create({'name':apl_name})
@@ -148,6 +149,8 @@ class uis_papl_substation(models.Model):
 			spil.pillar_type_id=1
 			_logger.debug('Create APL %r, Tap %r, Pillar 1 %r , Pillar 2 %r '%(napl,ntap,fpil,spil))
 			ss.apl_id=[(4, napl.id,0)]
+			apls.append(napl.id)
+		return apls
 			
 			
 	def _get_near_pillar(self,cr,uid,ids,context=None):
