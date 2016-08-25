@@ -53,7 +53,7 @@
 					<field name="name"/>
 					<field name="desc"/>
 					<field name="var"/>
-					<field name="value" type="char"/>
+					<field name="char_value"/>
 					<field name="enabled"/>
 				</tree>
 			</field>

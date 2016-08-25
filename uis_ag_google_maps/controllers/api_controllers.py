@@ -631,8 +631,8 @@ class maps_data_json(http.Controller):
 		pillar_cut_obj=request.registry['uis.papl.pillar.cut']
 		data=json.loads(json.dumps(request.jsonrequest))
 		pid=data['pillar_id']
-		cnt=data['pillar_cnt']
 		pt,pc=False,False
+		_logger.debug(data)
 		if 'pillar_type_id' in data:
 			domain_pt=[("id","in",[data['pillar_type_id']])]
 			pt_ids=pillar_type_obj.search(cr,uid,domain_pt,context=context)
@@ -641,6 +641,8 @@ class maps_data_json(http.Controller):
 			domain_pc=[("id","in",[data['pillar_cut_id']])]
 			pc_ids=pillar_type_obj.search(cr,uid,domain_pc,context=context)
 			pc=pillar_cut_obj.browse(cr,uid,pc_ids,context=context)[0]
+		_logger.debug(pt)
+		_logger.debug(pc)
 		domain=[("id","in",[pid])]
 		pillar_ids=pillar_obj.search(cr, uid, domain, context=context)
 		pcnt=0
@@ -656,9 +658,9 @@ class maps_data_json(http.Controller):
 		values={
 			'result':1
 		}
-		stop=datetime.datetime.now()s
+		stop=datetime.datetime.now()
 		elapsed=stop-start
-		_logger.info('Change pillar types (%r) and cut (&r) for %r pillars in %r seconds'%(pt,pc,pcnt,elapsed.total_seconds()))
+		_logger.debug('Change pillar types (%r) and cut (%r) for %r pillars in %r seconds'%(pt,pc,pcnt,elapsed.total_seconds()))
 		return values
 	@http.route('/apiv1/pillar/add_pillar_to_prev',type="json", auth="public", csfr=False)
 	def api_v1_pillar_add_pillar_to_prev(self, *arg, **post):

@@ -91,7 +91,7 @@ class uis_papl_substation(models.Model):
 	latlng=fields.Float(digits=(2,6),compute='_get_latlng',string="LatxLng")
 	photo=fields.Binary(string='Photo')
 	image_scheme=fields.Binary(string='Principal Scheme')
-	apl_scheme=fields.Binary(string="APLs Scheme" compute='_get_apl_scheme')
+	apl_scheme=fields.Binary(string="APLs Scheme", compute='_get_apl_scheme')
 	state=fields.Selection(UNI_STATE_SELECTION,'Status',readonly=True,default='draft')
 	apl_id=fields.One2many('uis.papl.apl','sup_substation_id',string='APLs')
 	conn_pillar_ids=fields.Many2many('uis.papl.pillar',

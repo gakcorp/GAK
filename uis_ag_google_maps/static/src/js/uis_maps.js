@@ -208,7 +208,7 @@ function mapslib(apl_ids, div_id) {
 				thatlib.settings.pillar_cut.forEach(function(item){
 					str=str+'<option value="'+item.id+'">'+item.name+'</option>';
 					});
-				str=str+'</select><center><br><button type="button" class="btn btn-success" id="cm_chptb_button">Create</button>';
+				str=str+'</select><center><br><button type="button" class="btn btn-success" id="cm_chptb_button">Change</button>';
 				str=str+'<button type="button" class="btn btn-danger" id="cm_chptb_cancel_button">Cancel</button></center>';
 				str=str+'</div>';
 				map_contextmenuDir.innerHTML=str;

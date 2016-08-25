@@ -13,8 +13,18 @@ class uis_global_settings(models.Model):
 	name=fields.Char(string='Name')
 	var=fields.Char(string='Variable')
 	desc=fields.Text(string='Description')
+	char_value=fields.Text(string='Value', compute='_get_char_value')
 	value=fields.Text(string='Value')
 	enabled=fields.Boolean(string="Enabled")
+	
+	@api.depends('value')
+	def _get_char_value(self):
+		for gs in self:
+			chstr=gs.value
+			if len(chstr)>100:
+				chstr=chstr[:100]+'...'
+			gs.char_value=chstr
+		return True
 	
 class uis_settings(models.Model):
 	_name='uis.settings'
