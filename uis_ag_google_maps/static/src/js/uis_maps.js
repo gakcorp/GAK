@@ -20,12 +20,14 @@ function mapslib(apl_ids, div_id) {
 	this.apl_list=[];
     this.lines_data=[];
     this.trans_data=[];
+	this.ps_data=[];
     this.layers=[];
     this.markers=[];
     this.lines=[];
     this.apls=[];
     this.markers.pillars=[];
     this.markers.trans=[];
+	this.markers.ps=[];
     this.settings=[];
     this.settings.pillar_icon=[];
 	this.settings.layers=[];
@@ -37,6 +39,7 @@ function mapslib(apl_ids, div_id) {
     this.showpillar=false;
     this.showpillarzoom=14;
     this.showtranszoom=12;
+	this.showpszoom=12;
 	this.editable_pillar=true;
     this.bounds=new google.maps.LatLngBounds();
     this.center_loc = new google.maps.LatLng(56,56);
@@ -44,6 +47,7 @@ function mapslib(apl_ids, div_id) {
     this.hash.apl_data='n/d';
     this.hash.pillar_data='n/d';
     this.hash.trans_data='n/d';
+	this.hash.ps_data='n/d';
 	px1=0;
 	px2=0;
 	py1=0;
@@ -558,6 +562,47 @@ function mapslib(apl_ids, div_id) {
         };
         return pci;
     };
+	this.get_ps_icon=function(rotation,state,selectable){
+		var color='blue';
+        switch (state.toUpperCase()){
+            case 'DRAFT':
+                color='green';
+                break;
+            case 'EXPLOITATION':
+                color='black';
+                break;
+            case 'DEFECT':
+                color='yellow';
+                break;
+            case 'MAINTENANCE':
+                color='blue';
+                break;
+            case 'REPAIRS':
+                color='red';
+                break;
+        }
+        var fillOpacity=0;
+        if (selectable){
+            fillOpacity=1;
+        }
+		var z1=15;
+        var z2=19;
+        var x1=0.15;
+        var x2=1;
+        var z=this.map.getZoom();
+        var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
+        var pci={
+            path: this.settings.global_var['ps_icon_path'],
+            fillColor:'red',
+            fillOpacity:fillOpacity,
+            scale:scalez,
+            strokeColor:color,
+            strokeWeight:2,
+            anchor: new google.maps.Point(50,50),
+			rotation:rotation
+        };
+        return pci;
+	}
     this.get_pillar_icon=function(apl_id,pic,type,rotation,state,selectable){
         var color='blue';
         //if (!this.settings.pillar_icon[pic].stroke_color){color=this.settings.pillar_icon[pic].stroke_color;}
@@ -633,6 +678,13 @@ function mapslib(apl_ids, div_id) {
                 }
         }
     };
+	this.set_show_ps=function(vis){
+		for (var i=0;i<thatlib.ps_data.counter;i++){
+			if (typeof thatlib.markers.ps[thatlib.ps_data.ps[i].id] != "undefined"){
+				thatlib.markers.ps[thatlib.ps_data.ps[i].id].setVisible(vis);
+			}
+		}
+	};
     this.set_show_trans=function(vis){
         for (var i=0; i < thatlib.trans_data.counter;i++){
             if (typeof thatlib.markers.trans[thatlib.trans_data.trans[i].id] != "undefined"){
@@ -696,6 +748,33 @@ function mapslib(apl_ids, div_id) {
                     'tap_count':"N/A" #Change to counter
                     })*/
     };
+	this.set_ps_markers=function(){
+		for(var i=0;i<this.ps_data.counter;i++){
+			cur_ps=this.ps_data.ps[i];
+			var location={};
+			if (cur_ps.latitude && cur_ps.longitude){
+                location = new google.maps.LatLng(cur_ps.latitude, cur_ps.longitude);
+                }
+			if (typeof this.markers.ps[cur_ps.id] != 'undefined'){
+				cur_marker=this.markers.ps[cur_ps.id];
+				this.markers.ps[cur_ps.id].setIcon(this.get_ps_icon(cur_ps.rotation,cur_ps.state,false));
+				//!!! Changes coordinate, changes state
+			}
+			else{
+				this.markers.ps[cur_ps.id]=new google.maps.Marker({
+					id:cur_ps.id,
+					map:this.map,
+					draggable:true,
+					position:location,
+					visible:true,
+					state:cur_ps.state,
+					rotation:cur_ps.rotation,
+					icon:this.get_ps_icon(cur_ps.rotation,cur_ps.state,false)
+				});
+			}
+			
+		}
+	};
     this.set_trans_markers=function(){
         for (var i=0;i<this.trans_data.counter; i++){
             cur_trans=this.trans_data.trans[i];
@@ -957,6 +1036,19 @@ function mapslib(apl_ids, div_id) {
                 that.get_trans_data();
             }
         };
+		xhr_ps=new XMLHttpRequest();
+		xhr_ps.open('POST','/apiv1/ps/data/hash',true);
+        xhr_ps.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr_ps.send(JSON.stringify(data));
+        xhr_ps.onload=function(e){
+            var res=JSON.parse(this.response);
+            var hash=JSON.parse(res.result.hash_ps);
+            //console.debug(hash);
+            if (that.hash.ps_data!=hash){
+                that.hash.ps_data=hash;
+                that.get_ps_data();
+            }
+        };
     }
     this.get_apl_lines_data=function(){
         var data={};
@@ -977,6 +1069,21 @@ function mapslib(apl_ids, div_id) {
 
             };
     };
+	this.get_ps_data=function(){
+		var data={};
+		data.apl_ids=this.apl_ids;
+		xhr=new XMLHttpRequest();
+		xhr.open('POST','/apiv1/ps/data',true);
+		xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(data));
+        var that=this;
+        xhr.onload=function(e){
+            var res=JSON.parse(this.response);
+            var pd=JSON.parse(res.result.ps_data);
+            that.ps_data=pd;
+            that.set_ps_markers();
+            };
+	};
     this.get_trans_data=function(){
         var data={};
         data.apl_ids=this.apl_ids;
@@ -1155,8 +1262,11 @@ function mapslib(apl_ids, div_id) {
 		this.settings.global_var.auto_refresh_time=60;
 		this.settings.global_var.photo_icon_path="M20 48 L20 64 L44 64 L44 48 L36 48 L64 0 L0 0 L28 48 Z";
 		this.settings.global_var.push('photo_icon_path');
-		this.settings.global_var.photo_point_icon="M-3,3 3,-3 M-3,-3 3,3"
+		this.settings.global_var.photo_point_icon="M-3,3 3,-3 M-3,-3 3,3";
 		this.settings.global_var.push('photo_point_icon');
+		this.settings.global_var.ps_icon_path="M0,0 0,20 20,20 20,0 z";
+		this.settings.global_var.push('ps_icon_path');
+		
 		
 	};
     this.init=function(){
@@ -1178,6 +1288,7 @@ function mapslib(apl_ids, div_id) {
 			var zoom = thatlib.map.getZoom();
             that.set_trans_markers();
             that.set_pillar_markers();
+			that.set_ps_markers();
             that.show_status_bar();
             if (zoom <= that.showpillarzoom) {
                that.set_show_pillar(false);
@@ -1188,6 +1299,11 @@ function mapslib(apl_ids, div_id) {
                that.set_show_trans(false);
             } else {
                that.set_show_trans(true);
+            }
+			if (zoom <= that.showpszoom) {
+               that.set_show_ps(false);
+            } else {
+               that.set_show_ps(true);
             }
         });
         //this.set_map_center(this.pillar_data.latitude,this.pillar_data.longitude);

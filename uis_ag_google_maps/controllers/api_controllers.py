@@ -92,6 +92,20 @@ class maps_data_json(http.Controller):
 						'apl_name':pillarid.apl_id.name,
 						'tap_name':pillarid.tap_id.name
 					})
+			for pil in apl_id.sup_substation_id.conn_pillar_ids:
+				if pil.apl_id==apl_id:
+					lines_data["counter"]=lines_data["counter"]+1
+					lines_data["lines"].append({
+						'line_id':"S_"+str(apl_id.sup_substation_id.id)+str(pil.id),
+						'lat1':apl_id.sup_substation_id.latitude,
+						'long1':apl_id.sup_substation_id.longitude,
+						'lat2':pil.latitude,
+						'long2':pil.longitude,
+						'tap_id':pil.tap_id.id,
+						'apl_id':pil.apl_id.id,
+						'apl_name':pil.apl_id.name,
+						'tap_name':pil.tap_id.name
+					})
 		#'Return for APL %r Photo %r near Pillar %r' % (pil.apl_id.id, ph.id, pil.name)
 		return apl_data,lines_data
 
@@ -163,11 +177,28 @@ class maps_data_json(http.Controller):
 		return pillar_data
 	def _get_ps_data(self,clean_ids):
 		cr, uid,context=request.cr,request.uid,request.context
+		pss=[]
 		ps_data={
 			"counter":0,
 			"ps":[]
 		}
-		#!!!!!!!!!!!!!!!!!!!!!!!!!!
+		apl_obj=request.registry['uis.papl.apl']
+		domain=[("id","in",clean_ids)]
+		apl_ids=apl_obj.search(cr,uid,domain,context=context)
+		for apl in apl_obj.browse(cr,uid,apl_ids,context=context):
+			ss=apl.sup_substation_id
+			if not(ss in pss):
+				pss.append(ss)
+				ps_data["counter"]=ps_data["counter"]+1
+				ps_data["ps"].append({
+					'id':ss.id,
+					'name':ss.name,
+					'state':ss.state,
+					'rotation':0,
+					'department':ss.department_id.name,
+					'latitude':ss.latitude,
+					'longitude':ss.longitude
+				})
 		return ps_data
 	def _get_trans_data(self,clean_ids):
 		cr, uid,context=request.cr,request.uid,request.context
@@ -532,10 +563,10 @@ class maps_data_json(http.Controller):
 		elapsed=stop-start
 		_logger.info('Generate PILLAR data in %r seconds'%elapsed.total_seconds())
 		return values
-	@http.route('/apiv1/ps/data',type="json",auth="publc",csfr=False)
+	@http.route('/apiv1/ps/data',type="json",auth="public",csfr=False)
 	def api_v1_ps_data(self, *arg, **post):
 		start=datetime.datetime.now()
-		data=json.loads(kson.dumps(request.jsonrequest))
+		data=json.loads(json.dumps(request.jsonrequest))
 		clean_ids=self._get_clean_apl_ids(data)
 		ps_data=self._get_ps_data(clean_ids)
 		values={
@@ -543,7 +574,7 @@ class maps_data_json(http.Controller):
 		}
 		stop=datetime.datetime.now()
 		elapsed=stop-start
-		_logger.info('Generate PS date in %r seconds'%elapsed.total_seconds())
+		_logger.info('Generate PS data for apl_ids (%r) in %r seconds'%(clean_ids,elapsed.total_seconds()))
 		return values
 	@http.route('/apiv1/trans/data', type="json", auth="public", csfr=False)
 	def api_v1_trans_data(self, *arg, **post):
