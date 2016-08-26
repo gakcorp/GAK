@@ -98,6 +98,7 @@ class uis_papl_substation(models.Model):
 									 relation='ss_conn_pillar_ids',
 									 column1='substation_id',
 									 column2='pillar_id',
+									 #domain="[('id','in',near_pillar_ids[0][2])]",
 									 domain="[('id','in',near_pillar_ids[0][2])]",
 									 string="Connected pollars")
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',

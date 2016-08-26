@@ -12,7 +12,8 @@ _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
 class maps_data_json(http.Controller):
-	def _get_clean_ids(self,data):
+	global _get_clean_ids
+	def _get_clean_ids(data):
 		clean_ids=[]
 		for s in data:
 			try:
@@ -804,9 +805,12 @@ class maps_data_json(http.Controller):
 		start=datetime.datetime.now()
 		cr, uid, context=request.cr, request.uid, request.context
 		ps_obj=request.registry['uis.papl.substation']
+		data=json.loads(json.dumps(request.jsonrequest))
+		_logger.debug(data)
 		clean_ids=_get_clean_ids(data['ps_ids'])
+		_logger.debug(clean_ids)
 		domain=[("id","in",clean_ids)]
-		ps_ids=apl_obj.search(cr, uid, domain, context=context)
+		ps_ids=ps_obj.search(cr, uid, domain, context=context)
 		lat,lng,add_new_apl,fid_no=False,False,False,None
 		pss=[]
 		if 'latitude' in data:
@@ -817,14 +821,14 @@ class maps_data_json(http.Controller):
 			add_new_apl=True
 		if 'fid_no' in data:
 			fid_no=data['fid_no']
-		for ps in apl_obj.browse(cr, uid, apl_ids, context=context):
+		for ps in ps_obj.browse(cr, uid, ps_ids, context=context):
 			pss.append(ps)
 			if lat:
 				ps.latitude=lat
 			if lng:
 				ps.longitude=lng
 			if add_new_apl:
-				apls=ps.add_apl(cr,uid,ids,context=context)
+				apls=ps.add_apl()
 		stop=datetime.datetime.now()
 		elapsed=stop-start
 		_logger.debug('Changes in ps (%r) in %r seconds'%(pss,elapsed.total_seconds()))

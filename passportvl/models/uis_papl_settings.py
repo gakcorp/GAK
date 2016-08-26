@@ -34,6 +34,17 @@ class uis_settings(models.Model):
 	auto_magnetic_pillar_to_tap=fields.Boolean(string='Auto magnetic pillar to line of tap', default=True)
 	google_elevation_API=fields.Char(string='Google elevation API')
 
+class uis_settings_apl_view(models.Model):
+	_name='uis.papl.view.settings.apl'
+	_description='Settings foe view apl lines'
+	def_show=fields.Boolean(string='Default_view')
+	stroke_width=fields.Integer(string='Stroke width')
+	stroke_color=fields.Char(string="Stroke color")
+	symbol_path=fields.Char(string="Symbol path")
+	symbol_repeat=fields.Integer(string="Symol repeat")
+	voltage=fields.Integer(string="Voltage")
+	enabled=field.Boolean(string="Enabled")
+	
 class uis_settings_pillar_icon(models.Model):
 	_name='uis.icon.settings.pillar'
 	_description='Icons and SVG path for pillars'

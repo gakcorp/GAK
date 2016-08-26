@@ -341,14 +341,18 @@ function mapslib(apl_ids, div_id) {
 	var onPsDragend=function(){
 		if (thatlib.editable_pillar){
 			var marker=this;
-			var point=marker.Position();
+			var point=marker.getPosition();
 			id=marker.id;
 			lat=point.lat();
 			lng=point.lng();
 			var data={};
-			data.ps_ids.push(id);
+			var ps_ids=[];
+			ps_ids.push(id);
+			data.ps_ids=ps_ids;
 			data.latitude=lat;
 			data.longitude=lng;
+			console.debug(data);
+			console.debug(JSON.stringify(data));
 			xhr=new XMLHttpRequest();
 			xhr.open('POST','/apiv1/ps/change',true);
 			xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
@@ -359,6 +363,10 @@ function mapslib(apl_ids, div_id) {
             };
 		}
 	};
+	var onPsRightClick = function(e){
+		var marker=this;
+		show_ps_context_menu(e,marker);
+	}
 	var onPsMouseOver=function(){
         
     };
@@ -827,6 +835,7 @@ function mapslib(apl_ids, div_id) {
 				google.maps.event.addListener(this.markers.ps[cur_ps.id],'dragend', onPsDragend);
 				google.maps.event.addListener(this.markers.ps[cur_ps.id],'mouseover', onPsMouseOver);
                 google.maps.event.addListener(this.markers.ps[cur_ps.id],'mouseout', onPsMouseOut);
+				google.maps.event.addListener(this.markers.ps[cur_ps.id], 'rightclick', onPsRightClick);
 			}
 			
 		}
@@ -1050,7 +1059,9 @@ function mapslib(apl_ids, div_id) {
 	};
 	this.ps_create_new_apl=function(pid){
 		var data={};
-		data.ps_ids.push(pid);
+		var ps_ids=[];
+		ps_ids.push(pid);
+		data.ps_ids=ps_ids;
 		data.add_new_apl=true;
 		xhr=new XMLHttpRequest();
         xhr.open('POST','/apiv1/ps/change', true);

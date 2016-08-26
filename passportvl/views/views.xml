@@ -454,7 +454,7 @@
 	  <field name="name">Power Substation List</field>
 	  <field name="model">uis.papl.substation</field>
 	  <field name="arch" type="xml">
-		<tree string="List of Power Substation" editable="false" create="false" edit="false">
+		<tree string="List of Power Substation" editable="false" create="true" edit="false">
 		  <field name="id"/>
 		  <field name="name" string="Substation Name"/>
 		  <field name="apl_id" string="APLs" widget='one2many'/>
@@ -498,6 +498,7 @@
 						<br/>
 						<label for="apl_id"/>
 						<field name="apl_id" widget="many2many_kanban"/>
+						<!--<field name="apl_id"/>!-->
 					</sheet>
 				</page>
 				<page string="Scheme">
@@ -512,7 +513,7 @@
 							<field name="near_pillar_ids" widget="many2many_tags"/>
 						</group>
 						<group string="Connected Pillars">
-							<field name="conn_pillar_ids" widget="many2many_checkboxes"/>
+							<field name="conn_pillar_ids" attrs="{'invisible':[('near_pillar_ids','=',False)]}"/><!--widget="many2many_checkboxes"!-->
 						</group>	
 					</group>
 					
