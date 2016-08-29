@@ -511,7 +511,28 @@ class maps_data_json(http.Controller):
 		elapsed=stop-start
 		_logger.info('Generate Pillar icon list in %r seconds'%elapsed.total_seconds())
 		return values
-			
+	@http.route('/apiv1/settings/line_display_list',type="json",auth="public", csfr=False)
+	def api_v1_line_display_list(self, *arg, **post):
+		start=datetime.datetime.now()
+		data=json.loads(json.dumps(request.jsonrequest))
+		cr,uid,context=request.cr,request.uid,request.context
+		ld_obj=request.registry['uis.papl.view.settings.apl']
+		domain=[("enabled","=",True)]
+		ld_ids=ld_obj.search(cr,uid,domain,context=context)
+		ld_data={
+			"counter":0,
+			"lds":[]
+		}
+		for ld in ld_obj.browse(cr,uid,ld_ids,context=context):
+			ld_data.id
+			#!!!!!!!!!Add code
+		values={
+			'ld_data':json.dumps(ld_data)
+		}
+		stop=datetime.datetime.now()
+		elapsed=stop-start
+		_logger.info('Generate Line display data in %r seconds'%elapsed.total_seconds())
+		return values
 	#Define List functions
 	@http.route('/apiv1/apl/list',type="json", auth="public", csfr=False)
 	def api_v1_apl_list(self,*arg, **post):

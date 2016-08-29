@@ -38,12 +38,22 @@ class uis_settings_apl_view(models.Model):
 	_name='uis.papl.view.settings.apl'
 	_description='Settings foe view apl lines'
 	def_show=fields.Boolean(string='Default_view')
+	line_code=fields.Char(string="Line code", compute="_def_line_code", store=True)
 	stroke_width=fields.Integer(string='Stroke width')
 	stroke_color=fields.Char(string="Stroke color")
 	symbol_path=fields.Char(string="Symbol path")
-	symbol_repeat=fields.Integer(string="Symol repeat")
+	symbol_repeat=fields.Integer(string="Symbol repeat")
 	voltage=fields.Integer(string="Voltage")
+	apl_type=fields.Char(string="Type of APL")
+	add_attribute=fields.Char(string="add atribute")
 	enabled=field.Boolean(string="Enabled")
+	
+	@api.depends('voltage','apl_type')
+	def _dwf_line_code(self):
+		for sav in self:
+			sav.line_code=str(sav.voltage)+'_'+str(sav.apl_type)
+			if sav.def_show:
+				sav.line_code="DEF"
 	
 class uis_settings_pillar_icon(models.Model):
 	_name='uis.icon.settings.pillar'

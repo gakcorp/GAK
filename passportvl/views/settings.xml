@@ -58,6 +58,22 @@
 				</tree>
 			</field>
 		</record>
+		<record model="ir.ui.view" id="uis_line_view_list">
+			<field name="name">Line display settings list</field>
+			<field name="model">uis.papl.view.settings.apl</field>
+			<field name="arch" type="xml">
+				<tree string="Line display settings list" editable="top" create="true" edit="false">
+					<field name="id"/>
+					<field name="line_code"/>
+					<field name="voltage"/>
+					<field name="apl_type"/>
+					<field name="stroke_width"/>
+					<field name="stroke_color"/>
+					<field name="symbol_path"/>
+					<field name="symbol_repeat"/>					
+				</tree>
+			</field>
+		</record>
 		<record model="ir.ui.view" id="uis_pillar_icon_list">
 			<field name="name">Pillar icon list</field>
 			<field name="model">uis.icon.settings.pillar</field>
