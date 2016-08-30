@@ -46,12 +46,18 @@ class uis_settings_apl_view(models.Model):
 	voltage=fields.Integer(string="Voltage")
 	apl_type=fields.Char(string="Type of APL")
 	add_attribute=fields.Char(string="add atribute")
-	enabled=field.Boolean(string="Enabled")
+	enabled=fields.Boolean(string="Enabled")
 	
 	@api.depends('voltage','apl_type')
-	def _dwf_line_code(self):
+	def _def_line_code(self):
 		for sav in self:
-			sav.line_code=str(sav.voltage)+'_'+str(sav.apl_type)
+			atype="ND"
+			avolt="ND"
+			if sav.apl_type:
+				atype=sav.apl_type
+			if sav.voltage:
+				avolt=str(sav.voltage)
+			sav.line_code=avolt+'_'+atype
 			if sav.def_show:
 				sav.line_code="DEF"
 	

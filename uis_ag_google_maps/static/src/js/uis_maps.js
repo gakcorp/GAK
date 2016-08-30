@@ -36,6 +36,7 @@ function mapslib(apl_ids, div_id) {
 	this.settings.apl_list=[];
 	this.settings.global=[];
 	this.settings.global_var=[];
+	this.settings.line_display=[];
     this.showpillar=false;
     this.showpillarzoom=14;
     this.showtranszoom=12;
@@ -779,13 +780,29 @@ function mapslib(apl_ids, div_id) {
             if (typeof this.lines[i] != "undefined"){
                 this.lines[i].setMap(null);
                 }
+			voltage=this.apls[line.apl_id].voltage;
+			apl_type=this.apls[line.apl_id].type;
+			code=voltage+"_"+apl_type;
+			if (this.settings.line_display.indexOf(code)<0){code="DEF";}
+			var lineSymbol={
+				path:'M 0,0 0,10',
+				strokeOpacity:1,
+				strokeWeight:2,
+				scale:1
+			};
+			//console.debug(this.settings.line_display[code]);
             this.lines[i]=new google.maps.Polyline({
                 path: [
                     new google.maps.LatLng(line.lat1, line.long1), 
                     new google.maps.LatLng(line.lat2, line.long2)
                 ],
+				icons:[{
+					icon:lineSymbol,
+					offset:'0',
+					repeat:'20px'
+				}],
                 strokeColor: this.get_line_color(false),//"#0000FF",
-                strokeOpacity: 1.0,
+                strokeOpacity: 0,
                 strokeWeight: 2,
                 map: this.map,
                 apl_id: line.apl_id,
@@ -991,6 +1008,15 @@ function mapslib(apl_ids, div_id) {
         $("#pillar_count_badge").html(this.pillar_data.counter);
     };
     //Get data functions
+	
+	var req_to_server=function(type,addr,data){
+		xhr=new XMLHttpRequest();
+		xhr.open(type,addr,true);
+		xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+		xhr.send(JSON.stringify(data));
+		return xhr;
+	};
+	
 	this.send_change_pillar=function(data){
 		xhr=new XMLHttpRequest();
         xhr.open('POST','/apiv1/pillar/change_pillar', true);
@@ -1300,6 +1326,19 @@ function mapslib(apl_ids, div_id) {
             }
         };
     };
+
+	this.get_settings_apl_display=function(){
+		var data={};
+		rxhr=req_to_server('POST','/apiv1/settings/line_display_list',data);
+		var that=this;
+		rxhr.onload=function(e){
+			var res=JSON.parse(this.response);
+			var ld=JSON.parse(res.result.ld_data);
+			ld.lds.forEach(function(item){
+					that.settings.line_display[item.code]=item;
+					});
+		};
+	};
 	this.get_settings_pillar_cut_list=function(){
 		var data={};
 		xhr=new XMLHttpRequest();
@@ -1338,6 +1377,7 @@ function mapslib(apl_ids, div_id) {
 	   this.get_settings_pillar_type_list();
 	   this.get_settings_pillar_cut_list();
 	   this.get_settings_global();
+	   this.get_settings_apl_display();
     };
 	this.init_global_vars=function(){
 		this.settings.global_var.push('auto_refresh_time');

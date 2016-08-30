@@ -524,8 +524,14 @@ class maps_data_json(http.Controller):
 			"lds":[]
 		}
 		for ld in ld_obj.browse(cr,uid,ld_ids,context=context):
-			ld_data.id
-			#!!!!!!!!!Add code
+			ld_data["counter"]=ld_data["counter"]+1
+			ld_data["lds"].append({
+				'code':ld.line_code,
+				'stroke_width':ld.stroke_width,
+				'symbol_path':ld.symbol_path,
+				'symbol_repeat':ld.symbol_repeat,
+				'stroke_color':ld.stroke_color
+			})
 		values={
 			'ld_data':json.dumps(ld_data)
 		}

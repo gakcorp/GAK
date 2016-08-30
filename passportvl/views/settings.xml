@@ -37,12 +37,23 @@
 				<p class="oe_view_nocontent_create">Create new pillar type</p>
 			</field>
 		</record>
+		
+		<record id="uis_papl_view_settings_apl_action_window" model="ir.actions.act_window">
+			<field name="name">APL display settings</field>
+			<field name="res_model">uis.papl.view.settings.apl</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Create new apl display view</p>
+			</field>
+		</record>
 		<!-- Menu items!-->
         <menuitem name="aGIS Settings" id="uis_settings_menu_root"/>
 		<menuitem name="Settings" id="uis_main_settings_menu" parent="uis_settings_menu_root" action="uis_main_settings_action_window"/>
 		<menuitem name="Global Settings" id="uis_global_settings_menu" parent="uis_settings_menu_root" action="uis_global_settings_action_window"/>
 		<menuitem name="Pillar Icons" id="uis_pillar_icon_settings_menu" parent="uis_settings_menu_root" action="uis_icon_settings_action_window"/>
 		<menuitem name="Pillar Types" id="uis_pillar_type_settings_menu" parent="uis_settings_menu_root" action="uis_pillar_type_settings_action_window"/>
+		<menuitem name="APL display settings" id="uis_papl_view_settings_apl_menu" parent="uis_settings_menu_root" action="uis_papl_view_settings_apl_action_window"/>
 		<!-- views !-->
 		<record model="ir.ui.view" id="uis_global_settings_list">
 			<field name="name">Global settings list</field>
@@ -62,7 +73,7 @@
 			<field name="name">Line display settings list</field>
 			<field name="model">uis.papl.view.settings.apl</field>
 			<field name="arch" type="xml">
-				<tree string="Line display settings list" editable="top" create="true" edit="false">
+				<tree string="Line display settings list" editable="top" create="true" edit="false" colors="red:enabled!=True">
 					<field name="id"/>
 					<field name="line_code"/>
 					<field name="voltage"/>
@@ -70,7 +81,8 @@
 					<field name="stroke_width"/>
 					<field name="stroke_color"/>
 					<field name="symbol_path"/>
-					<field name="symbol_repeat"/>					
+					<field name="symbol_repeat"/>
+					<field name="enabled"/>
 				</tree>
 			</field>
 		</record>
