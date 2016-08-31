@@ -11,7 +11,7 @@ $.getScript("../uis_ag_google_maps/static/src/js/infobubble/infobubble.js",funct
 
 
 function mapslib(apl_ids, div_id) {
-    this.center_loc='';
+	this.center_loc='';
 	this.map_div_id=div_id;
     this.first_load=true;
     this.apl_ids=apl_ids;
@@ -38,6 +38,7 @@ function mapslib(apl_ids, div_id) {
 	this.settings.global_var=[];
 	this.settings.line_display=[];
     this.showpillar=false;
+	this.animated=true;
     this.showpillarzoom=14;
     this.showtranszoom=12;
 	this.showpszoom=12;
@@ -49,6 +50,7 @@ function mapslib(apl_ids, div_id) {
     this.hash.pillar_data='n/d';
     this.hash.trans_data='n/d';
 	this.hash.ps_data='n/d';
+	this.cur_bounds=[];
 	px1=0;
 	px2=0;
 	py1=0;
@@ -575,7 +577,7 @@ function mapslib(apl_ids, div_id) {
             line=this.lines[i];
             if (line.apl_id===apl_id){
                 this.lines[i].setOptions({
-                    strokeColor:this.get_line_color(mark)
+                    strokeColor:this.get_line_color(this.lines[i].color,mark)
                 });
             }
         }
@@ -724,8 +726,8 @@ function mapslib(apl_ids, div_id) {
         return pci;
     };
     
-    this.get_line_color=function(selectable){
-        var color="#000099";
+    this.get_line_color=function(clr,selectable){
+        var color=clr;
         if (selectable){
             color="#00FFFF";
         }
@@ -757,7 +759,33 @@ function mapslib(apl_ids, div_id) {
     };
     
     //SET markers, transformators and lines functions
-    
+    this.ani_line=function(){
+		var count=0;
+		that=this;
+		window.setInterval(function(){
+			z=that.map.getZoom();
+			if ((that.animated)&&(z>that.showpillarzoom)){
+				var z1=13;
+				var z2=19;
+				var x1=0.07;
+				var x2=0.7;
+				var z=that.map.getZoom();
+				var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
+				count=(count+4)%20;
+					that.lines.forEach(function(item){
+					//console.debug(item);
+					//console.debug(that.cur_bounds);
+					if (((item.lat1>=that.cur_bounds.south)&&(item.lat1<=that.cur_bounds.north))||((item.lat2>=that.cur_bounds.south)&&(item.lat2<=that.cur_bounds.north))){
+						var icons=item.get('icons');
+						icons[0].offset=(0+(count))*scalez+'px';
+						//console.debug(count);
+						item.set('icons',icons);	
+						}
+					
+					});	
+				}
+			},150);
+	};
     this.set_lines=function(){
         for (var j=0; j<this.apl_data.counter;j++){
             apl=this.apl_data.apls[j];
@@ -783,35 +811,59 @@ function mapslib(apl_ids, div_id) {
 			voltage=this.apls[line.apl_id].voltage;
 			apl_type=this.apls[line.apl_id].type;
 			code=voltage+"_"+apl_type;
-			if (this.settings.line_display.indexOf(code)<0){code="DEF";}
+			//console.debug(code);
+			if (this.settings.line_display[code]===undefined){code="DEF";}
+			var z1=13;
+			var z2=19;
+			var x1=0.07;
+			var x2=0.7;
+			var z=this.map.getZoom();
+			var scalez=(z*(x2-x1)-z1*x2+x1*z2)/(z2-z1);
 			var lineSymbol={
 				path:'M 0,0 0,10',
 				strokeOpacity:1,
 				strokeWeight:2,
-				scale:1
+				scale:scalez
 			};
+			var color="#0000FF";
+			var weight=2;
+			set_path=this.settings.line_display[code].symbol_path;
+			if (set_path!==undefined){lineSymbol.path=set_path;}
+			set_color=this.settings.line_display[code].stroke_color;
+			if (set_color!==undefined){color=set_color;}
+			set_weight=this.settings.line_display[code].stroke_width;
+			if ((set_weight!==undefined)&&(set_weight>0)){weight=set_weight;lineSymbol.strokeWeight=set_weight;}
+			var strokeOpacity=1;
+			if (z>this.showpillarzoom){strokeOpacity=0;}
+			//console.debug(lineSymbol);
 			//console.debug(this.settings.line_display[code]);
             this.lines[i]=new google.maps.Polyline({
                 path: [
-                    new google.maps.LatLng(line.lat1, line.long1), 
-                    new google.maps.LatLng(line.lat2, line.long2)
+                    new google.maps.LatLng(line.lat2, line.long2), 
+                    new google.maps.LatLng(line.lat1, line.long1)
                 ],
 				icons:[{
 					icon:lineSymbol,
-					offset:'0',
-					repeat:'20px'
+					offset:'5%',
+					repeat:20*scalez+'px'
 				}],
-                strokeColor: this.get_line_color(false),//"#0000FF",
-                strokeOpacity: 0,
-                strokeWeight: 2,
+                strokeColor: this.get_line_color(color,false),//"#0000FF",
+                strokeOpacity: strokeOpacity,
+                strokeWeight: weight,
                 map: this.map,
                 apl_id: line.apl_id,
-                tap_id: line.tap_id
+                tap_id: line.tap_id,
+				lat1:line.lat1,
+				lat2:line.lat2,
+				long1:line.long1,
+				long2:line.long2,
+				color:color
                 });
             google.maps.event.addListener(this.lines[i],'mouseover', onLineMouseOver);
             google.maps.event.addListener(this.lines[i],'mouseout', onLineMouseOut);
             google.maps.event.addListener(this.lines[i],'click',onLineMouseClick);
             }
+		
          $("#apl_count_badge").html(this.apl_data.counter);
          /*
              'id':apl_id.id,
@@ -1157,7 +1209,7 @@ function mapslib(apl_ids, div_id) {
                 that.get_ps_data();
             }
         };
-    }
+    };
     this.get_apl_lines_data=function(){
         var data={};
         data.apl_ids=this.apl_ids;
@@ -1294,7 +1346,7 @@ function mapslib(apl_ids, div_id) {
 		var data={};
 		data.variables=[];
 		this.settings.global_var.forEach(function(item){
-			console.debug(item);
+			//console.debug(item);
 			data.variables.push(item);
 			});
 		xhr=new XMLHttpRequest();
@@ -1334,8 +1386,11 @@ function mapslib(apl_ids, div_id) {
 		rxhr.onload=function(e){
 			var res=JSON.parse(this.response);
 			var ld=JSON.parse(res.result.ld_data);
+			//that.settings.line_display=ld;
 			ld.lds.forEach(function(item){
+					that.settings.line_display[item.code]=[];
 					that.settings.line_display[item.code]=item;
+					//console.debug(that.settings.line_display);
 					});
 		};
 	};
@@ -1405,11 +1460,16 @@ function mapslib(apl_ids, div_id) {
         this.init_buttons();
 		this.get_settings_layers();
         that=this;
+		this.ani_line();
+		google.maps.event.addListener(thatlib.map,'bounds_changed',function(){
+			that.cur_bounds=that.map.getBounds().toJSON();
+			});
         google.maps.event.addListener(thatlib.map, 'zoom_changed', function() {
             hide_context_menu();
 			var zoom = thatlib.map.getZoom();
             that.set_trans_markers();
             that.set_pillar_markers();
+			that.set_lines();
 			that.set_ps_markers();
             that.show_status_bar();
             if (zoom <= that.showpillarzoom) {
@@ -1427,6 +1487,8 @@ function mapslib(apl_ids, div_id) {
             } else {
                that.set_show_ps(true);
             }
+			//console.debug(that.map.getBounds().toJSON());
+			
         });
         //this.set_map_center(this.pillar_data.latitude,this.pillar_data.longitude);
         //this.map.fitBounds(this.bounds);

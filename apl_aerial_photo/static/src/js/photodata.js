@@ -372,7 +372,7 @@ sitephotolib.init();
 //var photo_ref=new sitephotolib.refresher();
 function photo_ref() {
     sitephotolib.get_photo_count_hash();
-    sitephotolib.get_photo_count();
+    //sitephotolib.get_photo_count();
 };
 photo_ref();
 ref_functions.push(photo_ref);

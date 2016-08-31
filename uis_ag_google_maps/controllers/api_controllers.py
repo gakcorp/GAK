@@ -96,10 +96,10 @@ class maps_data_json(http.Controller):
 					lines_data["counter"]=lines_data["counter"]+1
 					lines_data["lines"].append({
 						'line_id':"S_"+str(apl_id.sup_substation_id.id)+str(pil.id),
-						'lat1':apl_id.sup_substation_id.latitude,
-						'long1':apl_id.sup_substation_id.longitude,
-						'lat2':pil.latitude,
-						'long2':pil.longitude,
+						'lat2':apl_id.sup_substation_id.latitude,
+						'long2':apl_id.sup_substation_id.longitude,
+						'lat1':pil.latitude,
+						'long1':pil.longitude,
 						'tap_id':pil.tap_id.id,
 						'apl_id':pil.apl_id.id,
 						'apl_name':pil.apl_id.name,
