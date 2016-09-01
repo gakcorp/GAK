@@ -926,7 +926,7 @@ function mapslib(apl_ids, div_id) {
                     this.markers.trans[cur_trans.id].setIcon(this.get_trans_icon(cur_trans.rotation,cur_trans.state,false));
                 }
 				if (cur_marker.rotation != cur_trans.rotation){
-					this.marker.trans[cur_trans.id].rotation=cur_trans_rotation
+					this.markers.trans[cur_trans.id].rotation=cur_trans.rotation;
 				}
             }
             else{

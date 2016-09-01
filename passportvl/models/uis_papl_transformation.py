@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import math, urllib, json, time
+import uismodels
 from openerp import models, fields, api
 class uis_papl_transformation_type(models.Model):
 	_name='uis.papl.transformer.type'
@@ -124,7 +125,11 @@ class uis_papl_transformation(models.Model):
 	
 	def _get_trans_state_rotation(self,cr,uid,ids,context=None):
 		for trans in self.browse(cr,uid,ids,context=context):
-			trans.trans_stay_rotation=trans.pillar_id.azimut_from_prev
+			rot=0
+			if trans.pillar_id:
+				dist,angl=uismodels.distangle2points(trans.pillar_id.latitude,trans.pillar_id.longitude,trans.latitude,trans.longitude)
+				rot=angl
+			trans.trans_stay_rotation=rot
 	
 	@api.depends('code')
 	def _get_unicode(self,cr,uid,ids,context=None):
