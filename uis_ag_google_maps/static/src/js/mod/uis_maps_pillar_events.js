@@ -28,7 +28,7 @@ var onPillarDragStart = function(e){
 				py4=pk2*px4+pb2;
 				//console.debug('k='+pb2+'p3='+'('+px3+';'+py3+') p4.lat='+px4+';lng='+py4);
 				var location = new google.maps.LatLng(px4,py4);
-				thatlib.markers.pillars[cur_pillar.id].setPosition(location);//NUPD cur_pillar to marker
+				thatlib.markers.pillars[marker.id].setPosition(location);//NUPD cur_pillar to marker
 			}
 		}
 	};
