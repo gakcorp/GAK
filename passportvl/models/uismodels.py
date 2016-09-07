@@ -596,100 +596,62 @@ class uis_papl_apl_pil_type(models.Model):
 	_name='uis.papl.apl.pil_type'
 	name=fields.Char(string="Name")
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
+	apl_id_nom=fields.Integer(string="aplid")
 	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
 	cnt=fields.Integer(string="Pillar counts")
 	numbers=fields.Char(string="Pillars numbers")
 
-	def calc_def_apl(self,aplid):
+	def calc_def_apl(self,apl):
 		_logger.debug('start pil_type CALCULATOR')
-		domain=[("id","=",aplid)]
+		#domain=[("id","=",aplid)]
 		types={}
 		napt_ids=[]
-		for apl in self.env['uis.papl.apl'].sudo().search(domain):
-			_logger.debug(apl)
-			for pil in apl.pillar_id:
-				tid=pil.pillar_type_id.id
-				if not(tid):
-					tid=0
-				if not(tid in types):
-					types[tid]={}
-					types[tid]["cnt"]=0
-					types[tid]["type"]=False
-					if tid>0:
-						types[tid]["type"]=pil.pillar_type_id
-					types[tid]["str"]=str(pil.num_by_vl)
-				else:
-					types[tid]["str"]+=","+str(pil.num_by_vl)
-				if not(pil.tap_id.is_main_line):
-					types[tid]["str"]+="("+str(pil.tap_id.num_by_vl)+")"
-				types[tid]["cnt"] +=1
-			domain=[("apl_id.id","=",apl.id)]
-			for apt in self.sudo().search(domain):
-				_logger.debug('EXIST apt %r'%apt)
-				atid=apt.pillar_type_id.id
-				if not atid:
-					atid=0
-				if atid in types:
-					apt.cnt=types[atid]["cnt"]
-					apt.numbers=types[atid]["str"]
-					napt_ids.append(apt.id)
-					del types[atid]
-				else:
-					apt.unlink()
-			_logger.debug(types)
-			
-		return napt_ids
-	def _get_pil_type_ids_old(self):
-		_logger.debug('Start calculate pillar types (count and numbers) for APL')
-		
-		for apl in self:
-			types={}
-			materials={}
-			napt_ids=[]
-			for pil in apl.pillar_id:
-				#work with types
-				tid=pil.pillar_type_id.id
-				if not(tid):
-					tid=0
-				if not(tid in types):
-					types[tid]={}
-					types[tid]["cnt"]=0
-					types[tid]["type"]=False
-					if tid>0:
-						types[tid]["type"]=pil.pillar_type_id
-					types[tid]["str"]=str(pil.num_by_vl)
-				else:
-					types[tid]["str"]+=","+str(pil.num_by_vl)
-				if not(pil.tap_id.is_main_line):
-					types[tid]["str"]+="("+str(pil.tap_id.num_by_vl)+")"
-				types[tid]["cnt"] +=1
-			domain=[("apl_id.id","=",apl.id)]
-			for apt in self.env['uis.papl.apl.pil_type'].sudo().search(domain):
-				atid=apt.pillar_type_id.id
-				if not atid:
-					atid=0
-				if atid in types:
-					apt.cnt=types[atid]["cnt"]
-					apt.numbers=types[atid]["str"]
-					napt_ids.append(apt.id)
-					del types[atid]
-				else:
-					apt.unlink()
-			_logger.debug(types)
+		#apl=aplid
+		_logger.debug(apl)
+		for pil in apl.pillar_id:
+			tid=pil.pillar_type_id.id
+			if not(tid):
+				tid=0
+			if not(tid in types):
+				types[tid]={}
+				types[tid]["cnt"]=0
+				types[tid]["type"]=False
+				if tid>0:
+					types[tid]["type"]=pil.pillar_type_id
+				types[tid]["str"]=str(pil.num_by_vl)
+			else:
+				types[tid]["str"]+=","+str(pil.num_by_vl)
+			if not(pil.tap_id.is_main_line):
+				types[tid]["str"]+="("+str(pil.tap_id.num_by_vl)+")"
+			types[tid]["cnt"] +=1
+		domain=[("apl_id.id","=",apl.id)]
+		domain=[("apl_id_nom","=",apl.id)]
+		for apt in self.sudo().search(domain):
+			_logger.debug('EXIST apt %r'%apt)
 			atid=apt.pillar_type_id.id
-				if not atid:
-					atid=0
-				if atid in types:
-					apt.cnt=types[atid]["cnt"]
-					apt.numbers=types[atid]["str"]
-					napt_ids.append(apt.id)
-					del types[atid]
-				else:
-					apt.unlink()
-			_logger.debug(types)
-			apl.apl_pil_type_ids=[(6,0,napt_ids)]
-			#_logger.debug(apt_ids)
-			return True
+			if not(atid):
+				atid=0
+			if atid in types:
+				apt.cnt=types[atid]["cnt"]
+				apt.numbers=types[atid]["str"]
+				napt_ids.append(apt.id)
+				del types[atid]
+			else:
+				apt.unlink()
+		for t in types:
+			_logger.debug(types[t])
+			napt=self.create({'apl_id_nom':apl.id,
+							  'cnt':types[t]["cnt"],
+							  'numbers':types[t]["str"]})
+			napt.pillar_type_id=types[t]["type"]
+			napt.apl_id=apl
+			napt.cnt=types[t]["cnt"]
+			napt.write({})
+			#napt.numbers=types[t]["str"]
+			_logger.debug(napt)
+		_logger.debug(types)
+		return napt_ids
+
 class uis_papl_apl_pil_materials(models.Model):
 	_name='uis.papl.apl.pil_materials'
 	name=fields.Char(string="Name")
@@ -730,6 +692,7 @@ class uis_papl_apl(models.Model):
 	sw_point=fields.Char(string="Switching point")
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
 	apl_pil_type_ids=fields.One2many('uis.papl.apl.pil_type', 'apl_id', string="Pillar types", compute='_get_pil_type_ids')
+	#compute='_get_pil_type_ids',
 	apl_pil_material_ids=fields.One2many('uis.papl.apl.pil_materials','apl_id', string="Pillar materials", compute='_get_pil_material_ids')
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
@@ -744,11 +707,14 @@ class uis_papl_apl(models.Model):
 	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image_2')
 	#scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
 	
+	@api.one
 	def _get_pil_type_ids(self):
+		_logger.debug('!returns!!!!!!!!!!!!!!!')
 		for apl in self:
-			apt_ids=self.env['uis.papl.apl.pil_type'].calc_def_apl(apl.id)
-			_logger.debug(apt_ids)
-	
+			apt_ids=self.env['uis.papl.apl.pil_type'].calc_def_apl(apl)
+			#apl.apl_pil_type_ids=[(6,0,apt_ids)]
+			_logger.debug(apl.apl_pil_type_ids)
+			
 			
 	def _get_pil_material_ids(self,cr,uid,ids, context=None):
 		_logger.debug('Start calculate pillar materials (count and numbers) for APL')

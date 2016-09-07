@@ -494,7 +494,7 @@
 		</tree>
 	  </field>
 	</record>
-	
+
 	<record model="ir.ui.view" id="uis_papl_substation_list">
 	  <field name="name">Power Substation List</field>
 	  <field name="model">uis.papl.substation</field>
@@ -687,7 +687,13 @@
       </field>
     </record>
     -->
-
+	<record id="uis_papl_apl_pil_type_action_window" model="ir.actions.act_window">
+		<field name="name">List of apt</field>
+		<field name="res_model">uis.papl.apl.pil_type</field>
+	  <field name="view_type">form</field>
+	  <field name="view_mode">tree,form</field>
+	</record>
+	
     <menuitem name="APL Management" id="uis_papl_menu_root"/>
 
     <!--menu new categories!-->
@@ -711,9 +717,12 @@
 	<menuitem name="Settings" id="uis_papl_menu_settings" parent="uis_papl_menu_root"/>
 !-->
     <!-- actions -->
-
-	<menuitem name="List of APL" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
+	<menuitem name="List of APL" id="uis_papl_pil_type_menu_apl_list" parent="uis_papl_menu_apl"
+              action="uis_papl_apl_pil_type_action_window"/>
+	
+	<menuitem name="List of APL apt" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
               action="uis_papl_apl_action_window"/>
+
 	<menuitem name="List of Tap" id="uis_papl_menu_tap_list" parent="uis_papl_menu_apl"
               action="uis_papl_tap_action_window"/>
 	<menuitem name="Pillar Wizard" id="uis_papl_menu_pillar_wiz" parent="uis_papl_menu_apl"
