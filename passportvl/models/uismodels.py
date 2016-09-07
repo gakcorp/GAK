@@ -6,6 +6,7 @@ from . import schemeAPL
 from . import schemeAPL_v2
 import logging
 import datetime
+import openerp
 
 try:
     import cStringIO as StringIO
@@ -591,7 +592,113 @@ class uis_papl_apl_cable(models.Model):
 	_name='uis.papl.apl.cable'
 	name=fields.Char(string="Name")
 
-    
+class uis_papl_apl_pil_type(models.Model):
+	_name='uis.papl.apl.pil_type'
+	name=fields.Char(string="Name")
+	apl_id=fields.Many2one('uis.papl.apl', string='APL')
+	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
+	cnt=fields.Integer(string="Pillar counts")
+	numbers=fields.Char(string="Pillars numbers")
+
+	def calc_def_apl(self,aplid):
+		_logger.debug('start pil_type CALCULATOR')
+		domain=[("id","=",aplid)]
+		types={}
+		napt_ids=[]
+		for apl in self.env['uis.papl.apl'].sudo().search(domain):
+			_logger.debug(apl)
+			for pil in apl.pillar_id:
+				tid=pil.pillar_type_id.id
+				if not(tid):
+					tid=0
+				if not(tid in types):
+					types[tid]={}
+					types[tid]["cnt"]=0
+					types[tid]["type"]=False
+					if tid>0:
+						types[tid]["type"]=pil.pillar_type_id
+					types[tid]["str"]=str(pil.num_by_vl)
+				else:
+					types[tid]["str"]+=","+str(pil.num_by_vl)
+				if not(pil.tap_id.is_main_line):
+					types[tid]["str"]+="("+str(pil.tap_id.num_by_vl)+")"
+				types[tid]["cnt"] +=1
+			domain=[("apl_id.id","=",apl.id)]
+			for apt in self.sudo().search(domain):
+				_logger.debug('EXIST apt %r'%apt)
+				atid=apt.pillar_type_id.id
+				if not atid:
+					atid=0
+				if atid in types:
+					apt.cnt=types[atid]["cnt"]
+					apt.numbers=types[atid]["str"]
+					napt_ids.append(apt.id)
+					del types[atid]
+				else:
+					apt.unlink()
+			_logger.debug(types)
+			
+		return napt_ids
+	def _get_pil_type_ids_old(self):
+		_logger.debug('Start calculate pillar types (count and numbers) for APL')
+		
+		for apl in self:
+			types={}
+			materials={}
+			napt_ids=[]
+			for pil in apl.pillar_id:
+				#work with types
+				tid=pil.pillar_type_id.id
+				if not(tid):
+					tid=0
+				if not(tid in types):
+					types[tid]={}
+					types[tid]["cnt"]=0
+					types[tid]["type"]=False
+					if tid>0:
+						types[tid]["type"]=pil.pillar_type_id
+					types[tid]["str"]=str(pil.num_by_vl)
+				else:
+					types[tid]["str"]+=","+str(pil.num_by_vl)
+				if not(pil.tap_id.is_main_line):
+					types[tid]["str"]+="("+str(pil.tap_id.num_by_vl)+")"
+				types[tid]["cnt"] +=1
+			domain=[("apl_id.id","=",apl.id)]
+			for apt in self.env['uis.papl.apl.pil_type'].sudo().search(domain):
+				atid=apt.pillar_type_id.id
+				if not atid:
+					atid=0
+				if atid in types:
+					apt.cnt=types[atid]["cnt"]
+					apt.numbers=types[atid]["str"]
+					napt_ids.append(apt.id)
+					del types[atid]
+				else:
+					apt.unlink()
+			_logger.debug(types)
+			atid=apt.pillar_type_id.id
+				if not atid:
+					atid=0
+				if atid in types:
+					apt.cnt=types[atid]["cnt"]
+					apt.numbers=types[atid]["str"]
+					napt_ids.append(apt.id)
+					del types[atid]
+				else:
+					apt.unlink()
+			_logger.debug(types)
+			apl.apl_pil_type_ids=[(6,0,napt_ids)]
+			#_logger.debug(apt_ids)
+			return True
+class uis_papl_apl_pil_materials(models.Model):
+	_name='uis.papl.apl.pil_materials'
+	name=fields.Char(string="Name")
+	apl_id=fields.Many2one('uis.papl.apl', string='APL')
+	pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
+	cnt=fields.Integer(string="Pillar counts")
+	numbers=fields.Char(string="Pillars numbers")
+
+pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
@@ -622,6 +729,8 @@ class uis_papl_apl(models.Model):
 	climatic_conditions=fields.Char(string="Climatic conditions")
 	sw_point=fields.Char(string="Switching point")
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
+	apl_pil_type_ids=fields.One2many('uis.papl.apl.pil_type', 'apl_id', string="Pillar types", compute='_get_pil_type_ids')
+	apl_pil_material_ids=fields.One2many('uis.papl.apl.pil_materials','apl_id', string="Pillar materials", compute='_get_pil_material_ids')
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply substation")
@@ -635,16 +744,15 @@ class uis_papl_apl(models.Model):
 	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image_2')
 	#scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
 	
-	'''def _get_scheme_image(self,cr,uid,ids,context=None):
-		for apl in self.browse(cr,uid,ids,context=context):
-			img = Image.new("RGBA", (schemeAPL.scheme_width,schemeAPL.scheme_height), (255,255,255,0))
-			#draw = ImageDraw.Draw(img)
-			draw = schemeAPL.drawScheme(img,apl)
-			#draw.ellipse ((190,90,210,110),fill="red", outline="blue")
-			background_stream=StringIO.StringIO()
-			img.save(background_stream, format="PNG")
-			apl.scheme_image_old=background_stream.getvalue().encode('base64')'''
+	def _get_pil_type_ids(self):
+		for apl in self:
+			apt_ids=self.env['uis.papl.apl.pil_type'].calc_def_apl(apl.id)
+			_logger.debug(apt_ids)
 	
+			
+	def _get_pil_material_ids(self,cr,uid,ids, context=None):
+		_logger.debug('Start calculate pillar materials (count and numbers) for APL')
+		
 	def add_ml(self, cr,uid,ids,context=None):
 		_logger.debug('Start add main line for apl')
 		re_tap=self.pool.get('uis.papl.tap').browse(cr,uid,ids,context=context)

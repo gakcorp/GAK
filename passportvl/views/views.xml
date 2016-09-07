@@ -275,15 +275,60 @@
 				</field>
 			  </page>
 			  <page string="Pillars">
-				<field name="pillar_id">
-				  <tree default_order="num_by_vl, tap_id">
+					<group>
+						<group string="Pillar types">
+							<field name="apl_pil_type_ids" nolabel="1">
+								<tree default_order="cnt desc">
+									<field name="pillar_type_id"/>
+									<field name="cnt"/>
+									<field name="numbers"/>	
+								</tree>
+							</field>
+						</group>
+						<group string="Pillar materials">
+							<field name="apl_pil_material_ids" nolabel="1">
+								<tree default_order="cnt desc">
+									<field name="pillar_material_id"/>
+									<field name="cnt"/>
+									<field name="numbers"/>	
+								</tree>
+							</field>
+						</group>
+					</group>
+					<group string="Pillars">
+						<field name="pillar_id" nolabel="1">
+							<tree default_order="tap_id,num_by_vl">
+								<field name="name"/>
+								<field name="tap_id" invisible="1"/>
+								<field name="num_by_vl"/>
+								<field name="pillar_material_id"/>
+								<field name="pillar_type_id"/>
+								<field name="pillar_cut_id"/>
+							</tree>
+						</field>
+					</group>
+				<!--field name="pillar_id" mode="tree" colspan="4" nolabel="1" widget="one2many_list" context="{'group_by':'pillar_material_id'}"/>!-->
+				<!--<field name="pillar_id">
+				  <tree default_order="num_by_vl,tap_id,apl_id">
 					<field name="name"/>
 					<field name="num_by_vl"/>
 					<field name="pillar_material_id"/>
 					<field name="pillar_type_id"/>
 					<field name="pillar_cut_id"/>
 				  </tree>
-				</field>
+					<search string="Search Pillar">
+						<field name="name"/>
+						<field name="num_by_vl"/>
+						<field name="pillar_material_id"/>
+						<separator/>
+						  <group expand="1" string="Group By...">
+                      <filter name="group_state"
+                              string="Material"
+                              context="{'group_by': 'pillar_material_id'}"
+                              />
+							</group>
+					</search>
+				</field>!-->
 				<!--<search string="Search pillar">
 				
 				    <tree string="List of pillars" editable="bottom">
