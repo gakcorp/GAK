@@ -608,7 +608,7 @@ class uis_papl_apl_pil_type(models.Model):
 		napt_ids=[]
 		#apl=aplid
 		_logger.debug(apl)
-		for pil in apl.pillar_id:
+		for pil in apl.pillar_id.sorted(key=lambda r:r.tap_id.id+r.num_by_vl, reverse=True):
 			tid=pil.pillar_type_id.id
 			if not(tid):
 				tid=0
@@ -640,14 +640,16 @@ class uis_papl_apl_pil_type(models.Model):
 				apt.unlink()
 		for t in types:
 			_logger.debug(types[t])
+			if not(types[t]["type"]):
+				ptid=None
+			else:
+				ptid=types[t]["type"].id
 			napt=self.create({'apl_id_nom':apl.id,
 							  'cnt':types[t]["cnt"],
-							  'numbers':types[t]["str"]})
-			napt.pillar_type_id=types[t]["type"]
-			napt.apl_id=apl
-			napt.cnt=types[t]["cnt"]
+							  'numbers':types[t]["str"],
+							  'pillar_type_id':ptid,
+							  'apl_id':apl.id})
 			napt.write({})
-			#napt.numbers=types[t]["str"]
 			_logger.debug(napt)
 		_logger.debug(types)
 		return napt_ids
@@ -712,7 +714,7 @@ class uis_papl_apl(models.Model):
 		_logger.debug('!returns!!!!!!!!!!!!!!!')
 		for apl in self:
 			apt_ids=self.env['uis.papl.apl.pil_type'].calc_def_apl(apl)
-			#apl.apl_pil_type_ids=[(6,0,apt_ids)]
+			apl.apl_pil_type_ids=[(6,0,apt_ids)]
 			_logger.debug(apl.apl_pil_type_ids)
 			
 			
