@@ -277,11 +277,11 @@
 			  <page string="Pillars">
 					<group>
 						<group string="Pillar types">
-							<field name="apl_pil_type_ids" nolabel="1" style="width:50%">
-								<tree default_order="cnt desc">
-									<field name="pillar_type_id"/>
-									<field name="cnt"/>
-									<field name="numbers" width="200"/>	
+							<field name="apl_pil_type_ids" nolabel="1" style="width:50%%">
+								<tree default_order="cnt desc" style="word-break:break-all;">
+									<field name="pillar_type_id" style="width:100px;"/>
+									<field name="cnt" style="width:50px"/>
+									<field name="numbers" style="width:150px"/>	
 								</tree>
 							</field>
 						</group>

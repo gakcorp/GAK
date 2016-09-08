@@ -257,6 +257,13 @@ class uis_papl_pillar(models.Model):
 									 compute='_get_near_pillar'
 									 )
 	
+	@api.depends('pillar_type_id')
+	def on_change_pillar_type_id(self):
+		for pil in self:
+			_logger.debug('Change pillar_type_id for pil %r'%pil)
+			if pil.apl_id:
+				pil.apl_id.get_pil_type_ids()
+			
 	def create_new_child(self, tap_id=False, parent_id=False,latlngdelta=0.0001,pillar_type_id=False, pillar_cut_id=False, latitude=0, longitude=0, num_by_vl=-1):
 		for pil in self:
 			nlat,nlng=latitude,longitude
@@ -620,7 +627,7 @@ class uis_papl_apl_pil_type(models.Model):
 					types[tid]["type"]=pil.pillar_type_id
 				types[tid]["str"]=str(pil.num_by_vl)
 			else:
-				types[tid]["str"]+=","+str(pil.num_by_vl)
+				types[tid]["str"]+=", "+str(pil.num_by_vl)
 			if not(pil.tap_id.is_main_line):
 				types[tid]["str"]+="("+str(pil.tap_id.num_by_vl)+")"
 			types[tid]["cnt"] +=1
@@ -693,7 +700,7 @@ class uis_papl_apl(models.Model):
 	climatic_conditions=fields.Char(string="Climatic conditions")
 	sw_point=fields.Char(string="Switching point")
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
-	apl_pil_type_ids=fields.One2many('uis.papl.apl.pil_type', 'apl_id', string="Pillar types", compute='_get_pil_type_ids')
+	apl_pil_type_ids=fields.One2many('uis.papl.apl.pil_type', 'apl_id', string="Pillar types", compute='get_pil_type_ids')
 	#compute='_get_pil_type_ids',
 	apl_pil_material_ids=fields.One2many('uis.papl.apl.pil_materials','apl_id', string="Pillar materials", compute='_get_pil_material_ids')
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
@@ -710,7 +717,7 @@ class uis_papl_apl(models.Model):
 	#scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
 	
 	@api.one
-	def _get_pil_type_ids(self):
+	def get_pil_type_ids(self):
 		_logger.debug('!returns!!!!!!!!!!!!!!!')
 		for apl in self:
 			apt_ids=self.env['uis.papl.apl.pil_type'].calc_def_apl(apl)
