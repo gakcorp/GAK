@@ -214,6 +214,66 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <br/>
+                        <div class="col-xs-12 text-center">
+                            <h4>2. Pillars</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6" style="border-right:1px solid black;">
+                            <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                                <div class="col-xs-4 text-center">Type</div>
+                                <div class="col-xs-2 text-center">Qnty</div>
+                                <div class="col-xs-6 text-center">Numbers of pillars</div>
+                            </div>
+                            <t t-foreach="o.apl_pil_type_ids" t-as="apt">
+                                <div class="row" style="border-bottom:1px dashed black;">
+                                    <div class="col-xs-4 text-center"><span t-field="apt.pillar_type_id.name"/></div>
+                                    <div class="col-xs-2 text-center"><span t-field="apt.cnt"/></div>
+                                    <div class="col-xs-6"><span t-field="apt.numbers"/></div>
+                                </div>    
+                            </t>
+                        </div>
+                        <div class="col-xs-6" style="border-left:1px solid black;">
+                            <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                                <div class="col-xs-4 text-center">Material</div>
+                                <div class="col-xs-2 text-center">Qnty</div>
+                                <div class="col-xs-6 text-center">Numbers of pillars</div>
+                            </div>
+                            <t t-foreach="o.apl_pil_material_ids" t-as="apm">
+                                <div class="row" style="border-bottom:1px dashed black;">
+                                    <div class="col-xs-4 text-center"><span t-field="apm.pillar_material_id.name"/></div>
+                                    <div class="col-xs-2 text-center"><span t-field="apm.cnt"/></div>
+                                    <div class="col-xs-6"><span t-field="apm.numbers"/></div>
+                                </div>    
+                            </t>
+                        </div>    
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="row" style="border-bottom:2px solid black;">
+                            <div class="col-xs-2 text-center">Name</div>
+                            <div class="col-xs-2 text-center">Number of tap</div>
+                            <div class="col-xs-2 text-center">Number</div>
+                            <div class="col-xs-2 text-center">Type</div>
+                            <div class="col-xs-2 text-center">Material</div>
+                            <div class="col-xs-2 text-center">Cut</div>
+                        </div>
+                        <t t-foreach="o.pillar_id.sorted(key=lambda r:str(r.tap_id.id).zfill(3)+'_'+str(r.num_by_vl).zfill(3), reverse=False)" t-as="pil">
+                            <div class="row" style="border-bottom:1px dashed black;">
+                                <div class="col-xs-2 text-center"><span t-field="pil.name"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.tap_id.num_by_vl"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.num_by_vl"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.pillar_type_id.name"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.pillar_material_id.name"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.pillar_cut_id.name"/></div>
+                            </div>
+                        </t>
+                    </div>
+                    
+                    
+                   
                     </p>
                 </div>
                 </div>

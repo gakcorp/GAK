@@ -603,19 +603,15 @@ class uis_papl_apl_pil_type(models.Model):
 	_name='uis.papl.apl.pil_type'
 	name=fields.Char(string="Name")
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
-	apl_id_nom=fields.Integer(string="aplid")
+	#apl_id_nom=fields.Integer(string="aplid")
 	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
 	cnt=fields.Integer(string="Pillar counts")
 	numbers=fields.Char(string="Pillars numbers")
 
 	def calc_def_apl(self,apl):
-		_logger.debug('start pil_type CALCULATOR')
-		#domain=[("id","=",aplid)]
 		types={}
 		napt_ids=[]
-		#apl=aplid
-		_logger.debug(apl)
-		for pil in apl.pillar_id.sorted(key=lambda r:r.tap_id.id+r.num_by_vl, reverse=True):
+		for pil in apl.pillar_id.sorted(key=lambda r:str(r.tap_id.id).zfill(3)+"_"+str(r.num_by_vl).zfill(3), reverse=False):
 			tid=pil.pillar_type_id.id
 			if not(tid):
 				tid=0
@@ -632,33 +628,30 @@ class uis_papl_apl_pil_type(models.Model):
 				types[tid]["str"]+="("+str(pil.tap_id.num_by_vl)+")"
 			types[tid]["cnt"] +=1
 		domain=[("apl_id.id","=",apl.id)]
-		domain=[("apl_id_nom","=",apl.id)]
 		for apt in self.sudo().search(domain):
-			_logger.debug('EXIST apt %r'%apt)
 			atid=apt.pillar_type_id.id
 			if not(atid):
 				atid=0
 			if atid in types:
-				apt.cnt=types[atid]["cnt"]
-				apt.numbers=types[atid]["str"]
 				napt_ids.append(apt.id)
+				apt.write({
+					'numbers':types[atid]["str"],
+					'cnt':types[atid]["cnt"]
+				})
 				del types[atid]
 			else:
 				apt.unlink()
 		for t in types:
-			_logger.debug(types[t])
 			if not(types[t]["type"]):
 				ptid=None
 			else:
 				ptid=types[t]["type"].id
-			napt=self.create({'apl_id_nom':apl.id,
+			napt=self.sudo().create({
 							  'cnt':types[t]["cnt"],
 							  'numbers':types[t]["str"],
 							  'pillar_type_id':ptid,
 							  'apl_id':apl.id})
 			napt.write({})
-			_logger.debug(napt)
-		_logger.debug(types)
 		return napt_ids
 
 class uis_papl_apl_pil_materials(models.Model):
@@ -668,7 +661,52 @@ class uis_papl_apl_pil_materials(models.Model):
 	pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
 	cnt=fields.Integer(string="Pillar counts")
 	numbers=fields.Char(string="Pillars numbers")
-
+	
+	def calc_def_apl(self,apl):
+		materials={}
+		napm_ids=[]
+		for pil in apl.pillar_id.sorted(key=lambda r:str(r.tap_id.id).zfill(3)+"_"+str(r.num_by_vl).zfill(3), reverse=False):
+			mid=pil.pillar_material_id.id
+			if not(mid):
+				mid=0
+			if not(mid in materials):
+				materials[mid]={}
+				materials[mid]["cnt"]=0
+				materials[mid]["material"]=False
+				if mid>0:
+					materials[mid]["material"]=pil.pillar_material_id
+				materials[mid]["str"]=str(pil.num_by_vl)
+			else:
+				materials[mid]["str"]+=", "+str(pil.num_by_vl)
+			if not(pil.tap_id.is_main_line):
+				materials[mid]["str"]+="("+str(pil.tap_id.num_by_vl)+")"
+			materials[mid]["cnt"] +=1
+		domain=[("apl_id.id","=",apl.id)]
+		for apm in self.sudo().search(domain):
+			amid=apm.pillar_material_id.id
+			if not(amid):
+				amid=0
+			if amid in materials:
+				napm_ids.append(apm.id)
+				apm.write({
+					'numbers':materials[amid]["str"],
+					'cnt':materials[amid]["cnt"]
+				})
+				del materials[amid]
+			else:
+				apm.unlink()
+		for m in materials:
+			if not(materials[m]["material"]):
+				pmid=None
+			else:
+				pmid=materials[m]["material"].id
+			napm=self.sudo().create({
+							  'cnt':materials[m]["cnt"],
+							  'numbers':materials[m]["str"],
+							  'pillar_material_id':pmid,
+							  'apl_id':apl.id})
+			napm.write({})
+		return napm_ids
 pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
@@ -718,15 +756,18 @@ class uis_papl_apl(models.Model):
 	
 	@api.one
 	def get_pil_type_ids(self):
-		_logger.debug('!returns!!!!!!!!!!!!!!!')
 		for apl in self:
 			apt_ids=self.env['uis.papl.apl.pil_type'].calc_def_apl(apl)
 			apl.apl_pil_type_ids=[(6,0,apt_ids)]
-			_logger.debug(apl.apl_pil_type_ids)
+			#_logger.debug(apl.apl_pil_type_ids)
 			
+	
+	@api.one		
+	def _get_pil_material_ids(self):
+		for apl in self:
+			apm_ids=self.env['uis.papl.apl.pil_materials'].calc_def_apl(apl)
+			apl.apl_pil_material_ids=[(6,0,apm_ids)]
 			
-	def _get_pil_material_ids(self,cr,uid,ids, context=None):
-		_logger.debug('Start calculate pillar materials (count and numbers) for APL')
 		
 	def add_ml(self, cr,uid,ids,context=None):
 		_logger.debug('Start add main line for apl')

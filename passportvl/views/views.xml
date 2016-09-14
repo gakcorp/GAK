@@ -278,7 +278,7 @@
 					<group>
 						<group string="Pillar types">
 							<field name="apl_pil_type_ids" nolabel="1" style="width:50%%">
-								<tree default_order="cnt desc" style="word-break:break-all;">
+								<tree default_order="cnt desc" style="word-break:break-all;" fonts="bold:pillar_type_id==False" colors="red:pillar_type_id==False">
 									<field name="pillar_type_id" style="width:100px;"/>
 									<field name="cnt" style="width:50px"/>
 									<field name="numbers" style="width:150px"/>	
@@ -286,8 +286,8 @@
 							</field>
 						</group>
 						<group string="Pillar materials">
-							<field name="apl_pil_material_ids" nolabel="1">
-								<tree default_order="cnt desc">
+							<field name="apl_pil_material_ids" nolabel="1" style="width:50%%">
+								<tree default_order="cnt desc" style="word-break:break-all;" fonts="bold:pillar_material_id==False" colors="red:pillar_material_id==False">
 									<field name="pillar_material_id"/>
 									<field name="cnt"/>
 									<field name="numbers"/>	
