@@ -14,7 +14,7 @@ class uis_logger(models.Model):
 	lib=fields.Char(string='Library')
 	delay=fields.Float(digits=(3,2), string="Medium delay")
 	
-	def add_log(self,code="DEFC",desc="",lib=__loader__,debug_level=10):
+	def add_log(self,code="DEFC",desc="",lib=__name__,debug_level=10):
 		_logger.setLevel(debug_level)
 		nlog=self.sudo().create({
 							  'code':code,
