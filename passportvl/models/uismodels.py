@@ -4,6 +4,7 @@ from openerp import models, fields, api
 from PIL import Image, ImageDraw
 from . import schemeAPL
 from . import schemeAPL_v2
+from . import uis_papl_logger
 import logging
 import datetime
 import openerp
@@ -13,8 +14,14 @@ try:
 except ImportError:
     import StringIO
 
+_ulog=uis_papl_logger.ulog
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
+
+#nulo=uis_papl_logger.uis_logger()
+#_logger.debug(nulo)
+#nulog=nulo.add_log(code='LOADMODULE',desc='Load modele %r'%(__name__),lib=__name__)
+#nulog.fix_delay(delay=0)
 
 UNI_STATE_SELECTION = [
 		('draft', 'DRAFT'),
@@ -121,7 +128,8 @@ class uis_papl_substation(models.Model):
 		return True
 	
 	def add_apl(self, cr,uid,ids,context=None, apl_name='NDEF', fid=0, apl_type='ВЛ', klass=6):
-		_logger.debug('Start add apl')
+		lr=_ulog(self,code='ADD_NE',lib=__name__,desc='Add new APL to substation')
+		_logger.debug(lr)
 		re_apl=self.pool.get('uis.papl.apl').browse(cr,uid,ids,context=context)
 		#napl=self.pool.get('uis.papl.apl').create(cr,uid,{'name':apl_name},context=context)
 		tlen=len(self.browse(cr,uid,[],context=context))
