@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import openerp
 import math, urllib, json, time
 import os, exifread
 import re
@@ -10,11 +10,16 @@ from openerp import models, fields, api, tools
 from datetime import datetime
 import logging
 
+import cv2
+import numpy as np
+
 '''try:
     import cStringIO as StringIO
 except ImportError:'''
 import StringIO
 import cStringIO
+from openerp.addons.passportvl.models import uis_papl_logger
+_ulog=uis_papl_logger.ulog
 
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
@@ -122,6 +127,7 @@ class uis_ap_photo(models.Model):
 	image_width=fields.Integer(string='Image Width')
 	image_800=fields.Binary(string='Image800', compute='_get_800_img')
 	image_400=fields.Binary(string='Image400', compute='_get_400_img')
+	image_edge=fields.Binary(string='ImageEdge', compute='_get_edge_img')
 	focal_length=fields.Float(digits=(2,4), string="Focal Length")
 	thumbnail=fields.Binary(string="Thumbnail")
 	image_filename=fields.Char(string='Image file name')
@@ -150,14 +156,110 @@ class uis_ap_photo(models.Model):
 										  compute='_get_near_trans_ids')
 	
 	def _get_800_img(self,cr,uid,ids,context=None):
+		tlr=_ulog(self,code='CALC_PH_GEN800',lib=__name__,desc='Generate (render) photo 800 px')
+		i=0
 		for ph in self.browse(cr,uid,ids,context=context):
+			tlr.add_comment('[*] Generate image for photo id[%r]'%ph.id)
 			img=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(800,600))
 			ph.image_800=img
+			i=i+1
+		tlr.set_qnt(i)
+		tlr.fix_end()
 		return True
 	def _get_400_img(self,cr,uid,ids,context=None):
+		tlr=_ulog(self,code='CALC_PH_GEN400',lib=__name__,desc='Generate (render) photo 400 px')
+		i=0
 		for ph in self.browse(cr,uid,ids,context=context):
-			img=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
-			ph.image_400=img
+			#ph.image_400=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
+			#ph.image_400=img
+			
+			image = Image.open(StringIO.StringIO(ph.with_context(bin_size=False).image.decode('base64')))
+			background_stream = StringIO.StringIO()
+			image.thumbnail((800,600))
+			image.thumbnail ((400,300), Image.ANTIALIAS)
+			image.save(background_stream, format="PNG")
+			ph.image_400=background_stream.getvalue().encode('base64')
+			
+			# Use cv2 for resize image
+			'''or_image=ph.with_context(bin_size=False).image.decode('base64')
+			array=np.fromstring(or_image,np.uint8)
+			ocvimg=cv2.imdecode(array,cv2.CV_LOAD_IMAGE_COLOR)
+			res_image=cv2.resize(ocvimg,(400,300))
+			ph.image_400=cv2.imencode('.jpg',res_image)[1].tostring().encode('base64')'''
+			# end code
+			
+			tlr.add_comment('[~] Generate for %r'%ph.id)
+			i=i+1
+		tlr.set_qnt(i)
+		tlr.fix_end()
+		return True
+	def _get_edge_img(self,cr,uid,ids,context=None):
+		tlr=_ulog(self,code='CALC_PH_WIRE',lib=__name__,desc='Generate wire on photo')
+		for ph in self.browse(cr,uid,ids,context=context):
+			img=ph.with_context(bin_size=False).image.decode('base64')
+			array=np.fromstring(img,np.uint8)
+			ocvimg=cv2.imdecode(array,cv2.CV_LOAD_IMAGE_COLOR)
+			grey=cv2.cvtColor(ocvimg,cv2.COLOR_BGR2GRAY)			
+			edges=cv2.Canny(grey,200,230,apertureSize=3)
+			minLineLength = 30
+			maxLineGap = 8
+			lines = cv2.HoughLinesP(edges,1,np.pi/180,230,minLineLength,maxLineGap,2)
+			#lines = cv2.HoughLines(edges,1,np.pi/180,200)
+			#_logger.debug(lines)
+			#for  rho,theta in lines[0]:
+			#	a = np.cos(theta)
+			#	b = np.sin(theta)
+			#	x0 = a*rho
+			#	y0 = b*rho
+			#	x1 = int(x0 + 1000*(-b))
+			#	y1 = int(y0 + 1000*(a))
+			#	x2 = int(x0 - 1000*(-b))
+			#	y2 = int(y0 - 1000*(a))
+			if lines is not None:
+				for x1,y1,x2,y2 in lines[0]:
+					cv2.line(ocvimg,(x1,y1),(x2,y2),(0,0,255),5)
+			imedg=cv2.imencode('.jpg',ocvimg)[1].tostring().encode('base64')
+			#imedg=cv2.imencode('.jpg',edges)[1].tostring().encode('base64')
+			ph.image_edge=imedg
+		tlr.fix_end()
+		return True
+	def _get_edge_img_cornes(self,cr,uid,ids,context=None):
+		for ph in self.browse(cr,uid,ids,context=context):
+			img=ph.with_context(bin_size=False).image_800.decode('base64')
+			array=np.fromstring(img,np.uint8)
+			ocvimg=cv2.imdecode(array,cv2.CV_LOAD_IMAGE_COLOR)
+			fast=cv2.FastFeatureDetector()
+			kp=fast.detect(ocvimg,None)
+			oimg=cv2.drawKeypoints(ocvimg,kp, color=(255,0,0))
+			imedg=cv2.imencode('.jpg',oimg)[1].tostring().encode('base64')
+			ph.image_edge=imedg
+		return True
+	def _get_edge_img_corners(self,cr,uid,ids,context=None):
+		for ph in self.browse(cr,uid,ids,context=context):
+			img=ph.with_context(bin_size=False).image_800.decode('base64')
+			#ib64=image.encode('base64')
+			#_logger.debug(img)
+			array=np.fromstring(img,np.uint8)
+			#_logger.debug('array: %r'%array)
+			ocvimg=cv2.imdecode(array,cv2.CV_LOAD_IMAGE_COLOR)
+			grey=cv2.cvtColor(ocvimg,cv2.COLOR_BGR2GRAY)
+			corners=cv2.goodFeaturesToTrack(grey,25,0.01,10)
+			corners = np.int0(corners)
+			for i in corners:
+				x,y=i.ravel()
+				cv2.circle(ocvimg,(x,y),4,255,-1)
+				_logger.debug(x,y)
+			#_logger.debug(type(ocvimg))
+			#_logger.debug(ocvimg)
+			#edges=cv2.Canny(ocvimg,100,200)
+			#_logger.debug(edges)
+			
+			#imedg=cv2.imencode('.jpg',edges)[1].tostring().encode('base64')
+			imedg=cv2.imencode('.jpg',ocvimg)[1].tostring().encode('base64')
+			#ocvimg=np.array(img)
+			#ocvimg=ocvimg[:,:,::-1].copy()
+			#edges=cv2.Canny(ocvimg,100,200)
+			ph.image_edge=imedg
 		return True
 		
 	@api.depends('latitude', 'longitude')
@@ -168,11 +270,11 @@ class uis_ap_photo(models.Model):
 			delta=0.01
 			nstr=''
 			max_dist=50
-			trans = self.pool.get('uis.papl.transformer').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
+			trans = self.pool.get('uis.papl.transformer').search(cr,openerp.SUPERUSER_ID,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
 			for tr in trans:
-				transformer=self.pool.get('uis.papl.transformer').browse(cr,uid,[tr],context=context)
+				transformer=self.pool.get('uis.papl.transformer').browse(cr,openerp.SUPERUSER_ID,[tr],context=context)
 				if transformer:
 					lat2=transformer.latitude
 					long2=transformer.longitude
@@ -184,7 +286,7 @@ class uis_ap_photo(models.Model):
 		
 	@api.depends('near_pillar_ids','latitude','longitude')
 	def _get_near_photo_apl(self,cr,uid,ids,context=None):
-		for photo in self.browse(cr,uid,ids,context=context):
+		for photo in self.browse(cr,openerp.SUPERUSER_ID,ids,context=context):
 			apl_ids=[]
 			for pil in photo.near_pillar_ids:
 				if pil.apl_id.id not in apl_ids:
@@ -199,11 +301,11 @@ class uis_ap_photo(models.Model):
 			delta=0.01
 			nstr=''
 			max_dist=40
-			pillars = self.pool.get('uis.papl.pillar').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
+			pillars = self.pool.get('uis.papl.pillar').search(cr,openerp.SUPERUSER_ID,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
 			for pid in pillars:
-				pillar=self.pool.get('uis.papl.pillar').browse(cr,uid,[pid],context=context)
+				pillar=self.pool.get('uis.papl.pillar').browse(cr,openerp.SUPERUSER_ID,[pid],context=context)
 				if pillar:
 					lat2=pillar.latitude
 					long2=pillar.longitude

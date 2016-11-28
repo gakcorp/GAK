@@ -64,6 +64,8 @@
 					<field name="image" widget="image" width="800" filename="fimage"/>
 					<field name="thumbnail" widget="image"/>
 					<field name="image_800" widget="image" />
+					<field name="image_edge" widget="image"/>
+					<!--<field name="image_edge"/>!-->
 				</group>
 				<group>
 					<notebook>

@@ -7,6 +7,9 @@ import json
 import logging
 import urllib
 import time
+import openerp
+
+_ulog=openerp.addons.passportvl.models.uis_papl_logger.ulog
 
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
@@ -293,87 +296,107 @@ class maps_data_json(http.Controller):
 	#Define API hash functions
 	@http.route('/apiv1/tap/elevation_data',type='json', auth="public", csfr=False)
 	def api_v1_tap_elevation_data(self, *arg, **post):
-		start=datetime.datetime.now()
+		tlr=_ulog(code='MP_GEN_TP_ELDT',lib=__name__,desc='Generate Tap elevation data settings')
+		#start=datetime.datetime.now()
 		data=json.loads(json.dumps(request.jsonrequest))
 		#code elevation data
 		#_logger.debug(data)
 		clean_ids=data['tap_ids']
+		tlr.add_comment('[~] Generate for tap ids[%r]'%clean_ids)
 		elevation_data=self._get_tap_elevation_data(clean_ids)
 		values={
 			'elevation_data':json.dumps(elevation_data)
 		}
-		stop=datetime.datetime.now()
-		elapsed=stop-start
-		_logger.info('Generate TAP elevation data in %r seconds'%elapsed.total_seconds())
+		tlr.fix_end()
+		#stop=datetime.datetime.now()
+		#elapsed=stop-start
+		#_logger.info('Generate TAP elevation data in %r seconds'%elapsed.total_seconds())
 		return values
 
 	@http.route('/apiv1/apl/data/hash',type='json', auth="public", csfr=False)
 	def api_v1_apl_data_hash(self, *arg, **post):
-		start=datetime.datetime.now()
+		tlr=_ulog(code="MP_GEN_APL_HSH", lib=__name__, desc='Generate APL data HASH')
+		#start=datetime.datetime.now()
 		#cr,uid,context=request.cr, request.uid, request.context
 		data=json.loads(json.dumps(request.jsonrequest))
 		clean_ids=self._get_clean_apl_ids(data)
+		tlr.set_qnt(len(clean_ids))
+		tlr.add_comment('[~] Generate for APL ids[%r]'%clean_ids)
 		apl_data,lines_data=self._get_apl_lines_data(clean_ids)
 		out=hash(str(apl_data)+str(lines_data))
 		values ={
 			'hash_apl':json.dumps(out)
 		}
-		stop=datetime.datetime.now()
-		elapsed=stop-start
-		_logger.info('Generate APL data HASH in %r seconds'%elapsed.total_seconds())
+		#stop=datetime.datetime.now()
+		#elapsed=stop-start
+		#_logger.info('Generate APL data HASH in %r seconds'%elapsed.total_seconds())
+		tlr.fix_end()
 		return values
 
 	@http.route('/apiv1/pillar/data/hash', type='json', auth="public", csfr=False)
 	def api_v1_pillar_data_hash(self, *arg, **post):
-		start=datetime.datetime.now()
+		tlr=_ulog(code="MP_GEN_PIL_HSH", lib=__name__, desc='Generate pillar data HASH')
+		#start=datetime.datetime.now()
 		#cr,uid,context=request.cr, request.uid, request.context
 		data=json.loads(json.dumps(request.jsonrequest))
 		clean_ids=self._get_clean_apl_ids(data)
+		tlr.set_qnt(len(clean_ids))
+		tlr.add_comment('[~] Generate for pillars of APLs ids[%r]'%clean_ids)
 		pillar_data=self._get_pillar_data(clean_ids)
 		out=hash(str(pillar_data))
 		values ={
 			'hash_pillar':json.dumps(out)
 		}
-		stop=datetime.datetime.now()
-		elapsed=stop-start
-		_logger.info('Generate PILLAR data HASH in %r seconds'%elapsed.total_seconds())
+		tlr.fix_end()
+		#stop=datetime.datetime.now()
+		#elapsed=stop-start
+		#_logger.info('Generate PILLAR data HASH in %r seconds'%elapsed.total_seconds())
 		return values
 	@http.route('/apiv1/ps/data/hash',type='json',auth="public",csfr=False)
 	def api_v1_ps_data_hash(self, *arg, **post):
-		start=datetime.datetime.now()
+		#start=datetime.datetime.now()
+		tlr=_ulog(code="MP_GEN_PS_HSH", lib=__name__, desc='Generate PS data HASH')
 		data=json.loads(json.dumps(request.jsonrequest))
 		clean_ids=self._get_clean_apl_ids(data)
+		tlr.set_qnt(len(clean_ids))
+		tlr.add_comment('[~] Generate hash (PS) by APLs ids[%r]'%clean_ids)
 		ps_data=self._get_ps_data(clean_ids)
 		out=hash(str(ps_data))
 		values ={
 			'hash_ps':json.dumps(out)
 		}
-		stop=datetime.datetime.now()
-		elapsed=stop-start
-		_logger.info('Generate PS data HASH in %r seconds'%elapsed.total_seconds())
+		#stop=datetime.datetime.now()
+		#elapsed=stop-start
+		#_logger.info('Generate PS data HASH in %r seconds'%elapsed.total_seconds())
+		tlr.fix_end()
 		return values
 	@http.route('/apiv1/trans/data/hash',type='json', auth="public", csfr=False)
 	def api_v1_trans_data_hash(self, *arg, **post):
-		start=datetime.datetime.now()
+		#start=datetime.datetime.now()
+		tlr=_ulog(code="MP_GEN_TS_HSH", lib=__name__, desc='Generate PS data HASH')
 		data=json.loads(json.dumps(request.jsonrequest))
 		clean_ids=self._get_clean_apl_ids(data)
+		tlr.set_qnt(len(clean_ids))
+		tlr.add_comment('[~] Generate hash (Trans) by APLs ids[%r]'%clean_ids)
 		trans_data=self._get_trans_data(clean_ids)
 		out=hash(str(trans_data))
 		values ={
 			'hash_trans':json.dumps(out)
 		}
-		stop=datetime.datetime.now()
-		elapsed=stop-start
-		_logger.info('Generate TRANS data HASH in %r seconds'%elapsed.total_seconds())
+		#stop=datetime.datetime.now()
+		#elapsed=stop-start
+		#_logger.info('Generate TRANS data HASH in %r seconds'%elapsed.total_seconds())
+		tlr.fix_end()
 		return values
 		#Define Settings Functions
 	@http.route('/apiv1/settings/global',type="json", auth="public",csfr=False)
 	def api_v1_settings_global(self, *arg, **post):
-		start=datetime.datetime.now()
+		gs_obj=request.registry['uis.global.settings']
+		tlr=_ulog(code='MP_GEN_GLSTNG',lib=__name__,desc='Generate global settings')
+		#start=datetime.datetime.now()
 		data=json.loads(json.dumps(request.jsonrequest))
 		_logger.debug(data)
 		cr,uid,context=request.cr,request.uid,request.context
-		gs_obj=request.registry['uis.global.settings']
 		gs_data={
 			"counter":0,
 			"gss":[]
@@ -388,6 +411,7 @@ class maps_data_json(http.Controller):
 		domain=[("enabled","=",True),("var","in",vnames)]
 		gs_ids=gs_obj.search(cr,uid,domain,context=context)
 		for gs in gs_obj.browse(cr,uid,gs_ids,context=context):
+			tlr.add_comment('[%r] Variable [%r] = %r'%(gs_data["counter"]+1,gs.var,gs.value))
 			gs_data["counter"]=gs_data["counter"]+1
 			gs_data["gss"].append({
 				'varname':gs.var,
@@ -396,13 +420,16 @@ class maps_data_json(http.Controller):
 		values={
 			'gs_data':json.dumps(gs_data)
 		}
-		stop=datetime.datetime.now()
-		elapsed=stop-start
-		_logger.info('Generate global settings in %r seconds'%elapsed.total_seconds())
+		#stop=datetime.datetime.now()
+		#elapsed=stop-start
+		#_logger.info('Generate global settings in %r seconds'%elapsed.total_seconds())
+		tlr.set_qnt(gs_data["counter"])
+		tlr.fix_end()
 		return values
 	@http.route('/apiv1/settings/layers',type="json",auth="public",csfr=False)
 	def api_v1_settings_layers(self, *arg, **post):
-		start=datetime.datetime.now()
+		tlr=_ulog(code='MP_GEN_LRSTNGS',lib=__name__,desc='Generate layers list')
+		#start=datetime.datetime.now()
 		data=json.loads(json.dumps(request.jsonrequest))
 		cr,uid,context=request.cr,request.uid,request.context
 		lr_obj=request.registry['uis.settings.layers']
@@ -413,6 +440,7 @@ class maps_data_json(http.Controller):
 			"lrs":[]
 		}
 		for lr in lr_obj.browse(cr,uid,lr_ids,context=context).sorted(key=lambda r:r.order):
+			tlr.add_comment('[%r] Layer %r (%r)'%(lr_data["counter"]+1, lr.name,lr.title))
 			lr_data["counter"]=lr_data["counter"]+1
 			lr_data["lrs"].append({
 				'name':lr.name,
@@ -425,9 +453,11 @@ class maps_data_json(http.Controller):
 		values={
 			'lr_data':json.dumps(lr_data)
 		}
-		stop=datetime.datetime.now()
-		elapsed=stop-start
-		_logger.info('Generate layers list in %r seconds'%elapsed.total_seconds())
+		#stop=datetime.datetime.now()
+		#elapsed=stop-start
+		#_logger.info('Generate layers list in %r seconds'%elapsed.total_seconds())
+		tlr.set_qnt(lr_data["counter"])
+		tlr.fix_end()
 		return values
 	@http.route('/apiv1/settings/pillar_type_list',type="json",auth="public", csfr=False)
 	def api_v1_pillar_type_list(self, *arg, **post):

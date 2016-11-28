@@ -10,6 +10,8 @@ import urllib2
 import math
 import requests
 import shutil
+import openerp
+
 from PIL import Image, ImageDraw, ImageFont
 '''try:
     import cStringIO as StringIO
@@ -23,6 +25,7 @@ font10= ImageFont.truetype (fontPath,10)
 font8= ImageFont.truetype (fontPath,8)
 font6= ImageFont.truetype (fontPath,6)
 
+_ulog=openerp.addons.passportvl.models.uis_papl_logger.ulog
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
@@ -149,22 +152,27 @@ class maps_data_json(http.Controller):
 		#Add code for update
 	@http.route('/maps/<string:lname>/<int:z>/<int:x>/<int:y>',type='http', auth="public")
 	def _get_tile_image(self,lname='',x=0,y=0,z=0):
-		start=datetime.datetime.now()
-		_logger.info('Get tile for %r (%r/%r/%r)'%(lname,z,x,y))
+		#start=datetime.datetime.now()
+		#_logger.info('Get tile for %r (%r/%r/%r)'%(lname,z,x,y))
 		#
+		tlr=_ulog(self,code='MP_GET_TILE',lib=__name__,desc='Get tile for layer %r (%r,%r,%r)'%(lname,z,x,y))
 		exc,nuc,img=self._check_cache(lname,z,x,y)
 		if not(exc):
+			tlr.add_comment('[~] Download to cache')
 			img=self._download_cache(lname,z,x,y)
 		if nuc:
+			tlr.add_comment('[~] Need update cache')
 			self._update_cache(lname,z,x,y)
 		#.encode('base64')
 		headers=[]
 		headers.append(('Content-Length', len(img)))
 		headers.append(('Content-Type','image/png'))
 		response = request.make_response(img, headers)
+		tlr.set_qnt(1)
+		tlr.fix_end()
 		#response.status_code = status
 		#
-		stop=datetime.datetime.now()
-		elapsed=stop-start
-		_logger.info('Generate TAP elevation data in %r seconds'%elapsed.total_seconds())
+		#stop=datetime.datetime.now()
+		#elapsed=stop-start
+		#_logger.info('Generate TAP elevation data in %r seconds'%elapsed.total_seconds())
 		return response

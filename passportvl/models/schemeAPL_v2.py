@@ -8,7 +8,7 @@ import math
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
-_logger.debug('Start scheme APLv2')
+#_logger.debug('Start scheme APLv2')
 scheme_width=800
 scheme_height=800
 border=20
@@ -45,7 +45,7 @@ def latlng2schemexy(lat,lng,minlat,minlng,maxlat,maxlng,width=scheme_width,heigh
 def getMinMaxLatLng(apl_id):
     minlat,maxlat,minlng,maxlng=360,0,360,0
     for pil in apl_id.pillar_id:
-        _logger.debug('pillar %r'%pil.id)
+        #_logger.debug('pillar %r'%pil.id)
         clat,clng=pil.latitude,pil.longitude
         if (clat!=0):
             if (clat>maxlat):
@@ -113,7 +113,7 @@ def getSchemedata(apl_id):
             dlng=-1
         if trans.latitude<trans.pillar_id.latitude:
             dlat=-1
-        _logger.debug('Trans glnglatperpx %r|%r'%(glngperpx,glatperpx))   
+        #_logger.debug('Trans glnglatperpx %r|%r'%(glngperpx,glatperpx))   
         plng=trans.longitude+dlng*d*glngperpx
         plat=trans.latitude+dlat*d*glatperpx
         trans_data["transformers"].append({
@@ -140,11 +140,11 @@ def getSchemedata(apl_id):
         lng1=pil.longitude
         lat2=pil.latitude
         lng2=pil.longitude
-        _logger.debug('Finder for base pillar %r'%pil.name)
+        #_logger.debug('Finder for base pillar %r'%pil.name)
         if pil.parent_id:
             np=pil.parent_id
             while (not(np.pillar_type_id.base)) and (np.parent_id) and (np.tap_id==pil.tap_id):
-                _logger.debug('Prev pillar is %r'%np.name)
+                #_logger.debug('Prev pillar is %r'%np.name)
                 np=np.parent_id
             lat2=np.latitude
             lng2=np.longitude
@@ -167,7 +167,7 @@ def drawpillar(draw,img,x,y,rot,text):
     draw.ellipse (points,fill="grey", outline="black")
     #fnt = ImageFont.truetype("arial.ttf", 15)
     #fnt = ImageFont.load("arial.pil")
-    _logger.debug('Pillar %r rotation is %r'%(text,rot))
+    #_logger.debug('Pillar %r rotation is %r'%(text,rot))
     draw.text((int(x+2+pillar_radius/2),int(y+1+pillar_radius/4)), text, font=font08, fill=(255,0,0,255))
 
 def drawtrans(draw,x,y,text):
@@ -214,13 +214,13 @@ def drawlines(draw,img,x1,y1,x2,y2,text):
 #    draw.text((int((x1+x2)/2)+15,int((y1+y2)/2)),text,font=font10,fill=(0,0,255,255))
     
 def drawScheme(img,apl_id):
-    _logger.debug('Start draw scheme for apl_id=%r'%apl_id)
+    #_logger.debug('Start draw scheme for apl_id=%r'%apl_id)
     points={}
     draw = ImageDraw.Draw(img)
     #draw.ellipse ((90,90,110,110),fill="red", outline="blue")
     minlat,minlng,maxlat,maxlng=getMinMaxLatLng(apl_id)
-    _logger.debug('Glatlng =%r/%r'%(glatperpx,glngperpx))
-    _logger.debug('Defined min|max lat/lng (%r|%r/%r|%r)'%(minlat,maxlat,minlng,maxlng))
+    #_logger.debug('Glatlng =%r/%r'%(glatperpx,glngperpx))
+    #_logger.debug('Defined min|max lat/lng (%r|%r/%r|%r)'%(minlat,maxlat,minlng,maxlng))
     ps_data, pillar_data, trans_data, pillar_links = getSchemedata(apl_id)
     for link in pillar_links["links"]:
         x1,y1=latlng2schemexy(link["lat1"],link["lng1"],minlat,minlng,maxlat,maxlng)
@@ -228,10 +228,10 @@ def drawScheme(img,apl_id):
         drawlines(draw,img,x1,y1,x2,y2,str(link["dist"]))
     for pil in pillar_data["pillars"]:
         x,y=latlng2schemexy(pil["latitude"],pil["longitude"],minlat,minlng,maxlat,maxlng)
-        _logger.debug('draw pillar %r in x,y (%r,%r)'%(pil["num_by_vl"],x,y))
+        #_logger.debug('draw pillar %r in x,y (%r,%r)'%(pil["num_by_vl"],x,y))
         drawpillar(draw,img,x,y,pil["rotate"],str(pil["num_by_vl"]))
     for trans in trans_data["transformers"]:
         x,y=latlng2schemexy(trans["platitude"],trans["plongitude"],minlat,minlng,maxlat,maxlng)
-        _logger.debug('draw transformer %r in (%r,%r)'%(trans["name"],x,y))
+        #_logger.debug('draw transformer %r in (%r,%r)'%(trans["name"],x,y))
         drawtrans(draw,x,y,trans["name"])
     return draw

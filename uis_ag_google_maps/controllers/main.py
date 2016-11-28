@@ -183,7 +183,7 @@ class pillar_google_map(http.Controller):
             domain=[("apl_id","=",apl_id.id)]
             trans_ids=trans_obj.search(cr, uid, domain, context=context)
             for trans in trans_obj.browse(cr, uid, trans_ids, context=context):
-                print trans.name
+                #print trans.name
                 ktp_data["counter"]=ktp_data["counter"]+1
                 ktp_data["trans"].append({
                     'id':trans.id,

@@ -61,11 +61,11 @@
           <field name="bld_year" string="Build Year"/>
           <field name="startexp_date" string="Start Explatation Date"/>
           <field name="line_len" string="Line Lengt (km)"/>
-		  <field name="line_len_calc" string="Calculate line len(m)"/>
+					<field name="line_len_calc" string="Calculate line len(m)"/>
           <field name="pillar_id" string="Pillars" widget='one2many'/>
-		  <field name="cnt_pillar_wo_tap"/>
-		  <field name="sup_substation_id" string="Supply Substation" widget='many2one'/>
-		  <button name="act_show_map" string="Map" type="object" icon="STOCK_FIND"/>
+					<field name="cnt_pillar_wo_tap"/>
+					<field name="sup_substation_id" string="Supply Substation" widget='many2one'/>
+					<button name="act_show_map" string="Map" type="object" icon="STOCK_FIND"/>
         </tree>
 		</field>
     </record>
@@ -208,7 +208,9 @@
 			  </group>
 			  <group>
 				<!--<label for="sup_substation_id" class="oe_edit_only"/>!-->
-                <field name="department_id"/>
+        <field name="department_id"/><!-- attrs="{'readonly':['|',('department_id_as_substation','==',True)]}"/>!-->
+				<field name="department_id_as_substation"/>
+				<field name="department_id_save" invisible="1"/><!-- attrs="{'invisible':[('department_id_as_substation','==',False)]}"/>!-->
 				<field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
 				<field name="apl_type"/>
 				<field name="feeder_num"/>

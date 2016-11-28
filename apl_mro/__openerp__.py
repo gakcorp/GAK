@@ -30,6 +30,7 @@ Main Features
             'views/mod_transformer_view.xml',
             'views/uis_papl_mro_view.xml',
             'views/uis_papl_mro_defect_view.xml'
+           
     ],
     'application': True,
 }

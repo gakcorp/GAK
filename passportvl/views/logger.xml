@@ -1,0 +1,43 @@
+<openerp>
+    <data>
+		<record id="uis_logger_action_window" model="ir.actions.act_window">
+			<field name="name">Logger</field>
+			<field name="res_model">uis.logger</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,graph</field>
+			<field name="auto_refresh">10</field>
+			<field name="limit">100</field>
+		</record>
+		
+		<menuitem name="Logger" id="uis_main_logger_menu" parent="uis_settings_menu_root" action="uis_logger_action_window"/>
+		
+		<record model="ir.ui.view" id="uis_logger_list">
+			<field name="name">Logger list</field>
+			<field name="model">uis.logger</field>
+			<field name="arch" type="xml">
+				<tree string="Log records" editable="top" create="false" edit="false" default_order='start_dt desc' colors="orange:delay>1;red:delay>2">
+					<field name="id"/>
+					<field name="code"/>
+					<field name="ipaddr"/>
+					<field name="start_dt"/>
+					<field name="delay"/>
+					<field name="uqnt"/>
+					<field name="desc_char"/>
+					
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="uis_main_logger_graph">
+			<field name="name">Log (Graph)</field>
+			<field name="model">uis.logger</field>
+			<field name="arch" type="xml">
+			<graph string="Logs delay" type="pivot">
+				<field name="start_dt" type="row" interval="day"/>
+				<field name="code" type="col"/>
+				<field name="ipaddr" type="col"/>
+				<field name="delay" type="measure" operator="+"/>
+			</graph>
+			</field>
+		</record>
+	</data>
+</openerp>

@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 9.0c-20161107\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-28 09:36+0000\n"
-"PO-Revision-Date: 2016-11-28 13:43+0300\n"
+"POT-Creation-Date: 2016-11-16 11:55+0000\n"
+"PO-Revision-Date: 2016-11-16 15:57+0300\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: \n"
-"Language: ru\n"
+"Language: en\n"
 "X-Generator: Poedit 1.8.6\n"
 
 #. module: passportvl
@@ -182,11 +182,6 @@ msgstr "Воздушная линия"
 #: model:ir.model.fields,field_description:passportvl.field_uis_icon_settings_pillar_anchor
 msgid "Anchor Point"
 msgstr "Точка привязки"
-
-#. module: passportvl
-#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_department_id_as_substation
-msgid "As at the substation"
-msgstr "как на подстанции"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_settings_auto_magnetic_pillar_to_tap
@@ -566,7 +561,7 @@ msgstr "Растояние между опорами"
 #. module: passportvl
 #: selection:uis.papl.substation,state:0 selection:uis.papl.transformer,state:0
 msgid "EXPLOITATION"
-msgstr "ЭКСПЛУАТАЦИЯ"
+msgstr "Эксплуатация"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_pillar_elevation
@@ -936,7 +931,7 @@ msgstr "Список ВЛ"
 #. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_apl_list
 msgid "List of APL apt"
-msgstr "Список ВЛ"
+msgstr "List of APL apt"
 
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_apl_list
@@ -973,7 +968,7 @@ msgstr "Подстанции"
 #. module: passportvl
 #: model:ir.ui.menu,name:passportvl.uis_papl_menu_substation_list
 msgid "List of Power substation"
-msgstr "Список подстанций"
+msgstr "Списко подстанций"
 
 #. module: passportvl
 #: model:ir.actions.act_window,name:passportvl.uis_papl_tap_action_window
@@ -1032,7 +1027,7 @@ msgstr "Населенный пункт:"
 #. module: passportvl
 #: model:ir.ui.view,arch_db:passportvl.uis_logger_list
 msgid "Log records"
-msgstr "Записи журнала"
+msgstr "Log records"
 
 #. module: passportvl
 #: model:ir.actions.act_window,name:passportvl.uis_logger_action_window
@@ -1470,7 +1465,7 @@ msgstr "ГОТОВ К ЭКСПЛУАТАЦИИ"
 #. module: passportvl
 #: selection:uis.papl.substation,state:0 selection:uis.papl.transformer,state:0
 msgid "REPAIRS"
-msgstr "РЕМОНТ"
+msgstr "Ремонт"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_t1_current
@@ -1508,11 +1503,6 @@ msgstr "Стрела провеса средняя"
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_sag_min
 msgid "Sag minimum"
 msgstr "Стрела провеса минимальная"
-
-#. module: passportvl
-#: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_department_id_save
-msgid "Saved Department"
-msgstr "Saved Department"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_apl_scheme_image
@@ -1730,7 +1720,7 @@ msgstr "Отпайка"
 #: model:ir.ui.view,arch_db:passportvl.uis_papl_pillar_list
 #: model:ir.ui.view,arch_db:passportvl.wizard_create_pillar
 msgid "Tap"
-msgstr "Отпайка"
+msgstr "ОТпайка"
 
 #. module: passportvl
 #: model:ir.model.fields,field_description:passportvl.field_uis_papl_transformer_tap_id

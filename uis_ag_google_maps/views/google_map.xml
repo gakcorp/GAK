@@ -12,10 +12,10 @@
 		<!--<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/bootstrap.min.css"/>!-->
 		<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/leftbar.css"/>
 		<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/rightbar.css"/>
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-		<script src="http://maps.google.com/maps/api/js?key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"></script>
+		<script src="https://maps.google.com/maps/api/js?key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"></script>
     </head>
     <body style="overflow-x: hidden;"> <!--t-att-data-partner-url="pillar_url or ''"!-->
          <script>

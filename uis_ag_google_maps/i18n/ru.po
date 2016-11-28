@@ -1,28 +1,329 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# * website_google_map
-# 
-# Translators:
+# 	* uis_ag_google_maps
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo 9.0\n"
+"Project-Id-Version: Odoo Server 9.0c-20161107\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-07 14:41+0000\n"
-"PO-Revision-Date: 2015-10-09 08:51+0000\n"
-"Last-Translator: Martin Trigaux\n"
-"Language-Team: Russian (http://www.transifex.com/odoo/odoo-9/language/ru/)\n"
+"POT-Creation-Date: 2016-11-17 07:06+0000\n"
+"PO-Revision-Date: 2016-11-17 10:15+0300\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
 "Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+"X-Generator: Poedit 1.8.6\n"
 
-#. module: website_google_map
-#: model:ir.ui.view,arch_db:website_google_map.google_map
-msgid "&lt;!DOCTYPE html&gt;"
-msgstr "&lt;!DOCTYPE html&gt;"
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid ""
+"<span class=\"glyphicon glyphicon-flash\"/>\n"
+"\t\t\t\t\t\tTransformers\n"
+"\t\t\t\t\t\t<span class=\"badge cust_badge\" id=\"trans_count_badge\"/>"
+msgstr ""
+"<span class=\"glyphicon glyphicon-flash\"/>\n"
+"\t\t\t\t\t\tКТП\n"
+"\t\t\t\t\t\t<span class=\"badge cust_badge\" id=\"trans_count_badge\"/>"
 
-#. module: website_google_map
-#: model:ir.ui.view,arch_db:website_google_map.google_map
-msgid "World Map"
-msgstr "Карта мира"
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid ""
+"<span class=\"glyphicon glyphicon-record\"/>\n"
+"\t\t\t\t\t\tPillars\n"
+"\t\t\t\t\t\t<span class=\"badge cust_badge\" id=\"pillar_count_badge\"/>"
+msgstr ""
+"<span class=\"glyphicon glyphicon-record\"/>\n"
+"\t\t\t\t\t\tОпоры\n"
+"\t\t\t\t\t\t<span class=\"badge cust_badge\" id=\"pillar_count_badge\"/>"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid ""
+"<span class=\"glyphicon glyphicon-transfer\"/>\n"
+"\t\t\t\t\t\tAPL\n"
+"\t\t\t\t\t\t<span class=\"badge cust_badge\" id=\"apl_count_badge\"/>"
+msgstr ""
+"<span class=\"glyphicon glyphicon-transfer\"/>\n"
+"\t\t\t\t\t\tВЛL\n"
+"\t\t\t\t\t\t<span class=\"badge cust_badge\" id=\"apl_count_badge\"/>"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid "<span class=\"sr-only\">20% Repairs</span>"
+msgstr "<span class=\"sr-only\">20% Ремонт</span>"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid "<span class=\"sr-only\">30% Defects</span>"
+msgstr "<span class=\"sr-only\">30% Дефект</span>"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid "<span class=\"sr-only\">50% Exploitation</span>"
+msgstr "<span class=\"sr-only\">50% Эксплуатация</span>"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_papl_apl_map
+msgid "APL map"
+msgstr "Карта ВЛ"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.menu,name:uis_ag_google_maps.uis_cache_layers_menu
+msgid "Cache"
+msgstr "Кэш"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_cache_life_day
+msgid "Cache Live time"
+msgstr "Срок жизни"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_cache_date
+msgid "Cache date"
+msgstr "Дата создания"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_cache_end_life
+msgid "Cache end life date"
+msgstr "Дата окончания срока"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_cache
+msgid "Cashed layer"
+msgstr "Слой"
+
+#. module: uis_ag_google_maps
+#: model:ir.actions.act_window,help:uis_ag_google_maps.uis_layers_settings_action_window
+msgid "Create new layer"
+msgstr "Создать новый слой"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_create_uid
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_create_uid
+msgid "Created by"
+msgstr "Создано"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_create_date
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_create_date
+msgid "Created on"
+msgstr "Создан"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_alt
+msgid "Description"
+msgstr "Описание"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_display_name
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_display_name
+msgid "Display Name"
+msgstr "Отображаемое Имя"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_url_code
+msgid "Get Tule URL function"
+msgstr "URL (GET) тайл (функция)"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_id
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_id
+msgid "ID"
+msgstr "ID"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_icon
+msgid "Icon image"
+msgstr "Изображение"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers___last_update
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers___last_update
+msgid "Last Modified on"
+msgstr "Последнее изменение"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_write_uid
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_write_uid
+msgid "Last Updated by"
+msgstr "Последний раз обновлено"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_write_date
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_write_date
+msgid "Last Updated on"
+msgstr "Последний раз обновлено"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_layer_name
+msgid "Layear Name"
+msgstr "Наименование слоя"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_layer
+msgid "Layer"
+msgstr "Слой"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_maxzoom
+msgid "Layer Max Zoom"
+msgstr "Макс.увеличение для слоя"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_minzoom
+msgid "Layer Min Zoom"
+msgstr "Мин. увеличение для слоя"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.menu,name:uis_ag_google_maps.uis_layers_settings_menu
+msgid "Layers"
+msgstr "Слои"
+
+#. module: uis_ag_google_maps
+#: model:ir.model,name:uis_ag_google_maps.model_uis_settings_layers
+msgid "Layers for maps"
+msgstr "Слой для карты"
+
+#. module: uis_ag_google_maps
+#: model:ir.actions.act_window,name:uis_ag_google_maps.uis_layers_cache_action_window
+#: model:ir.actions.act_window,name:uis_ag_google_maps.uis_layers_settings_action_window
+msgid "Layers settings"
+msgstr "Настройки слоя"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_layers_settings_list
+msgid "List of cache (for map)"
+msgstr "List of cache (for map)"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid "MAPS"
+msgstr "Карты"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid "Map"
+msgstr "Карта"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.view_papl_apl_layer_settings_form
+msgid "Maps Settings"
+msgstr "Настройки карты"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_med_delay
+msgid "Medium delay"
+msgstr "Средняя задержка"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_name
+msgid "Name"
+msgstr "Наименование"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_opacity
+msgid "Opacity"
+msgstr "Прозрачность"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_layers_settings_form
+msgid "Photo form"
+msgstr "Фотография"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_papl_apl_rec_layer_id
+msgid "Recomended Layer"
+msgstr "Рекомендованный слой"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_req_cnt
+msgid "Requests count"
+msgstr "Кол-во запросов"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid "Select Map Type<br/>"
+msgstr "Слой"
+
+#. module: uis_ag_google_maps
+#: model:ir.ui.view,arch_db:uis_ag_google_maps.uis_google_map
+msgid "Status"
+msgstr "Статус"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_auto_stretch_mz
+msgid "Stretch tile after maxzoom"
+msgstr "Растягивать тайл (после макс.увеличения)"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_title
+msgid "Title"
+msgstr "Обращение"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_url_base
+msgid "URL base"
+msgstr "URL base"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_x
+msgid "X tile"
+msgstr "X tile"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_y
+msgid "Y tile"
+msgstr "Y tile"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_enabled
+msgid "enabled"
+msgstr "Активно"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_is_stretch_tile
+msgid "is stretch tile"
+msgstr "Апроксим. тайл"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_name
+msgid "name"
+msgstr "Наименование"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_order
+msgid "order"
+msgstr "Порядок"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_origin_url
+msgid "origin URL string"
+msgstr "URL извлечения"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_settings_layers_shown
+msgid "show layer"
+msgstr "Показывать слой"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_tile
+msgid "tile"
+msgstr "Тайл"
+
+#. module: uis_ag_google_maps
+#: model:ir.model,name:uis_ag_google_maps.model_uis_cache_layers
+msgid "uis.cache.layers"
+msgstr "uis.cache.layers"
+
+#. module: uis_ag_google_maps
+#: model:ir.model,name:uis_ag_google_maps.model_uis_papl_apl
+msgid "uis.papl.apl"
+msgstr "uis.papl.apl"
+
+#. module: uis_ag_google_maps
+#: model:ir.model.fields,field_description:uis_ag_google_maps.field_uis_cache_layers_z
+msgid "zoom layer"
+msgstr "Увеличение"

@@ -29,9 +29,11 @@
         'views/templates.xml',
         'views/transformation.xml',
         'views/settings.xml',
+        'views/logger.xml',
         'views/reports/uis_papl_apl_report.xml',
         'views/reports/uis_papl_apl_report_passport.xml',
         'views/schemas/apl_scheme.xml',
+        
 
     ],
     # only loaded in demonstration mode
