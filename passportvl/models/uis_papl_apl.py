@@ -18,7 +18,13 @@ _ulog=uis_papl_logger.ulog
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
+#Define Passport VL constants
 cv_apl_def_type=openerp._('*NT*')
+cv_apl_voltage=openerp._('*0*')
+cv_apl_feed=openerp._('*NFD*')
+cv_apl_substation=openerp._('*NPS*')
+cv_apl_voltage=openerp._('kV')
+cv_apl_feed_abbr=openerp._('F')
 
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
@@ -146,7 +152,7 @@ class uis_papl_apl(models.Model):
 			#cv_apl_feed	-	default code for feeder (if not defined ='*NFD*')
 			#cv_apl_substation -default code for substation (if not defined ='*NPS*')
 			#cv_apl_voltage	-	default abbreviation of vlotage (if not defined ='kV')
-			#cv_feed_abbr	-	default abbreviation of feeder (if not defined ='F')
+			#cv_apl_feed_abbr	-	default abbreviation of feeder (if not defined ='F')
 			
 			
 			str_apl_type=cv_apl_def_type

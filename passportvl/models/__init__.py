@@ -9,3 +9,6 @@ from . import uis_papl_department
 from . import uis_papl_transformation
 from . import uis_papl_settings
 from . import uis_papl_logger
+
+#load modernizing models
+from . import mod

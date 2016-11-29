@@ -29,10 +29,12 @@ class uis_global_settings(models.Model):
 class uis_settings(models.Model):
 	_name='uis.settings'
 	_description='Settings of AG application'
-	uid=fields.Many2one('res.users', string='User')
+	user_ids=fields.Many2one('res.users', string='Users')
 	auto_normalize_tap=fields.Boolean(string='Auto normalize tap', default=True)
 	auto_magnetic_pillar_to_tap=fields.Boolean(string='Auto magnetic pillar to line of tap', default=True)
 	google_elevation_API=fields.Char(string='Google elevation API')
+	
+	_sql_constraints = [('uid_unique', 'unique(uid)', 'Settings for this user already exists')]
 
 class uis_settings_apl_view(models.Model):
 	_name='uis.papl.view.settings.apl'
