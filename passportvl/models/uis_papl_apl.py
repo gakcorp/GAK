@@ -171,7 +171,7 @@ class uis_papl_apl(models.Model):
 			if apl.short_name:
 				str_short_name='('+unicode(apl.short_name)+')'
 			nname=unicode(str_apl_type)+'-'+str_voltage+'kV'+' F.'+str_feeder_num+'-'+str_ssn+str_short_name
-			_logger.debug(self.env.user)
+			_logger.debug(self.env.user.employee_ids)
 			apl.name=nname
 	
 	@api.multi
