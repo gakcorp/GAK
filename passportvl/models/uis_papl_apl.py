@@ -23,7 +23,7 @@ cv_apl_def_type=openerp._('*NT*')
 cv_apl_voltage=openerp._('*0*')
 cv_apl_feed=openerp._('*NFD*')
 cv_apl_substation=openerp._('*NPS*')
-cv_apl_voltage=openerp._('kV')
+cv_apl_voltage_abbr=openerp._('kV')
 cv_apl_feed_abbr=openerp._('F')
 
 class uis_papl_apl(models.Model):
@@ -145,34 +145,61 @@ class uis_papl_apl(models.Model):
 	@api.depends('short_name','apl_type','feeder_num','voltage','sup_substation_id')
 	def _get_apl_name(self):
 		for apl in self:
-			nname=''
 			#work with defined rpython consts
 			#cv_apl_def_type - 	default type (if not defined =NT=)
 			#cv_apl_voltage - 	default voltage code (if not defined = *0*)
 			#cv_apl_feed	-	default code for feeder (if not defined ='*NFD*')
 			#cv_apl_substation -default code for substation (if not defined ='*NPS*')
-			#cv_apl_voltage	-	default abbreviation of vlotage (if not defined ='kV')
+			#cv_apl_voltage_abbr	-	default abbreviation of volotage (if not defined ='kV')
 			#cv_apl_feed_abbr	-	default abbreviation of feeder (if not defined ='F')
+
+			dname=''
+			def_frm='ta+"-"+va+av+" "+af+fa+"-"+sa+sn'
+			#type of APL
+			ta=apl.apl_type
+			if not ta:
+				ta=self.env.user.employee_papl_ids.code_empty_type_apl
+				if not ta:
+					ta=cv_apl_def_type
+			#voltage of APL
+			vai=apl.voltage
+			va=str(vai)
+			if not (vai>0):
+				va=self.env.user.employee_papl_ids.code_empty_voltage_apl
+				if not va:
+					va=cv_apl_voltage
+			#abbr voltage:
+			av=self.env.user.employee_papl_ids.code_abbr_voltage_apl
+			if not av:
+				av=cv_apl_voltage_abbr
 			
-			
-			str_apl_type=cv_apl_def_type
-			if apl.apl_type:
-				str_apl_type=unicode(apl.apl_type)
-			str_voltage='*0*'
-			if apl.voltage>0:
-				str_voltage=str(apl.voltage)
-			str_feeder_num='*NFD*'
-			if apl.feeder_num>0:
-				str_feeder_num=str(apl.feeder_num)
-			str_ssn='*NPS*'
-			if (apl.sup_substation_id):
-				str_ssn=apl.sup_substation_id.name
-			str_short_name=''
+			#feed apl
+			fai=apl.feeder_num
+			fa=str(fai)
+			if not(fai>0):
+				fa=self.env.user.employee_papl_ids.code_empty_feed_apl
+				if not fa:
+					fa=cv_apl_feed
+			#abbr feed
+			af=self.env.user.employee_papl_ids.code_abbr_feed_apl
+			if not af:
+				af=cv_apl_feed_abbr
+			#substation
+			sa=apl.sup_substation_id.name
+			if not sa:
+				sa=self.env.user.employee_papl_ids.code_empty_substation_apl
+				if not sa:
+					sa=cv_apl_substation
+			apl.sup_substation_id.name
+			sn=''
 			if apl.short_name:
-				str_short_name='('+unicode(apl.short_name)+')'
-			nname=unicode(str_apl_type)+'-'+str_voltage+'kV'+' F.'+str_feeder_num+'-'+str_ssn+str_short_name
-			_logger.debug(self.env.user.employee_ids)
-			apl.name=nname
+				sn='('+unicode(apl.short_name)+')'
+			
+			if self.env.user.employee_papl_ids.disp_apl_frm:
+				def_frm=self.env.user.employee_papl_ids.disp_apl_frm
+			dname=eval(def_frm)
+			apl.name=dname
+				
 	
 	@api.multi
 	def define_taps_num(self):

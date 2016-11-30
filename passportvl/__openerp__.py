@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base','mail'],
 
     # always loaded
     'data': [
@@ -28,6 +28,7 @@
         'views/department.xml',
         'views/templates.xml',
         'views/transformation.xml',
+        'views/employee_views.xml',
         'views/settings.xml',
         'views/logger.xml',
         'views/reports/uis_papl_apl_report.xml',

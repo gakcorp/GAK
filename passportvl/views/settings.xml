@@ -1,6 +1,28 @@
 <openerp>
     <data>
 		<!--Actions items!-->
+		<record id="uis_papl_employee_action_window" model="ir.actions.act_window">
+			<field name="name">ActivGIS employee</field>
+			<field name="res_model">uis.papl.employee</field>
+			<field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+			<!--NUPD Need add kanban view an xml for kanban from HR module!-->
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+			<!-- NUPD Add search filter!-->
+            <!--<field name="search_view_id" ref="view_employee_filter"/><!-->
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new ActivGIS employee.
+              </p><p>
+                With just a quick glance on the ActivGIS employee screen, you
+                can easily find all the information you need for each person;
+                contact data, job position, department and set personal settings.
+              </p>
+            </field>
+		</record>
+		
 		<record id="uis_main_settings_action_window" model="ir.actions.act_window">
 			<field name="name">Main Settings</field>
 			<field name="res_model">uis.settings</field>
@@ -52,6 +74,7 @@
 		<menuitem name="Settings" id="uis_main_settings_menu" parent="uis_settings_menu_root" action="uis_main_settings_action_window"/>
 		<menuitem name="Global Settings" id="uis_global_settings_menu" parent="uis_settings_menu_root" action="uis_global_settings_action_window"/>
 		<menuitem name="Pillar Icons" id="uis_pillar_icon_settings_menu" parent="uis_settings_menu_root" action="uis_icon_settings_action_window"/>
+		<menuitem name="Employees" id="uis_papl_employee_menu" parent="uis_settings_menu_root" action="uis_papl_employee_action_window"/>
 		<menuitem name="Pillar Types" id="uis_pillar_type_settings_menu" parent="uis_settings_menu_root" action="uis_pillar_type_settings_action_window"/>
 		<menuitem name="APL display settings" id="uis_papl_view_settings_apl_menu" parent="uis_settings_menu_root" action="uis_papl_view_settings_apl_action_window"/>
 		<!-- views !-->
