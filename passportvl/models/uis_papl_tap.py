@@ -8,6 +8,11 @@ from . import uis_papl_logger
 import logging
 import datetime
 import openerp
+import googlemaps
+
+_ulog=uis_papl_logger.ulog
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
 
 cv_tap_empty_apl=openerp._('*NOAPL*')
 cv_tap_empty_conn_pillar=openerp._('*NOPIL*')
@@ -15,6 +20,15 @@ cv_tap_empty_num_vl=openerp._('*NONUM*')
 cv_tap_abbr_ml=openerp._('ML')
 cv_tap_abbr_tap=openerp._('T')
 
+class uis_papl_tap_elevation(models.Model):
+	_name = 'uis.papl.tap.elevation'
+	tap_id=fields.Many2one('uis.papl.tap', string='TAP')
+	dist=fields.Float(digits=(6,2), string="Distance from start")
+	latitude=fields.Float(digits=(2,6), string="Latitude")
+	longitude=fields.Float(digits=(2,6), string="Longitude")
+	elevation=fields.Float(digits=(2,6), string="Elevation")
+	resolution=fields.Float(digits=(2,6), string="Resolution")
+	
 
 class uis_papl_tap(models.Model):
 	_name = 'uis.papl.tap'
@@ -30,7 +44,67 @@ class uis_papl_tap(models.Model):
 	conn_pillar_id=fields.Many2one('uis.papl.pillar', string='Connect Pilar', compute='_get_num_by_vl')
 	code=fields.Integer(string='Code', compute='_get_unicode')
 	full_code=fields.Char(string='UniCode', compute='_get_unicode')
+	tap_encode_path=fields.Text(string='Google API pillar path decode', compute='_get_pillar_path')
+	tap_elevation_ids=fields.One2many('uis.papl.tap.elevation', 'tap_id', string="Elevations", compute='get_tap_elevations')
 	
+	@api.depends('tap_encode_path')
+	def get_tap_elevations(self):
+		tlr=_ulog(self,code='CALC_TAP_ELVT', lib=__name__,desc='Calculate tap elevations')
+		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI'
+		client=googlemaps.Client(key)
+		qnt_point=300 #NUPD Load from settings
+		for tap in self:
+			res=[]
+			try:
+				#res=googlemaps.elevation.elevation_along_path(client,str(tap.tap_encode_path),qnt_point)
+				res=googlemaps.client.elevation_along_path(client,str(tap.tap_encode_path),qnt_point)
+			except ValueError:
+				_logger.debug('error')
+			#_logger.debug(res)
+			# {u'resolution': 152.7032318115234, u'elevation': 127.8238067626953, u'location': {u'lat': 56.34013832776039, u'lng': 55.53444859530858}}
+			dd=tap.line_len_calc/qnt_point
+			i=0
+			for item in res:
+				res=item['resolution']
+				elv=item['elevation']
+				lat=item['location']['lat']
+				lng=item['location']['lng']
+				dist=i*dd
+				i+=1
+				_logger.debug('dist = %r elevation=%r'%(dist,elv))
+				
+		tlr.fix_end()
+		
+	def _get_pillar_path(self):
+		tlr=_ulog(self,code='CALC_TAP_PATH',lib=__name__,desc='Calculate encode polyline for tap')
+		i=0
+		for tap in self:
+			i+=1
+			points=[]
+			tlr.add_comment('[%r] Calculate path for tap id %r'%(i,tap.id))
+			ep=None
+			if tap.pillar_cnt>0:
+				for pil in tap.pillar_ids.sorted(key=lambda r:r.num_by_vl, reverse=False):
+					point={
+						'lat':pil.latitude,
+						'lng':pil.longitude
+					}
+					points.append(point)
+					ep=pil
+				if ep.parent_id:
+					point={
+						'lat':ep.parent_id.latitude,
+						'lng':ep.parent_id.longitude
+					}
+					points.append(point)
+				path=googlemaps.convert.encode_polyline(points)
+				tap.tap_encode_path=path
+				#NUPD delete
+		tlr.set_qnt(i)
+		tlr.fix_end()
+		
+		
+		
 	@api.depends('num_by_vl','apl_id','conn_pillar_id')
 	def _get_tap_full_name(self):
 		#variables:
