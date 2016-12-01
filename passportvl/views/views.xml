@@ -120,7 +120,7 @@
 	len_prev_pillar=fields.Float(digits=(5,2), compute='_pillar_get_len')
 	azimut_from_prev=fields.Float(digits=(3,2), compute='_pillar_get_len')
 	elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
-	apl_id=fields.Many2one('uis.papl.apl', string='APL')
+	apl_id=fields.Many2one('Elevationapl', string='APL')
 	tap_id=fields.Many2one('uis.papl.tap', string='Taps')
 	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
@@ -479,6 +479,23 @@
 			</kanban>
 		</field>
 	</record>
+	
+	<record model="ir.ui.view" id="uis_papl_tap_elevation_list">
+		<field name="name">Tap Elevation List</field>
+	  <field name="model">uis.papl.tap.elevation</field>
+	  <field name="arch" type="xml">
+		<tree string="List of Tap Elevation">
+		  <field name="id"/>
+			<field name="tap_id"/>
+			<field name="dist"/>
+			<field name="latitude"/>
+			<field name="longitude"/>
+			<field name="elevation"/>
+			<field name="resolution"/>
+		</tree>
+	  </field>
+	</record>
+	
 	<record model="ir.ui.view" id="uis_papl_tap_list">
 	  <field name="name">Tap List</field>
 	  <field name="model">uis.papl.tap</field>
@@ -668,6 +685,16 @@
 	  </field>
 	</record>
 	
+		<record id="uis_papl_tap_elevation_action_window" model="ir.actions.act_window">
+	  <field name="name">List Elevation</field>
+	  <field name="res_model">uis.papl.tap.elevation</field>
+	  <field name="view_type">form</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p class="oe_view_nocontent_create">Create new Tap elevation</p>
+	  </field>
+		</record>
+	
 	<record id="uis_papl_wiz_creat_pillar" model="ir.actions.act_window">
 	  <field name="name">Create new pillars</field>
 	  <field name="res_model">uis.papl.wizard.create.pillars</field>
@@ -724,6 +751,9 @@
 	
 	<menuitem name="List of APL apt" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
               action="uis_papl_apl_action_window"/>
+
+<menuitem name="Tap elevation points" id="uis_papl_menu_tap_elevation_list" parent="uis_papl_menu_apl"
+              action="uis_papl_tap_elevation_action_window"/>
 
 	<menuitem name="List of Tap" id="uis_papl_menu_tap_list" parent="uis_papl_menu_apl"
               action="uis_papl_tap_action_window"/>
