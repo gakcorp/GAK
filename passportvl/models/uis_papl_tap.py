@@ -34,10 +34,22 @@ class uis_papl_tap_elevation(models.Model):
 	elevation=fields.Float(digits=(2,6), string="Elevation")
 	resolution=fields.Float(digits=(2,6), string="Resolution")
 	
-	def add_ne(self,tap,data,dd):
+	def add_ne(self,tap):
+		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
+		client=googlemaps.Client(key)
+		qnt_point_perpil=3 #NUPD Load from settings
+		_logger.debug(tap.id)
+		_logger.debug('Start for tap %r'%unicode(tap.name))
+		qnt_point=qnt_point_perpil*tap.pillar_cnt
+		res=[]
+		try:
+			res=googlemaps.client.elevation_along_path(client,str(tap.tap_encode_path),qnt_point)
+		except googlemaps.exceptions.ApiError:
+			_logger.debug('error')
+		dd=tap.line_len_calc/qnt_point
 		el_ids=[]
 		i=0
-		for item in data:
+		for item in res:
 				resol=item['resolution']
 				elv=item['elevation']
 				lat=item['location']['lat']
@@ -78,19 +90,21 @@ class uis_papl_tap(models.Model):
 	@api.one
 	def _get_tap_elevations(self):
 		tlr=_ulog(self,code='CALC_TAP_ELVT', lib=__name__,desc='Calculate tap elevations')
-		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
-		client=googlemaps.Client(key)
-		qnt_point_perpil=3 #NUPD Load from settings
-		_logger.debug(self.id)
-		_logger.debug('Start for tap %r'%unicode(self.name))
-		qnt_point=qnt_point_perpil*self.pillar_cnt
-		res=[]
-		try:
-			res=googlemaps.client.elevation_along_path(client,str(self.tap_encode_path),qnt_point)
-		except googlemaps.exceptions.ApiError:
-			_logger.debug('error')
-		dd=self.line_len_calc/qnt_point
-		elv_ids=self.env['uis.papl.tap.elevation'].add_ne(self,res,dd)
+		_logger.debug('!!!!!!!!!!!!!!!!!!!%r!!!!!!!!!!!!!!!!'%self.name)
+		#elv_ids=self.env['uis.papl.tap.elevation'].add_ne(self)
+		#for values in elv_ids:
+		if self.id<2:
+			self.tap_elevation_ids |= self.env['uis.papl.tap.elevation'].sudo().create({
+				'tap_id':self.id,
+				'dist':1,
+				'latitude':2,
+				'longitude':3,
+				'elevation':4,
+				'resolution':5
+			}
+			)
+		_logger.debug('---------------end----------------')
+		#self.tap_elevations_ids=elv_ids
 		#self.tap_elevation_ids=[(6,0,elv_ids)]
 		'''for tap in self:
 			_logger.debug('Start for tap %r'%unicode(tap.name))
