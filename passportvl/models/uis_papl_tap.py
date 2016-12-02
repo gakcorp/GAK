@@ -11,6 +11,11 @@ import logging
 import datetime
 import openerp
 import googlemaps
+import json
+import numpy as np
+from plotly.offline import download_plotlyjs, init_notebook_mode, iplot, plot
+from plotly.graph_objs import *
+
 
 distance2points=uismodels.distance2points
 distangle2points=uismodels.distangle2points
@@ -85,38 +90,83 @@ class uis_papl_tap(models.Model):
 	code=fields.Integer(string='Code', compute='_get_unicode')
 	full_code=fields.Char(string='UniCode', compute='_get_unicode')
 	tap_encode_path=fields.Text(string='Google API pillar path decode', compute='_get_pillar_path')
-	tap_elevation_ids=fields.One2many('uis.papl.tap.elevation', 'tap_id', string="Elevations", compute='_get_tap_elevations')
+	tap_elevation_json=fields.Text(string='Elevation data', compute='_get_tap_elv_txt')
+	tap_pillar_elevation_json=fields.Text(string='Pillar elevation data', compute='_get_pillar_path')
+	#tap_elevation_ids=fields.One2many('uis.papl.tap.elevation', 'tap_id', string="Elevations", compute='_get_tap_elevations')
+	profile_image=fields.Binary(string="Profile", compute='_get_profile')
 	
-	@api.one
-	def _get_tap_elevations(self):
-		tlr=_ulog(self,code='CALC_TAP_ELVT', lib=__name__,desc='Calculate tap elevations')
-		_logger.debug('!!!!!!!!!!!!!!!!!!!%r!!!!!!!!!!!!!!!!'%self.name)
-		#elv_ids=self.env['uis.papl.tap.elevation'].add_ne(self)
-		#for values in elv_ids:
-		if self.id<2:
-			self.tap_elevation_ids |= self.env['uis.papl.tap.elevation'].sudo().create({
-				'tap_id':self.id,
-				'dist':1,
-				'latitude':2,
-				'longitude':3,
-				'elevation':4,
-				'resolution':5
-			}
+	@api.depends('tap_elevation_json','tap_pillar_elevation_json')
+	def _get_profile(self):
+		tlr=_ulog(self, code='CALC_TAP_PRFL', lib=__name__, desc='Calculate elevation profile for tap')
+		for tap in self:
+			tlr.add_comment('[%r] Calculete for tap %r'%(tap.id, tap.name))
+			init_notebook_mode()
+			N=500
+			field_x=[]
+			field_y=[]
+			#_logger.debug(json.dump())
+			for dt in json.loads(tap.tap_elevation_json):
+				field_x.append(dt['d'])
+				field_y.append(dt['e'])
+			trace=Scatter(
+				x=field_x,
+				y=field_y
 			)
-		_logger.debug('---------------end----------------')
-		#self.tap_elevations_ids=elv_ids
-		#self.tap_elevation_ids=[(6,0,elv_ids)]
-		'''for tap in self:
-			_logger.debug('Start for tap %r'%unicode(tap.name))
-			qnt_point=qnt_point_perpil*tap.pillar_cnt
+			layout=Layout(
+				showlegend=False,
+				height=600,
+				width=1000
+			)
+			px,py=[],[]
+			for dt in json.loads(tap.tap_pillar_elevation_json):
+				px.append(dt['d'])
+				py.append(dt['e'])
+				px.append(dt['d'])
+				py.append(dt['e']+dt['h'])
+			trace_pil=Scatter(x=px,y=py,mode="markers")
+			wx,wy=[],[]
+			for dt in json.loads(tap.tap_pillar_elevation_json):
+				wx.append(dt['d'])
+				wy.append(dt['e']+dt['h'])
+			
+			trace_wire=Scatter(x=wx,y=wy,mode="line")
+			data=[trace,trace_pil,trace_wire]
+			_logger.debug(trace)
+			fig=dict(data=data,layout=layout)
+			d=plot(fig,image='png',image_filename='/temp/tap_el_%r'%tap.id)
+			
+			_logger.debug(d)
+		tlr.fix_end()
+	@api.depends('tap_encode_path')
+	def _get_tap_elv_txt(self):
+		tlr=_ulog(self,code='CALC_TAP_ELTX', lib=__name__,desc='Calculate tap elevations to text')
+		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
+		client=googlemaps.Client(key)
+		for tap in self:
+			tlr.add_comment('[%r] Get elevation'%tap.id)
+			qnt_point_perpil=10 #NUPD Load from settings
+			qnt_point=min(512,qnt_point_perpil*tap.pillar_cnt)
+			
 			res=[]
 			try:
 				res=googlemaps.client.elevation_along_path(client,str(tap.tap_encode_path),qnt_point)
 			except googlemaps.exceptions.ApiError:
 				_logger.debug('error')
+				tlr.add_comment('[E] error for tap (%r)%r'%(tap.id,tap.name))
 			dd=tap.line_len_calc/qnt_point
-			elv_ids=self.env['uis.papl.tap.elevation'].add_ne(tap,res,dd)
-			tap.tap_elevation_ids=[(6,0,elv_ids)]'''
+			cd=dd
+			elvs=[]
+			for it in res:
+				elv={
+					'd':cd,
+					'lat':it['location']['lat'],
+					'lng':it['location']['lng'],
+					'e':it['elevation'],
+				}
+				cd+=dd
+				elvs.append(elv)
+			#tap.tap_elevation_ids.unlink()
+			tap.tap_elevation_json=json.dumps(elvs)
 		tlr.fix_end()
 		
 	def _get_pillar_path(self):
@@ -127,6 +177,8 @@ class uis_papl_tap(models.Model):
 			points=[]
 			tlr.add_comment('[%r] Calculate path for tap id %r'%(i,tap.id))
 			ep=None
+			elvs=[]
+			cd=0
 			if tap.pillar_cnt>0:
 				for pil in tap.pillar_ids.sorted(key=lambda r:r.num_by_vl, reverse=False):
 					point={
@@ -135,6 +187,18 @@ class uis_papl_tap(models.Model):
 					}
 					points.append(point)
 					ep=pil
+					cd+=pil.len_prev_pillar
+					elv={
+						'd':cd,
+						'lat':pil.latitude,
+						'lng':pil.longitude,
+						'e':pil.elevation,
+						'h':10
+					}
+					elvs.append(elv)
+					
+					
+				
 				if ep.parent_id:
 					point={
 						'lat':ep.parent_id.latitude,
@@ -143,6 +207,7 @@ class uis_papl_tap(models.Model):
 					points.append(point)
 				path=googlemaps.convert.encode_polyline(points)
 				tap.tap_encode_path=path
+				tap.tap_pillar_elevation_json=json.dumps(elvs)
 				#NUPD delete
 		tlr.set_qnt(i)
 		tlr.fix_end()
