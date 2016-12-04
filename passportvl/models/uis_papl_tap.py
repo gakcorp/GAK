@@ -13,8 +13,15 @@ import openerp
 import googlemaps
 import json
 import numpy as np
-from plotly.offline import download_plotlyjs, init_notebook_mode, iplot, plot
-from plotly.graph_objs import *
+#from plotly.offline import download_plotlyjs, init_notebook_mode, iplot, plot
+#from plotly.graph_objs import *
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib import cm
+import StringIO
+import cStringIO
+
 
 
 distance2points=uismodels.distance2points
@@ -100,42 +107,49 @@ class uis_papl_tap(models.Model):
 		tlr=_ulog(self, code='CALC_TAP_PRFL', lib=__name__, desc='Calculate elevation profile for tap')
 		for tap in self:
 			tlr.add_comment('[%r] Calculete for tap %r'%(tap.id, tap.name))
-			init_notebook_mode()
+			#init_notebook_mode()
 			N=500
-			field_x=[]
-			field_y=[]
+			x=[]
+			y=[]
 			#_logger.debug(json.dump())
 			for dt in json.loads(tap.tap_elevation_json):
-				field_x.append(dt['d'])
-				field_y.append(dt['e'])
-			trace=Scatter(
-				x=field_x,
-				y=field_y
-			)
-			layout=Layout(
-				showlegend=False,
-				height=600,
-				width=1000
-			)
+				x.append(dt['d'])
+				y.append(dt['e'])
 			px,py=[],[]
 			for dt in json.loads(tap.tap_pillar_elevation_json):
 				px.append(dt['d'])
 				py.append(dt['e'])
 				px.append(dt['d'])
 				py.append(dt['e']+dt['h'])
-			trace_pil=Scatter(x=px,y=py,mode="markers")
 			wx,wy=[],[]
 			for dt in json.loads(tap.tap_pillar_elevation_json):
 				wx.append(dt['d'])
 				wy.append(dt['e']+dt['h'])
+			#myarray=x+y
 			
-			trace_wire=Scatter(x=wx,y=wy,mode="line")
-			data=[trace,trace_pil,trace_wire]
-			_logger.debug(trace)
-			fig=dict(data=data,layout=layout)
-			d=plot(fig,image='png',image_filename='/temp/tap_el_%r'%tap.id)
+			#fig=plt.figure()
+			#ax=fig.add_subplot(111)
+			#ax.plot(range(10))
 			
-			_logger.debug(d)
+			'''x = np.linspace(0, 2 * np.pi, 900)
+			y = np.linspace(0, 2 * np.pi, 600).reshape(-1, 1)
+			myarray = np.sin(x) + np.cos(y)'''
+			
+			#p=plt()
+			#x = np.linspace(0, 10)
+			line, = plt.plot(x, y, '-', linewidth=2)
+
+			#dashes = [10, 5, 100, 5]  # 10 points on, 5 off, 100 on, 5 off
+			#line.set_dashes(dashes)
+			background_stream = StringIO.StringIO()
+			#fig=plt.figure()
+			plt.show()
+			plt.savefig(background_stream)
+			#image1 = Image.fromarray(np.uint8(cm.gist_earth(myarray)*255))
+			
+			#image1.save(background_stream, format="PNG")
+			tap.profile_image=background_stream.getvalue().encode('base64')
+			#_logger.debug(d)
 		tlr.fix_end()
 	@api.depends('tap_encode_path')
 	def _get_tap_elv_txt(self):
