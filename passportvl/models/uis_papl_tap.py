@@ -219,18 +219,44 @@ class uis_papl_tap(models.Model):
 					sx.append(sp['lat'])
 					sy.append(sp['lng'])
 					sz.append(sp['e'])
-				_logger.debug(sz)
+				#_logger.debug(sz)
 				
+				n_angles = 36
+				n_radii = 8
+				
+				# An array of radii
+				# Does not include radius r=0, this is to eliminate duplicate points
+				radii = np.linspace(0.125, 1.0, n_radii)
+				
+				# An array of angles
+				angles = np.linspace(0, 2*np.pi, n_angles, endpoint=False)
+				
+				# Repeat all angles for each radius
+				angles = np.repeat(angles[..., np.newaxis], n_radii, axis=1)
+				
+				# Convert polar (radii, angles) coords to cartesian (x, y) coords
+				# (0, 0) is added here. There are no duplicate points in the (x, y) plane
+				x = np.append(0, (radii*np.cos(angles)).flatten())
+				y = np.append(0, (radii*np.sin(angles)).flatten())
+				
+				# Pringle surface
+				z = np.sin(-x*y)
+				#ax3d.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0.2)
+				ax3d.scatter(sx,sy,sz,c='g',marker='.',s=2)
 				ax3d.plot(px3,py3,pz3,label="3d profile")
 				ax3d.scatter(pex3,pey3,pez3,c='b',marker='+')
-				ax3d.scatter(pex3,pey3,pez3h,c='r',marker='+')
-				#ax3d.plot_surface(sx, sy, sz, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=1, antialiased=True)
-				ax3d.scatter(sx,sy,sz,c='g',marker='o')
+				ax3d.scatter(pex3,pey3,pez3h,c='r',marker='o')
+				#surf=ax3d.plot_surface(x, y, z, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=1, antialiased=False)
+				#_logger.debug(surf)
+				
 				#ax3d.plot_trisurf(X=sx,Y=sy,Z=sz)
 				
-				ax3d.view_init(tap.rotate_x_3d, tap.rotate_y_3d)
+				#ax3d.view_init(tap.rotate_x_3d, tap.rotate_y_3d)
 				ax3d.set_xticks([]) 
-				ax3d.set_yticks([]) 
+				ax3d.set_yticks([])
+				
+				#ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0.2)
+				
 				background_stream_3d = StringIO.StringIO()
 				fig3d.savefig(background_stream_3d, format='png', dpi=100, transparent=True)
 				#plt.savefig(background_stream)
