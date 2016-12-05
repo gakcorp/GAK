@@ -25,6 +25,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'views/views.xml',
+        'views/forms/uis_papl_tap.xml',
         'views/department.xml',
         'views/templates.xml',
         'views/transformation.xml',

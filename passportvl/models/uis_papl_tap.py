@@ -13,12 +13,11 @@ import openerp
 import googlemaps
 import json
 import numpy as np
-#from plotly.offline import download_plotlyjs, init_notebook_mode, iplot, plot
-#from plotly.graph_objs import *
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 import StringIO
 import cStringIO
 
@@ -90,7 +89,7 @@ class uis_papl_tap(models.Model):
 	cnt_np=fields.Integer(compute='_get_cnt_np', string='Pillars wo prev')
 	pillar_cnt=fields.Integer(compute='_get_cnt_np', string='Total pillars')
 	pillar_ids=fields.One2many('uis.papl.pillar','tap_id',string='Pillars')
-	line_len_calc=fields.Float(digits=(6,2), compute='_tap_get_len')
+	line_len_calc=fields.Float(digits=(6,2), compute='_tap_get_len', string="Tap lenght")
 	is_main_line=fields.Boolean(string='is main line')
 	num_by_vl=fields.Integer(string='Number', compute='_get_num_by_vl')
 	conn_pillar_id=fields.Many2one('uis.papl.pillar', string='Connect Pilar', compute='_get_num_by_vl')
@@ -99,11 +98,72 @@ class uis_papl_tap(models.Model):
 	tap_encode_path=fields.Text(string='Google API pillar path decode', compute='_get_pillar_path')
 	tap_elevation_json=fields.Text(string='Elevation data', compute='_get_tap_elv_txt')
 	tap_pillar_elevation_json=fields.Text(string='Pillar elevation data', compute='_get_pillar_path')
+	tap_surface_elevation_json=fields.Text(string='Tap surface elevation data', compute='_get_surface_data')
 	#tap_elevation_ids=fields.One2many('uis.papl.tap.elevation', 'tap_id', string="Elevations", compute='_get_tap_elevations')
-	profile_image=fields.Binary(string="Profile", compute='_get_profile')
+	profile_image=fields.Binary(string="Profile", compute='get_profile')
+	profile_3d_image=fields.Binary(string="3D profile", compute='get_profile')
+	rotate_x_3d=fields.Integer(string="x rotate 3D plot")
+	rotate_y_3d=fields.Integer(string="y rotate #D plot")
 	
+	@api.depends('tap_encode_path')
+	def _get_surface_data(self):
+		point_per_ax=22
+		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
+		client=googlemaps.Client(key)
+		for tap in self:
+			tej=json.loads(tap.tap_elevation_json)
+			minlat,minlng=1000,1000
+			maxlat,maxlng=0,0
+			for el in tej:
+				lat=el['lat']
+				lng=el['lng']
+				if lat<minlat:
+					minlat=lat
+				if lat>maxlat:
+					maxlat=lat
+				if lng<minlng:
+					minlng=lng
+				if lng>maxlng:
+					maxlng=lng
+			_logger.debug('values %r,%r,%r,%r'%(minlat,maxlat,minlng,maxlng))
+			clat=minlat
+			clnn=minlng
+			dlat=(maxlat-minlat)/point_per_ax
+			dlng=(maxlng-minlng)/point_per_ax
+			points=[]
+			while clat<maxlat:
+				point={
+						'lat':clat,
+						'lng':minlng
+					}
+				points.append(point)
+				point={
+						'lat':clat,
+						'lng':maxlng
+					}
+				points.append(point)
+				clat+=dlat
+			path=googlemaps.convert.encode_polyline(points)
+			res=[]
+			try:
+				res=googlemaps.client.elevation_along_path(client,str(path),512)
+			except googlemaps.exceptions.ApiError:
+				_logger.debug('error')
+				tlr.add_comment('[E] error for tap (%r)%r'%(tap.id,tap.name))
+			elvs=[]
+			
+			for it in res:
+				elv={
+					'lat':it['location']['lat'],
+					'lng':it['location']['lng'],
+					'e':it['elevation'],
+				}
+				elvs.append(elv)
+			tap.tap_surface_elevation_json=json.dumps(elvs)
+			
+
 	@api.depends('tap_elevation_json','tap_pillar_elevation_json')
-	def _get_profile(self):
+	def get_profile(self):
 		tlr=_ulog(self, code='CALC_TAP_PRFL', lib=__name__, desc='Calculate elevation profile for tap')
 		for tap in self:
 			tlr.add_comment('[%r] Calculete for tap %r'%(tap.id, tap.name))
@@ -112,45 +172,99 @@ class uis_papl_tap(models.Model):
 			x=[]
 			y=[]
 			#_logger.debug(json.dump())
-			for dt in json.loads(tap.tap_elevation_json):
-				x.append(dt['d'])
-				y.append(dt['e'])
-			px,py=[],[]
-			for dt in json.loads(tap.tap_pillar_elevation_json):
-				px.append(dt['d'])
-				py.append(dt['e'])
-				px.append(dt['d'])
-				py.append(dt['e']+dt['h'])
-			wx,wy=[],[]
-			for dt in json.loads(tap.tap_pillar_elevation_json):
-				wx.append(dt['d'])
-				wy.append(dt['e']+dt['h'])
-			#myarray=x+y
-			
-			#fig=plt.figure()
-			#ax=fig.add_subplot(111)
-			#ax.plot(range(10))
-			
-			'''x = np.linspace(0, 2 * np.pi, 900)
-			y = np.linspace(0, 2 * np.pi, 600).reshape(-1, 1)
-			myarray = np.sin(x) + np.cos(y)'''
-			
-			#p=plt()
-			#x = np.linspace(0, 10)
-			line, = plt.plot(x, y, '-', linewidth=2)
-
-			#dashes = [10, 5, 100, 5]  # 10 points on, 5 off, 100 on, 5 off
-			#line.set_dashes(dashes)
-			background_stream = StringIO.StringIO()
-			#fig=plt.figure()
-			plt.show()
-			plt.savefig(background_stream)
-			#image1 = Image.fromarray(np.uint8(cm.gist_earth(myarray)*255))
-			
-			#image1.save(background_stream, format="PNG")
-			tap.profile_image=background_stream.getvalue().encode('base64')
-			#_logger.debug(d)
+			if tap.pillar_cnt>1:
+				for dt in json.loads(tap.tap_elevation_json):
+					x.append(dt['d'])
+					y.append(dt['e'])
+				px,py=[],[]
+				for dt in json.loads(tap.tap_pillar_elevation_json):
+					px.append(dt['d'])
+					py.append(dt['e'])
+					px.append(dt['d'])
+					py.append(dt['e']+dt['h'])
+				wx,wy=[],[]
+				for dt in json.loads(tap.tap_pillar_elevation_json):
+					wx.append(dt['d'])
+					wy.append(dt['e']+dt['h'])
+				
+				mx=max(x)
+				my=max(wy)
+				
+				fig, ax = plt.subplots(figsize=(math.ceil(mx/200),math.ceil(my/30)))
+				ax.plot(x,y,'b-')
+				ax.plot(px,py,'ro')
+				ax.plot(wx,wy,'g--')
+				ax.set_xlim((0,mx))
+				ax.spines['top'].set_visible(False)
+				ax.spines['right'].set_visible(False)
+				background_stream = StringIO.StringIO()
+				fig.savefig(background_stream, format='png', dpi=100, transparent=True)
+				tap.profile_image=background_stream.getvalue().encode('base64')
+				#3D
+				fig3d=plt.figure()
+				ax3d=fig3d.gca(projection='3d')
+				px3,py3,pz3=[],[],[]
+				for pp in json.loads(tap.tap_elevation_json):
+					px3.append(pp['lat'])
+					py3.append(pp['lng'])
+					pz3.append(pp['e'])
+				pex3,pey3,pez3,pez3h=[],[],[],[]
+				for pep in json.loads(tap.tap_pillar_elevation_json):
+					pex3.append(pep['lat'])
+					pey3.append(pep['lng'])
+					pez3.append(pep['e'])
+					pez3h.append(pep['e']+pep['h'])
+				sx,sy,sz=[],[],[]
+				for sp in json.loads(tap.tap_surface_elevation_json):
+					sx.append(sp['lat'])
+					sy.append(sp['lng'])
+					sz.append(sp['e'])
+				_logger.debug(sz)
+				
+				ax3d.plot(px3,py3,pz3,label="3d profile")
+				ax3d.scatter(pex3,pey3,pez3,c='b',marker='+')
+				ax3d.scatter(pex3,pey3,pez3h,c='r',marker='+')
+				#ax3d.plot_surface(sx, sy, sz, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=1, antialiased=True)
+				ax3d.scatter(sx,sy,sz,c='g',marker='o')
+				#ax3d.plot_trisurf(X=sx,Y=sy,Z=sz)
+				
+				ax3d.view_init(tap.rotate_x_3d, tap.rotate_y_3d)
+				ax3d.set_xticks([]) 
+				ax3d.set_yticks([]) 
+				background_stream_3d = StringIO.StringIO()
+				fig3d.savefig(background_stream_3d, format='png', dpi=100, transparent=True)
+				#plt.savefig(background_stream)
+				tap.profile_3d_image=background_stream_3d.getvalue().encode('base64')
 		tlr.fix_end()
+	
+	@api.onchange('rotate_x_3d','rotate_y_3d')
+	def onchange_rotate(self):
+		for tap in self:
+			tap.get_profile(tap)
+	@api.multi
+	def act_rx_plus(self):
+		for tap in self:
+			tap.rotate_x_3d+=5
+	
+	@api.multi
+	def act_rx_minus(self):
+		for tap in self:
+			tap.rotate_x_3d-=5
+	@api.multi
+	def act_ry_plus(self):
+		for tap in self:
+			tap.rotate_y_3d+=5
+	
+	@api.multi
+	def act_ry_minus(self):
+		for tap in self:
+			tap.rotate_y_3d-=5
+	
+	@api.onchange('tap_encode_path')
+	def onchangetapencodepath(self):
+		for tap in self:
+			_logger.debug('NUPD')
+			
 	@api.depends('tap_encode_path')
 	def _get_tap_elv_txt(self):
 		tlr=_ulog(self,code='CALC_TAP_ELTX', lib=__name__,desc='Calculate tap elevations to text')
@@ -179,7 +293,6 @@ class uis_papl_tap(models.Model):
 				}
 				cd+=dd
 				elvs.append(elv)
-			#tap.tap_elevation_ids.unlink()
 			tap.tap_elevation_json=json.dumps(elvs)
 		tlr.fix_end()
 		
@@ -195,34 +308,30 @@ class uis_papl_tap(models.Model):
 			cd=0
 			if tap.pillar_cnt>0:
 				for pil in tap.pillar_ids.sorted(key=lambda r:r.num_by_vl, reverse=False):
+					
+					if pil.parent_id:
+						if pil.parent_id.tap_id!=tap:
+							point={'lat':pil.parent_id.latitude,
+								   'lng':pil.parent_id.longitude}
+							points.append(point)
 					point={
 						'lat':pil.latitude,
 						'lng':pil.longitude
 					}
 					points.append(point)
-					ep=pil
+					#ep=pil
 					cd+=pil.len_prev_pillar
 					elv={
 						'd':cd,
 						'lat':pil.latitude,
 						'lng':pil.longitude,
 						'e':pil.elevation,
-						'h':10
+						'h':6
 					}
 					elvs.append(elv)
-					
-					
-				
-				if ep.parent_id:
-					point={
-						'lat':ep.parent_id.latitude,
-						'lng':ep.parent_id.longitude
-					}
-					points.append(point)
 				path=googlemaps.convert.encode_polyline(points)
 				tap.tap_encode_path=path
 				tap.tap_pillar_elevation_json=json.dumps(elvs)
-				#NUPD delete
 		tlr.set_qnt(i)
 		tlr.fix_end()
 		

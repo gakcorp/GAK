@@ -109,26 +109,7 @@
 			</form>
 		</field>
 	</record>
-	<!--
-	num_by_vl = fields.Integer()
-	pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
-	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
-	longitude=fields.Float(digits=(2,6))
-	latitude=fields.Float(digits=(2,6))
-	prev_longitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
-	prev_latitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
-	len_prev_pillar=fields.Float(digits=(5,2), compute='_pillar_get_len')
-	azimut_from_prev=fields.Float(digits=(3,2), compute='_pillar_get_len')
-	elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
-	apl_id=fields.Many2one('Elevationapl', string='APL')
-	tap_id=fields.Many2one('uis.papl.tap', string='Taps')
-	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
-	near_pillar_ids=fields.Many2many('uis.papl.pillar',
-									 relation='near_pillar_ids',
-									 column1='trans_id',
-									 column2='pillar_id',
-									 compute='_get_near_pillar'
-									 )!-->
+
 	<record id="uis_papl_apl_kanban" model="ir.ui.view">
 		<field name="name">APL Kanban view</field>
 		<field name="model">uis.papl.apl</field>
@@ -480,39 +461,9 @@
 		</field>
 	</record>
 	
-	<record model="ir.ui.view" id="uis_papl_tap_elevation_list">
-		<field name="name">Tap Elevation List</field>
-	  <field name="model">uis.papl.tap.elevation</field>
-	  <field name="arch" type="xml">
-		<tree string="List of Tap Elevation">
-		  <field name="id"/>
-			<field name="tap_id"/>
-			<field name="dist"/>
-			<field name="latitude"/>
-			<field name="longitude"/>
-			<field name="elevation"/>
-			<field name="resolution"/>
-		</tree>
-	  </field>
-	</record>
+
 	
-	<record model="ir.ui.view" id="uis_papl_tap_list">
-	  <field name="name">Tap List</field>
-	  <field name="model">uis.papl.tap</field>
-	  <field name="arch" type="xml">
-		<tree string="List of Tap" editable="top" create="true" edit="true">
-		  <field name="id"/>
-		  <field name="name"/>
-		  <field name="apl_id"/>
-		  <field name="pillar_cnt"/>
-		  <field name="cnt_np"/>
-		  <field name="pillar_ids" readonly="1" widget="one2many"/>
-		  <button name="act_normalize_num" string="Normalize" type="object" icon="STOCK_REFRESH"/>
-		  <button name="get_elevation" string="Elevation" type="object" icon="STOCK_EXECUTE"/>
-			<button name="do_pillar_apl_id_by_tap" string="Pil apl id by tap id" type="object" icon="STOCK_REFRESH"/>
-		</tree>
-	  </field>
-	</record>
+
 
 	<record model="ir.ui.view" id="uis_papl_substation_list">
 	  <field name="name">Power Substation List</field>
@@ -675,25 +626,8 @@
 	  </field>
 	</record>
 	
-	<record id="uis_papl_tap_action_window" model="ir.actions.act_window">
-	  <field name="name">List of Tap</field>
-	  <field name="res_model">uis.papl.tap</field>
-	  <field name="view_type">form</field>
-	  <field name="view_mode">tree,form</field>
-	  <field name="help" type="html">
-		<p class="oe_view_nocontent_create">Create new Tap</p>
-	  </field>
-	</record>
-	
-		<record id="uis_papl_tap_elevation_action_window" model="ir.actions.act_window">
-	  <field name="name">List Elevation</field>
-	  <field name="res_model">uis.papl.tap.elevation</field>
-	  <field name="view_type">form</field>
-	  <field name="view_mode">tree,form</field>
-	  <field name="help" type="html">
-		<p class="oe_view_nocontent_create">Create new Tap elevation</p>
-	  </field>
-		</record>
+
+
 	
 	<record id="uis_papl_wiz_creat_pillar" model="ir.actions.act_window">
 	  <field name="name">Create new pillars</field>
@@ -752,11 +686,7 @@
 	<menuitem name="List of APL apt" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
               action="uis_papl_apl_action_window"/>
 
-<menuitem name="Tap elevation points" id="uis_papl_menu_tap_elevation_list" parent="uis_papl_menu_apl"
-              action="uis_papl_tap_elevation_action_window"/>
 
-	<menuitem name="List of Tap" id="uis_papl_menu_tap_list" parent="uis_papl_menu_apl"
-              action="uis_papl_tap_action_window"/>
 	<menuitem name="Pillar Wizard" id="uis_papl_menu_pillar_wiz" parent="uis_papl_menu_apl"
               action="uis_papl_wiz_creat_pillar"/>
 	<menuitem name="List of Pillar" id="uis_papl_menu_pillar_list" parent="uis_papl_menu_pillar" 
