@@ -193,7 +193,7 @@ class uis_papl_tap(models.Model):
 				fig, ax = plt.subplots(figsize=(math.ceil(mx/200),math.ceil(my/30)))
 				ax.plot(x,y,'b-')
 				ax.plot(px,py,'ro')
-				ax.plot(wx,wy,'g--')
+				#ax.plot(wx,wy,'g--')
 				ax.set_xlim((0,mx))
 				ax.spines['top'].set_visible(False)
 				ax.spines['right'].set_visible(False)
@@ -245,7 +245,7 @@ class uis_papl_tap(models.Model):
 				ax3d.scatter(sx,sy,sz,c='g',marker='.',s=2)
 				ax3d.plot(px3,py3,pz3,label="3d profile")
 				ax3d.scatter(pex3,pey3,pez3,c='b',marker='+')
-				ax3d.scatter(pex3,pey3,pez3h,c='r',marker='o')
+				#ax3d.scatter(pex3,pey3,pez3h,c='r',marker='o')
 				#surf=ax3d.plot_surface(x, y, z, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=1, antialiased=False)
 				#_logger.debug(surf)
 				

@@ -250,7 +250,9 @@
 				</group>
 			  </page>
 			  <page string="Resistance wire">
-				
+				<field name="resistance_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id}">
+					
+				</field>
 			  </page>
 			  <page string="Taps">
 				<field name="tap_ids">
