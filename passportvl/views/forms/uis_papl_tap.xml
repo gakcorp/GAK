@@ -101,11 +101,12 @@
 		<field name="name">Tap List</field>
 		<field name="model">uis.papl.tap</field>
 		<field name="arch" type="xml">
-			<tree string="List of Tap" editable="top" create="false" edit="false">
+			<tree string="List of Tap" editable="top" create="false" edit="true">
 				<field name="id"/>
 				<field name="name"/>
 				<field name="apl_id"/>
 				<field name="pillar_cnt"/>
+				<field name="is_main_line"/>
 				<!--<field name="cnt_np"/>
 				<field name="pillar_ids" readonly="1" widget="one2many"/>!-->
 				<button name="act_normalize_num" string="Normalize" type="object" icon="STOCK_REFRESH"/>

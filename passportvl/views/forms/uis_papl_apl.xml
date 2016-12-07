@@ -5,17 +5,6 @@
 			<field name="name">Resistance apl view</field>
 			<field name="model">uis.papl.apl.resistance</field>
 			<field name="arch" type="xml">
-				<!--
-				_name='uis.papl.apl.resistance'
-	apl_id=fields.Many2one('uis.papl.apl',string="APL")
-	cable_id=fields.Many2one('uis.papl.apl.cable', string="Cable")#, domain="[('id','in',pos_cable_ids[0][2])])"
-	length=fields.Float(digits=(3,2), string="Length of the wire")
-	resistivity_from_cable=fields.Boolean(string="Resistivity from cable directory")
-	resistivity=fields.Float(digits=(3,4), string="Resestivity")
-	resistivity_save_value=fields.Float(digits=(3,4), string="Resistivity saved value")
-	total_resistance=fields.Float(digits=(3,4), string="Total resistance")
-	total_resistance_save_value=fields.Float(digits=(3,4), string="Total resistance saved value")
-	auto_calc_total_resistance=fields.Boolean(string="Auto calculate total resistance")!-->
 				<form string="APL resistance form">
 					<group>
 						<group>
