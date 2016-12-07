@@ -203,6 +203,12 @@ class uis_papl_apl_resistance(models.Model):
 			#apl.department_id=res_dep
 			#apl.write({})
 	
+class uis_papl_apl_fittings_type(models.Model):
+	_name='uis.papl.apl.fittings.type'
+
+class uis_papl_apl_fittings(models.Model):
+	_name='uis.papl.apl.fittings'
+	
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
