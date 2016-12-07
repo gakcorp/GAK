@@ -11,10 +11,11 @@
                     <t t-foreach="o.photo_ids" t-as="ph_id">
                         <div class="row">
                             <div class="col-xs-8">
-                                <span t-field="ph_id.image_800" t-field-options="{&quot;widget&quot;:&quot;image&quot;}"/>
+                                <!--<span t-field="ph_id.image_800" t-field-options="{&quot;widget&quot;:&quot;image&quot;}"/>!-->
+								<span t-field="ph_id.image_800" t-field-options='{"widget":"image"}'/>
                             </div>
                             <div class="col-xs-1">
-                                <img width="100%" t-att-src="'https://api.qrserver.com/v1/create-qr-code/?data=http://app.uisgis.ru/web/image/uis.ap.photo/%s/image' % ph_id.id"/>
+                                <img width="100%" t-att-src="'https://api.qrserver.com/v1/create-qr-code/?data=http://ag.uisgis.ru/web/image/uis.ap.photo/%s/image' % ph_id.id"/>
                             </div>
                             <div class="col-xs-3">
                                 <span t-field="ph_id.image_filename"/><br/>
@@ -47,7 +48,7 @@
                                         Date:
                                     </div>
                                     <div class="col-xs-6 text-center report-field">
-                                        <span t-field="ph_id.image_date"/>
+                                        <span t-field="ph_id.image_date" t-field-options='{"format":"d MMMM y"}'/>
                                     </div>
                                 </div>
                                 <t t-foreach="ph_id.near_pillar_ids" t-as="pil">

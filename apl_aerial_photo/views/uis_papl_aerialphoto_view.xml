@@ -19,6 +19,7 @@
 									<a type="open">
 										<field name="image_filename"/>
 									</a>
+									
 								<div name="tags"/>
 								<ul>
 									<li>Date: <field name="image_date"/></li>
@@ -48,6 +49,7 @@
 				<field name="longitude"/>
 				<field name="altitude"/>
 				<field name="image" filename="name"/>
+				<button name="generate_snap" string="small photos generate" type="object" icon="STOCK_REFRESH"/>
 				
 			</tree>
 	  </field>
@@ -57,6 +59,9 @@
 	  <field name="model">uis.ap.photo</field>
 	  <field name="arch" type="xml">
 		<form string="Photo form">
+			<header>
+				<button string="Generate small photos" type="object" name="generate_snap"/>
+			</header>
 			<group>
 				<group>
 					<field name="name"/>
@@ -64,7 +69,7 @@
 					<field name="image" widget="image" width="800" filename="fimage"/>
 					<field name="thumbnail" widget="image"/>
 					<field name="image_800" widget="image" />
-					<field name="image_edge" widget="image"/>
+					<field name="image_400" widget="image"/>
 					<!--<field name="image_edge"/>!-->
 				</group>
 				<group>

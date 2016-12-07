@@ -29,7 +29,7 @@ cv_apl_feed_abbr=openerp._('F')
 class uis_papl_apl_cable(models.Model):
 	_name='uis.papl.apl.cable'
 	name=fields.Char(string="Name")
-	resestivity=fields.Float(digits=(3,2), string="Resestivity")
+	resistivity=fields.Float(digits=(3,4), string="Resestivity")
 	breaking_load=fields.Float(digits=(3,2), string="Breaking load")
 	weight=fields.Float(digits=(3,2), string="Weight (kg) per km")
 	diameter=fields.Float(digits=(3,2), string="Diameter (mm)")
@@ -145,50 +145,64 @@ class uis_papl_apl_pil_materials(models.Model):
 class uis_papl_apl_resistance(models.Model):
 	_name='uis.papl.apl.resistance'
 	apl_id=fields.Many2one('uis.papl.apl',string="APL")
-	cable_id=fields.Many2one('uis.papl.apl.cable', string="Cable", domain="[('id','in',pos_cable_ids[0][2])])")
-	pos_cable_ids=fields.Many2many('uis.papl.apl.cable',
-								   relation="pos_cable_ids",
-								   column1="resistance_id",
-								   column2="cable_id",
-								   string="Posible cables",
-								   compute="_get_pos_cable_ids")
+	cable_id=fields.Many2one('uis.papl.apl.cable', string="Cable")#, domain="[('id','in',pos_cable_ids[0][2])])"
+	length=fields.Float(digits=(3,2), string="Length of the wire")
 	resistivity_from_cable=fields.Boolean(string="Resistivity from cable directory")
-	resestivity=fields.Float(digits=(3,2), string="Resestivity")
-	resistivity_save_value=fields.Float(digits=(3,2), string="Resistivity saved value")
-	total_resistance=fields.Float(digits=(3,2), string="Total resistance")
-	total_resistance_save_value=fields.Float(digits=(3,2), string="Total resistance saved value")
-	auto_calc_total_resistance=fields.Boolean(string="")
+	resistivity=fields.Float(digits=(3,4), string="Resistivity")
+	resistivity_save_value=fields.Float(digits=(3,4), string="Resistivity saved value")
+	total_resistance=fields.Float(digits=(3,4), string="Total resistance")
+	total_resistance_save_value=fields.Float(digits=(3,4), string="Total resistance saved value")
+	auto_calc_total_resistance=fields.Boolean(string="Auto calculate total resistance")
 	_defaults={
-		"apl_id": lambda self,cr,uid,c:c.get('apl_id',False)
+		"apl_id": lambda self,cr,uid,c:c.get('apl_id',False),
+		"length": lambda self,cr,uid,c:c.get('line_len_calc',0)
 	}
+	@api.onchange('length')
+	def _onchange_length(self):
+			for aplres in self:
+				if aplres.auto_calc_total_resistance:
+					aplres.total_resistance=aplres.resistivity*aplres.length/1000
+	@api.onchange('resistivity')
+	def _onchange_resistivity(self):
+		for aplres in self:
+			if aplres.resistivity!=aplres.cable_id.resistivity:
+				aplres.resistivity_save_value=aplres.resistivity
+				aplres.resistivity_from_cable=False
+			else:
+				aplres.resistivity_from_cable=True
+	@api.onchange('auto_calc_total_resistance')
+	def _get_set_total_resistance(self):
+		for aplres in self:
+			if aplres.auto_calc_total_resistance:
+				aplres.total_resistance_save_value=aplres.total_resistance
+				aplres.total_resistance=aplres.resistivity*aplres.length/1000
+			else:
+				aplres.total_resistance=aplres.total_resistance_save_value
+				
+	@api.onchange('cable_id')
+	def _get_values_onchange_cable(self):
+		for aplres in self:
+			if aplres.resistivity_from_cable:
+				aplres.resistivity=aplres.cable_id.resistivity
+				
+	@api.onchange('resistivity_from_cable')
+	def _get_set_resistivity(self):
+		for aplres in self:
+			res_dep=None
+			if aplres.resistivity_from_cable:
+				aplres.resistivity_save_value=aplres.resistivity
+				aplres.resistivity=aplres.cable_id.resistivity
+			else:
+				aplres.resistivity=aplres.resistivity_save_value
+			
+			#if apl.department_id_as_substation:
+			#	apl.department_id_save=apl.department_id
+			#	res_dep=apl.sup_substation_id.department_id
+			#if not(apl.department_id_as_substation):
+			#	res_dep=apl.department_id_save
+			#apl.department_id=res_dep
+			#apl.write({})
 	
-	@api.depends('apl_id')
-	def _get_pos_cable_ids(self,cr,uid,ids,context=None):
-		_logger.debug('Def pos cable_ids')
-		'''tlr=_ulog(self,code='CALC_NR_PL_PL',lib=__name__,desc='Calculate near pillars for pillar')
-		for pil in self.browse(cr,uid,ids,context=context):
-			tlr.add_comment('[~] define new pillar for id:[%r]'%pil.id)
-			lat1=pil.latitude
-			long1=pil.longitude
-			delta=0.01
-			max_dist=300
-			npillars = self.pool.get('uis.papl.pillar').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
-			near_pillars=[]
-			near_pillars_ids=[]
-			for pid in npillars:
-				npil=self.pool.get('uis.papl.pillar').browse(cr,uid,[pid],context=context)
-				if npil:
-					if npil.id != pil.id:
-						lat2=npil.latitude
-						long2=npil.longitude
-						dist=0
-						if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0) and (abs(lat1-lat2)<delta) and (abs(long1-long2)<delta):
-							dist=distance2points(lat1,long1,lat2,long2)
-						if (dist<max_dist) and (dist>0):
-							near_pillars.append(npil)
-							near_pillars_ids.append(npil.id)
-							pil.near_pillar_ids=[(4,npil.id,0)]
-		tlr.fix_end()'''
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
@@ -207,7 +221,8 @@ class uis_papl_apl(models.Model):
 	cable_ids=fields.Many2many('uis.papl.apl.cable',
 								relation='cable_ids',
 								column1='apl_id',
-								column2='cable_id'
+								column2='cable_id',
+								compute='_get_cable_ids'
 								)
 	line_len=fields.Float(digits=(3,2))
 	line_len_calc=fields.Float(digits=(6,2), compute='_apl_get_len')
@@ -238,6 +253,16 @@ class uis_papl_apl(models.Model):
 	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image_2')
 	
 	#scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
+	@api.depends('resistance_ids')
+	def _get_cable_ids(self,cr,uid,ids,context=None):
+		for apl in self.browse(cr,uid,ids,context=context):
+			res_cables=[]
+			res_cables_ids=[]
+			for res in apl.resistance_ids:
+				if res.cable_id:
+					#res_cables.append(res.cable_id)
+					#res_cable_ids.append(res.cable_id.id)
+					apl.cable_ids=[(4,res.cable_id.id,0)]
 	
 	@api.one
 	def get_pil_type_ids(self):

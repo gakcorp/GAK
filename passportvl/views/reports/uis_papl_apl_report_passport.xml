@@ -274,6 +274,26 @@
                     
                     
                    
+                    <div class="row">
+                        <br/>
+                        <div class="col-xs-12 text-center">
+                            <h4>3. Resistance</h4>
+                        </div>
+                    </div>
+                    <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                        <div class="col-xs-3 text-center">Cable type</div>
+                        <div class="col-xs-3 text-center">Resistivity</div>
+                        <div class="col-xs-3 text-center">Length</div>
+                        <div class="col-xs-3 text-center">Total resistance</div>
+                    </div>
+                    <t t-foreach="o.resistance_ids" t-as="aplres">
+                        <div class="row" style="border-bottom:1px dashed black;">
+                            <div class="col-xs-3 text-center"><span t-field="aplres.cable_id.name"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="aplres.resistivity"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="aplres.length"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="aplres.total_resistance"/></div>
+                        </div>
+                    </t>
                     </p>
                 </div>
                 </div>

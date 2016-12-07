@@ -125,8 +125,8 @@ class uis_ap_photo(models.Model):
 	image=fields.Binary(string='Image')
 	image_length=fields.Integer(string='Image Length')
 	image_width=fields.Integer(string='Image Width')
-	image_800=fields.Binary(string='Image800', compute='_get_800_img')
-	image_400=fields.Binary(string='Image400', compute='_get_400_img')
+	image_800=fields.Binary(string='Image800', compute='_get_800_img', store=True)
+	image_400=fields.Binary(string='Image400', compute='_get_400_img', store=True)
 	image_edge=fields.Binary(string='ImageEdge', compute='_get_edge_img')
 	focal_length=fields.Float(digits=(2,4), string="Focal Length")
 	thumbnail=fields.Binary(string="Thumbnail")
@@ -155,10 +155,18 @@ class uis_ap_photo(models.Model):
 										  column2='transformer_id',
 										  compute='_get_near_trans_ids')
 	
+	@api.multi
+	def generate_snap(self):
+		for ph in self:
+			ph._get_800_img()
+			#ph._get_400_img()
+		
+	@api.depends('image')
 	def _get_800_img(self,cr,uid,ids,context=None):
 		tlr=_ulog(self,code='CALC_PH_GEN800',lib=__name__,desc='Generate (render) photo 800 px')
 		i=0
 		for ph in self.browse(cr,uid,ids,context=context):
+			_logger.debug(ph.id)
 			tlr.add_comment('[*] Generate image for photo id[%r]'%ph.id)
 			img=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(800,600))
 			ph.image_800=img
@@ -166,16 +174,17 @@ class uis_ap_photo(models.Model):
 		tlr.set_qnt(i)
 		tlr.fix_end()
 		return True
+	@api.depends('image_800')
 	def _get_400_img(self,cr,uid,ids,context=None):
 		tlr=_ulog(self,code='CALC_PH_GEN400',lib=__name__,desc='Generate (render) photo 400 px')
 		i=0
 		for ph in self.browse(cr,uid,ids,context=context):
 			#ph.image_400=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
 			#ph.image_400=img
-			
-			image = Image.open(StringIO.StringIO(ph.with_context(bin_size=False).image.decode('base64')))
+			_logger.debug(ph.id)
+			image = Image.open(StringIO.StringIO(ph.with_context(bin_size=False).image_800.decode('base64')))
 			background_stream = StringIO.StringIO()
-			image.thumbnail((800,600))
+			#image.thumbnail((800,600))
 			image.thumbnail ((400,300), Image.ANTIALIAS)
 			image.save(background_stream, format="PNG")
 			ph.image_400=background_stream.getvalue().encode('base64')
@@ -193,9 +202,11 @@ class uis_ap_photo(models.Model):
 		tlr.set_qnt(i)
 		tlr.fix_end()
 		return True
+	
+	 
 	def _get_edge_img(self,cr,uid,ids,context=None):
 		tlr=_ulog(self,code='CALC_PH_WIRE',lib=__name__,desc='Generate wire on photo')
-		for ph in self.browse(cr,uid,ids,context=context):
+		'''for ph in self.browse(cr,uid,ids,context=context):
 			img=ph.with_context(bin_size=False).image.decode('base64')
 			array=np.fromstring(img,np.uint8)
 			ocvimg=cv2.imdecode(array,cv2.CV_LOAD_IMAGE_COLOR)
@@ -204,25 +215,13 @@ class uis_ap_photo(models.Model):
 			minLineLength = 30
 			maxLineGap = 8
 			lines = cv2.HoughLinesP(edges,1,np.pi/180,230,minLineLength,maxLineGap,2)
-			#lines = cv2.HoughLines(edges,1,np.pi/180,200)
-			#_logger.debug(lines)
-			#for  rho,theta in lines[0]:
-			#	a = np.cos(theta)
-			#	b = np.sin(theta)
-			#	x0 = a*rho
-			#	y0 = b*rho
-			#	x1 = int(x0 + 1000*(-b))
-			#	y1 = int(y0 + 1000*(a))
-			#	x2 = int(x0 - 1000*(-b))
-			#	y2 = int(y0 - 1000*(a))
 			if lines is not None:
 				for x1,y1,x2,y2 in lines[0]:
 					cv2.line(ocvimg,(x1,y1),(x2,y2),(0,0,255),5)
 			imedg=cv2.imencode('.jpg',ocvimg)[1].tostring().encode('base64')
-			#imedg=cv2.imencode('.jpg',edges)[1].tostring().encode('base64')
 			ph.image_edge=imedg
 		tlr.fix_end()
-		return True
+		return True'''
 	def _get_edge_img_cornes(self,cr,uid,ids,context=None):
 		for ph in self.browse(cr,uid,ids,context=context):
 			img=ph.with_context(bin_size=False).image_800.decode('base64')
@@ -296,6 +295,8 @@ class uis_ap_photo(models.Model):
 	#@api.depends('latitude','longitude')
 	def _get_near_photo_pillar(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
+			#photo.generate_snap()
+			#_logger.debug('!!!!!!!!!!!')
 			lat1=photo.latitude
 			long1=photo.longitude
 			delta=0.01

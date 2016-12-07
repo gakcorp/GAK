@@ -250,8 +250,13 @@
 				</group>
 			  </page>
 			  <page string="Resistance wire">
-				<field name="resistance_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id}">
-					
+				<field name="resistance_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id,'line_len_calc':line_len_calc}">
+					<tree default_order="cable_id">
+						<field name="cable_id"/>
+						<field name="resistivity"/>
+						<field name="length"/>
+						<field name="total_resistance"/>
+					</tree>
 				</field>
 			  </page>
 			  <page string="Taps">
