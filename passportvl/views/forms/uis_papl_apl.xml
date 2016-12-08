@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-		<record id="uis_papl_pillar_form" model="ir.ui.view">
+		<record id="uis_papl_apl_resistance_form" model="ir.ui.view">
 			<field name="name">Resistance apl view</field>
 			<field name="model">uis.papl.apl.resistance</field>
 			<field name="arch" type="xml">
@@ -24,5 +24,217 @@
 				</form>
 			</field>
 		</record>
+		#Fitting form
+		<record id="uis_papl_apl_fitting_form" model="ir.ui.view">
+			<field name="name">Fitting view</field>
+			<field name="model">uis.papl.apl.fitting</field>
+			<field name="arch" type="xml">
+				<form string="Fitting">
+					<group>
+						<group>
+							<field name="class_id"/>
+							<field name="fitting_name" placeholder="Arching Horn,Links,Rings etc."/>
+							<field name="fitting_type" placeholder="A, 15/29 etc." />
+						</group>
+						<group>
+							<field name="apl_id" invisible="context.get('apl_id',False)"/>
+							<field name="qnt"/>
+							<field name="comment" placeholder="Decription of fittings location"/>
+						</group>
+					</group>
+				</form>
+			</field>
+		</record>
+		<record id="uis_papl_apl_fitting_class_form" model="ir.ui.view">
+			<field name="name">Fitting class form view</field>
+			<field name="model">uis.papl.apl.fittings.class</field>
+			<field name="arch" type="xml">
+				<form string="Fitting class">
+					<field name="name"/>
+					<field name="description"/>
+				</form>
+			</field>
+		</record>
+		#APL Form view
+		<record id="uis_papl_apl_form" model="ir.ui.view">
+			<field name="name">APL form view</field>
+			<field name="model">uis.papl.apl</field>
+			<field name="arch" type="xml">
+			  <form string="APL form">
+				<sheet string="Details">
+				  <div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+					<button class="oe_inline" name="act_show_scheme" type="object" 
+							 icon="fa-object-group">
+							 Scheme
+						 </button>
+					 <button class="oe_inline" name="act_show_map" type="object" 
+							 icon="fa-map">
+							 Map
+						 </button><br/>
+				  </div>
+					  <h1 style="position:absolute;">
+						<field name="name"/>
+					  </h1>
+					<h2>
+					  <field name="short_name"/>
+					</h2>
+				  <group>
+					<group>
+					  <field name="locality"/>
+					  <field name="bld_year"/>
+					  <field name="startexp_date"/>
+					  <field name="inv_num"/>
+					  <field name="build_company"/>
+					</group>
+					<group>
+			  <field name="department_id"/><!-- attrs="{'readonly':['|',('department_id_as_substation','==',True)]}"/>!-->
+					  <field name="department_id_as_substation"/>
+					  <field name="department_id_save" invisible="1"/><!-- attrs="{'invisible':[('department_id_as_substation','==',False)]}"/>!-->
+					  <field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>
+					  <field name="apl_type"/>
+					  <field name="feeder_num"/>
+					  <field name="voltage"/>
+					</group>
+				  </group>
+				  <notebook>
+					<page string="Scheme">
+					  <div id="scheme_holder"></div>
+					  <div id="scheme_id_apls">
+						<!--<field name="scheme_image_old" widget="image" class="imagescheme" options='{"size":[800,400]}'/>!-->
+						  <field name="scheme_image" widget="image" class="imagescheme2" options='{"size":[800,800]}'/>
+					  </div>
+					</page>
+					<page string="Main details">
+					  <group>
+						<group>
+						  <field name="cable_ids" widget="many2many_tags"/>
+						  <field name="line_len"/>
+						  <field name="line_len_calc"/>
+						  <field name="prol_max_len"/>
+						  <field name="prol_med_len"/>
+						  <field name="prol_min_len"/>
+						  <field name="sag_max"/>
+						  <field name="sag_med"/>
+						  <field name="sag_min"/>
+						</group>
+						<group>
+						  <field name="count_circ"/>
+						  <field name="climatic_conditions"/>
+						  <field name="sw_point"/>
+						  <field name="tap_text"/>
+						</group>
+					  </group>
+					</page>
+					<page string="Resistance wire">
+					  <field name="resistance_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id,'line_len_calc':line_len_calc}">
+						  <tree default_order="cable_id">
+							  <field name="cable_id"/>
+							  <field name="resistivity"/>
+							  <field name="length"/>
+							  <field name="total_resistance"/>
+						  </tree>
+					  </field>
+					</page>
+					<page string="Taps">
+						  <field name="tap_ids">
+							  <tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
+								  <field name="num_by_vl" invisible="1"/>
+								  <field name="name"/>
+								  <field name="conn_pillar_id"/>
+								  <field name="pillar_cnt"/>
+								  <field name="line_len_calc"/>
+								  <field name="is_main_line" invisible="1"/>
+							  </tree>
+						  </field>
+						  <field name="tap_ids_rel" widget="many2many_kanban">
+							  <kanban  quick_create="false" create="false" delete="false">
+								  <field name="name"/>
+								  <field name="num_by_vl"/>
+								  <field name="pillar_cnt"/>
+								  <field name="line_len_calc"/>
+								  
+								  <templates>
+									  <t t-name="kanban-box" create="false"><!--default_group_by="field"!-->
+										  <div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+												  <img style="max-width:100%;"  t-att-src="kanban_image('uis.papl.tap','profile_3d_image',record.id.value)" class="oe_kanban_image"/>
+												  <div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
+												  <h4>
+													  <a type="open">
+														  <field name="name"/>
+													  </a>
+												  <div name="tags"/>
+												  <ul>
+													  <li>Tap No:<field name="num_by_vl"/></li>
+													  <li>Pillar count:<field name="pillar_cnt"/></li>
+													  <li>Tap lenght:<field name="line_len_calc"/></li>
+												  </ul>
+												  </h4>
+											  </div>
+										  </div>
+									  </t>
+								  </templates>
+							  </kanban>
+						  </field>
+					</page>
+					<page string="Pillars">
+						  <group>
+							  <group string="Pillar types">
+								  <field name="apl_pil_type_ids" nolabel="1" style="width:50%%">
+									  <tree default_order="cnt desc" style="word-break:break-all;" fonts="bold:pillar_type_id==False" colors="red:pillar_type_id==False">
+										  <field name="pillar_type_id" style="width:100px;"/>
+										  <field name="cnt" style="width:50px"/>
+										  <field name="numbers" style="width:150px"/>	
+									  </tree>
+								  </field>
+							  </group>
+							  <group string="Pillar materials">
+								  <field name="apl_pil_material_ids" nolabel="1" style="width:50%%">
+									  <tree default_order="cnt desc" style="word-break:break-all;" fonts="bold:pillar_material_id==False" colors="red:pillar_material_id==False">
+										  <field name="pillar_material_id"/>
+										  <field name="cnt"/>
+										  <field name="numbers"/>	
+									  </tree>
+								  </field>
+							  </group>
+						  </group>
+						  <group string="Pillars">
+							  <field name="pillar_id" nolabel="1">
+								  <tree default_order="tap_id,num_by_vl">
+									  <field name="name"/>
+									  <field name="tap_id" invisible="1"/>
+									  <field name="num_by_vl"/>
+									  <field name="pillar_material_id"/>
+									  <field name="pillar_type_id"/>
+									  <field name="pillar_cut_id"/>
+								  </tree>
+							  </field>
+						  </group>
+					</page>
+					<page string="Crossing">
+
+					</page>
+					<page string="Fittings">
+					  <field name="fitting_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id}">
+						  <tree default_order="fitting name" colors="red:qnt==0">
+							  <field name="class_id"/>
+							  <field name="fitting_type"/>
+							  <field name="fitting_name"/>
+							  <field name="qnt"/>
+							  <field name="comment"/>
+						  </tree>
+					  </field>					  
+					</page>
+					<page string="Connections">
+					  
+					</page>
+					<page string="Insulators">
+					  
+					</page>
+				  </notebook>
+				</sheet>
+			  </form>
+			</field>
+		  </record>
+		
 	</data>
 </openerp>

@@ -203,12 +203,37 @@ class uis_papl_apl_resistance(models.Model):
 			#apl.department_id=res_dep
 			#apl.write({})
 	
-class uis_papl_apl_fittings_type(models.Model):
-	_name='uis.papl.apl.fittings.type'
+class uis_papl_apl_fittings_class(models.Model):
+	_name='uis.papl.apl.fittings.class'
+	name=fields.Char(string="Class name")
+	description=fields.Text(string="Description Fittings")
 
-class uis_papl_apl_fittings(models.Model):
-	_name='uis.papl.apl.fittings'
+class uis_papl_apl_fitting(models.Model):
+	_name='uis.papl.apl.fitting'
+	apl_id=fields.Many2one('uis.papl.apl',string="APL")
+	class_id=fields.Many2one('uis.papl.apl.fittings.class', string="Fitting class")
+	fitting_type=fields.Char(string="Fitting type")
+	fitting_name=fields.Char(string="Fitting name")
+	qnt=fields.Integer(string="Quantity")
+	comment=fields.Text(string="Comment")
+	_defaults={
+		"apl_id": lambda self,cr,uid,c:c.get('apl_id',False)
+	}
+class uis_papl_apl_crossing_type(models.Model):
+	_name='uis.papl.apl.crossing.type'
+	name=fields.Char(string="Crossing type")
+
+class uis_papl_apl_crossing(models.Model):
+	_name='uis.papl.apl.crossing'
+	apl_id=fields.Many2one('uis.papl.apl', string="APL")
+	cross_type=fields.Many2one('uis.papl.apl.crossing.type', string="Crossing type")
+	from_pillar_id=field.Many2one('uis.papl.pillar', string="Cross from (pillar)")
+	to_pillar_id=fields.Many2one('uis.papl.pillar', string="Cross to (pillar)")
+	length=fields.Float(digits=(3,2), string="Length")
 	
+	_defaults={
+		"apl_id": lambda self,cr,uid,c:c.get('apl_id',False)
+	}
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
@@ -253,6 +278,7 @@ class uis_papl_apl(models.Model):
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply substation")
 	transformer_ids=fields.One2many('uis.papl.transformer','apl_id', string="Transformers")
 	resistance_ids=fields.One2many('uis.papl.apl.resistance','apl_id', string="Resistance")
+	fitting_ids=fields.One2many('uis.papl.apl.fitting','apl_id', string="Fittings")
 	tap_text=fields.Html(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()

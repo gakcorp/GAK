@@ -322,6 +322,28 @@
                             </div>     	
                         </div>
                     </t>
+                    <div class="row">
+                        <br/>
+                        <div class="col-xs-12 text-center">
+                            <h4>5.Fittings</h4>
+                        </div>
+                    </div>
+                    <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                        <div class="col-xs-3 text-center">Fitting class</div>
+                        <div class="col-xs-3 text-center">Fitting name</div>
+                        <div class="col-xs-1 text-center">Fitting type</div>
+                        <div class="col-xs-1 text-center">Quantity</div>
+                        <div class="col-xs-4">Comment</div>
+                    </div>
+                    <t t-foreach="o.fitting_ids" t-as="fit">
+                        <div class="row" style="border-bottom:1px dashed black;">
+                            <div class="col-xs-3 text-center"><span t-field="fit.class_id.name"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="fit.fitting_name"/></div>
+                            <div class="col-xs-1 text-center"><span t-field="fit.fitting_type"/></div>
+                            <div class="col-xs-1 text-center"><span t-field="fit.qnt"/></div>
+                            <div class="col-xs-4"><span t-field="fit.comment"/></div>
+                        </div>
+                    </t>
                     </p>
                 </div>
                 </div>
