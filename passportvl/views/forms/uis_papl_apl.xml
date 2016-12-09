@@ -45,6 +45,27 @@
 				</form>
 			</field>
 		</record>
+		#Crossing form
+		<record id="uis_papl_apl_crossing_form" model="ir.ui.view">
+			<field name="name">Crossing</field>
+			<field name="model">uis.papl.apl.crossing</field>
+			<field name="arch" type="xml">
+				<form string="Crossing">
+					<group>
+						<group>
+							<field name="apl_id" invisible="context.get('apl_id',False)"/>
+							<field name="from_pillar_id"/>
+							<field name="to_pillar_id"/>
+							<field name="cross_type"/>
+							<field name="length"/>
+						</group>
+						<group>
+							 <field name="scheme" widget="image" class="imagescheme2" options='{"size":[400,400]}'/>
+						</group>
+					</group>
+				</form>
+			</field>
+		</record>
 		<record id="uis_papl_apl_fitting_class_form" model="ir.ui.view">
 			<field name="name">Fitting class form view</field>
 			<field name="model">uis.papl.apl.fittings.class</field>
@@ -211,7 +232,9 @@
 						  </group>
 					</page>
 					<page string="Crossing">
-
+						<field name="crossing_ids" nolabel="1" context="{'apl_id':active_id}">
+							
+						</field>
 					</page>
 					<page string="Fittings">
 					  <field name="fitting_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id}">

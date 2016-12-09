@@ -5,9 +5,16 @@ from PIL import Image, ImageDraw
 from . import schemeAPL
 from . import schemeAPL_v2
 from . import uis_papl_logger
+from uismodels import distance2points
 import logging
 import datetime
 import openerp
+from openerp.exceptions import Warning
+
+import numpy as np
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
 try:
     import cStringIO as StringIO
@@ -194,14 +201,7 @@ class uis_papl_apl_resistance(models.Model):
 				aplres.resistivity=aplres.cable_id.resistivity
 			else:
 				aplres.resistivity=aplres.resistivity_save_value
-			
-			#if apl.department_id_as_substation:
-			#	apl.department_id_save=apl.department_id
-			#	res_dep=apl.sup_substation_id.department_id
-			#if not(apl.department_id_as_substation):
-			#	res_dep=apl.department_id_save
-			#apl.department_id=res_dep
-			#apl.write({})
+
 	
 class uis_papl_apl_fittings_class(models.Model):
 	_name='uis.papl.apl.fittings.class'
@@ -227,13 +227,63 @@ class uis_papl_apl_crossing(models.Model):
 	_name='uis.papl.apl.crossing'
 	apl_id=fields.Many2one('uis.papl.apl', string="APL")
 	cross_type=fields.Many2one('uis.papl.apl.crossing.type', string="Crossing type")
-	from_pillar_id=field.Many2one('uis.papl.pillar', string="Cross from (pillar)")
-	to_pillar_id=fields.Many2one('uis.papl.pillar', string="Cross to (pillar)")
+	from_pillar_id=fields.Many2one('uis.papl.pillar', string="Cross from (pillar)", domain="[('apl_id','=',apl_id)]")
+	to_pillar_id=fields.Many2one('uis.papl.pillar', string="Cross to (pillar)", domain="[('apl_id','=',apl_id)]")
 	length=fields.Float(digits=(3,2), string="Length")
+	scheme=fields.Binary(string="Scheme", compute='_get_crossing_scheme')
 	
 	_defaults={
 		"apl_id": lambda self,cr,uid,c:c.get('apl_id',False)
 	}
+	
+	@api.onchange('to_pillar_id')
+	def onchange_to_pillar_id(self):
+		if self.from_pillar_id:
+			if self.to_pillar_id:
+				fp=self.from_pillar_id
+				tp=self.to_pillar_id
+				self.length=distance2points(fp.latitude,fp.longitude,tp.latitude,tp.longitude)
+	
+	@api.onchange('from_pillar_id')
+	def onchange_from_pillar_id(self):
+		res={}
+		if self.from_pillar_id:
+			ids=self.apl_id.pillar_id.search([('parent_id','=',self.from_pillar_id.id)])
+			res['domain']={
+				'to_pillar_id':[('id','in',ids.mapped('id'))]
+			}
+			if len(ids)==1:
+				self.to_pillar_id=ids[0]
+			else:
+				self.to_pillar_id=None
+		return res
+	
+	@api.onchange('from_pillar_id','to_pillar_id','apl_id')
+	def _get_crossing_scheme(self):
+		_logger.debug('!!!!!!!!!------------------')
+		for cross in self:
+			points=[]
+			_logger.debug('----------------------------------------')
+			for pil in cross.apl_id.pillar_id.search([('apl_id','=',cross.apl_id.id),('pillar_type_id.base','=',True)]):
+				point={
+					'lat':pil.latitude,
+					'lng':pil.longitude,
+					'n':pil.num_by_vl
+				}
+				points.append(point)
+				for tap in cross.apl_id.tap_ids:
+					tp=tap.tap_encode_path
+			fig, ax = plt.subplots(figsize=(10,10))
+			ax.plot([d['lng'] for d in points],[d['lat'] for d in points],'ro')
+			ax.spines['top'].set_visible(False)
+			ax.spines['right'].set_visible(False)
+			ax.axis('off')
+			background_stream = StringIO.StringIO()
+			fig.savefig(background_stream, format='png', dpi=100, transparent=True)
+			cross.scheme=background_stream.getvalue().encode('base64')
+			_logger.debug('Fin gen scheme')
+				
+				#_logger.debug('Pil No %r from aplid %r'%(pil.num_by_vl,pil.apl_id))
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
 	name = fields.Char(string="Name", compute="_get_apl_name")
@@ -279,6 +329,7 @@ class uis_papl_apl(models.Model):
 	transformer_ids=fields.One2many('uis.papl.transformer','apl_id', string="Transformers")
 	resistance_ids=fields.One2many('uis.papl.apl.resistance','apl_id', string="Resistance")
 	fitting_ids=fields.One2many('uis.papl.apl.fitting','apl_id', string="Fittings")
+	crossing_ids=fields.One2many('uis.papl.apl.crossing','apl_id', string="Crossing")
 	tap_text=fields.Html(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
