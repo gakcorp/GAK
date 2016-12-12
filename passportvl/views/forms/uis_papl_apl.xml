@@ -233,6 +233,12 @@
 					</page>
 					<page string="Crossing">
 						<field name="crossing_ids" nolabel="1" context="{'apl_id':active_id}">
+							<tree default_order="from_pillar_id">
+								<field name="from_pillar_id"/>
+								<field name="to_pillar_id"/>
+								<field name="cross_type"/>
+								<field name="length"/>	
+							</tree>
 							
 						</field>
 					</page>
