@@ -498,7 +498,6 @@ class uis_papl_apl(models.Model):
 				def_frm=self.env.user.employee_papl_ids.disp_apl_frm
 			dname=eval(def_frm)
 			apl.name=dname
-				
 	
 	@api.multi
 	def define_taps_num(self):
@@ -582,11 +581,7 @@ class uis_papl_apl(models.Model):
 
 	def _apl_get_len(self):
 		for record in self:
-			vsum=0
-			vmin=1000
-			vmax=0
-			vmed=0
-			vcnt=0
+			vsum,vmax,vmed,vcnt,vmin=0,0,0,0,1000
 			for pil in record.pillar_id:
 				vcnt=vcnt+1
 				lpp=pil.len_prev_pillar
