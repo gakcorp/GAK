@@ -227,6 +227,7 @@ class uis_papl_apl_crossing_type(models.Model):
 class uis_papl_apl_crossing(models.Model):
 	_name='uis.papl.apl.crossing'
 	apl_id=fields.Many2one('uis.papl.apl', string="APL")
+	name = fields.Char(string="Name", compute="_get_cross_name")
 	cross_type=fields.Many2one('uis.papl.apl.crossing.type', string="Crossing type")
 	from_pillar_id=fields.Many2one('uis.papl.pillar', string="Cross from (pillar)", domain="[('apl_id','=',apl_id)]")
 	to_pillar_id=fields.Many2one('uis.papl.pillar', string="Cross to (pillar)", domain="[('apl_id','=',apl_id)]")
@@ -237,6 +238,13 @@ class uis_papl_apl_crossing(models.Model):
 		"apl_id": lambda self,cr,uid,c:c.get('apl_id',False)
 	}
 	
+	def _get_cross_name(self):
+		for cross in self:
+			sname=""
+			if cross.from_pillar_id:
+				sname+=str(cross.from_pillar_id.num_by_vl)
+			if cross.to_pillar_id:
+				sname+='_%r'%str(cross.to_pillar_id.num_by_vl)
 	@api.onchange('to_pillar_id')
 	def onchange_to_pillar_id(self):
 		if self.from_pillar_id:
@@ -353,6 +361,8 @@ class uis_papl_apl(models.Model):
 	resistance_ids=fields.One2many('uis.papl.apl.resistance','apl_id', string="Resistance")
 	fitting_ids=fields.One2many('uis.papl.apl.fitting','apl_id', string="Fittings")
 	crossing_ids=fields.One2many('uis.papl.apl.crossing','apl_id', string="Crossing")
+	crossing_rel_ids=fields.One2many(related='crossing_ids', string="Crossing")
+	
 	tap_text=fields.Html(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()

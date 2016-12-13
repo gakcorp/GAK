@@ -374,7 +374,12 @@
 
 
     <!-- actions opening views on models -->
-  
+		<record model="ir.actions.act_window" id="uis_papl_apl_crossing_action_window">
+			<field name="name">List of crossing</field>
+			<field name="res_model">uis.papl.apl.crossing</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">kanban,form</field>
+		</record>
     <record model="ir.actions.act_window" id="uis_papl_apl_action_window">
       <field name="name">List of air power line</field>
       <field name="res_model">uis.papl.apl</field>
@@ -471,7 +476,7 @@
     <!-- actions -->
 	<menuitem name="List of APL" id="uis_papl_pil_type_menu_apl_list" parent="uis_papl_menu_apl"
               action="uis_papl_apl_pil_type_action_window"/>
-	
+	<menuitem name="List of Crossing" id="uis_papl_apl_cross_menu_list" parent="uis_papl_menu_apl" action="uis_papl_apl_crossing_action_window"/>
 	<menuitem name="List of APL apt" id="uis_papl_menu_apl_list" parent="uis_papl_menu_apl"
               action="uis_papl_apl_action_window"/>
 
