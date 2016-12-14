@@ -2,10 +2,11 @@
 import math, urllib, json, time, random
 from openerp import models, fields, api
 from PIL import Image, ImageDraw
-from . import schemeAPL
+#from . import schemeAPL
 from . import schemeAPL_v2
 from . import uis_papl_logger
 from uismodels import distance2points
+from scheme_apl_v3 import drawscheme
 import logging
 import datetime
 import openerp
@@ -244,7 +245,9 @@ class uis_papl_apl_crossing(models.Model):
 			if cross.from_pillar_id:
 				sname+=str(cross.from_pillar_id.num_by_vl)
 			if cross.to_pillar_id:
-				sname+='_%r'%str(cross.to_pillar_id.num_by_vl)
+				sname=sname+"->"+str(cross.to_pillar_id.num_by_vl)
+			cross.name=sname
+			
 	@api.onchange('to_pillar_id')
 	def onchange_to_pillar_id(self):
 		if self.from_pillar_id:
@@ -270,48 +273,7 @@ class uis_papl_apl_crossing(models.Model):
 	@api.onchange('from_pillar_id','to_pillar_id','apl_id')
 	def _get_crossing_scheme(self):
 		for cross in self:
-			points=[]
-			for pil in cross.apl_id.pillar_id.search([('apl_id','=',cross.apl_id.id),('pillar_type_id.base','=',True)]):
-				point={
-					'lat':pil.latitude,
-					'lng':pil.longitude,
-					'n':pil.num_by_vl,
-					'd':pil.azimut_from_prev
-				}
-				points.append(point)
-
-			fig, ax = plt.subplots(figsize=(10,10))
-			#DRAW LINES
-			for tap in cross.apl_id.tap_ids:
-				tap_points=googlemaps.convert.decode_polyline(tap.tap_encode_path)
-				ax.plot([d['lng'] for d in tap_points],[d['lat'] for d in tap_points],'b-')
-				#_logger.debug(tap_points)
-			cpoint=[]
-			cpoint.append({
-				'lat':cross.from_pillar_id.latitude,
-				'lng':cross.from_pillar_id.longitude
-			})
-			if cross.to_pillar_id:
-				cpoint.append({
-					'lat':cross.to_pillar_id.latitude,
-					'lng':cross.to_pillar_id.longitude	
-					})
-			px=[d['lng'] for d in points]
-			py=[d['lat'] for d in points]
-			pn=[d['n'] for d in points]
-			pd=[d['d'] for d in points]
-			ax.plot(px,py,'wo', markersize=18)
-			#ax.scatter(px,py,c=None,marker='o', s=20)
-			ax.plot([d['lng'] for d in cpoint],[d['lat'] for d in cpoint],'r+',mew=5,ms=15)
-			ax.spines['top'].set_visible(False)
-			ax.spines['right'].set_visible(False)
-			ax.axis('off')
-			for i,txt in enumerate(pn):
-				ax.annotate(txt,(px[i],py[i]),va="center",ha="center")
-
-			background_stream = StringIO.StringIO()
-			fig.savefig(background_stream, format='png', dpi=100, transparent=True)
-			cross.scheme=background_stream.getvalue().encode('base64')
+			cross.scheme=drawscheme(cross.apl_id, mark_cross_id=cross, drawCross=True)
 			_logger.debug('Fin gen scheme')
 				
 				#_logger.debug('Pil No %r from aplid %r'%(pil.num_by_vl,pil.apl_id))
@@ -369,7 +331,7 @@ class uis_papl_apl(models.Model):
 	url_maps=fields.Char(compute='_apl_get_url_maps')
 	url_scheme=fields.Char(compute='_apl_get_url_scheme')  #NUPD Old use. Need delete
 	image_file=fields.Char(string="Scheme File Name", compute='_get_scheme_image_file_name')
-	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image_2')
+	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image_3')
 	
 	#scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
 	@api.depends('resistance_ids')
@@ -411,7 +373,15 @@ class uis_papl_apl(models.Model):
 		tlr.fix_end()
 		return ntap
 	
-	def _get_scheme_image_2(self,cr,uid,ids,context=None):
+	def _get_scheme_image_3(self):
+		tlr=_ulog(self,code='CALC_APL_SCHM',lib=__name__,desc='Calculate scheme images for apl')
+		i=0
+		for apl in self:
+			i+=1
+			apl.scheme_image=drawscheme([apl],drawBP=True,drawTS=True,drawPS=True,drawCross=True, drawCrossObj=True, drawScale=True)
+		tlr.set_qnt(i)
+		tlr.fix_end()
+	'''def _get_scheme_image_2(self,cr,uid,ids,context=None):
 		tlr=_ulog(self,code='CALC_APL_SCHM',lib=__name__,desc='Calculate scheme images for apl')
 		i=0
 		for apl in self.browse(cr,uid,ids,context=context):
@@ -423,7 +393,7 @@ class uis_papl_apl(models.Model):
 			img.save(background_stream, format="PNG")
 			apl.scheme_image=background_stream.getvalue().encode('base64')
 		tlr.set_qnt(i)
-		tlr.fix_end()
+		tlr.fix_end()'''
 	
 	@api.onchange('department_id_as_substation')
 	def _get_set_department_id(self):
