@@ -17,6 +17,11 @@ _ulog=uis_papl_logger.ulog
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
+
+cv_pillar_sep=openerp._('/')
+cv_pillar_empty_num_vl=openerp._('*NONUM*')
+cv_pillar_empty_tap=openerp._('*NOTAP*')
+cv_pillar_empty_tap_num=openerp._('*NONUM*')
 	
 class uis_papl_pillar_type(models.Model):
 	_name='uis.papl.pillar.type'
@@ -69,6 +74,39 @@ class uis_papl_pillar(models.Model):
 									 compute='_get_near_pillar'
 									 )
 	
+
+	@api.depends('num_by_vl','tap_id','apl_id')
+	def _get_pillar_full_name(self):
+		#variables
+		#cv_pillar_sep=openerp._('/')
+		#cv_pillar_empty_num_vl=openerp._('*NONUM*')
+		#cv_pillar_empty_tap=openerp._('*NOTAP*')
+
+		empapl=self.env.user.employee_papl_ids
+		for pil in self:
+			dname=''
+			sp=empapl.pv_pillar_sep or cv_pillar_sep
+			pn=empapl.pv_pillar_empty_num_vl or cv_pillar_empty_num_vl
+			tn=empapl.pv_pillar_empty_tap or cv_pillar_empty_tap
+			if (pil.num_by_vl>0):
+				pn=str(pil.num_by_vl)
+			an=''
+			tcpn=None
+			tnum=None
+			if pil.apl_id:
+				an=unicode(pil.apl_id.name)
+			if pil.tap_id:
+				tn=unicode(pil.tap_id.name)
+				tcpn=str(pil.tap_id.conn_pillar_id.num_by_vl)
+				tnum=str(pil.tap_id.num_by_vl)
+			def_frm_mp=empapl.disp_mp_frm or ('pn+sp+an')
+			def_frm_tp=empapl.disp_tp_frm or ('"("+tnum+")"+sp+pn+sp+an')
+			ex_frm=def_frm_tp
+			if pil.tap_id.is_main_line:
+				ex_frm=def_frm_mp
+			dname=eval(ex_frm)
+			pil.name=dname
+			
 	@api.depends('pillar_type_id')
 	def on_change_pillar_type_id(self):
 		for pil in self:
@@ -178,18 +216,7 @@ class uis_papl_pillar(models.Model):
 					tlr.fix_end()
 			record.elevation=el
 
-	@api.depends('num_by_vl','tap_id','apl_id')
-	def _get_pillar_full_name(self):
-		for record in self:
-			new_name=str(record.num_by_vl)
-			#tap_name=record.tap_id.name
-			#apl_name=record.apl_id.name
-			str_tap_num_by_vl=str(record.tap_id.num_by_vl)
-			if (record.tap_id.is_main_line):
-				str_tap_num_by_vl='ML'
-			tap_name='T('+str_tap_num_by_vl+')_Feed'+str(record.apl_id.feeder_num) #NUPD Change to mask for user
-			mname=new_name+"."+unicode(tap_name)
-			record.name=mname
+
 
 	#@api.depends('longitude','latitude','parent_id')
 	def _pillar_get_len(self):

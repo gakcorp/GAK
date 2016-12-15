@@ -8,6 +8,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp.addons.passportvl.models import uis_papl_apl
 from openerp.addons.passportvl.models import uis_papl_tap
+from openerp.addons.passportvl.models import uis_papl_pillar
 
 cv_apl_def_type=uis_papl_apl.cv_apl_def_type
 cv_apl_voltage=uis_papl_apl.cv_apl_voltage
@@ -21,6 +22,11 @@ cv_tap_empty_conn_pillar=uis_papl_tap.cv_tap_empty_conn_pillar
 cv_tap_empty_num_vl=uis_papl_tap.cv_tap_empty_num_vl
 cv_tap_abbr_ml=uis_papl_tap.cv_tap_abbr_ml
 cv_tap_abbr_tap=uis_papl_tap.cv_tap_abbr_tap
+
+cv_pillar_sep=uis_papl_pillar.cv_pillar_sep
+cv_pillar_empty_num_vl=uis_papl_pillar.cv_pillar_empty_num_vl
+cv_pillar_empty_tap=uis_papl_pillar.cv_pillar_empty_tap
+
 
 #default abbreviation of volotage (if not defined ='kV')
 #cv_apl_feed_abbr	-	default abbreviation of feeder (if not defined ='F')
@@ -55,7 +61,18 @@ class uis_papl_apl(osv.osv):
 		('tn+"("+cp+")"+an',openerp._('2(52)APL name')),
 		('tn+"("+cp+")"',openerp._('2(52)'))
 	]
-	
+	DISP_MP_FRM=[
+		('pn',openerp._('64')),
+		('pn+sp+an',openerp._('64.APL name')),
+		('"0"+sp+pn',openerp._('0.64')),
+		('"0"+sp+pn+an',openerp._('0.64.APL Name'))
+	]
+	DISP_TP_FRM=[
+		('pn+sp+tn',openerp._('32.Tap name')),
+		('pn+sp+tcpn+sp+an', openerp._('32.64.APL Name')),
+		('tnum+sp+pn+sp+an', openerp._('3.64.32.APL Name')),
+		('tcpn+sp+pn',openerp._('64.32'))
+	]
 	_columns = {
 		#we need a related field in order to be able to sort the employee by name
 		'name_related': fields.related('resource_id', 'name', type='char', string='Name', readonly=True, store=True),
@@ -81,6 +98,16 @@ class uis_papl_apl(osv.osv):
 		'disp_tap_frm': fields.selection(DISP_TAP_FRM, 'Dispathing TAP name format', readonly=False,
 										help="Use dispathing TAP name with next format\n\
 										if field is empty default format is ex.'T.2(52).APL name'"),
+		#fields define value of dispathing PIL name
+		'pv_pillar_sep':fields.char('Separator for mark pillar', help="Default separator id %r"%cv_pillar_sep),
+		'pv_pillar_empty_num_vl':fields.char('Code empty pillar number by APL', help="Default empty code is %r"%cv_pillar_empty_num_vl),
+		'pv_pillar_empty_tap':fields.char('Code empty tap name', help="Default empty code is %r"%cv_pillar_empty_tap),
+		'disp_mp_frm':fields.selection(DISP_MP_FRM, 'Disparhing pillar (main line) format', readonly=False,
+										help="Use dispathing Pillar of main line\n\
+										if field is empty default format is ex. '2.APL name'"),
+		'disp_tp_frm':fields.selection(DISP_TP_FRM, 'Dispathing pillar (tap) format', readonly=False,
+										help="Use dispathing name of pillar tap\n\
+										if field is empty default format is ex. '(3).2.APL name'"),
 		#personal fields
 		'color': fields.integer('Color Index'),
 		'work_email': fields.char('Work Email', size=240)
