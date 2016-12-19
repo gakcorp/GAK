@@ -53,12 +53,12 @@ var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
 //Toggle Menu
 $SIDEBAR_PHOTO.hide();
 $('#menu_toggle_button').on('click',function(){
-    $SIDEBAR_MENU.show();
-    $SIDEBAR_PHOTO.hide();
+    $SIDEBAR_MENU.show("slow");
+    $SIDEBAR_PHOTO.hide("slow");
 });
 $('#photo_toggle_button').on('click',function(){
-    $SIDEBAR_MENU.hide();
-    $SIDEBAR_PHOTO.show();
+    $SIDEBAR_MENU.hide("slow");
+    $SIDEBAR_PHOTO.show("slow");
 })
 // Sidebar
 $(document).ready(function() {
