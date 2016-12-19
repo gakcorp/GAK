@@ -191,6 +191,7 @@ class uis_papl_tap(models.Model):
 				my=max(wy)
 				
 				fig, ax = plt.subplots(figsize=(math.ceil(mx/200),math.ceil(my/30)))
+				fig,ax=plt.subplots(figsize=(20,10))
 				ax.plot(x,y,'b-')
 				ax.plot(px,py,'ro')
 				#ax.plot(wx,wy,'g--')

@@ -24,7 +24,7 @@
 				</form>
 			</field>
 		</record>
-		#Fitting form
+		<!--#Fitting form!-->
 		<record id="uis_papl_apl_fitting_form" model="ir.ui.view">
 			<field name="name">Fitting view</field>
 			<field name="model">uis.papl.apl.fitting</field>
@@ -45,7 +45,7 @@
 				</form>
 			</field>
 		</record>
-		#Crossing form
+		<!--#Crossing form!-->
 		<record id="uis_papl_apl_crossing_form" model="ir.ui.view">
 			<field name="name">Crossing</field>
 			<field name="model">uis.papl.apl.crossing</field>
@@ -66,6 +66,69 @@
 				</form>
 			</field>
 		</record>
+		
+		<record id="uis_papl_apl_crossing_kanban" model="ir.ui.view">
+			<field name="name">Crossing kanban view</field>
+			<field name="model">uis.papl.apl.crossing</field>
+			<field name="arch" type="xml">
+				<kanban>
+					<field name="name"/>
+					<field name="length"/>
+					<field name="id"/>
+					<templates>
+						<t t-name="kanban-box">
+							<!--<div>test1</div>!-->
+							<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+								<!--<img style="max-width:100%;"  t-att-src="kanban_image('uis.papl.apl.crossing','scheme',record.id.value)" class="oe_kanban_image"/>!-->
+								<div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
+									<field name="length"/>
+								</div>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
+		
+			<!--	<record id="uis_papl_tap_kanban" model="ir.ui.view">
+		<field name="name">Tap Kanban view</field>
+		<field name="model">uis.papl.tap</field>
+		<field name="arch" type="xml">
+			<kanban>
+				<field name="name"/>
+				<templates>
+					<t t-name="kanban-box" create="false">
+						<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+							<img style="max-width:100%;"  t-att-src="kanban_image('uis.papl.tap','profile_3d_image',record.id.value)" class="oe_kanban_image"/>
+							<div class="oe_right oe_button_box" style="width: 200px;position: absolute;bottom: 10px;" name="buttons_kanban_view">
+									<button class="oe_inline" name="act_rx_plus" type="object">v</button>
+									<button class="oe_inline" name="act_rx_minus" type="object">^</button>
+									<button class="oe_inline" name="act_ry_plus" type="object">&lt;</button>
+									<button class="oe_inline" name="act_ry_minus" type="object">&gt;</button>
+							</div>
+							<div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
+								<h4>
+									<a type="open">
+										<field name="name"/>
+									</a>
+								</h4>
+								<div name="tags">
+								<ul>
+									<li>APL:<field name="apl_id"/></li>
+									<li>Pillar count:<field name="pillar_cnt"/></li>
+									<li>Tap lenght:<field name="line_len_calc"/></li>
+									<li>Tap No:<field name="num_by_vl"/></li>
+								</ul>
+								</div>
+							</div>
+						</div>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>!-->
+		
+		<!--#Fitting form!-->
 		<record id="uis_papl_apl_fitting_class_form" model="ir.ui.view">
 			<field name="name">Fitting class form view</field>
 			<field name="model">uis.papl.apl.fittings.class</field>
@@ -76,7 +139,7 @@
 				</form>
 			</field>
 		</record>
-		#APL Form view
+		<!--#APL Form view!-->
 		<record id="uis_papl_apl_form" model="ir.ui.view">
 			<field name="name">APL form view</field>
 			<field name="model">uis.papl.apl</field>
@@ -232,7 +295,7 @@
 						  </group>
 					</page>
 					<page string="Crossing">
-						<field name="crossing_ids" nolabel="1" context="{'apl_id':active_id}">
+						<field name="crossing_rel_ids" nolabel="1" context="{'apl_id':active_id}">
 							<tree default_order="from_pillar_id">
 								<field name="from_pillar_id"/>
 								<field name="to_pillar_id"/>
@@ -241,6 +304,37 @@
 							</tree>
 							
 						</field>
+						
+
+						<!--
+						<field name="crossing_rel_ids" widget="many2many_kanban">
+							  <kanban  quick_create="false" create="false" delete="false">
+								  <field name="cross_type"/>
+								  <field name="from_pillar_id"/>
+								  <field name="to_pillar_id"/>
+								  <field name="length"/>
+								  <templates>
+									  <t t-name="kanban-box" create="false">
+										  <div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+												  <img style="max-width:100%;"  t-att-src="kanban_image('uis.papl.apl.crossing','scheme',record.id.value)" class="oe_kanban_image"/>
+												  <div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
+												  <h4>
+													  <a type="open">
+														  <field name="cross_type"/>
+													  </a>
+												  <div name="tags"/>
+												  <ul>
+													  <li>From pillar:<field name="from_pillar_id"/></li>
+													  <li>To pillar:<field name="to_pillar_id"/></li>
+													  <li>Lenght:<field name="length"/></li>
+												  </ul>
+												  </h4>
+											  </div>
+										  </div>
+									  </t>
+								  </templates>
+							  </kanban>
+						  </field>!-->
 					</page>
 					<page string="Fittings">
 					  <field name="fitting_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id}">

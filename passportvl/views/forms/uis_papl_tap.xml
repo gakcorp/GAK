@@ -81,14 +81,15 @@
 									<a type="open">
 										<field name="name"/>
 									</a>
-								<div name="tags"/>
+								</h4>
+								<div name="tags">
 								<ul>
 									<li>APL:<field name="apl_id"/></li>
 									<li>Pillar count:<field name="pillar_cnt"/></li>
 									<li>Tap lenght:<field name="line_len_calc"/></li>
 									<li>Tap No:<field name="num_by_vl"/></li>
 								</ul>
-								</h4>
+								</div>
 							</div>
 						</div>
 					</t>

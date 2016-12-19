@@ -3,6 +3,7 @@
 #load base passport vl models
 
 from . import uismodels
+from . import uis_papl_pillar
 from . import uis_papl_apl
 from . import uis_papl_tap
 from . import wizardsmodels
