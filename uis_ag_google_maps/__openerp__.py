@@ -14,7 +14,8 @@ information for which information is availeble in Activ.GIS system
     'data': [
         'views/google_map.xml',
         'views/layers_views.xml',
-        'views/mod_apl_view.xml'
+        'views/mod_apl_view.xml',
+        'views/v2/carto_template.xml'
     ],
     'installable': True,
     'auto_install': False,

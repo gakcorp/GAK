@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<template id="uis_cartography_menu_bar_layout">
+			
+		</template>
+		<template id="uis_cartography_main">
+			&lt;!DOCTYPE html&gt;
+			<html>
+				<head>
+					<meta charset="utf-8" />
+					<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+					<meta name="viewport" content="width=device-width, initial-scale=1"/>
+					<title>ActiveGIS - </title>
+					<link href="/uis_ag_google_maps/static/v2/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/nprogress/nprogress.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/iCheck/skins/flat/green.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet"/>
+					<!-- Custom Theme Style -->
+					<link href="/uis_ag_google_maps/static/v2/build/css/custom.min.css" rel="stylesheet"/>
+				</head>
+				<body class="nav-md">
+					<div class="container body">
+						<div class="main_container">
+							<div class="col-md-3 left_col">
+								<div class="left_col scroll-view">
+									<div class="navbar nav_title" style="border: 0;">
+										<a href="index.html" class="site_title"><i class="fa fa-map-marker"></i><span>ActiveGIS</span></a>
+									</div>
+									<div class="clearfix">
+										
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<t t-call="uis_ag_google_maps.uis_cartography_menu_bar_layout">
+					
+					</t>
+				</body>
+			</html>
+		</template>
+	</data>
+</openerp>
