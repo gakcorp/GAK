@@ -287,6 +287,8 @@
 			                 icon="fa-plus">
                        Map
 								</button>
+								<button class="oe_inline" name="act_show_new_map" type="object"
+												icon="fa-map">New map</button>
 								
 								<br/>
 						</div>

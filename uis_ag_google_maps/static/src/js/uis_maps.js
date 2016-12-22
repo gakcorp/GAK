@@ -1061,7 +1061,7 @@ function mapslib(apl_ids, div_id) {
 					console.debug(i);
 					thatlib.markers.pillars[i].setMap(null);
 					//ind=thatlib.markers.pillars.indexOf(item);
-					//console.debug(ind);
+					//console.debug(inlld);
 					//thatlib.markers.pillars.splice(i,1);
 				}
 				});*/

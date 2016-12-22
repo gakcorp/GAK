@@ -180,8 +180,8 @@ class uis_papl_tap(models.Model):
 				for dt in json.loads(tap.tap_pillar_elevation_json):
 					px.append(dt['d'])
 					py.append(dt['e'])
-					px.append(dt['d'])
-					py.append(dt['e']+dt['h'])
+					#px.append(dt['d'])
+					#py.append(dt['e']+dt['h'])
 				wx,wy=[],[]
 				for dt in json.loads(tap.tap_pillar_elevation_json):
 					wx.append(dt['d'])

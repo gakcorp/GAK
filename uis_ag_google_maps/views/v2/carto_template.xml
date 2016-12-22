@@ -19,6 +19,7 @@
 					<link href="/uis_ag_google_maps/static/v2/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet"/>
 					<link href="/uis_ag_google_maps/static/v2/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
 					<link href="/uis_ag_google_maps/static/v2/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/switchery/dist/switchery.min.css" rel="stylesheet"/>
 					<!-- Custom Theme Style -->
 					<link href="/uis_ag_google_maps/static/v2/build/css/custom.css" rel="stylesheet"/>
 					<!--OLD!-->
@@ -56,13 +57,18 @@
 												  </ul>
 												</li>
 												<li><a><i class="fa fa-sitemap"/>Items <span class="fa fa-chevron-down"></span></a>
-													<ul class="nav child_menu">
+													<ul class="nav child_menu" style="display:block; overflow-y:auto;max-height:350px;">
 														<li><a href="#">Power substation</a>
 															<ul class="nav child_menu">
-																<li><a href="#">Подстанция 1</a>
-																</li>
-																<li><a href="#">Подстанция 2</a>
-																</li>
+																<label>
+																	<input type="checkbox" class="js-switch" checked="0"/>
+																	APL filter	
+																</label>
+																<t t-foreach="ps_data['pss']" t-as="ps">
+																	<li t-att="{'psid':ps['id']}">
+																		<a href="#"><t t-esc="ps['name']"/></a>
+																	</li>
+																</t>
 															</ul>
 														</li>
 														<li><a href="#">APLs</a></li>
@@ -127,7 +133,7 @@
 					<script src="/uis_ag_google_maps/static/v2/vendors/jquery/dist/jquery.min.js"></script>
 					<!-- Bootstrap -->
 					<script src="/uis_ag_google_maps/static/v2/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-					
+					<script src="/uis_ag_google_maps/static/v2/vendors/switchery/dist/switchery.min.js"></script>
 					<!--Custom Theme Scripts!-->
 					<script src="/uis_ag_google_maps/static/v2/js/custom.js"></script>
 					

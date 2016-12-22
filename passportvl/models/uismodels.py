@@ -200,6 +200,16 @@ class uis_papl_substation(models.Model):
 			for apl in record.apl_id:
 				url=url+unicode(str(apl.id))+","
 			record.url_maps=url
+	
+	@api.multi
+	def act_show_new_map(self):
+		return{
+			'name': 'Maps',
+			'res_model':'ir.actions.act_url',
+			'type':'ir.actions.act_url',
+			'target':'new',
+			'url':'/maps'
+			}
 
 	@api.multi
 	def act_show_map(self):

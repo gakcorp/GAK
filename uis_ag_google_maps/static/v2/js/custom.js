@@ -59,7 +59,7 @@ $('#menu_toggle_button').on('click',function(){
 $('#photo_toggle_button').on('click',function(){
     $SIDEBAR_MENU.hide("slow");
     $SIDEBAR_PHOTO.show("slow");
-})
+});
 // Sidebar
 $(document).ready(function() {
     // TODO: This is some kind of easy fix, maybe we can improve this
