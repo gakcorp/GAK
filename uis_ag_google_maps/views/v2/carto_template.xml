@@ -58,7 +58,10 @@
 												</li>
 												<li><a><i class="fa fa-sitemap"/>Items <span class="fa fa-chevron-down"></span></a>
 													<ul class="nav child_menu" style="display:block; overflow-y:auto;max-height:350px;">
-														<li><a href="#">Power substation</a>
+														<li><a href="#">Power substation
+															<span class="badge bg-green" style="right:10px;position:absolute;">
+																<t t-esc="ps_data['counter']"/>
+															</span></a>
 															<ul class="nav child_menu">
 																<label>
 																	<input type="checkbox" class="js-switch" checked="0"/>
@@ -81,8 +84,20 @@
 									</div>
 									<!--/side bar menu!-->
 									<div id="sidebar-photo" class="main_menu_side hidden-print main_menu">
-										<div>
-											Photos
+										<div class="menu_section">
+											<ul class="nav side-menu">
+												<li class="active"><a><i class="fa fa-picture-o"></i> Photo <span class="fa fa-chevron-down"></span></a>
+													<ul class="nav child_menu" style="  display: block;
+																						max-height: 600px;
+																						overflow-y: auto;">
+														<t t-foreach="ph_data['phs']" t-as="ph">
+															<li>
+																<img t-attf-src="{{ph['thumbnail']}}"/>
+															</li>
+														</t>
+													</ul>
+												</li>
+											</ul>
 										</div>
 									</div>
 									<!-- /menu footer buttons -->
