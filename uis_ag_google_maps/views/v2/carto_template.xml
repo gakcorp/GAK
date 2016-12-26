@@ -57,9 +57,14 @@
 												  </ul>
 												</li>
 												<li><a><i class="fa fa-sitemap"/>Items <span class="fa fa-chevron-down"></span></a>
-													<ul class="nav child_menu" style="display:block; overflow-y:auto;max-height:350px;">
-														<li><a href="#">Power substation
-															<span class="badge bg-green" style="right:10px;position:absolute;">
+													<ul class="nav child_menu" style="display:block; overflow-y:auto;max-height:450px;">
+														
+														<li><a href="#">Substation
+															<span class="label label-default" style="float:right;">
+																<span class="fa fa-filter" style="float: none;vertical-align: text-bottom;"/>
+																<t t-esc="ps_data['counter_filtered']"/>
+															</span>
+															<span class="badge bg-green" style="right:10px;position:relative;float:right;">
 																<t t-esc="ps_data['counter']"/>
 															</span></a>
 															<ul class="nav child_menu">
@@ -69,14 +74,76 @@
 																</label>
 																<t t-foreach="ps_data['pss']" t-as="ps">
 																	<li t-att="{'psid':ps['id']}">
+																		<span t-if="ps['show']==True" class="fa fa-check-square-o"/>
 																		<a href="#"><t t-esc="ps['name']"/></a>
 																	</li>
 																</t>
 															</ul>
 														</li>
-														<li><a href="#">APLs</a></li>
-														<li><a href="#">Transformers</a></li>
-														<li><a href="#">Pillar</a></li>
+														<li>
+															<a href="#">APL
+																<span class="label label-default" style="float:right;">
+																	<span class="fa fa-filter" style="float: none;vertical-align: text-bottom;" id="span_apl_filt_cnt"/>
+																	<t t-esc="apl_data['counter_filtered']"/>
+																</span>
+																<span class="badge bg-green" style="right:10px;position:relative;float:right;">
+																	<t t-esc="apl_data['counter']"/>
+																</span>
+															</a>
+															<ul class="nav child_menu">
+																<label>
+																	<input type="checkbox" class="js-switch" checked="0"/>
+																	Pillar filter
+																</label>
+																	<br/>
+																<label>
+																	<input type="checkbox" class="js-switch" checked="0"/>
+																	Transformer filter	
+																</label>
+																<t t-foreach="apl_data['apls']" t-as="apl">
+																	<li t-att="{'aplid':apl['id']}">
+																		<a href="#"><t t-esc="apl['name']"/></a>
+																	</li>
+																</t>
+															</ul>
+														
+														</li>
+														<li>
+															<a href="#">Transformers
+																<span class="label label-default" style="float:right;">
+																	<span class="fa fa-filter" style="float: none;vertical-align: text-bottom;" id="span_trans_filt_cnt"/>
+																	<t t-esc="trans_data['counter_filtered']"/>
+																</span>
+																<span class="badge bg-green" style="right:10px;position:relative;float:right;">
+																	<t t-esc="trans_data['counter']"/>
+																</span>
+																<ul class="nav child_menu">
+																	<t t-foreach="trans_data['transs']" t-as="trans">
+																		<li t-att="{'transid':trans['id']}">
+																			<a href="#"><t t-esc="trans['name']"/></a>
+																		</li>
+																	</t>
+																</ul>
+															</a>
+														</li>
+														<li>
+															<a href="#">Pillar
+																<span class="label label-default" style="float:right;">
+																	<span class="fa fa-filter" style="float: none;vertical-align: text-bottom;" id="span_pillar_filt_cnt"/>
+																	<t t-esc="pillar_data['counter_filtered']"/>
+																</span>
+																<span class="badge bg-green" style="right:10px;position:relative;float:right;">
+																	<t t-esc="pillar_data['counter']"/>
+																</span>
+																<ul class="nav child_menu">
+																	<t t-foreach="pillar_data['pillars']" t-as="pillar">
+																		<li t-att="{'pillarid':pillar['id']}">
+																			<a href="#"><t t-esc="pillar['name']"/></a>
+																		</li>
+																	</t>
+																</ul>
+															</a>
+														</li>
 													</ul>
 												</li>
 											</ul>				
@@ -134,9 +201,27 @@
 								</div>
 							</div>
 							<!--/ top navigation!-->
-							<div class="right_col" role="main">
-								
+							<div class="right_col" role="main" id="statistics">
+								<div class="row tile_count">
+									<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+										<span class="count_top"><i class="fa fa-arrows-h"></i> Total Lenght</span>
+										<div class="count">
+											<t t-esc="apl_data['total_length']"/>
+										</div>
+										<span class="count_bottom"><i class="green">4% </i> 1 year exploatation</span><br/>
+										<span class="count_bottom"><i class="yellow">24% </i> 5 year exploatation</span><br/>
+										<span class="count_bottom"><i class="red">72% </i> 10 year exploatation</span><br/>
+									</div>
+									<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+										<span class="count_top"><i class="fa fa-clock-o"></i> Average Time</span>
+										<div class="count">5 day 3 hour 23 min</div>
+										<span class="count_bottom"><i class="green"><i class="fa fa-thumbs-o-up"></i>65% </i> Just in time</span><br/>
+										<span class="count_bottom"><i class="yellow"><i class="fa fa-meh-o"></i>25% </i> Less 50% delay</span><br/>
+										<span class="count_bottom"><i class="red"><i class="fa fa-thumbs-o-down"></i>10% </i> 50% (and more) delay</span><br/>
+									</div>
+								</div>
 							</div>
+							
 						</div>
 					</div>
 					<t t-call="uis_ag_google_maps.uis_cartography_menu_bar_layout">
