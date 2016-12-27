@@ -45,10 +45,26 @@ var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
     $SIDEBAR_MENU = $('#sidebar-menu'),
     $SIDEBAR_PHOTO = $('#sidebar-photo'),
     $SIDEBAR_FOOTER = $('.sidebar-footer'),
+    $STAT_PANEL = $('#statistics_panel'),
+    $MAP_PANEL= $('#map_panel'),
     $LEFT_COL = $('.left_col'),
     $RIGHT_COL = $('.right_col'),
     $NAV_MENU = $('.nav_menu'),
     $FOOTER = $('footer');
+
+// Menu buttons
+$STAT_PANEL.hide();
+$('#menu_button_map').on('click', function(){
+    $MAP_PANEL.show("slow");
+    $STAT_PANEL.hide("slow");
+    console.debug('maps_button_click');
+});
+
+$('#menu_button_stat').on('click', function(){
+    $STAT_PANEL.show("slow");
+    $MAP_PANEL.hide("slow");
+    console.debug('stat_button_click');
+});
 
 //Toggle Menu
 $SIDEBAR_PHOTO.hide();
@@ -60,6 +76,8 @@ $('#photo_toggle_button').on('click',function(){
     $SIDEBAR_MENU.hide("slow");
     $SIDEBAR_PHOTO.show("slow");
 });
+
+
 // Sidebar
 $(document).ready(function() {
     // TODO: This is some kind of easy fix, maybe we can improve this
