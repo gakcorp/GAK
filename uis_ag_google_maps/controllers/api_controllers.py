@@ -130,6 +130,11 @@ class maps_data_json(http.Controller):
 		for apl_id in apl_obj.browse(cr, uid, apl_ids, context=context):
 			#apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
 			for pillar_id in apl_id.pillar_id:
+				#NUPD1 add sorted
+				#NUPD2 select maxmin latlng from dict
+				#seq = [x['the_key'] for x in dict_list]
+				#min(seq)
+				#max(seq)
 				#print "Do pillar"+pillar_id.name
 				pillar_data["counter"]=pillar_data["counter"]+1
 				if pillar_id.latitude>maxlat:
