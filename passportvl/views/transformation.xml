@@ -2,16 +2,16 @@
 <openerp>
   <data>
 	<record id="uis_papl_transformer_search" model="ir.ui.view">
-	  <field name="name">uis.papl.transforer.search</field>
+	  <field name="name">uis.papl.transformer.search</field>
 	  <field name="model">uis.papl.transformer</field>
 	  <field name="arch" type="xml">
 		<search string="Transformation Search">
 		  <field name="id"/>
 		  <field name="name"/>
-          <field name="apl_id"/>
+      <field name="apl_id"/>
 		  <field name="pillar_id"/>
 		  <filed name="voltage"/>
-         </search>
+    </search>
 	  </field>
 	</record>
 	
@@ -22,8 +22,9 @@
         <tree string="List of Transformer" editable="top" create="true" edit="false">
           <field name="id"/>
           <field name="name"/>
-		  <field name="state"/>
-		  <field name="voltage"/>
+					<field name="apl_id"/>
+					<field name="state"/>
+					<field name="voltage"/>
           <field name="inv_num"/>
           <field name="bld_year"/>
           <field name="start_exp_year"/>
@@ -106,17 +107,24 @@
 					</group>
 				  </page>
 				  <page string="Geo Data">
-					<group>
-					  <field name="latitude"/>
-					  <field name="longitude"/>
-						<field name="trans_stay_rotation"/>
-					</group>
+						<group>
+							<field name="latitude"/>
+							<field name="longitude"/>
+							<field name="trans_stay_rotation"/>
+						</group>
 				  </page>
 				  <page string="Connections">
-					<group>
-					  <field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
-					  <field name="pillar_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
-					</group>
+						<group>
+							<group>
+								<field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+								<field name="pillar_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							</group>
+							<group>
+								<field name="pass_type"/>
+								<field name="near_pillar2_ids" widget="many2many_tags" attrs="{'invisible':[('pass_type','=',False)]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
+								<field name="pillar2_id" attrs="{'invisible':[('pass_type','=',False)]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							</group>
+						</group>
 				  </page>
 				  <page string="Step-down transformer">
 					<group>

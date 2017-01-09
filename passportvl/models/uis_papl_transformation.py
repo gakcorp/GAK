@@ -54,8 +54,9 @@ class uis_papl_transformation(models.Model):
 	state=fields.Selection(STATE_SELECTION,'Status',readonly=True,default='draft')
 	apl_id=fields.Many2one('uis.papl.apl', string='APL Name', store=True, compute='_get_apl_tap_id')
 	tap_id=fields.Many2one('uis.papl.tap', string='Tap Name', store=True, compute='_get_apl_tap_id')
-	pillar_id=fields.Many2one('uis.papl.pillar',string='Pillar Name', domain="[('id','in',near_pillar_ids[0][2])]")
-	
+	pillar_id=fields.Many2one('uis.papl.pillar',string='Connected pillar (in)', domain="[('id','in',near_pillar_ids[0][2])]")
+	pass_type=fields.Boolean(string='Pass type')
+	pillar2_id=fields.Many2one('uis.papl.pillar',string='Connected pillar (out)', domain="[('id','in',near_pillar2_ids[0][2])]")
 	#GEODATA
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
@@ -67,7 +68,11 @@ class uis_papl_transformation(models.Model):
 									 column2='pillar_id',
 									 compute='_get_near_pillar'
 									 )
-	
+	near_pillar2_ids=fields.Many2many('uis.papl.pillar',
+									  relation='near_pillar2_ids',
+									  column1='trans_id',
+									  column2='pillar_id',
+									  compute='_get_near_pillar2')
 	#Details data
 	bld_year=fields.Integer(string='Build year')
 	start_exp_year=fields.Integer(string='Start of operation')
@@ -141,7 +146,29 @@ class uis_papl_transformation(models.Model):
 		for trans in self.browse(cr,uid,ids,context=context):
 			trans.apl_id=trans.pillar_id.apl_id
 			trans.tap_id=trans.pillar_id.tap_id
+	
+	#@api.onchange('pass_type')
+	#def onchange_pass_type(self,cr,uid,ids,context=None):
+	#	for trans in self:
+	#		trans._get_near_pillar2(self,cr,uid,[trans.id],context=context)
 		
+	@api.depends('latitude','longitude','pillar_id','pass_type')
+	def _get_near_pillar2(self,cr,uid,ids,context=None):
+		for trans in self.browse(cr,uid,ids,context=context):
+			trans.near_pillar2_ids=[(5,0,0)]
+			pils=[]
+			if trans.pass_type:
+				if trans.pillar_id:
+					nxpils_ids = self.pool.get('uis.papl.pillar').search(cr,uid,[('parent_id','=',trans.pillar_id.id)],context=context)
+					nxpils=self.pool.get('uis.papl.pillar').browse(cr,uid,nxpils_ids,context=context)
+					for npil in nxpils:
+						pils.append(npil)
+					if trans.pillar_id.parent_id:
+						pils.append(trans.pillar_id.parent_id)
+					
+			for pil in pils:
+				trans.near_pillar2_ids=[(4,pil.id,0)]
+				
 	@api.depends('latitude','longitude')
 	def _get_near_pillar(self,cr,uid,ids,context=None):
 		for trans in self.browse(cr,uid,ids,context=context):
