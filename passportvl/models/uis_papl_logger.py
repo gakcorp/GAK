@@ -117,7 +117,7 @@ class uis_logger(models.Model):
 				'delay':el
 			})
 		self.env.cr.commit()
-		#self.env.cr.close()
+		self.env.cr.close()
 		return True
 
 

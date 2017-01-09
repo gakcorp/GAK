@@ -279,7 +279,80 @@ class uis_papl_apl_crossing(models.Model):
 				#_logger.debug('Pil No %r from aplid %r'%(pil.num_by_vl,pil.apl_id))
 class uis_papl_apl(models.Model):
 	_name ='uis.papl.apl'
-	name = fields.Char(string="Name", compute="_get_apl_name")
+	#define functions
+	@api.one
+	@api.depends('short_name','apl_type','feeder_num','voltage','sup_substation_id')
+	def _get_name(self):
+		for apl in self:
+			#work with defined rpython consts
+			#cv_apl_def_type - 	default type (if not defined =NT=)
+			#cv_apl_voltage - 	default voltage code (if not defined = *0*)
+			#cv_apl_feed	-	default code for feeder (if not defined ='*NFD*')
+			#cv_apl_substation -default code for substation (if not defined ='*NPS*')
+			#cv_apl_voltage_abbr	-	default abbreviation of volotage (if not defined ='kV')
+			#cv_apl_feed_abbr	-	default abbreviation of feeder (if not defined ='F')
+
+			dname=''
+			def_frm='ta+"-"+va+av+" "+af+fa+"-"+sa+sn'
+			#type of APL
+			ta=apl.apl_type
+			if not ta:
+				ta=self.env.user.employee_papl_ids.code_empty_type_apl
+				if not ta:
+					ta=cv_apl_def_type
+			#voltage of APL
+			vai=apl.voltage
+			va=str(vai)
+			if not (vai>0):
+				va=self.env.user.employee_papl_ids.code_empty_voltage_apl
+				if not va:
+					va=cv_apl_voltage
+			#abbr voltage:
+			av=self.env.user.employee_papl_ids.code_abbr_voltage_apl
+			if not av:
+				av=cv_apl_voltage_abbr
+			
+			#feed apl
+			fai=apl.feeder_num
+			fa=str(fai)
+			if not(fai>0):
+				fa=self.env.user.employee_papl_ids.code_empty_feed_apl
+				if not fa:
+					fa=cv_apl_feed
+			#abbr feed
+			af=self.env.user.employee_papl_ids.code_abbr_feed_apl
+			if not af:
+				af=cv_apl_feed_abbr
+			#substation
+			sa=apl.sup_substation_id.name
+			if not sa:
+				sa=self.env.user.employee_papl_ids.code_empty_substation_apl
+				if not sa:
+					sa=cv_apl_substation
+			apl.sup_substation_id.name
+			sn=''
+			if apl.short_name:
+				sn='('+unicode(apl.short_name)+')'
+			
+			if self.env.user.employee_papl_ids.disp_apl_frm:
+				def_frm=self.env.user.employee_papl_ids.disp_apl_frm
+			dname=eval(def_frm)
+			apl.name=dname
+	
+	#@api.one
+	#def _name_search(self, name, args=None, operator='ilike', limit=100):
+	#	if operator == 'like': 
+	#		operator = 'ilike'
+	#	apls=self.search([('name', operator, name)], limit=limit)
+	#	_logger.debug(apls)
+	#	return apls.name_get()
+	#@api.one
+	def _name_search(self, operator, value):
+		if operator == 'like':
+			operator = 'ilike'
+		return [('name', operator, value)]
+	
+	name = fields.Char(string="Name", compute=_get_name, search=_name_search)
 	short_name=fields.Char(string="Short name")
 	locality=fields.Char(string="Locality")
 	apl_type=fields.Char(string="Type APL")
@@ -311,20 +384,16 @@ class uis_papl_apl(models.Model):
 	sw_point=fields.Char(string="Switching point")
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
 	apl_pil_type_ids=fields.One2many('uis.papl.apl.pil_type', 'apl_id', string="Pillar types", compute='get_pil_type_ids')
-	#compute='_get_pil_type_ids',
 	apl_pil_material_ids=fields.One2many('uis.papl.apl.pil_materials','apl_id', string="Pillar materials", compute='_get_pil_material_ids')
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
 	tap_ids=fields.One2many('uis.papl.tap', 'apl_id', string="Taps")
 	tap_ids_rel=fields.One2many(related='tap_ids', string="Taps")
-	#nickname = fields.Char(related='user_id.partner_id.name', store=True)
-	#  'phone_2': fields.related('phone', string='Phone')
 	sup_substation_id=fields.Many2one('uis.papl.substation', string="Supply substation")
 	transformer_ids=fields.One2many('uis.papl.transformer','apl_id', string="Transformers")
 	resistance_ids=fields.One2many('uis.papl.apl.resistance','apl_id', string="Resistance")
 	fitting_ids=fields.One2many('uis.papl.apl.fitting','apl_id', string="Fittings")
 	crossing_ids=fields.One2many('uis.papl.apl.crossing','apl_id', string="Crossing")
 	crossing_rel_ids=fields.One2many(related='crossing_ids', string="Crossing")
-	
 	tap_text=fields.Html(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
@@ -420,64 +489,7 @@ class uis_papl_apl(models.Model):
 		for apl in self:
 			if apl.department_id_as_substation:
 				apl.department_id=apl.sup_substation_id.department_id
-				
-	@api.depends('short_name','apl_type','feeder_num','voltage','sup_substation_id')
-	def _get_apl_name(self):
-		for apl in self:
-			#work with defined rpython consts
-			#cv_apl_def_type - 	default type (if not defined =NT=)
-			#cv_apl_voltage - 	default voltage code (if not defined = *0*)
-			#cv_apl_feed	-	default code for feeder (if not defined ='*NFD*')
-			#cv_apl_substation -default code for substation (if not defined ='*NPS*')
-			#cv_apl_voltage_abbr	-	default abbreviation of volotage (if not defined ='kV')
-			#cv_apl_feed_abbr	-	default abbreviation of feeder (if not defined ='F')
-
-			dname=''
-			def_frm='ta+"-"+va+av+" "+af+fa+"-"+sa+sn'
-			#type of APL
-			ta=apl.apl_type
-			if not ta:
-				ta=self.env.user.employee_papl_ids.code_empty_type_apl
-				if not ta:
-					ta=cv_apl_def_type
-			#voltage of APL
-			vai=apl.voltage
-			va=str(vai)
-			if not (vai>0):
-				va=self.env.user.employee_papl_ids.code_empty_voltage_apl
-				if not va:
-					va=cv_apl_voltage
-			#abbr voltage:
-			av=self.env.user.employee_papl_ids.code_abbr_voltage_apl
-			if not av:
-				av=cv_apl_voltage_abbr
-			
-			#feed apl
-			fai=apl.feeder_num
-			fa=str(fai)
-			if not(fai>0):
-				fa=self.env.user.employee_papl_ids.code_empty_feed_apl
-				if not fa:
-					fa=cv_apl_feed
-			#abbr feed
-			af=self.env.user.employee_papl_ids.code_abbr_feed_apl
-			if not af:
-				af=cv_apl_feed_abbr
-			#substation
-			sa=apl.sup_substation_id.name
-			if not sa:
-				sa=self.env.user.employee_papl_ids.code_empty_substation_apl
-				if not sa:
-					sa=cv_apl_substation
-			apl.sup_substation_id.name
-			sn=''
-			if apl.short_name:
-				sn='('+unicode(apl.short_name)+')'
-			
-			if self.env.user.employee_papl_ids.disp_apl_frm:
-				def_frm=self.env.user.employee_papl_ids.disp_apl_frm
-			dname=eval(def_frm)
-			apl.name=dname
+	
 	
 	@api.multi
 	def define_taps_num(self):

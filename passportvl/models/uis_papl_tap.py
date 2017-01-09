@@ -399,7 +399,7 @@ class uis_papl_tap(models.Model):
 		tlr=_ulog(self,code='ADD_NE_PLR_TO_TP',lib=__name__,desc='Create new pillar for TAP')
 		re_pillar=self.pool.get('uis.papl.pillar').browse(cr,uid,ids,context=context)
 		for tap in self.browse(cr,uid,ids,context=context):
-			tlr.add_comment('[*] Tap id = %r',tap.id)	
+			tlr.add_comment('[*] Tap id = %r'%tap.id)	
 			npil=re_pillar.create({'name':False})
 			if not(latitude==0):
 				npil.latitude=latitude
@@ -421,7 +421,7 @@ class uis_papl_tap(models.Model):
 			now=datetime.datetime.now()
 			nt=self.create({'name':'NewCNC PIllar DT'+str(now)})
 			nt.apl_id=self.apl_id
-			tlr.add_comment('[*] Add new tap id=%r',nt.id)
+			#tlr.add_comment('[*] Add new tap id=%r'%nt.id)
 		tlr.fix_end()
 		return nt
 		
