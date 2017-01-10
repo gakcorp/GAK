@@ -126,33 +126,36 @@ class maps_data_json(http.Controller):
 		minlong=120
 		maxlong=0
 		domain=[("id","in",clean_ids)]
+		pils=[]
 		apl_ids=apl_obj.search(cr, uid, domain, context=context)
 		for apl_id in apl_obj.browse(cr, uid, apl_ids, context=context):
 			#apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
-			for pillar_id in apl_id.pillar_id:
-				#NUPD1 add sorted
-				#NUPD2 select maxmin latlng from dict
-				#seq = [x['the_key'] for x in dict_list]
-				#min(seq)
-				#max(seq)
-				#print "Do pillar"+pillar_id.name
-				pillar_data["counter"]=pillar_data["counter"]+1
-				if pillar_id.latitude>maxlat:
-					maxlat=pillar_id.latitude
-				if pillar_id.latitude<minlat:
-					minlat=pillar_id.latitude
-				if pillar_id.longitude>maxlong:
-					maxlong=pillar_id.longitude
-				if pillar_id.longitude<minlong:
-					minlong=pillar_id.longitude
-				rotation=0
-				if pillar_id.pillar_type_id.auto_rotate:
-					rotation=pillar_id.azimut_from_prev+pillar_id.pillar_type_id.auto_rotate_delta
-				if pillar_id.pillar_type_id.auto_rotate_formula:
-					exec pillar_id.pillar_type_id.auto_rotate_formula
-				if pillar_id.pillar_stay_rotation:
-					rotation=pillar_id.pillar_stay_rotation
-				pillar_data["pillars"].append({
+			for pil in apl_id.pillar_id:
+				pils.append(pil)
+		for pillar_id in pils:#apl_id.pillar_id:
+			#NUPD1 add sorted
+			#NUPD2 select maxmin latlng from dict
+			#seq = [x['the_key'] for x in dict_list]
+			#min(seq)
+			#max(seq)
+			#print "Do pillar"+pillar_id.name
+			pillar_data["counter"]=pillar_data["counter"]+1
+			if pillar_id.latitude>maxlat:
+				maxlat=pillar_id.latitude
+			if pillar_id.latitude<minlat:
+				minlat=pillar_id.latitude
+			if pillar_id.longitude>maxlong:
+				maxlong=pillar_id.longitude
+			if pillar_id.longitude<minlong:
+				minlong=pillar_id.longitude
+			rotation=0
+			if pillar_id.pillar_type_id.auto_rotate:
+				rotation=pillar_id.azimut_from_prev+pillar_id.pillar_type_id.auto_rotate_delta
+			if pillar_id.pillar_type_id.auto_rotate_formula:
+				exec pillar_id.pillar_type_id.auto_rotate_formula
+			if pillar_id.pillar_stay_rotation:
+				rotation=pillar_id.pillar_stay_rotation
+			pillar_data["pillars"].append({
 					'id':pillar_id.id,
 					'name':pillar_id.name,
 					'apl':apl_id.name,
