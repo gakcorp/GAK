@@ -66,7 +66,7 @@
 				<group>
 					<field name="name"/>
 					<!--<field name="image" widget="binary" filename="name"  height="480"/>!-->
-					<field name="image" widget="image" width="800" filename="fimage"/>
+					<field name="image" widget="image" filename="fimage"/>
 					<field name="thumbnail" widget="image"/>
 					<field name="image_800" widget="image" />
 					<field name="image_400" widget="image"/>
@@ -79,6 +79,7 @@
 							<field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="near_apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="near_transformer_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="next_photo_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 						</group>
 						</page>
 						<page string='ExifData'>
@@ -89,7 +90,13 @@
 								<field name="rotation"/>
 							</group>
 						</page>
+					
+					
 					</notebook>
+					<div>
+						<field name="image_scheme" widget="image"/>
+					</div>
+					
 				</group>
 			</group>
 		</form>
