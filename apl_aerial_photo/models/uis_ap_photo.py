@@ -9,6 +9,10 @@ import psycopg2
 from openerp import models, fields, api, tools
 from datetime import datetime
 import logging
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 
 import cv2
 import numpy as np
@@ -128,6 +132,7 @@ class uis_ap_photo(models.Model):
 	image_800=fields.Binary(string='Image800', compute='_get_800_img', store=True)
 	image_400=fields.Binary(string='Image400', compute='_get_400_img', store=True)
 	image_edge=fields.Binary(string='ImageEdge', compute='_get_edge_img')
+	image_scheme=fields.Binary(string='Scheme position', compute='_get_scheme_position')
 	focal_length=fields.Float(digits=(2,4), string="Focal Length")
 	thumbnail=fields.Binary(string="Thumbnail")
 	image_filename=fields.Char(string='Image file name')
@@ -143,6 +148,11 @@ class uis_ap_photo(models.Model):
 									 column2='pillar_id',
 									 compute='_get_near_photo_pillar'
 									 )
+	next_photo_ids=fields.Many2many('uis.ap.photo',
+								   realation='next_photo_ids',
+								   column1='photo_id',
+								   column2='next_photo_id',
+								   compute='_get_next_photo')
 	near_apl_ids=fields.Many2many('uis.papl.apl',
 							 relation='photo_near_apl',
 							 column1='photo_id',
@@ -160,7 +170,23 @@ class uis_ap_photo(models.Model):
 		for ph in self:
 			ph._get_800_img()
 			#ph._get_400_img()
-		
+	
+	@api.depends('latitude','longitude')
+	def _get_scheme_position(self):
+		_logger.debug('Start')
+		sch_w, sch_h,sch_dpi=4,4,100
+		ms=18
+		for photo in self:
+			fig, ax = plt.subplots(figsize=(sch_w,sch_h))
+			
+			#ax.spines['top'].set_visible(False)
+			#ax.spines['right'].set_visible(False)
+			#ax.axis('off')
+			#ax.axis('equal')
+			background_stream = StringIO.StringIO()
+			fig.savefig(background_stream, format='png', dpi=sch_dpi, transparent=True)
+			photo.image_scheme=background_stream.getvalue().encode('base64')
+		return True
 	@api.depends('image')
 	def _get_800_img(self,cr,uid,ids,context=None):
 		tlr=_ulog(self,code='CALC_PH_GEN800',lib=__name__,desc='Generate (render) photo 800 px')
@@ -260,7 +286,31 @@ class uis_ap_photo(models.Model):
 			#edges=cv2.Canny(ocvimg,100,200)
 			ph.image_edge=imedg
 		return True
-		
+	
+	@api.depends('latitude', 'longitude')
+	def _get_next_photo(self,cr,uid,ids,context=None):
+		#empapl=uid.employee_papl_ids
+		delta=0.01
+		max_dist=100
+		for photo in self.browse(cr,uid,ids,context=context):
+			lat1, lng1=photo.latitude, photo.longitude
+			domain_np=[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',lng1-delta),('longitude','<',lng1+delta)]
+			pos_next_photo_ids=self.pool.get('uis.ap.photo').search(cr,openerp.SUPERUSER_ID,domain_np,context=context)
+			#next_photo=[]
+			#next_photo_ids=[]
+			for pid in pos_next_photo_ids:
+				nph=self.pool.get('uis.ap.photo').browse(cr,uid,[pid],context=context)
+				if nph:
+					if nph.id != photo.id:
+						lat2,lng2=nph.latitude,nph.longitude
+						dist=0
+						if (lat1<>0) and (lng1<>0) and (lat2<>0) and (lng2<>0) and (abs(lat1-lat2)<delta) and (abs(lng1-lng2)<delta):
+							dist=distance2points(lat1,lng1,lat2,lng2)
+						if (dist<max_dist) and (dist>0):
+							#next_photo.append(nph)
+							#next_photo_ids.append(nph.i)
+							photo.next_photo_ids=[(4,nph.id,0)]
+		return True
 	@api.depends('latitude', 'longitude')
 	def _get_near_trans_ids(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):

@@ -73,8 +73,14 @@ class uis_papl_pillar(models.Model):
 									 column2='pillar_id',
 									 compute='_get_near_pillar'
 									 )
+	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	
-
+	@api.depends('longitude','latitude','name','num_by_vl','pillar_material_id','pillar_type_id','pillar_cut_id','pillar_stay_rotation','parent_id')
+	def _get_hash(self):
+		for pil in self:
+			str_to_hash='%r%r%r%r%r%r%r%r%r'%(pil.name,pil.num_by_vl,pil.pillar_material_id.name,pil.pillar_type_id.name,pil.pillar_cut_id.name,pil.pillar_stay_rotation,pil.longitude,pil.longitude,pil.parent_id.name)
+			pil.hash_summ=hash(str_to_hash)
+	
 	@api.depends('num_by_vl','tap_id','apl_id')
 	def _get_pillar_full_name(self):
 		#variables
@@ -91,8 +97,8 @@ class uis_papl_pillar(models.Model):
 			if (pil.num_by_vl>0):
 				pn=str(pil.num_by_vl)
 			an=''
-			tcpn=None
-			tnum=None
+			tcpn=''
+			tnum=''
 			if pil.apl_id:
 				an=unicode(pil.apl_id.name)
 			if pil.tap_id:
@@ -104,7 +110,12 @@ class uis_papl_pillar(models.Model):
 			ex_frm=def_frm_tp
 			if pil.tap_id.is_main_line:
 				ex_frm=def_frm_mp
-			dname=eval(ex_frm)
+			_logger.debug(pil.id)
+			_logger.debug(ex_frm)
+			try:
+				dname=eval(ex_frm)
+			except:
+				pass
 			pil.name=dname
 			
 	@api.depends('pillar_type_id')
