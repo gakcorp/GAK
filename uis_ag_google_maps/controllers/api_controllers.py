@@ -110,44 +110,48 @@ class maps_data_json(http.Controller):
 					})
 		#'Return for APL %r Photo %r near Pillar %r' % (pil.apl_id.id, ph.id, pil.name)
 		return apl_data,lines_data
-
+	
+	def _get_pillar_hash(self,clean_ids):
+		cr,uid,context=request.cr,request.uid,request.context
+		pil_obj=request.registry['uis.papl.pillar']
+		pil_domain=[("apl_id","in",clean_ids)]
+		hash_sum=''
+		pil_ids=pil_obj.search(cr,uid,pil_domain,context=context)
+		pils=pil_obj.browse(cr,uid,pil_ids,context=context)
+		for pil in pils:
+			hash_sum=hash("%r %r"%(hash_sum,pil.hash_summ))
+			_logger.debug(hash_sum)
+		return hash_sum
+	
 	def _get_pillar_data(self,clean_ids):
 		cr, uid,context=request.cr,request.uid,request.context
 		#code _get_pillar_data
 		apl_obj=request.registry['uis.papl.apl']
+		pil_obj=request.registry['uis.papl.pillar']
 		pillar_data={
 			"counter":0,
 			"latitude":0,
 			"longitude":0,
 			"pillars":[]
 		}
-		minlat=120
-		maxlat=0
-		minlong=120
-		maxlong=0
-		domain=[("id","in",clean_ids)]
+		minlat,maxlat=120,0
+		minlong,maxlong=120,0
+		#domain=[("id","in",clean_ids)]
+		pil_domain=[("apl_id","in",clean_ids)]
 		pils=[]
-		apl_ids=apl_obj.search(cr, uid, domain, context=context)
-		for apl_id in apl_obj.browse(cr, uid, apl_ids, context=context):
+		pil_ids=pil_obj.search(cr,uid,pil_domain,context=context)
+		pils=pil_obj.browse(cr,uid,pil_ids,context=context)
+		#apl_ids=apl_obj.search(cr, uid, domain, context=context)
+		#for apl_id in apl_obj.browse(cr, uid, apl_ids, context=context):
 			#apl_id.pillar_id.sorted(key=lambda r: r.num_by_vl)
-			for pil in apl_id.pillar_id:
-				pils.append(pil)
+		#	for pil in apl_id.pillar_id:
+		#		pils.append(pil)
+		lat=[pil.latitude for pil in pils]
+		lng=[pil.longitude for pil in pils]
+		maxlat,minlat=max(lat),min(lat)
+		maxlong,minlong=max(lng),min(lng)
 		for pillar_id in pils:#apl_id.pillar_id:
-			#NUPD1 add sorted
-			#NUPD2 select maxmin latlng from dict
-			#seq = [x['the_key'] for x in dict_list]
-			#min(seq)
-			#max(seq)
-			#print "Do pillar"+pillar_id.name
 			pillar_data["counter"]=pillar_data["counter"]+1
-			if pillar_id.latitude>maxlat:
-				maxlat=pillar_id.latitude
-			if pillar_id.latitude<minlat:
-				minlat=pillar_id.latitude
-			if pillar_id.longitude>maxlong:
-				maxlong=pillar_id.longitude
-			if pillar_id.longitude<minlong:
-				minlong=pillar_id.longitude
 			rotation=0
 			if pillar_id.pillar_type_id.auto_rotate:
 				rotation=pillar_id.azimut_from_prev+pillar_id.pillar_type_id.auto_rotate_delta
@@ -158,8 +162,8 @@ class maps_data_json(http.Controller):
 			pillar_data["pillars"].append({
 					'id':pillar_id.id,
 					'name':pillar_id.name,
-					'apl':apl_id.name,
-					'apl_id':apl_id.id,
+					'apl':pillar_id.apl_id.name,
+					'apl_id':pillar_id.apl_id.id,
 					'tap_id':pillar_id.tap_id.id,
 					'elevation':pillar_id.elevation,
 					'latitude': escape(str(pillar_id.latitude)),
@@ -350,8 +354,9 @@ class maps_data_json(http.Controller):
 		clean_ids=self._get_clean_apl_ids(data)
 		tlr.set_qnt(len(clean_ids))
 		tlr.add_comment('[~] Generate for pillars of APLs ids[%r]'%clean_ids)
-		pillar_data=self._get_pillar_data(clean_ids)
-		out=hash(str(pillar_data))
+		#pillar_data=self._get_pillar_data(clean_ids)
+		#out=hash(str(pillar_data))
+		out=self._get_pillar_hash(clean_ids)
 		values ={
 			'hash_pillar':json.dumps(out)
 		}
