@@ -64,24 +64,28 @@
 			</header>
 			<group>
 				<group>
-					<field name="name"/>
+					
 					<!--<field name="image" widget="binary" filename="name"  height="480"/>!-->
 					<!--<field name="image" widget="image" filename="fimage"/>!-->
-					<field name="image_800" widget="image" />
-					<field name="image_scheme" widget="image"/>
+					<field name="image_800" widget="image" options='{"size":[800,600]}' nolabel="1" colspan="2"/>
+					<!--<field name="image_800" widget="image" />!-->
+					
 					<!--<field name="thumbnail" widget="image"/>
 					<field name="image_800" widget="image" />
 					<field name="image_400" widget="image"/>!-->
 					<!--<field name="image_edge"/>!-->
 				</group>
 				<group>
+					<field name="name" nolabel="1"  colspan="2"/>
 					<notebook>
 						<page string="Objects">
 						<group>
 							<field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="near_apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="near_transformer_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="next_photo_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="image_scheme" widget="image" options='{"size":[600,600]}' nolabel="1" colspan="2"/>
 						</group>
 						</page>
 						<page string='ExifData'>
@@ -90,6 +94,12 @@
 								<field name="longitude"/>
 								<field name="altitude"/>
 								<field name="rotation"/>
+							</group>
+						</page>
+						<page string='Admins'>
+							<group>
+								<field name="view_distance"/>
+								<field name="focal_angles"/>
 							</group>
 						</page>
 					

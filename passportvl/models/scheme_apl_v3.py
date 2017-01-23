@@ -50,7 +50,7 @@ def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=Fals
 				ax.plot([lng],[lat],'s',ms=sizeTS, markerfacecolor="white",markeredgecolor='blue')
 				ax.plot([lng],[lat],'^',ms=sizeTS, markerfacecolor="white",markeredgecolor='blue')
 				if annotateTS==True:
-					ax.annotate(ts.name,(lng+alng,lat+alat),va="center",ha="center",fontproperties=fm.FontProperties(fname='/usr/share/fonts/truetype/verdana/verdana.ttf'))
+					ax.annotate(ts.name,(lng+alng,lat+alat),va="center",ha="center",size=8,fontproperties=fm.FontProperties(fname='/usr/share/fonts/truetype/verdana/verdana.ttf'))
 		if drawBP==True:
 			base_points=[]
 			for pil in apl.pillar_id.search([('apl_id','=',apl.id),('pillar_type_id.base','=',True)]):
@@ -66,7 +66,7 @@ def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=Fals
 			bpn=[d['n'] for d in base_points]
 			ax.plot(bpx,bpy,'wo', markersize=ms)
 			for i,txt in enumerate(bpn):
-				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center")
+				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center",size=8)
 		
 		if drawCross==True:
 			for cross in apl.crossing_ids:
@@ -103,7 +103,7 @@ def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=Fals
 					lat+=alat
 					lng+=alng
 			ax.plot([lng],[lat],'8',ms=25, markerfacecolor="white",markeredgecolor='blue')
-			ax.annotate(ss.name,(lng+alng,lat+alat),va="center",ha="center",fontproperties=fm.FontProperties(fname='/usr/share/fonts/truetype/verdana/verdana.ttf'))
+			ax.annotate(ss.name,(lng+alng,lat+alat),va="center",ha="center",size=8,fontproperties=fm.FontProperties(fname='/usr/share/fonts/truetype/verdana/verdana.ttf'))
 		
 	
 	if drawScale==True:

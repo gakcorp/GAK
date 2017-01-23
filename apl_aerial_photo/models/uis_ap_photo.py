@@ -13,7 +13,8 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-from matplotlib.markers import TICKLEFT, TICKRIGHT, TICKUP, TICKDOWN
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 import cv2
 import numpy as np
@@ -121,7 +122,40 @@ def strdiv(strdiv):
 	#print parts
 	rval=int(parts[0])/int(parts[1])
 	return rval
-	
+def point_in_triangle(lat,lng,tripoints):
+	return 0
+def triangle_points(lat,lng,direction,angle,distance):
+	points=[]
+	R=6378.1
+	dirm=math.radians(direction)
+	dir1=math.radians(direction-angle/2)
+	dir2=math.radians(direction+angle/2)
+	d=distance/1000
+	lat0=math.radians(lat)
+	lng0=math.radians(lng)
+	latm=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dirm))
+	lngm =lng0+math.atan2(math.sin(dirm)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(latm))
+	lat1=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dir1))
+	lng1 =lng0+math.atan2(math.sin(dir1)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(lat1))
+	lat2=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dir2))
+	lng2 =lng0+math.atan2(math.sin(dir2)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(lat2))
+	rval=[{'lat':math.degrees(lat0),'lng':math.degrees(lng0)},
+		{'lat':math.degrees(lat1),'lng':math.degrees(lng1)},
+		{'lat':math.degrees(latm),'lng':math.degrees(lngm)},
+		{'lat':math.degrees(latm),'lng':math.degrees(lngm)},
+		{'lat':math.degrees(lat2),'lng':math.degrees(lng2)},
+		{'lat':math.degrees(lat0),'lng':math.degrees(lng0)}]
+	#_logger.debug(rval)
+	return rval
+def point_in_poly(lat,lng,poly):
+	point = Point(lat, lng)
+	poly_array=[]
+	for d in poly:
+		poly_array.append((d['lat'],d['lng']))
+	polygon = Polygon(poly_array)
+	res=polygon.contains(point)
+	#_logger.debug(res)
+	return res
 class uis_ap_photo(models.Model):
 	_name='uis.ap.photo'
 	_description='Photo_apl'
@@ -143,6 +177,13 @@ class uis_ap_photo(models.Model):
 	latitude=fields.Float(digits=(2,6), string='Latitude')
 	altitude=fields.Float(digits=(2,4), string='Altitude')
 	rotation=fields.Float(digits=(2,4),string='Rotation')
+	view_distance=fields.Float(digits=(2,0), string='View distance', default=50)
+	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=40)
+	pillar_ids=fields.Many2many('uis.papl.pillar',
+								relation='photo_pillar_rel',
+								column1='photo_id',
+								column2='pillar_id',
+								compute='_get_photo_pillar')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='photo_near_pillar',
 									 column1='photo_id',
@@ -172,28 +213,36 @@ class uis_ap_photo(models.Model):
 			ph._get_800_img()
 			#ph._get_400_img()
 	
-	@api.depends('latitude','longitude','rotation')
+	@api.depends('latitude','longitude','rotation','view_distance','focal_angles')
 	def _get_scheme_position(self):
 		_logger.debug('Start')
-		sch_w, sch_h,sch_dpi=4,4,100
-		ms=12
+		sch_w, sch_h,sch_dpi=6,4,100
+		ms=10
 		for photo in self:
 			fig, ax = plt.subplots(figsize=(sch_w,sch_h))
 			pil_points=[]
 			for pil in photo.near_pillar_ids:
+				ins=False
+				if pil in photo.pillar_ids:
+					ins=True
 				pil_point={
 					'lat':pil.latitude,
 					'lng':pil.longitude,
 					'n':pil.num_by_vl,
-					'd':pil.azimut_from_prev
+					'd':pil.azimut_from_prev,
+					'ins':ins
 				}
 				pil_points.append(pil_point)
 			bpx=[d['lng'] for d in pil_points]
 			bpy=[d['lat'] for d in pil_points]
 			bpn=[d['n'] for d in pil_points]
+			bpin=[d['ins'] for d in pil_points]
 			ax.plot(bpx,bpy,'wo', markersize=ms)
 			for i,txt in enumerate(bpn):
-				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center")
+				clr='black'
+				if bpin[i]:
+					clr='red'
+				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center", size=6, color=clr)
 			ax.plot(photo.longitude,photo.latitude,marker=(1,2,-photo.rotation),markersize=ms*1.5, markerfacecolor="white", markeredgecolor='red')
 			ax.plot(photo.longitude,photo.latitude,'o',markersize=ms//2, markerfacecolor="white",markeredgecolor='red')
 			ph_points=[]
@@ -212,7 +261,8 @@ class uis_ap_photo(models.Model):
 				ax.plot(d['lng'],d['lat'],marker='o', markersize=ms//2, markerfacecolor="white", markeredgecolor='blue')
 			#ax.scatter(ppx,ppy,c='blue', angles=ppa)
 			pil_points=[]
-			
+			tri_points=triangle_points(photo.latitude,photo.longitude,photo.rotation,photo.focal_angles,photo.view_distance)
+			ax.plot([d['lng'] for d in tri_points],[d['lat'] for d in tri_points],'rx-')
 			ax.spines['top'].set_visible(False)
 			ax.spines['right'].set_visible(False)
 			ax.axis('off')
@@ -325,7 +375,7 @@ class uis_ap_photo(models.Model):
 	def _get_next_photo(self,cr,uid,ids,context=None):
 		#empapl=uid.employee_papl_ids
 		delta=0.01
-		max_dist=100
+		max_dist=150
 		for photo in self.browse(cr,uid,ids,context=context):
 			lat1, lng1=photo.latitude, photo.longitude
 			domain_np=[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',lng1-delta),('longitude','<',lng1+delta)]
@@ -352,7 +402,7 @@ class uis_ap_photo(models.Model):
 			long1=photo.longitude
 			delta=0.01
 			nstr=''
-			max_dist=100
+			max_dist=150
 			trans = self.pool.get('uis.papl.transformer').search(cr,openerp.SUPERUSER_ID,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
@@ -376,6 +426,16 @@ class uis_ap_photo(models.Model):
 					apl_ids.append(pil.apl_id.id)
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
+	def _get_photo_pillar(self,cr,uid,ids,context=None):
+		for photo in self.browse(cr,uid,ids,context=context):
+			lat=photo.latitude
+			lng=photo.longitude
+			tri_points=triangle_points(lat,lng,photo.rotation,photo.focal_angles,photo.view_distance)
+			for pil in photo.near_pillar_ids:
+				inpoint=point_in_poly(pil.latitude,pil.longitude,tri_points)
+				_logger.debug('For PH %r Pilar %r is %r'%(photo.name,pil.name,inpoint))
+				if inpoint:
+					photo.pillar_ids=[(4,pil.id,0)]
 	#@api.depends('latitude','longitude')
 	def _get_near_photo_pillar(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
@@ -385,7 +445,7 @@ class uis_ap_photo(models.Model):
 			long1=photo.longitude
 			delta=0.01
 			nstr=''
-			max_dist=100
+			max_dist=150
 			pillars = self.pool.get('uis.papl.pillar').search(cr,openerp.SUPERUSER_ID,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
