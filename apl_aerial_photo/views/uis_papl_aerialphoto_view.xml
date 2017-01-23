@@ -66,10 +66,12 @@
 				<group>
 					<field name="name"/>
 					<!--<field name="image" widget="binary" filename="name"  height="480"/>!-->
-					<field name="image" widget="image" filename="fimage"/>
-					<field name="thumbnail" widget="image"/>
+					<!--<field name="image" widget="image" filename="fimage"/>!-->
 					<field name="image_800" widget="image" />
-					<field name="image_400" widget="image"/>
+					<field name="image_scheme" widget="image"/>
+					<!--<field name="thumbnail" widget="image"/>
+					<field name="image_800" widget="image" />
+					<field name="image_400" widget="image"/>!-->
 					<!--<field name="image_edge"/>!-->
 				</group>
 				<group>
@@ -93,9 +95,6 @@
 					
 					
 					</notebook>
-					<div>
-						<field name="image_scheme" widget="image"/>
-					</div>
 					
 				</group>
 			</group>

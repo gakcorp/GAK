@@ -13,6 +13,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+from matplotlib.markers import TICKLEFT, TICKRIGHT, TICKUP, TICKDOWN
 
 import cv2
 import numpy as np
@@ -171,18 +172,51 @@ class uis_ap_photo(models.Model):
 			ph._get_800_img()
 			#ph._get_400_img()
 	
-	@api.depends('latitude','longitude')
+	@api.depends('latitude','longitude','rotation')
 	def _get_scheme_position(self):
 		_logger.debug('Start')
 		sch_w, sch_h,sch_dpi=4,4,100
-		ms=18
+		ms=12
 		for photo in self:
 			fig, ax = plt.subplots(figsize=(sch_w,sch_h))
+			pil_points=[]
+			for pil in photo.near_pillar_ids:
+				pil_point={
+					'lat':pil.latitude,
+					'lng':pil.longitude,
+					'n':pil.num_by_vl,
+					'd':pil.azimut_from_prev
+				}
+				pil_points.append(pil_point)
+			bpx=[d['lng'] for d in pil_points]
+			bpy=[d['lat'] for d in pil_points]
+			bpn=[d['n'] for d in pil_points]
+			ax.plot(bpx,bpy,'wo', markersize=ms)
+			for i,txt in enumerate(bpn):
+				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center")
+			ax.plot(photo.longitude,photo.latitude,marker=(1,2,-photo.rotation),markersize=ms*1.5, markerfacecolor="white", markeredgecolor='red')
+			ax.plot(photo.longitude,photo.latitude,'o',markersize=ms//2, markerfacecolor="white",markeredgecolor='red')
+			ph_points=[]
+			for ph in photo.next_photo_ids:
+				ph_point={
+					'lat':ph.latitude,
+					'lng':ph.longitude,
+					'd':ph.rotation
+				}
+				ph_points.append(ph_point)
+			ppx=[d['lng'] for d in ph_points]
+			ppy=[d['lat'] for d in ph_points]
+			ppa=[d['d'] for d in ph_points]
+			for d in ph_points:
+				ax.plot(d['lng'],d['lat'],marker=(1,2,-d['d']),markersize=ms*1.5, markerfacecolor="white", markeredgecolor='blue')
+				ax.plot(d['lng'],d['lat'],marker='o', markersize=ms//2, markerfacecolor="white", markeredgecolor='blue')
+			#ax.scatter(ppx,ppy,c='blue', angles=ppa)
+			pil_points=[]
 			
-			#ax.spines['top'].set_visible(False)
-			#ax.spines['right'].set_visible(False)
-			#ax.axis('off')
-			#ax.axis('equal')
+			ax.spines['top'].set_visible(False)
+			ax.spines['right'].set_visible(False)
+			ax.axis('off')
+			ax.axis('equal')
 			background_stream = StringIO.StringIO()
 			fig.savefig(background_stream, format='png', dpi=sch_dpi, transparent=True)
 			photo.image_scheme=background_stream.getvalue().encode('base64')
@@ -318,7 +352,7 @@ class uis_ap_photo(models.Model):
 			long1=photo.longitude
 			delta=0.01
 			nstr=''
-			max_dist=50
+			max_dist=100
 			trans = self.pool.get('uis.papl.transformer').search(cr,openerp.SUPERUSER_ID,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
@@ -351,7 +385,7 @@ class uis_ap_photo(models.Model):
 			long1=photo.longitude
 			delta=0.01
 			nstr=''
-			max_dist=40
+			max_dist=100
 			pillars = self.pool.get('uis.papl.pillar').search(cr,openerp.SUPERUSER_ID,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
