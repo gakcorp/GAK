@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
+import googlemaps
 
 import cv2
 import numpy as np
@@ -167,7 +168,7 @@ class uis_ap_photo(models.Model):
 	image_800=fields.Binary(string='Image800', compute='_get_800_img', store=True)
 	image_400=fields.Binary(string='Image400', compute='_get_400_img', store=True)
 	image_edge=fields.Binary(string='ImageEdge', compute='_get_edge_img')
-	image_scheme=fields.Binary(string='Scheme position', compute='_get_scheme_position')
+	image_scheme=fields.Binary(string='Scheme position', compute='_get_scheme_position',store=True)
 	focal_length=fields.Float(digits=(2,4), string="Focal Length")
 	thumbnail=fields.Binary(string="Thumbnail")
 	image_filename=fields.Char(string='Image file name')
@@ -176,9 +177,11 @@ class uis_ap_photo(models.Model):
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
 	altitude=fields.Float(digits=(2,4), string='Altitude')
+	elevation_point=fields.Float(digits=(2,2), string="Ground Elevation", compute='_get_photo_elev', store=True)
 	rotation=fields.Float(digits=(2,4),string='Rotation')
 	view_distance=fields.Float(digits=(2,0), string='View distance', default=50)
 	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=40)
+	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	pillar_ids=fields.Many2many('uis.papl.pillar',
 								relation='photo_pillar_rel',
 								column1='photo_id',
@@ -210,15 +213,28 @@ class uis_ap_photo(models.Model):
 	@api.multi
 	def generate_snap(self):
 		for ph in self:
-			ph._get_800_img()
+			ph._get_scheme_position()
+			ph._get_photo_elev()
 			#ph._get_400_img()
-	
-	@api.depends('latitude','longitude','rotation','view_distance','focal_angles')
+	@api.depends('latitude','longitude')
+	def _get_photo_elev(self):
+		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
+		client=googlemaps.Client(key)
+		for ph in self:
+			try:
+				res=client.elevation((ph.latitude, ph.longitude))
+				_logger.debug('RES frmat')
+			except googlemaps.exceptions.ApiError:
+				pass
+			#ph.elevation_point = res
+		return True
+	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
 	def _get_scheme_position(self):
 		_logger.debug('Start')
 		sch_w, sch_h,sch_dpi=6,4,100
 		ms=10
 		for photo in self:
+			lines=[]
 			fig, ax = plt.subplots(figsize=(sch_w,sch_h))
 			pil_points=[]
 			for pil in photo.near_pillar_ids:
@@ -232,7 +248,19 @@ class uis_ap_photo(models.Model):
 					'd':pil.azimut_from_prev,
 					'ins':ins
 				}
+				if pil.parent_id:
+					
+					line={
+						'lat1':pil.latitude,
+						'lng1':pil.longitude,
+						'lat2':pil.parent_id.latitude,
+						'lng2':pil.parent_id.longitude
+					}
+					_logger.debug(line)
+					lines.append(line)
 				pil_points.append(pil_point)
+			for line in lines:
+				ax.plot([line['lng1'],line['lng2']],[line['lat1'],line['lat2']],'b-',color = '0.75')
 			bpx=[d['lng'] for d in pil_points]
 			bpy=[d['lat'] for d in pil_points]
 			bpn=[d['n'] for d in pil_points]
@@ -253,6 +281,9 @@ class uis_ap_photo(models.Model):
 					'd':ph.rotation
 				}
 				ph_points.append(ph_point)
+				tri_points=triangle_points(ph.latitude,ph.longitude,ph.rotation,ph.focal_angles,ph.view_distance)
+				ax.plot([d['lng'] for d in tri_points],[d['lat'] for d in tri_points],'--', color='#dddddd')
+			
 			ppx=[d['lng'] for d in ph_points]
 			ppy=[d['lat'] for d in ph_points]
 			ppa=[d['d'] for d in ph_points]
@@ -426,6 +457,7 @@ class uis_ap_photo(models.Model):
 					apl_ids.append(pil.apl_id.id)
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
+	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
 	def _get_photo_pillar(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
 			lat=photo.latitude

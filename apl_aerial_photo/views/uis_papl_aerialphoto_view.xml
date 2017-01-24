@@ -85,7 +85,6 @@
 							<field name="near_apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="near_transformer_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="next_photo_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
-							<field name="image_scheme" widget="image" options='{"size":[600,600]}' nolabel="1" colspan="2"/>
 						</group>
 						</page>
 						<page string='ExifData'>
@@ -93,6 +92,7 @@
 								<field name="latitude"/>
 								<field name="longitude"/>
 								<field name="altitude"/>
+								<field name="elevation_point"/>
 								<field name="rotation"/>
 							</group>
 						</page>
@@ -105,7 +105,7 @@
 					
 					
 					</notebook>
-					
+					<field name="image_scheme" widget="image" options='{"size":[600,600]}' nolabel="1" colspan="2"/>
 				</group>
 			</group>
 		</form>
