@@ -90,7 +90,7 @@ def dms2dd(degrees,minutes,seconds, direction):
 	dd=float(degrees)+float(minutes)/60+float(seconds)/(60*60)
 	if direction == 'S' or direction =='W':
 		dd *=-1
-	_logger.debug('For deg,min,sec,dir (%r,%r,%r,%r) coordinate is (%r)'%(degrees,minutes,seconds,direction,dd))
+	#_logger.debug('For deg,min,sec,dir (%r,%r,%r,%r) coordinate is (%r)'%(degrees,minutes,seconds,direction,dd))
 	return dd
 
 def parse_dms(dms,direction):
@@ -107,9 +107,9 @@ def parse_dms(dms,direction):
 		p3=0
 	if p4=='':
 		p4=1
-	_logger.debug('Parts of dms %r is %r,%r,%r,%r'%(dms,p1,p2,p3,p4))
+	#_logger.debug('Parts of dms %r is %r,%r,%r,%r'%(dms,p1,p2,p3,p4))
 	dd=dms2dd(p1,p2,float(p3)/float(p4),direction)
-	_logger.debug('Parts of coordinates %s'%parts);
+	#_logger.debug('Parts of coordinates %s'%parts);
 	return dd
 
 def parse_date(str_date):
@@ -169,18 +169,18 @@ class uis_ap_photo(models.Model):
 	image_400=fields.Binary(string='Image400', compute='_get_400_img', store=True)
 	image_edge=fields.Binary(string='ImageEdge', compute='_get_edge_img')
 	image_scheme=fields.Binary(string='Scheme position', compute='_get_scheme_position',store=True)
-	focal_length=fields.Float(digits=(2,4), string="Focal Length")
+	focal_length=fields.Float(digits=(2,2), string="Focal Length")
 	thumbnail=fields.Binary(string="Thumbnail")
 	image_filename=fields.Char(string='Image file name')
 	image_date=fields.Datetime(string='Image date')
 	load_hist_id=fields.One2many('uis.ap.photo.load_hist','photo_ids','Load data')
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
-	altitude=fields.Float(digits=(2,4), string='Altitude')
+	altitude=fields.Float(digits=(2,2), string='Altitude')
 	elevation_point=fields.Float(digits=(2,2), string="Ground Elevation", compute='_get_photo_elev', store=True)
-	rotation=fields.Float(digits=(2,4),string='Rotation')
-	view_distance=fields.Float(digits=(2,0), string='View distance', default=50)
-	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=40)
+	rotation=fields.Float(digits=(2,2),string='Rotation')
+	view_distance=fields.Float(digits=(2,0), string='View distance', default=100)
+	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=60)
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	pillar_ids=fields.Many2many('uis.papl.pillar',
 								relation='photo_pillar_rel',
@@ -211,6 +211,16 @@ class uis_ap_photo(models.Model):
 										  compute='_get_near_trans_ids')
 	
 	@api.multi
+	def rotate_plus(self):
+		for ph in self:
+			ph.rotation+=5
+		
+	@api.multi
+	def rotate_minus(self):
+		for ph in self:
+			ph.rotation-=5
+
+	@api.multi
 	def generate_snap(self):
 		for ph in self:
 			ph._get_scheme_position()
@@ -223,14 +233,16 @@ class uis_ap_photo(models.Model):
 		for ph in self:
 			try:
 				res=client.elevation((ph.latitude, ph.longitude))
-				_logger.debug('RES frmat')
+				_logger.debug('result google api elevation %r'%res)
 			except googlemaps.exceptions.ApiError:
 				pass
-			#ph.elevation_point = res
+			for item in res:
+				elv=item['elevation']
+				ph.elevation_point = elv
 		return True
 	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
 	def _get_scheme_position(self):
-		_logger.debug('Start')
+		#_logger.debug('Start')
 		sch_w, sch_h,sch_dpi=6,4,100
 		ms=10
 		for photo in self:
@@ -256,7 +268,7 @@ class uis_ap_photo(models.Model):
 						'lat2':pil.parent_id.latitude,
 						'lng2':pil.parent_id.longitude
 					}
-					_logger.debug(line)
+					#_logger.debug(line)
 					lines.append(line)
 				pil_points.append(pil_point)
 			for line in lines:
@@ -307,7 +319,7 @@ class uis_ap_photo(models.Model):
 		tlr=_ulog(self,code='CALC_PH_GEN800',lib=__name__,desc='Generate (render) photo 800 px')
 		i=0
 		for ph in self.browse(cr,uid,ids,context=context):
-			_logger.debug(ph.id)
+			#_logger.debug(ph.id)
 			tlr.add_comment('[*] Generate image for photo id[%r]'%ph.id)
 			img=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(800,600))
 			ph.image_800=img
@@ -322,7 +334,7 @@ class uis_ap_photo(models.Model):
 		for ph in self.browse(cr,uid,ids,context=context):
 			#ph.image_400=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
 			#ph.image_400=img
-			_logger.debug(ph.id)
+			#_logger.debug(ph.id)
 			image = Image.open(StringIO.StringIO(ph.with_context(bin_size=False).image_800.decode('base64')))
 			background_stream = StringIO.StringIO()
 			#image.thumbnail((800,600))
@@ -388,7 +400,7 @@ class uis_ap_photo(models.Model):
 			for i in corners:
 				x,y=i.ravel()
 				cv2.circle(ocvimg,(x,y),4,255,-1)
-				_logger.debug(x,y)
+				#_logger.debug(x,y)
 			#_logger.debug(type(ocvimg))
 			#_logger.debug(ocvimg)
 			#edges=cv2.Canny(ocvimg,100,200)
@@ -465,7 +477,7 @@ class uis_ap_photo(models.Model):
 			tri_points=triangle_points(lat,lng,photo.rotation,photo.focal_angles,photo.view_distance)
 			for pil in photo.near_pillar_ids:
 				inpoint=point_in_poly(pil.latitude,pil.longitude,tri_points)
-				_logger.debug('For PH %r Pilar %r is %r'%(photo.name,pil.name,inpoint))
+				#_logger.debug('For PH %r Pilar %r is %r'%(photo.name,pil.name,inpoint))
 				if inpoint:
 					photo.pillar_ids=[(4,pil.id,0)]
 	#@api.depends('latitude','longitude')

@@ -92,8 +92,14 @@
 								<field name="latitude"/>
 								<field name="longitude"/>
 								<field name="altitude"/>
+								<field name="focal_length"/>
 								<field name="elevation_point"/>
 								<field name="rotation"/>
+								<div style="display: flex;" colspan="2">
+									<button name="rotate_plus" string="+" class="oe_highlight oe_edit_only" type="object" />
+									<button name="rotate_minus" string="-" class="oe_highlight oe_edit_only" type="object" />
+								</div>
+								
 							</group>
 						</page>
 						<page string='Admins'>
