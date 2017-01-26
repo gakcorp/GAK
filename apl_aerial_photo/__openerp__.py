@@ -25,7 +25,8 @@ Main Features
         'views/uis_papl_aerialphoto_view.xml',
         'views/mod_apl_view.xml',
         'views/mod_google_map_template.xml',
-        'views/reports/mod_uis_papl_apl_report_passport.xml'
+        'views/reports/mod_uis_papl_apl_report_passport.xml',
+        'views/uis_ap_vis_object.xml'
     ],
     'application': True,
 }
