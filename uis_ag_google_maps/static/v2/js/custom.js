@@ -46,12 +46,18 @@ var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
     $SIDEBAR_PHOTO = $('#sidebar-photo'),
     $SIDEBAR_FOOTER = $('.sidebar-footer'),
     $STAT_PANEL = $('#statistics_panel'),
+    $PHOTO_PANEL=$('#photo_panel'),
     $MAP_PANEL= $('#map_panel'),
     $LEFT_COL = $('.left_col'),
     $RIGHT_COL = $('.right_col'),
     $NAV_MENU = $('.nav_menu'),
     $FOOTER = $('footer');
 
+$(".photo_button").on('click',function(){
+   $PHOTO_PANEL.show("slow");
+   var id=this.getAttribute("photo_id");
+   console.debug(id);
+});
 // Menu buttons
 $STAT_PANEL.hide();
 $('#menu_button_map').on('click', function(){
