@@ -42,7 +42,7 @@
 			</field>
 		</record>
 		<!--Modernize Photo form!-->
-		<record id="view_papl_apl_aerophoto_buttons_form" model="ir.ui.view">
+		<record id="uis_ap_photo_form_add_visobj_page" model="ir.ui.view">
             <field name="name">Modern (Visual object) Photo form</field>
             <field name="model">uis.ap.photo</field>
             <field name="inherit_id" ref="apl_aerial_photo.uis_ap_photo_form"/>

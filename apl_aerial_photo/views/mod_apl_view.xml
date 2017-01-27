@@ -24,26 +24,32 @@
 						<!--<field name="photo2_ids"/>!-->
                         <!--<field name="photo_ids">!-->
 						<field name="photo_ids" widget="many2many_kanban">
-                            <templates>
-                            	<t t-name="kanban-box-apl">
-                            		<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
-                            			<a type="open">
-                            				<!--<img style="max-width:100%;" t-att-data-magnify-src="kanban_image('uis.ap.photo','image_800',record.id.value)" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image zoom"/>!-->
-											<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image"/>
-                            			</a>
-                        			<div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
-                        				<h4>
-                        					<a type="open">
-                                                <t t-esc="record.id.value"/>
-                        					</a>
-                            				<div name="tags"/>
-                            				<ul>
-                            				</ul>
-                        				</h4>
-                        			</div>
-                            		</div>
-                            	</t>
-                            </templates>
+                            <kanban>
+								<templates>
+									<t t-name="kanban-box">
+										<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+											<a type="open">
+												<!--<img style="max-width:100%;" t-att-data-magnify-src="kanban_image('uis.ap.photo','image_800',record.id.value)" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image zoom"/>!-->
+												<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image"/>
+												<div style="position: absolute;bottom: 0px;right: 0px;width: 300px;">
+													<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.photo','image_scheme', record.id.value)" />	
+												</div>
+												
+											</a>
+										<div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
+											<h4>
+												<a type="open">
+													<field name="image_filename"/>
+												</a>
+												<div name="tags"/>
+												<ul>
+												</ul>
+											</h4>
+										</div>
+										</div>
+									</t>
+								</templates>
+							</kanban>
                         </field>
 
                        <!-- </field>!-->
