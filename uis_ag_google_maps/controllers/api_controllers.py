@@ -120,7 +120,7 @@ class maps_data_json(http.Controller):
 		pils=pil_obj.browse(cr,uid,pil_ids,context=context)
 		for pil in pils:
 			hash_sum=hash("%r %r"%(hash_sum,pil.hash_summ))
-			_logger.debug(hash_sum)
+			#_logger.debug(hash_sum)
 		return hash_sum
 	
 	def _get_pillar_data(self,clean_ids):
@@ -275,7 +275,7 @@ class maps_data_json(http.Controller):
 				pil_parent_ids=pillar_obj.search(cr,uid,domain_end_pillar,context=context)
 				if not pil_parent_ids:
 					ep=pil
-			_logger.debug('End pillar of %r TAP is %r'%(tap.name,ep.name))
+			#_logger.debug('End pillar of %r TAP is %r'%(tap.name,ep.name))
 			#_logger.debug('Tap %r / Count of pillar is %r / Tap calc lenght is %r m'%(tap.name,pil_count,tap_len))
 			tap_len=tap.line_len_calc
 			dx=tlen/(total_point-1)

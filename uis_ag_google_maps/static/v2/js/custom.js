@@ -52,23 +52,51 @@ var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
     $RIGHT_COL = $('.right_col'),
     $NAV_MENU = $('.nav_menu'),
     $FOOTER = $('footer');
+    $PHOTO_IMAGE=$('#photo_big_view')
 
 $(".photo_button").on('click',function(){
    $PHOTO_PANEL.show("slow");
    var id=this.getAttribute("photo_id");
+   //$PHOTO_IMAGE.Jcrop();
+   $PHOTO_IMAGE.attr('src', 'https://ag.uisgis.ru/web/image?model=uis.ap.photo&id='+id+'&field=image_800');
+    var wcrop = new Cropper($PHOTO_IMAGE, {
+      
+          crop: function(e) {
+            console.log(e.detail.x);
+            console.log(e.detail.y);
+            console.log(e.detail.width);
+            console.log(e.detail.height);
+            console.log(e.detail.rotate);
+            console.log(e.detail.scaleX);
+            console.log(e.detail.scaleY);
+          }
+});
+   //#$PHOTO_IMAGE.Jcrop();
+   /*
+   var img = $("<img />").attr('src', 'https://ag.uisgis.ru/web/image?model=uis.ap.photo&id='+id+'&field=image_800')
+    .on('load', function() {
+        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+            alert('broken image!');
+        } else {
+            $PHOTO_IMAGE.append(img);
+        }
+    });*/
    console.debug(id);
 });
 // Menu buttons
 $STAT_PANEL.hide();
+$PHOTO_PANEL.hide();
 $('#menu_button_map').on('click', function(){
     $MAP_PANEL.show("slow");
     $STAT_PANEL.hide("slow");
+    $PHOTO_PANEL.hide("slow");
     console.debug('maps_button_click');
 });
 
 $('#menu_button_stat').on('click', function(){
     $STAT_PANEL.show("slow");
     $MAP_PANEL.hide("slow");
+    $PHOTO_PANEL.hide("slow");
     console.debug('stat_button_click');
 });
 

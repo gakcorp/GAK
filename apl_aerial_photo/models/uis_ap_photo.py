@@ -198,6 +198,12 @@ class uis_ap_photo(models.Model):
 								   column1='photo_id',
 								   column2='next_photo_id',
 								   compute='_get_next_photo')
+	apl_ids=fields.Many2many('uis.papl.apl',
+							 relation='photo_apl_rel',
+							 column1='photo_id',
+							 column2='apl_id',
+							 compute='_get_photo_apl'
+							 )
 	near_apl_ids=fields.Many2many('uis.papl.apl',
 							 relation='photo_near_apl',
 							 column1='photo_id',
@@ -227,6 +233,12 @@ class uis_ap_photo(models.Model):
 			ph._get_photo_elev()
 			#ph._get_400_img()
 	@api.depends('latitude','longitude')
+	def _get_hash(self):
+		for ph in self:
+			res=None
+			ph.hash_summ=res
+		
+	@api.depends('latitude','longitude')
 	def _get_photo_elev(self):
 		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
 		client=googlemaps.Client(key)
@@ -243,12 +255,14 @@ class uis_ap_photo(models.Model):
 	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
 	def _get_scheme_position(self):
 		#_logger.debug('Start')
-		sch_w, sch_h,sch_dpi=6,4,100
-		ms=10
+		sch_w, sch_h,sch_dpi=8,6,100
+		ms=14
 		for photo in self:
 			lines=[]
 			fig, ax = plt.subplots(figsize=(sch_w,sch_h))
 			pil_points=[]
+			tr_points=[]
+			near_pil_ids=[]
 			for pil in photo.near_pillar_ids:
 				ins=False
 				if pil in photo.pillar_ids:
@@ -271,18 +285,52 @@ class uis_ap_photo(models.Model):
 					#_logger.debug(line)
 					lines.append(line)
 				pil_points.append(pil_point)
+				near_pil_ids.append(pil.id)
+			to_pils=self.env['uis.papl.pillar'].search([('parent_id','in', near_pil_ids),('id','not in', near_pil_ids)])
+			for pil in to_pils:
+				line={
+					'lat1':pil.latitude,
+					'lng1':pil.longitude,
+					'lat2':pil.parent_id.latitude,
+					'lng2':pil.parent_id.longitude
+				}
+				lines.append(line)
+			for tr in photo.near_transformer_ids:
+				ins=False
+				if tr in photo.near_transformer_ids: #nupd transformer_ids
+					ins=True
+				tr_point={
+					'lat':tr.latitude,
+					'lng':tr.longitude,
+					'd':tr.trans_stay_rotation,
+					'ins':ins
+				}
+				if tr.pillar_id:
+					for pil in tr.pillar_id:
+						line={
+							'lat1':pil.latitude,
+							'lng1':pil.longitude,
+							'lat2':tr.latitude,
+							'lng2':tr.longitude
+						}
+						lines.append(line)
+				tr_points.append(tr_point)	
 			for line in lines:
 				ax.plot([line['lng1'],line['lng2']],[line['lat1'],line['lat2']],'b-',color = '0.75')
 			bpx=[d['lng'] for d in pil_points]
 			bpy=[d['lat'] for d in pil_points]
+			btx=[d['lng'] for d in tr_points] #get x points for transformers dict
+			bty=[d['lat'] for d in tr_points] #get y points for transformers dict
 			bpn=[d['n'] for d in pil_points]
 			bpin=[d['ins'] for d in pil_points]
+			ax.plot(btx,bty,'ws', markersize=ms)
 			ax.plot(bpx,bpy,'wo', markersize=ms)
+			
 			for i,txt in enumerate(bpn):
 				clr='black'
 				if bpin[i]:
 					clr='red'
-				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center", size=6, color=clr)
+				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center", size=9, color=clr)
 			ax.plot(photo.longitude,photo.latitude,marker=(1,2,-photo.rotation),markersize=ms*1.5, markerfacecolor="white", markeredgecolor='red')
 			ax.plot(photo.longitude,photo.latitude,'o',markersize=ms//2, markerfacecolor="white",markeredgecolor='red')
 			ph_points=[]
@@ -469,6 +517,15 @@ class uis_ap_photo(models.Model):
 					apl_ids.append(pil.apl_id.id)
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
+	@api.depends('pillar_ids')
+	def _get_photo_apl(self,cr,uid,ids,context=None):
+		for photo in self.browse(cr,uid,ids,context=context):
+			apl_ids=[]
+			for pil in photo.pillar_ids:
+				if pil.apl_id.id not in apl_ids:
+					apl_ids.append(pil.apl_id.id)
+					photo.apl_ids=[(4,pil.apl_id.id,0)]
+					
 	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
 	def _get_photo_pillar(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):

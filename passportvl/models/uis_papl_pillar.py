@@ -153,6 +153,7 @@ class uis_papl_pillar(models.Model):
 				np.pillar_type_id=pillar_type_id
 			if pillar_cut_id:
 				np.pillar_cut_id=pillar_cut_id
+			_logger.debug(np)
 			np.tap_id.act_normalize_num()
 		tlr.fix_end()
 		return np
