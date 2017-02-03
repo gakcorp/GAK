@@ -231,6 +231,7 @@ class uis_ap_photo(models.Model):
 		for ph in self:
 			ph._get_scheme_position()
 			ph._get_photo_elev()
+			ph._get_near_photo_apl()
 			#ph._get_400_img()
 	@api.depends('latitude','longitude')
 	def _get_hash(self):
@@ -364,31 +365,32 @@ class uis_ap_photo(models.Model):
 		return True
 	@api.depends('image')
 	def _get_800_img(self,cr,uid,ids,context=None):
-		tlr=_ulog(self,code='CALC_PH_GEN800',lib=__name__,desc='Generate (render) photo 800 px')
+		#tlr=_ulog(self,code='CALC_PH_GEN800',lib=__name__,desc='Generate (render) photo 800 px')
 		i=0
 		for ph in self.browse(cr,uid,ids,context=context):
 			#_logger.debug(ph.id)
-			tlr.add_comment('[*] Generate image for photo id[%r]'%ph.id)
+			#tlr.add_comment('[*] Generate image for photo id[%r]'%ph.id)
 			img=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(800,600))
 			ph.image_800=img
 			i=i+1
-		tlr.set_qnt(i)
-		tlr.fix_end()
+		#tlr.set_qnt(i)
+		#tlr.fix_end()
 		return True
 	@api.depends('image_800')
 	def _get_400_img(self,cr,uid,ids,context=None):
-		tlr=_ulog(self,code='CALC_PH_GEN400',lib=__name__,desc='Generate (render) photo 400 px')
+		#tlr=_ulog(self,code='CALC_PH_GEN400',lib=__name__,desc='Generate (render) photo 400 px')
 		i=0
 		for ph in self.browse(cr,uid,ids,context=context):
 			#ph.image_400=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
 			#ph.image_400=img
 			#_logger.debug(ph.id)
-			image = Image.open(StringIO.StringIO(ph.with_context(bin_size=False).image_800.decode('base64')))
-			background_stream = StringIO.StringIO()
-			#image.thumbnail((800,600))
-			image.thumbnail ((400,300), Image.ANTIALIAS)
-			image.save(background_stream, format="PNG")
-			ph.image_400=background_stream.getvalue().encode('base64')
+			if ph.image_800:
+				image = Image.open(StringIO.StringIO(ph.with_context(bin_size=False).image_800.decode('base64')))
+				background_stream = StringIO.StringIO()
+				#image.thumbnail((800,600))
+				image.thumbnail ((400,300), Image.ANTIALIAS)
+				image.save(background_stream, format="PNG")
+				ph.image_400=background_stream.getvalue().encode('base64')
 			
 			# Use cv2 for resize image
 			'''or_image=ph.with_context(bin_size=False).image.decode('base64')
@@ -398,10 +400,10 @@ class uis_ap_photo(models.Model):
 			ph.image_400=cv2.imencode('.jpg',res_image)[1].tostring().encode('base64')'''
 			# end code
 			
-			tlr.add_comment('[~] Generate for %r'%ph.id)
+			#tlr.add_comment('[~] Generate for %r'%ph.id)
 			i=i+1
-		tlr.set_qnt(i)
-		tlr.fix_end()
+		#tlr.set_qnt(i)
+		#tlr.fix_end()
 		return True
 	
 	 
@@ -582,14 +584,17 @@ class uis_ap_photo_load_hist(models.Model):
 		re_photos=self.pool.get('uis.ap.photo').browse(cr,uid,ids,context=context)
 		_logger.debug("Start load photos")
 		path='/home'
+		i=1
 		val=self.browse(cr,uid,ids,context=context)
 		if val.folder_name != '':
 			path=val.folder_name
 		for filen in os.listdir(path):
 			if filen.endswith(".JPG"):
+				
+				_logger.debug('___________________[%r] file %r'%(i,filen))
 				img=file(path+'/'+filen,'rb').read().encode('base64')
 				with open(path+'/'+filen,'rb') as f:
-					_logger.debug('load photo from file %r'%filen)
+					#_logger.debug('______________________Load photo from file %r'%filen)
 					tags=exifread.process_file(f)
 					dms_longitude=tags["GPS GPSLongitude"]
 					_logger.debug('Lonngitude from exif is %r'%dms_longitude)
@@ -606,9 +611,17 @@ class uis_ap_photo_load_hist(models.Model):
 					#EXIF ExifImageLength, value 3000
 					cil=str(tags["EXIF ExifImageLength"])
 					#EXIF FocalLength, value 361/100
-					cfl=strdiv(tags["EXIF FocalLength"])
+					try:
+						cfl=strdiv(tags["EXIF FocalLength"])
+					except:
+						_logger.debug('error in Exif FocalLenght tag=%r'%tags["EXIF FocalLength"])
+						cfl=-1
 					#GPS GPSAltitude, value 181921/1000
-					calt=strdiv(tags["GPS GPSAltitude"])
+					try:
+						calt=strdiv(tags["GPS GPSAltitude"])
+					except:
+						_logger.debug('Error in EXIF GPS Altitude tag=%r'%tags["GPS GPSAltitude"])
+						calt=-1
 					#for tag in tags.keys():
 					#	if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
 					#		_logger.debug("Key: %s, value %s" % (tag, tags[tag]))
@@ -626,5 +639,6 @@ class uis_ap_photo_load_hist(models.Model):
 					np.altitude=calt
 					#np.load_hist_id=val.id
 					#np.image_date.from_string(idate)
-					np.thumbnail=base64.b64encode(tags['JPEGThumbnail'])
+					_logger.debug('End loading file %r (%r)'%(i,filen))
+					i+=1
 				
