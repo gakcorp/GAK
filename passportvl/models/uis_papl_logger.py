@@ -35,6 +35,7 @@ class uis_logger(models.Model):
 	def add_log(self,context=None,code="DEFCODE",desc="",lib=__name__,debug_level=10):
 		ncr=self.pool.cursor()
 		ipadr=request.httprequest.environ['REMOTE_ADDR']
+		_logger.debug(ipadr)
 		#_logger.debug(ipadr)
 		std=datetime.datetime.now()
 		lr=self.create(ncr,openerp.SUPERUSER_ID,{

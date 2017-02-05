@@ -53,15 +53,17 @@ var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
     $NAV_MENU = $('.nav_menu'),
     $FOOTER = $('footer');
     $PHOTO_IMAGE=$('#photo_big_view')
+    $SCHEME_NAV_VIEW=$('#scheme_nav_view')
 
 $(".photo_button").on('click',function(){
    $PHOTO_PANEL.show("slow");
    var id=this.getAttribute("photo_id");
    //$PHOTO_IMAGE.Jcrop();
    $PHOTO_IMAGE.attr('src', 'https://ag.uisgis.ru/web/image?model=uis.ap.photo&id='+id+'&field=image_800');
-    var wcrop = new Cropper($PHOTO_IMAGE, {
-      
-          crop: function(e) {
+   $SCHEME_NAV_VIEW.attr('src', 'https://ag.uisgis.ru/web/image?model=uis.ap.photo&id='+id+'&field=image_scheme');
+    var wcrop = $PHOTO_IMAGE.cropper($PHOTO_IMAGE,{
+        zoomable:false,
+         crop: function(e) {
             console.log(e.detail.x);
             console.log(e.detail.y);
             console.log(e.detail.width);
