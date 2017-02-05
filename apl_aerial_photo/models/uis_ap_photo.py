@@ -157,6 +157,8 @@ def point_in_poly(lat,lng,poly):
 	res=polygon.contains(point)
 	#_logger.debug(res)
 	return res
+
+
 class uis_ap_photo(models.Model):
 	_name='uis.ap.photo'
 	_description='Photo_apl'
@@ -208,8 +210,7 @@ class uis_ap_photo(models.Model):
 							 relation='photo_near_apl',
 							 column1='photo_id',
 							 column2='apl_id',
-							 compute='_get_near_photo_apl',
-							 store=True)
+							 compute='_get_near_photo_apl')
 	near_transformer_ids=fields.Many2many('uis.papl.transformer',
 										  relation='photo_near_trans',
 										  column1='photo_id',
@@ -375,7 +376,7 @@ class uis_ap_photo(models.Model):
 		tlr.set_qnt(i)
 		tlr.fix_end()
 		return True
-	@api.depends('image_800')
+	@api.depends('image')
 	def _get_400_img(self,cr,uid,ids,context=None):
 		tlr=_ulog(self,code='CALC_PH_GEN400',lib=__name__,desc='Generate (render) photo 400 px')
 		i=0
@@ -383,12 +384,13 @@ class uis_ap_photo(models.Model):
 			#ph.image_400=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
 			#ph.image_400=img
 			#_logger.debug(ph.id)
-			image = Image.open(StringIO.StringIO(ph.with_context(bin_size=False).image_800.decode('base64')))
-			background_stream = StringIO.StringIO()
+			#image = Image.open(StringIO.StringIO(ph.with_context(bin_size=False).image.decode('base64')))
+			img=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
+			##background_stream = StringIO.StringIO()
 			#image.thumbnail((800,600))
-			image.thumbnail ((400,300), Image.ANTIALIAS)
-			image.save(background_stream, format="PNG")
-			ph.image_400=background_stream.getvalue().encode('base64')
+			##image.thumbnail ((400,300), Image.ANTIALIAS)
+			##image.save(background_stream, format="PNG")
+			ph.image_400=img
 			
 			# Use cv2 for resize image
 			'''or_image=ph.with_context(bin_size=False).image.decode('base64')

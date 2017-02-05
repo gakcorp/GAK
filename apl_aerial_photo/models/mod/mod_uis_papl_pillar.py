@@ -26,7 +26,7 @@ class uis_apl_aerial_photo_mod_uis_papl_pillar(osv.Model):
 		
 	_columns = {
 		'photo_count': fields.function(_pillar_photo_count, string='# Photo', type='integer'),
-		'photo_ids':fields.many2many('uis.ap.photo',rel='photo_near_pillar', id1='pillar_id', id2='photo_id',string="Photos")
+		#'photo_ids':fields.many2many('uis.ap.photo',rel='photo_near_pillar', id1='pillar_id', id2='photo_id',string="Photos")
 	}
 
 	def action_view_photos(self, cr, uid, ids, context=None):

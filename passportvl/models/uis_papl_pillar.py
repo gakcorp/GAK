@@ -129,6 +129,7 @@ class uis_papl_pillar(models.Model):
 			
 	def create_new_child(self, tap_id=False, parent_id=False,latlngdelta=0.0001,pillar_type_id=False, pillar_cut_id=False, latitude=0, longitude=0, num_by_vl=-1):
 		tlr=_ulog(self,code='ADD_NE_PIL_CHLD',lib=__name__,desc='Create new child for pillar')
+		_logger.debug('1. start for pil in self %r'%self)
 		for pil in self:
 			tlr.add_comment('[*] New child for pillar id:[%r]'%pil.id)
 			nlat,nlng=latitude,longitude
@@ -136,7 +137,9 @@ class uis_papl_pillar(models.Model):
 				nlat,nlng=pil.latitude+latlngdelta,pil.longitude+latlngdelta
 			tlr.add_comment('[--*] with new latitude,longitude (%r,%r)'%(nlat,nlng))
 			now=datetime.datetime.now()
+			_logger.debug('2. Start create new pillar for lat=%r, lng=%r'%(nlat,nlng))
 			np=self.create({'name':'NewCNC PIllar DT'+str(now)})
+			_logger.debug('3. Create pillar with id %r'%np.id)
 			np.latitude,np.longitude=nlat,nlng
 			np.tap_id=pil.tap_id
 			np.apl_id=pil.apl_id

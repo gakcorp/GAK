@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<record model="ir.actions.act_window" id="create_airway_form">
+		<field name="name">Create Airway</field>
+		<field name="res_model">airway</field>
+	</record>
+
+	<record model="ir.actions.act_window" id="create_rack_form">
+		<field name="name">Create Rack</field>
+		<field name="res_model">rack</field>
+	</record>
+
+	<record model="ir.ui.view" id="airway_view">
+    		<field name="name">Airway View</field>
+    		<field name="model">airway</field>
+    		<field name="priority">1</field>
+    		<field name="arch" type="xml">
+			<form string="Airway Form">
+				<sheet>
+					<group>
+    						<!--<field name="AirwayID"/>!-->
+    						<field name="id"/>
+							<field name="name"/>
+					</group>
+				</sheet>
+			</form>
+   		</field>
+	</record>
+
+	<record model="ir.ui.view" id="rack_view">
+    		<field name="name">Rack View</field>
+    		<field name="model">rack</field>
+    		<field name="priority">1</field>
+    		<field name="arch" type="xml">
+			<form string="Rack Form">
+				<sheet>
+					<group>
+    						<!--<field name="RackID"/>!-->
+							<field name="id"/>
+    						<field name="name"/>
+							<field name="airway_id"/>
+						<!--<field name="Airway"/>!-->
+					</group>
+				</sheet>
+			</form>
+   		</field>
+	</record>
+
+	<data>
+		<menuitem name="APL" id="apl_menu"/>
+		<menuitem name="Assets" id="assets_menu" parent="apl_menu"/>
+		<menuitem name="Create Airway" parent="assets_menu" id="create_airway" action="create_airway_form"/>
+		<menuitem name="Create Rack" parent="assets_menu" id="create_rack" action="create_rack_form"/>
+	</data>
+</openerp>
