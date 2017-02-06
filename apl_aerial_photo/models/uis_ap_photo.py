@@ -217,6 +217,21 @@ class uis_ap_photo(models.Model):
 										  column2='transformer_id',
 										  compute='_get_near_trans_ids')
 	
+	def scheduler_rec_scheme(self, cr, uid, context=None):
+		photo_obj = self.pool.get('uis.ap.photo')
+		#Contains all ids for the model uis.ap.photo
+		photo_ids = self.pool.get('uis.ap.photo').search(cr, uid, [])   
+		#Loops over every record in the model uis.ap.photo
+		i=1
+		for ph_id in photo_ids:
+			i+=1
+			ph=photo_obj.browse(cr, uid,ph_id ,context=context)
+			ph._get_scheme_position()
+			_logger.debug('[%r] Recalc scheme for %r photo'%(i,ph.id))
+			cr.commit()
+			#Contains all details from the record in the variable ph_id
+			
+			
 	@api.multi
 	def rotate_plus(self):
 		for ph in self:
