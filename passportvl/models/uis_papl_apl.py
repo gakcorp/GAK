@@ -341,18 +341,23 @@ class uis_papl_apl(models.Model):
 	
 	#@api.one
 	#def _name_search(self, name, args=None, operator='ilike', limit=100):
-	#	if operator == 'like': 
+	
+	#if operator == 'like': 
 	#		operator = 'ilike'
 	#	apls=self.search([('name', operator, name)], limit=limit)
 	#	_logger.debug(apls)
-	#	return apls.name_get()
+	#	_logger.debug(self)
+		return []
 	#@api.one
 	def _name_search(self, operator, value):
-		if operator == 'like':
-			operator = 'ilike'
-		return [('name', operator, value)]
+		_logger.debug(self)
+		ids=[]
+		for apl in self:
+			if value in self.name:
+				ids.appent(apl.id)
+		return [('id', 'in' , ids)]
 	
-	name = fields.Char(string="Name", compute=_get_name)#, search=_name_search)
+	name = fields.Char(string="Name", compute=_get_name, search=_name_search)
 	short_name=fields.Char(string="Short name")
 	locality=fields.Char(string="Locality")
 	apl_type=fields.Char(string="Type APL")

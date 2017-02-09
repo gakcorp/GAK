@@ -105,6 +105,15 @@ class uis_papl_tap(models.Model):
 	rotate_x_3d=fields.Integer(string="x rotate 3D plot")
 	rotate_y_3d=fields.Integer(string="y rotate #D plot")
 	
+	def reverse_tap(self):
+		for tap in self:
+			pillar_ids=tap.pillar_ids
+			_logger.debug(pillar_ids)
+			rev_pillar_ids=reversed(pillar_ids)
+			_logger.debug(rev_pillar_ids)
+			for pil in rev_pillar_ids:
+				_logger.debug(pil.id)
+				
 	@api.depends('tap_encode_path')
 	def _get_surface_data(self):
 		point_per_ax=22
