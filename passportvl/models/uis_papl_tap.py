@@ -105,6 +105,15 @@ class uis_papl_tap(models.Model):
 	rotate_x_3d=fields.Integer(string="x rotate 3D plot")
 	rotate_y_3d=fields.Integer(string="y rotate #D plot")
 	
+	def reverse_tap(self):
+		for tap in self:
+			pillar_ids=tap.pillar_ids
+			_logger.debug(pillar_ids)
+			rev_pillar_ids=reversed(pillar_ids)
+			_logger.debug(rev_pillar_ids)
+			for pil in rev_pillar_ids:
+				_logger.debug(pil.id)
+				
 	@api.depends('tap_encode_path')
 	def _get_surface_data(self):
 		point_per_ax=22
@@ -302,6 +311,7 @@ class uis_papl_tap(models.Model):
 			qnt_point_perpil=10 #NUPD Load from settings
 			qnt_point=min(512,qnt_point_perpil*tap.pillar_cnt)
 			
+			_logger.debug('tap points %r is %r qnt_points is %r'%(tap,tap.pillar_cnt,qnt_point))
 			res=[]
 			try:
 				res=googlemaps.client.elevation_along_path(client,str(tap.tap_encode_path),qnt_point)
@@ -463,6 +473,7 @@ class uis_papl_tap(models.Model):
 			t_pillar=0
 			for pillar in tap.pillar_ids:
 				t_pillar=t_pillar+1
+				_logger.debug(t_pillar)
 				if not(pillar.parent_id):
 					cnt=cnt+1
 			tap.cnt_np=cnt
