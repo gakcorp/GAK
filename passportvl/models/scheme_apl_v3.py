@@ -31,8 +31,11 @@ def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=Fals
 			if apl.sup_substation_id not in pss:
 				pss.append(apl.sup_substation_id)
 		for tap in apl.tap_ids:
-			tap_points=googlemaps.convert.decode_polyline(tap.tap_encode_path)
-			ax.plot([d['lng'] for d in tap_points],[d['lat'] for d in tap_points],'b-')
+			try:
+				tap_points=googlemaps.convert.decode_polyline(tap.tap_encode_path)
+				ax.plot([d['lng'] for d in tap_points],[d['lat'] for d in tap_points],'b-')
+			except:
+				_logger.debug('Error for generate tap points fo tap')
 		if drawTS==True:
 			for ts in apl.transformer_ids:
 				lat,lng,plat,plng=ts.latitude,ts.longitude,ts.pillar_id.latitude,ts.pillar_id.longitude
