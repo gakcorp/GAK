@@ -110,8 +110,8 @@ class uis_papl_pillar(models.Model):
 			ex_frm=def_frm_tp
 			if pil.tap_id.is_main_line:
 				ex_frm=def_frm_mp
-			_logger.debug(pil.id)
-			_logger.debug(ex_frm)
+			#_logger.debug(pil.id)
+			#_logger.debug(ex_frm)
 			try:
 				dname=eval(ex_frm)
 			except:
