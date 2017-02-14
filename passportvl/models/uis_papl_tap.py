@@ -311,6 +311,7 @@ class uis_papl_tap(models.Model):
 			qnt_point_perpil=10 #NUPD Load from settings
 			qnt_point=min(512,qnt_point_perpil*tap.pillar_cnt)
 			
+			_logger.debug('tap points %r is %r qnt_points is %r'%(tap,tap.pillar_cnt,qnt_point))
 			res=[]
 			try:
 				res=googlemaps.client.elevation_along_path(client,str(tap.tap_encode_path),qnt_point)
@@ -472,6 +473,7 @@ class uis_papl_tap(models.Model):
 			t_pillar=0
 			for pillar in tap.pillar_ids:
 				t_pillar=t_pillar+1
+				#_logger.debug(t_pillar)
 				if not(pillar.parent_id):
 					cnt=cnt+1
 			tap.cnt_np=cnt
@@ -524,6 +526,7 @@ class uis_papl_tap(models.Model):
 				last_pillar=pillar
 				tlr.add_comment('[1] Last pillar is %r'%last_pillar.id)
 				tlr.add_comment('[2] Max number is %r'%max_num)
+				_logger.debug('New las pillar %r with num by vl is %r'%(pillar, pillar.num_by_vl))
 		tlr.set_qnt(pillar_cnt)
 		if pillar_cnt>0:
 			i=0
@@ -531,7 +534,7 @@ class uis_papl_tap(models.Model):
 			np=last_pillar.parent_id
 			n_id=np.id
 			while (n_id>0) and (pillar_cnt-i>=1) and (cp.tap_id==np.tap_id):
-				#print "Set to Pillar id:"+str(cp.id)+" num_by_vl value is "+str(pillar_cnt-i)
+				_logger.debug("Set to Pillar id:"+str(cp.id)+" num_by_vl value is "+str(pillar_cnt-i))
 				cp.num_by_vl=pillar_cnt-i
 				np=cp.parent_id
 				n_id=np.id

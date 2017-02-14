@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import openerp
-import math, urllib, json, time
+import math, urllib, json, time, random
 import os, exifread
 import re
 from PIL import Image
@@ -223,7 +223,7 @@ class uis_ap_photo(models.Model):
 		photo_ids = self.pool.get('uis.ap.photo').search(cr, uid, [])   
 		#Loops over every record in the model uis.ap.photo
 		i=1
-		for ph_id in photo_ids:
+		for ph_id in random.sample(photo_ids,50):
 			i+=1
 			ph=photo_obj.browse(cr, uid,ph_id ,context=context)
 			ph._get_scheme_position()
