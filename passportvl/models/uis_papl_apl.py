@@ -348,15 +348,6 @@ class uis_papl_apl(models.Model):
 	#	_logger.debug(apls)
 	#	_logger.debug(self)
 		return []
-<<<<<<< HEAD
-	#@api.one
-	def _name_search(self, operator, value):
-		_logger.debug(self)
-		ids=[]
-		for apl in self:
-			if value in self.name:
-				ids.appent(apl.id)
-=======
 	
 	#@api.v8
 	def _name_search(self, operator, value):
@@ -370,7 +361,6 @@ class uis_papl_apl(models.Model):
 			for val in value_split:
 				if val.lower() in apl.name.lower():
 					ids.append(apl.id)
->>>>>>> origin/v.0.7(mro)
 		return [('id', 'in' , ids)]
 	
 	name = fields.Char(string="Name", compute=_get_name, search=_name_search)
