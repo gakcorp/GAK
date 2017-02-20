@@ -204,7 +204,8 @@ class uis_ap_photo(models.Model):
 							 relation='photo_apl_rel',
 							 column1='photo_id',
 							 column2='apl_id',
-							 compute='_get_photo_apl'
+							 compute='_get_photo_apl',
+							 store=True
 							 )
 	near_apl_ids=fields.Many2many('uis.papl.apl',
 							 relation='photo_near_apl',
@@ -218,19 +219,22 @@ class uis_ap_photo(models.Model):
 										  compute='_get_near_trans_ids')
 	
 	def scheduler_rec_scheme(self, cr, uid, context=None):
+		tlr=_ulog(self,code='CALC_PH_SHACT',lib=__name__,desc='Scheduled action for photos')
 		photo_obj = self.pool.get('uis.ap.photo')
 		#Contains all ids for the model uis.ap.photo
 		photo_ids = self.pool.get('uis.ap.photo').search(cr, uid, [])   
 		#Loops over every record in the model uis.ap.photo
 		i=1
-		for ph_id in random.sample(photo_ids,50):
+		for ph_id in random.sample(photo_ids,100):
 			i+=1
 			ph=photo_obj.browse(cr, uid,ph_id ,context=context)
+			tlr.add_comment('[%r] Generate new scheme position for photo'%ph.id)
 			ph._get_scheme_position()
-			_logger.debug('[%r] Recalc scheme for %r photo'%(i,ph.id))
+			tlr.add_comment('[%r] Recalculate apls for photo'%ph.id)
+			ph._get_photo_apl()
 			cr.commit()
-			#Contains all details from the record in the variable ph_id
-			
+		tlr.set_qnt(i)
+		tlr.fix_end()
 			
 	@api.multi
 	def rotate_plus(self):
@@ -248,7 +252,7 @@ class uis_ap_photo(models.Model):
 			ph._get_scheme_position()
 			ph._get_photo_elev()
 			ph._get_near_photo_apl()
-			#ph._get_400_img()
+
 	@api.depends('latitude','longitude')
 	def _get_hash(self):
 		for ph in self:
@@ -257,7 +261,7 @@ class uis_ap_photo(models.Model):
 		
 	@api.depends('latitude','longitude')
 	def _get_photo_elev(self):
-		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
+		key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings uis_google_api_key
 		client=googlemaps.Client(key)
 		for ph in self:
 			try:
@@ -272,7 +276,7 @@ class uis_ap_photo(models.Model):
 	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
 	def _get_scheme_position(self):
 		#_logger.debug('Start')
-		sch_w, sch_h,sch_dpi=8,6,100
+		sch_w, sch_h,sch_dpi=8,6,200
 		ms=14
 		for photo in self:
 			lines=[]
@@ -347,7 +351,7 @@ class uis_ap_photo(models.Model):
 				clr='black'
 				if bpin[i]:
 					clr='red'
-				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center", size=9, color=clr)
+				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center", size=8, color=clr)
 			ax.plot(photo.longitude,photo.latitude,marker=(1,2,-photo.rotation),markersize=ms*1.5, markerfacecolor="white", markeredgecolor='red')
 			ax.plot(photo.longitude,photo.latitude,'o',markersize=ms//2, markerfacecolor="white",markeredgecolor='red')
 			ph_points=[]
@@ -359,7 +363,7 @@ class uis_ap_photo(models.Model):
 				}
 				ph_points.append(ph_point)
 				tri_points=triangle_points(ph.latitude,ph.longitude,ph.rotation,ph.focal_angles,ph.view_distance)
-				ax.plot([d['lng'] for d in tri_points],[d['lat'] for d in tri_points],'--', color='#dddddd')
+				ax.plot([d['lng'] for d in tri_points],[d['lat'] for d in tri_points],'--', color='#cccccc')
 			
 			ppx=[d['lng'] for d in ph_points]
 			ppy=[d['lat'] for d in ph_points]
@@ -545,7 +549,7 @@ class uis_ap_photo(models.Model):
 					apl_ids.append(pil.apl_id.id)
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
-	@api.depends('pillar_ids')
+	@api.depends('pillar_ids','near_apl_ids')
 	def _get_photo_apl(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
 			apl_ids=[]
