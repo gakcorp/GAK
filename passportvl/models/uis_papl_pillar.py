@@ -206,7 +206,7 @@ class uis_papl_pillar(models.Model):
 
 	@api.multi
 	@api.depends('longitude','latitude')
-	def _get_elevation(self):
+	def _get_elevation(self): #NUPD Changes to google maps lib python
 		for record in self:
 			#print 'Get Elevation for '+str(record.id)
 			lat=record.latitude
