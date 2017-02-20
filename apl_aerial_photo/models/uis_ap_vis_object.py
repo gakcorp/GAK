@@ -26,7 +26,7 @@ class uis_ap_vis_object(models.Model):
 	auto_detected=fields.Boolean(string='Auto Detected')
 	distance_from_photo_point=fields.Float(digits=(2,2), string='Distance from photo point')
 	
-class uis_ap_photo_mod_Vis_object(models.Model):
+class uis_ap_photo_mod_vis_object(models.Model):
 	_inherit='uis.ap.photo'
 	vis_objects_ids=fields.One2many('uis.ap.vis_object','photo_id','Visual objects')
 	image_vis_obj=fields.Binary(string='Image with visual objects')
