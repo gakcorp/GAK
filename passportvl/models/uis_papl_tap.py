@@ -514,7 +514,7 @@ class uis_papl_tap(models.Model):
 			if pillar.apl_id != self.apl_id:
 				pillar.apl_id=self.apl_id
 				
-	@api.multi
+	@api.multi #NUPD СChange define last_pillar, pillar_cnt and p
 	def act_normalize_num(self):
 		tlr=_ulog(self,code='CALC_NORMALIZE_NUM_TAP',lib=__name__,desc='Start normalize num by APL (by TAP id=%r)'%(self.id))
 		max_num=0

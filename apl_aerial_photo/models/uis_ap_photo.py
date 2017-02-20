@@ -219,7 +219,7 @@ class uis_ap_photo(models.Model):
 										  compute='_get_near_trans_ids')
 	
 	def scheduler_rec_scheme(self, cr, uid, context=None):
-		tlr=_ulog(self,code='CALC_PH_SHACT',lib=__name__,desc='Scheduled action for photos')
+		#tlr=_ulog(self,code='CALC_PH_SHACT',lib=__name__,desc='Scheduled action for photos')
 		photo_obj = self.pool.get('uis.ap.photo')
 		#Contains all ids for the model uis.ap.photo
 		photo_ids = self.pool.get('uis.ap.photo').search(cr, uid, [])   
@@ -228,13 +228,13 @@ class uis_ap_photo(models.Model):
 		for ph_id in random.sample(photo_ids,100):
 			i+=1
 			ph=photo_obj.browse(cr, uid,ph_id ,context=context)
-			tlr.add_comment('[%r] Generate new scheme position for photo'%ph.id)
+			#tlr.add_comment('[%r] Generate new scheme position for photo'%ph.id)
 			ph._get_scheme_position()
-			tlr.add_comment('[%r] Recalculate apls for photo'%ph.id)
+			#tlr.add_comment('[%r] Recalculate apls for photo'%ph.id)
 			ph._get_photo_apl()
 			cr.commit()
-		tlr.set_qnt(i)
-		tlr.fix_end()
+		#tlr.set_qnt(i)
+		#tlr.fix_end()
 			
 	@api.multi
 	def rotate_plus(self):
