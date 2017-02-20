@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api
+import logging
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
 
 class uis_licenses(models.Model):
 	_name='uis.licenses'
@@ -17,15 +21,29 @@ class uis_global_settings(models.Model):
 	value=fields.Text(string='Value')
 	enabled=fields.Boolean(string="Enabled")
 	
+	def get_value(self,value_name=None):
+		res=None
+		_logger.debug(value_name)
+		domain=[("enabled","=",True),("var","=",value_name)]
+		gs_ids=self.search(domain)
+		_logger.debug(gs_ids)
+		for gs in gs_ids:
+			res=gs.value
+		return res
+	
 	@api.depends('value')
 	def _get_char_value(self):
 		for gs in self:
-			chstr=gs.value
-			if len(chstr)>100:
-				chstr=chstr[:100]+'...'
-			gs.char_value=chstr
+			if gs.value:
+				chstr=gs.value
+				if len(chstr)>100:
+					chstr=chstr[:100]+'...'
+				gs.char_value=chstr
 		return True
 	
+	_sql_contraints=[
+		('unic_value_var','unique(var)',"Global settings already exists with this name of variable. Global values name of variable must be unique")
+	]
 class uis_settings(models.Model):
 	_name='uis.settings'
 	_description='Settings of AG application'
