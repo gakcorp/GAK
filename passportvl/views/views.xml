@@ -104,6 +104,13 @@
 					</page>
 					<page string="Details">
 					</page>
+					<page string="System details">
+						<group>
+							<field name="next_base_pillar_id"/>
+							<field name="prev_base_pillar_id"/>
+						</group>
+						
+					</page>
 	   		</notebook>
 			</sheet>
 			</form>

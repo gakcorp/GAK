@@ -67,6 +67,8 @@ class uis_papl_pillar(models.Model):
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
 	tap_id=fields.Many2one('uis.papl.tap', string='Taps')
 	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
+	prev_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Prev base pillar', compute='_get_prev_base_pillar')
+	next_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Next base pillar')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='near_pillar_ids',
 									 column1='trans_id',
@@ -75,6 +77,33 @@ class uis_papl_pillar(models.Model):
 									 )
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	
+	def _get_prev_base_pillar(self):
+		pp=None
+		cp=None
+		for pil in self:
+			_logger.debug('start define prev base pillar for pillar id=%r'%pil.id)
+			if pil.parent_id:
+				cp=pil.parent_id
+				while cp and (cp.tap_id==pil.tap_id) and (cp.pillar_type_id.base==False):
+					pp=cp
+					cp=cp.parent_id
+					#_logger.debug('pil %r base=%r tap_id=%r'%(cp.name,cp.pillar_type_id.base, cp.tap_id))
+				if not cp:
+					cp=pp
+			
+			pil.prev_base_pillar_id=cp
+			if pil.pillar_type_id.base==True:
+				_logger.debug('!!!!!!!!!!!!!')
+				try:
+					#pil.prev_base_pillar_id.next_base_pillar_id=pil
+					
+					pil.prev_base_pillar_id.write({'next_base_pillar_id': pil.id })
+				except:
+					_logger.debug('error')
+				
+			_logger.debug('prev base pillar is %r'%cp)
+			_logger.debug('next base pillar for %r is %r'%(pil.prev_base_pillar_id,pil.prev_base_pillar_id.next_base_pillar_id))
+			
 	@api.depends('longitude','latitude','name','num_by_vl','pillar_material_id','pillar_type_id','pillar_cut_id','pillar_stay_rotation','parent_id')
 	def _get_hash(self):
 		for pil in self:
