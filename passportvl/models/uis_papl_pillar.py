@@ -81,6 +81,7 @@ class uis_papl_pillar(models.Model):
 		pp=None
 		cp=None
 		for pil in self:
+			cp=None
 			_logger.debug('start define prev base pillar for pillar id=%r'%pil.id)
 			if pil.parent_id:
 				cp=pil.parent_id
@@ -96,11 +97,16 @@ class uis_papl_pillar(models.Model):
 				_logger.debug('!!!!!!!!!!!!!')
 				try:
 					#pil.prev_base_pillar_id.next_base_pillar_id=pil
-					
+					#pil.prev_base_pillar_id.write({'next_base_pillar_id': pil.id })
 					pil.prev_base_pillar_id.write({'next_base_pillar_id': pil.id })
 				except:
 					_logger.debug('error')
-				
+			if cp and cp.next_base_pillar_id and (cp.next_base_pillar_id != pil):
+				np=cp.next_base_pillar_id.parent_id
+				while (np!= pil) and (np):
+					np.write({'next_base_pillar_id':cp.next_base_pillar_id.id})
+					np=np.parent_id
+					_logger.debug(np)
 			_logger.debug('prev base pillar is %r'%cp)
 			_logger.debug('next base pillar for %r is %r'%(pil.prev_base_pillar_id,pil.prev_base_pillar_id.next_base_pillar_id))
 			
