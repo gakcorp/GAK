@@ -5,7 +5,8 @@
     <t t-call="report.html_container">
         <t t-foreach="docs" t-as="o">
             <t t-call="report.external_layout">
-                <div class="page">
+                <div class="page" name="blocks">
+                <div name="main_passport"> <!--class="page" !-->
                     <style type="text/css">
                         .report-field{
                         border-bottom: 1px solid black;
@@ -32,7 +33,7 @@
                     <div class="row">
                         <div class="col-xs-4"/>
                         <div class="col-xs-4 text-center">
-                        <img t-att-src="'https://api.qrserver.com/v1/create-qr-code/?data=http://demo.uisgis.ru:8069%s' % o.url_maps"/>        
+                        <img t-att-src="'https://api.qrserver.com/v1/create-qr-code/?data=http://app.uisgis.ru%s' % o.url_maps"/>        
                         </div>
                         <div class="col-xs-4"/>
                     </div>
@@ -98,6 +99,7 @@
                             <span t-field="o.scheme_image" t-field-options="{&quot;widget&quot;:&quot;image&quot;}"/>
                         </div>
                     </div>
+                    <p style="page-break-after:always;"/>
                     <div class="row">
                         <div class="col-xs-12 text-center">
                             <h3>II. Main details</h3>
@@ -212,9 +214,160 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <br/>
+                        <div class="col-xs-12 text-center">
+                            <h4>2. Pillars</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6" style="border-right:1px solid black;">
+                            <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                                <div class="col-xs-4 text-center">Type</div>
+                                <div class="col-xs-2 text-center">Qnty</div>
+                                <div class="col-xs-6 text-center">Numbers of pillars</div>
+                            </div>
+                            <t t-foreach="o.apl_pil_type_ids" t-as="apt">
+                                <div class="row" style="border-bottom:1px dashed black;">
+                                    <div class="col-xs-4 text-center"><span t-field="apt.pillar_type_id.name"/></div>
+                                    <div class="col-xs-2 text-center"><span t-field="apt.cnt"/></div>
+                                    <div class="col-xs-6"><span t-field="apt.numbers"/></div>
+                                </div>    
+                            </t>
+                        </div>
+                        <div class="col-xs-6" style="border-left:1px solid black;">
+                            <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                                <div class="col-xs-4 text-center">Material</div>
+                                <div class="col-xs-2 text-center">Qnty</div>
+                                <div class="col-xs-6 text-center">Numbers of pillars</div>
+                            </div>
+                            <t t-foreach="o.apl_pil_material_ids" t-as="apm">
+                                <div class="row" style="border-bottom:1px dashed black;">
+                                    <div class="col-xs-4 text-center"><span t-field="apm.pillar_material_id.name"/></div>
+                                    <div class="col-xs-2 text-center"><span t-field="apm.cnt"/></div>
+                                    <div class="col-xs-6"><span t-field="apm.numbers"/></div>
+                                </div>    
+                            </t>
+                        </div>    
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="row" style="border-bottom:2px solid black;">
+                            <div class="col-xs-2 text-center">Name</div>
+                            <div class="col-xs-2 text-center">Number of tap</div>
+                            <div class="col-xs-2 text-center">Number</div>
+                            <div class="col-xs-2 text-center">Type</div>
+                            <div class="col-xs-2 text-center">Material</div>
+                            <div class="col-xs-2 text-center">Cut</div>
+                        </div>
+                        <t t-foreach="o.pillar_id.sorted(key=lambda r:str(r.tap_id.id).zfill(3)+'_'+str(r.num_by_vl).zfill(3), reverse=False)" t-as="pil">
+                            <div class="row" style="border-bottom:1px dashed black;">
+                                <div class="col-xs-2 text-center"><span t-field="pil.name"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.tap_id.num_by_vl"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.num_by_vl"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.pillar_type_id.name"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.pillar_material_id.name"/></div>
+                                <div class="col-xs-2 text-center"><span t-field="pil.pillar_cut_id.name"/></div>
+                            </div>
+                        </t>
+                    </div>
+                    
+                    
+                   
+                    <div class="row">
+                        <br/>
+                        <div class="col-xs-12 text-center">
+                            <h4>3. Resistance</h4>
+                        </div>
+                    </div>
+                    <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                        <div class="col-xs-3 text-center">Cable type</div>
+                        <div class="col-xs-3 text-center">Resistivity</div>
+                        <div class="col-xs-3 text-center">Length</div>
+                        <div class="col-xs-3 text-center">Total resistance</div>
+                    </div>
+                    <t t-foreach="o.resistance_ids" t-as="aplres">
+                        <div class="row" style="border-bottom:1px dashed black;">
+                            <div class="col-xs-3 text-center"><span t-field="aplres.cable_id.name"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="aplres.resistivity"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="aplres.length"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="aplres.total_resistance"/></div>
+                        </div>
+                    </t>
+                    <div class="row">
+                        <br/>
+                        <div class="col-xs-12 text-center">
+                            <h4>4. Main line / taps</h4>
+                        </div>
+                    </div>
+                    <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                        <div class="col-xs-3 text-center">Name</div>
+                        <div class="col-xs-3 text-center">Connected pillar</div>
+                        <div class="col-xs-3 text-center">Pillar count</div>
+                        <div class="col-xs-3 text-center">Line length</div>
+                    </div>
+                    <t t-foreach="o.tap_ids" t-as="tap">
+                        <div class="row" style="border-bottom:1px dashed grey;">
+                            <div class="col-xs-3 text-center"><span t-field="tap.name"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="tap.conn_pillar_id.name"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="tap.pillar_cnt"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="tap.line_len_calc"/></div>
+                        </div>
+                        <div class="row" style="border-bottom:1px solid black;">
+                            <div class="col-xs-6">
+                                <span t-field="tap.profile_image" t-field-options='{"widget":"image"}'/>
+                            </div>
+                            <div class="col-xs-6">
+                                <span t-field="tap.profile_3d_image" t-field-options='{"widget":"image"}'/>
+                            </div>     	
+                        </div>
+                    </t>
+                    <div class="row">
+                        <br/>
+                        <div class="col-xs-12 text-center">
+                            <h4>5.Fittings</h4>
+                        </div>
+                    </div>
+                    <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                        <div class="col-xs-3 text-center">Fitting class</div>
+                        <div class="col-xs-3 text-center">Fitting name</div>
+                        <div class="col-xs-1 text-center">Fitting type</div>
+                        <div class="col-xs-1 text-center">Quantity</div>
+                        <div class="col-xs-4">Comment</div>
+                    </div>
+                    <t t-foreach="o.fitting_ids" t-as="fit">
+                        <div class="row" style="border-bottom:1px dashed black;">
+                            <div class="col-xs-3 text-center"><span t-field="fit.class_id.name"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="fit.fitting_name"/></div>
+                            <div class="col-xs-1 text-center"><span t-field="fit.fitting_type"/></div>
+                            <div class="col-xs-1 text-center"><span t-field="fit.qnt"/></div>
+                            <div class="col-xs-4"><span t-field="fit.comment"/></div>
+                        </div>
+                    </t>
+                    <div class="row">
+                        <br/>
+                        <div class="col-xs-12 text-center">
+                            <h4>6.Crossing</h4>
+                        </div>
+                    </div>
+                    <div class="row" style="border-bottom:2px solid black; font-weight:bold;">
+                        <div class="col-xs-3 text-center">Crossing type</div>
+                        <div class="col-xs-3 text-center">Span</div>
+                        <div class="col-xs-2 text-center">Length</div>
+                        <div class="col-xs-4 text-center">Scheme</div>
+                    </div>
+                    <t t-foreach="o.crossing_ids" t-as="cross">
+                        <div class="row" style="border-bottom:1px dashed black;">
+                            <div class="col-xs-3 text-center"><span t-field="cross.cross_type.name"/></div>
+                            <div class="col-xs-3 text-center"><span t-field="cross.name"/></div>
+                            <div class="col-xs-2 text-center"><span t-field="cross.length"/></div>
+                            <div class="col-xs-4 text-center"><span t-field="cross.scheme" t-field-options='{"widget":"image"}'/></div>
+                        </div>
+                    </t>
                     </p>
                 </div>
-             </t>
+                </div>
+            </t>
         </t>
     </t>
 </template>

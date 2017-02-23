@@ -22,13 +22,16 @@ Main Features
     'demo': ['demo/demo.xml'],
     'data':[
         'views/mod_apl_view.xml',
-        'views/mod_pillar_view.xml',
         'views/uis_papl_aerialphoto_view.xml',
-        'views/mod_google_map_template.xml'
+        'views/mod_apl_view.xml',
+        'views/mod_google_map_template.xml',
+        'views/reports/mod_uis_papl_apl_report_passport.xml',
+        'views/uis_ap_vis_object.xml',
+        'action/uis_ap_action_recalc_scheme.xml'
     ],
     'application': True,
 }
-#
+#,'views/mod_pillar_view.xml',
 #,
 #        'views/mod_google_map_template.xml'
 #'views/mod_apl_view.xml',

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+		<record model="ir.ui.view" id="uis_ap_visual_object_list">
+		<field name="name">Visual Object List</field>
+		<field name="model">uis.ap.vis_object</field>
+		<field name="arch" type="xml">
+			<tree string="List of Visual objects" editable="top" create="true" edit="false">
+				<field name="id"/>
+				<field name="name"/>
+				<field name="state"/>
+				<field name="rect_coordinate_json"/>
+				<field name="auto_detected"/>
+			</tree>
+		</field>
+		</record>
+		<!--FORM Visual object!-->
+		<record id="uis_ap_visual_object_form" model="ir.ui.view">
+			<field name="name">Visual Objects</field>
+			<field name="model">uis.ap.vis_object</field>
+			<field name="arch" type="xml">
+				<form string="Visual object">
+					<header>
+						<field name="state" widget="statusbar" statusbar_visible="draft,correct,incorrect" statusbar_colors='{"draft":"blue","correct":"green","incorrect":"red"}'/>
+					</header>
+					<group>
+						<group>
+							<field name="photo_id" invisible="context.get('photo_id',False)"/>
+							<field name="rect_coordinate_json"/>
+							<field name="distance_from_photo_point"/>
+							<!--
+							<field name="from_pillar_id"/>
+							<field name="to_pillar_id"/>
+							<field name="cross_type"/>
+							<field name="length"/>!-->
+						</group>
+						<group>
+							 <field name="image" widget="image" options='{"size":[400,400]}'/>
+						</group>
+					</group>
+				</form>
+			</field>
+		</record>
+		<!--Modernize Photo form!-->
+		<record id="uis_ap_photo_form_add_visobj_page" model="ir.ui.view">
+            <field name="name">Modern (Visual object) Photo form</field>
+            <field name="model">uis.ap.photo</field>
+            <field name="inherit_id" ref="apl_aerial_photo.uis_ap_photo_form"/>
+            <field name="arch" type="xml">
+				<xpath expr="/form/group/group/notebook" position="inside">
+					<page string="Visual objects">
+						<field name="vis_objects_ids" context="{'apl_id':active_id}"/>
+					</page>
+				</xpath>
+			</field>
+		</record>
+	</data>
+</openerp>

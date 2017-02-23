@@ -1,5 +1,41 @@
+.b_marked{
+    border: 1px solid #f00;
+}
 .div_img_thumb{
     overflow-y: overlay;
+}
+.cls_btn{
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    right: 10px;
+    z-index:2000;
+    font-size:25px;
+    cursor:pointer;
+}
+.cls_btn:hover{
+    color:black;
+}
+.cls_cls_btn{
+    top: 10px;
+    right: 10px;
+    color: maroon;
+}
+.cls_cls_next_btn{
+    top: 50px;
+    color: maroon;
+}
+.cls_cls_prev_btn{
+    top: 100px;
+    color: maroon;
+}
+.cls_cls_zoom_btn{
+    top: 150px;
+    color: maroon;
+}
+.cls_cls_deff_btn{
+    top: 200px;
+    color: red;
 }
 #photolist{
     position:relative;

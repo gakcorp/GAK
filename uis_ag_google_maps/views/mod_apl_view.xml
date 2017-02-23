@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+        <record id="view_papl_apl_layer_settings_form" model="ir.ui.view">
+            <field name="name">uis.papl.apl.form.inherit</field>
+            <field name="model">uis.papl.apl</field>
+            <field name="inherit_id" ref="passportvl.uis_papl_apl_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/notebook" position="inside">
+					<page string="Maps Settings">
+						<field name="rec_layer_id"/>
+					</page>
+				</xpath>
+            </field>
+        </record>
+	</data>
+</openerp>

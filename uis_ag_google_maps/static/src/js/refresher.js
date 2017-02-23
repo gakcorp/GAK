@@ -1,4 +1,5 @@
-var ref_time=10000;
+var ref_time=10000;//sitemapslib.settings.global_var.auto_refresh_time*1000;
+
 var ref_functions=[]
 
 var res_shed=setInterval(ref_timer_fun,ref_time);

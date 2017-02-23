@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+	<record model="ir.ui.view" id="uis_ap_photo_kanban">
+		<field name="name">Photo kanban view</field>
+		<field name="model">uis.ap.photo</field>
+		<field name="arch" type="xml">
+			<kanban>
+				<field name="name"/>
+				<templates>
+					<t t-name="kanban-box" create="false"><!--default_group_by="field"!-->
+						<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+							<!--<a type="open">!-->
+								<!--<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image"/>!-->
+								<img style="max-width:100%;"  t-att-data-magnify-src="kanban_image('uis.ap.photo','image',record.id.value)" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image zoom"/>
+							<!--</a>!-->
+							<div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
+								<h4>
+									<a type="open">
+										<field name="image_filename"/>
+									</a>
+									
+								<div name="tags"/>
+								<ul>
+									<li>Date: <field name="image_date"/></li>
+									<!--<li>Alt : <field name="altitude"/></li>!-->
+								</ul>
+								</h4>
+							</div>
+						</div>
+					</t>
+				</templates>
+				
+			</kanban>
+		</field>
+	</record>
     <record model="ir.ui.view" id="uis_ap_photo_list">
 		<field name="name">Photo List</field>
 		<field name="model">uis.ap.photo</field>
@@ -16,6 +49,7 @@
 				<field name="longitude"/>
 				<field name="altitude"/>
 				<field name="image" filename="name"/>
+				<button name="generate_snap" string="small photos generate" type="object" icon="STOCK_REFRESH"/>
 				
 			</tree>
 	  </field>
@@ -25,21 +59,33 @@
 	  <field name="model">uis.ap.photo</field>
 	  <field name="arch" type="xml">
 		<form string="Photo form">
+			<header>
+				<button string="Generate small photos" type="object" name="generate_snap"/>
+			</header>
 			<group>
 				<group>
-					<field name="name"/>
-					<field name="image" widget="binary" filename="name"  height="480"/>
-					<field name="image" widget="image"/>
-					<field name="thumbnail" widget="image"/>
+					
+					<!--<field name="image" widget="binary" filename="name"  height="480"/>!-->
+					<!--<field name="image" widget="image" filename="fimage"/>!-->
+					<field name="image_800" widget="image" options='{"size":[800,600]}' nolabel="1" colspan="2"/>
+					<!--<field name="image_800" widget="image" />!-->
+					
+					<!--<field name="thumbnail" widget="image"/>
 					<field name="image_800" widget="image" />
+					<field name="image_400" widget="image"/>!-->
+					<!--<field name="image_edge"/>!-->
 				</group>
 				<group>
+					<field name="name" nolabel="1"  colspan="2"/>
 					<notebook>
 						<page string="Objects">
 						<group>
 							<field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="near_apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="near_transformer_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="next_photo_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 						</group>
 						</page>
 						<page string='ExifData'>
@@ -47,10 +93,26 @@
 								<field name="latitude"/>
 								<field name="longitude"/>
 								<field name="altitude"/>
+								<field name="focal_length"/>
+								<field name="elevation_point"/>
 								<field name="rotation"/>
+								<div style="display: flex;" colspan="2">
+									<button name="rotate_plus" string="+" class="oe_highlight oe_edit_only" type="object" />
+									<button name="rotate_minus" string="-" class="oe_highlight oe_edit_only" type="object" />
+								</div>
+								
 							</group>
 						</page>
+						<page string='Admins'>
+							<group>
+								<field name="view_distance"/>
+								<field name="focal_angles"/>
+							</group>
+						</page>
+					
+					
 					</notebook>
+					<field name="image_scheme" widget="image" options='{"size":[600,600]}' nolabel="1" colspan="2"/>
 				</group>
 			</group>
 		</form>
@@ -78,7 +140,7 @@
 	  <field name="name">List of Photo</field>
 	  <field name="res_model">uis.ap.photo</field>
 	  <field name="view_type">form</field>
-	  <field name="view_mode">tree,form</field>
+	  <field name="view_mode">tree,form,kanban</field>
 	  <field name="help" type="html">
 		<p class="oe_view_nocontent_create">Create new Photo</p>
 	  </field>

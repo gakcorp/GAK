@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<template id="uis_cartography_menu_bar_layout">
+			
+		</template>
+		<template id="uis_cartography_main">
+			&lt;!DOCTYPE html&gt;
+			<html>
+				<head>
+					<meta charset="utf-8" />
+					<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+					<meta name="viewport" content="width=device-width, initial-scale=1"/>
+					<title>ActiveGIS - </title>
+					<link href="/uis_ag_google_maps/static/v2/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/nprogress/nprogress.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/iCheck/skins/flat/green.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/switchery/dist/switchery.min.css" rel="stylesheet"/>
+					<!-- Custom Theme Style -->
+					<link href="/uis_ag_google_maps/static/v2/build/css/custom.css" rel="stylesheet"/>
+					<link href="/uis_ag_google_maps/static/v2/vendors/jcrop/css/Jcrop.css" rel="stylesheet" type="text/css"/>
+					<!--Cropper!-->
+					<link  href="/uis_ag_google_maps/static/v2/vendors/cropper/dist/cropper.css" rel="stylesheet"/>
+					<!--OLD!-->
+					<script src="https://maps.google.com/maps/api/js?key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"></script>
+					<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/refresher.js"></script>
+					<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/mod/uis_maps_pillar_events.js"></script>
+					
+				</head>
+				<body class="nav-md">
+					<script>
+						var apl_ids=[15,16,68];
+					</script>
+					<div id="site-map" style="position: absolute;top: 0px;left:0;width: 100%;height: 100%;z-index:-1;"></div>
+					<div class="container body">
+						<div class="main_container">
+							<div class="col-md-3 left_col">
+								<div class="left_col scroll-view">
+									<div class="navbar nav_title" style="border: 0;">
+										<a href="/" class="site_title">
+											<img src="/web/binary/company_logo" alt="Active GIS" class="img-circle profile_img" style="
+													margin-left: 10px;
+													margin-top: 0px;
+													margin-right: 10px;
+													width: 20%;"/>
+											ActiveGIS</a>
+									</div>
+									<div class="clearfix">
+										
+									</div>
+									<!--side bar menu!-->
+									<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+										 <div class="menu_section">
+											<ul class="nav side-menu">
+												<li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+												  <ul class="nav child_menu">
+													<li id="menu_button_map"><a href="#"><i class="fa fa-map"></i>Maps</a></li>
+													<li id="menu_button_dash"><a href="#"><i class="fa fa-tachometer"></i>Dashboard</a></li>
+													<li id="menu_button_stat"><a href="#"><i class="fa fa-bar-chart"></i>Statistic</a></li>
+												  </ul>
+												</li>
+												<li><a><i class="fa fa-sitemap"/>Items <span class="fa fa-chevron-down"></span></a>
+													<ul class="nav child_menu" style="display:block; overflow-y:auto;max-height:450px;">
+														
+														<li><a href="#">Substation
+															<span class="label label-default" style="float:right;">
+																<span class="fa fa-filter" style="float: none;vertical-align: text-bottom;"/>
+																<t t-esc="ps_data['counter_filtered']"/>
+															</span>
+															<span class="badge bg-green" style="right:10px;position:relative;float:right;">
+																<t t-esc="ps_data['counter']"/>
+															</span></a>
+															<ul class="nav child_menu">
+																<label>
+																	<input type="checkbox" class="js-switch" checked="0"/>
+																	APL filter	
+																</label>
+																<t t-foreach="ps_data['pss']" t-as="ps">
+																	<li t-att="{'psid':ps['id']}">
+																		<span t-if="ps['show']==True" class="fa fa-check-square-o"/>
+																		<a href="#"><t t-esc="ps['name']"/></a>
+																	</li>
+																</t>
+															</ul>
+														</li>
+														<li>
+															<a href="#">APL
+																<span class="label label-default" style="float:right;">
+																	<span class="fa fa-filter" style="float: none;vertical-align: text-bottom;" id="span_apl_filt_cnt"/>
+																	<t t-esc="apl_data['counter_filtered']"/>
+																</span>
+																<span class="badge bg-green" style="right:10px;position:relative;float:right;">
+																	<t t-esc="apl_data['counter']"/>
+																</span>
+															</a>
+															<ul class="nav child_menu">
+																<label>
+																	<input type="checkbox" class="js-switch" checked="0"/>
+																	Pillar filter
+																</label>
+																	<br/>
+																<label>
+																	<input type="checkbox" class="js-switch" checked="0"/>
+																	Transformer filter	
+																</label>
+																<t t-foreach="apl_data['apls']" t-as="apl">
+																	<li t-att="{'aplid':apl['id']}">
+																		<a href="#"><t t-esc="apl['name']"/></a>
+																	</li>
+																</t>
+															</ul>
+														
+														</li>
+														<li>
+															<a href="#">Transformers
+																<span class="label label-default" style="float:right;">
+																	<span class="fa fa-filter" style="float: none;vertical-align: text-bottom;" id="span_trans_filt_cnt"/>
+																	<t t-esc="trans_data['counter_filtered']"/>
+																</span>
+																<span class="badge bg-green" style="right:10px;position:relative;float:right;">
+																	<t t-esc="trans_data['counter']"/>
+																</span>
+																<ul class="nav child_menu">
+																	<t t-foreach="trans_data['transs']" t-as="trans">
+																		<li t-att="{'transid':trans['id']}">
+																			<a href="#"><t t-esc="trans['name']"/></a>
+																		</li>
+																	</t>
+																</ul>
+															</a>
+														</li>
+														<li>
+															<a href="#">Pillar
+																<span class="label label-default" style="float:right;">
+																	<span class="fa fa-filter" style="float: none;vertical-align: text-bottom;" id="span_pillar_filt_cnt"/>
+																	<t t-esc="pillar_data['counter_filtered']"/>
+																</span>
+																<span class="badge bg-green" style="right:10px;position:relative;float:right;">
+																	<t t-esc="pillar_data['counter']"/>
+																</span>
+																<ul class="nav child_menu">
+																	<t t-foreach="pillar_data['pillars']" t-as="pillar">
+																		<li t-att="{'pillarid':pillar['id']}">
+																			<a href="#"><t t-esc="pillar['name']"/></a>
+																		</li>
+																	</t>
+																</ul>
+															</a>
+														</li>
+													</ul>
+												</li>
+											</ul>				
+										</div>
+									</div>
+									<!--/side bar menu!-->
+									<div id="sidebar-photo" class="main_menu_side hidden-print main_menu">
+										<div class="menu_section">
+											<ul class="nav side-menu">
+												<li class="active"><a><i class="fa fa-picture-o"></i> Photo <span class="fa fa-chevron-down"></span></a>
+													<ul class="nav child_menu" style="  display: block;
+																						max-height: 600px;
+																						overflow-y: auto;">
+														<t t-foreach="ph_data['phs']" t-as="ph">
+															<li>
+																<img t-attf-src="{{ph['thumbnail']}}" t-attf-photo_id="{{ph['id']}}" class="photo_button"/>
+															</li>
+														</t>
+													</ul>
+												</li>
+											</ul>
+										</div>
+									</div>
+									<!-- /menu footer buttons -->
+									<div class="sidebar-footer hidden-small">
+										<a id="menu_toggle_button" data-toggle="tooltip" data-placement="top" title="Menu">
+											<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+										</a>
+										<a id="photo_toggle_button" data-toggle="tooltip" data-placement="top" title="Photo">
+											<span class="glyphicon glyphicon-camera" aria-hidden="true"></span>
+										</a>
+										<a id="fullscreen_togle_button" data-toggle="tooltip" data-placement="top" title="FullScreen">
+											<span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+										</a>
+										<a data-toggle="tooltip" data-placement="top" title="Logout">
+											<span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+										</a>
+									</div>
+									<!-- /menu footer buttons -->
+								</div>
+							</div>
+							<!--top navigation!-->
+							<div class="top_nav">
+								<div class="nav_menu">
+									<div class="nav toggle">
+										<a id="menu_toggle"><i class="fa fa-bars"></i></a>
+									</div>
+									<div>
+										<t t-foreach="lr_data['lrs']" t-as="lr">
+											<a data-toggle="tooltip" data-placement="bottom" t-att="{'title':lr['alt']}">
+												<img t-attf-src="{{lr['url_icon']}}" class="img-circle menu_button" width="30" height="30"/>
+											</a>
+										</t>
+									</div>
+								</div>
+							</div>
+							<!--/ top navigation!-->
+							<div class="right_col" role="main" id="photo_panel">
+								<div style="max-height: 800px;">
+									<img  t-attf-src="#" id="photo_big_view"  style="max-width: 100%;display: block;margin: auto;width: 800px;max-height: 100%;height: 100%; border: 1px solid;"/>
+									<div id="scheme_photo_nav" style="display: block; position: absolute; right: 1px; top: 1px;">
+										<img t-attf-src="#" id="scheme_nav_view"/>
+									</div>
+								</div>
+							</div>
+							<div class="right_col" role="main" id="statistics_panel">
+								<div class="row tile_count">
+									<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+										<span class="count_top"><i class="fa fa-arrows-h"></i> Total Lenght</span>
+										<div class="count">
+											<t t-esc="apl_data['total_length']"/>
+										</div>
+										<span class="count_bottom"><i class="green">4% </i> 1 year exploatation</span><br/>
+										<span class="count_bottom"><i class="yellow">24% </i> 5 year exploatation</span><br/>
+										<span class="count_bottom"><i class="red">72% </i> 10 year exploatation</span><br/>
+									</div>
+									<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+										<span class="count_top"><i class="fa fa-clock-o"></i> Average Time</span>
+										<div class="count">5d 3h 23m</div>
+										<span class="count_bottom"><i class="green"><i class="fa fa-thumbs-o-up"></i>65% </i> Just in time</span><br/>
+										<span class="count_bottom"><i class="yellow"><i class="fa fa-meh-o"></i>25% </i> Less 50% delay</span><br/>
+										<span class="count_bottom"><i class="red"><i class="fa fa-thumbs-o-down"></i>10% </i> 50% (and more) delay</span><br/>
+									</div>
+									<div class="col-md-3 col-sm-3 col-xs-6 tile_stats_count">
+										<span class="count_top"><i class="fa fa-exclamation-circle"/> Defects per week</span><br/>
+										<!--<div class="count">
+											23
+										</div>!-->
+										<span class="sparkline_defect_per_week" style="height: 160px;">
+											<canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+										</span><br/>
+										<span class="sparkline_close_defect_per_week" style="height: 160px;">
+											<canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+										</span>
+									  </div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					<t t-call="uis_ag_google_maps.uis_cartography_menu_bar_layout">
+					 <!-- Custom Theme Scripts -->
+					
+					</t>
+									
+					<!-- jQuery -->
+					<script src="/uis_ag_google_maps/static/v2/vendors/jquery/dist/jquery.min.js"></script>
+					<!-- Bootstrap -->
+					<!--jscropper!-->
+					
+					<script src="/uis_ag_google_maps/static/v2/vendors/cropper/dist/cropper.js"></script>
+					<script src="/uis_ag_google_maps/static/v2/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+					<script src="/uis_ag_google_maps/static/v2/vendors/switchery/dist/switchery.min.js"></script>
+					<!-- jQuery Sparklines !-->
+					<script src="/uis_ag_google_maps/static/v2/vendors/jquery-sparkline/dist/jquery.sparkline.min.js"></script>
+					<!--JCrop!-->
+					<script src="/uis_ag_google_maps/static/v2/vendors/jcrop/js/Jcrop.js"></script>
+					
+					<!--Custom Theme Scripts!-->
+					<script src="/uis_ag_google_maps/static/v2/js/custom.js"></script>
+					
+					<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/uis_maps.js"></script>
+					
+					<script>
+						$(".sparkline_defect_per_week").sparkline([20, 19, 15, 14, 5, 3, 5, 12, 20, 33, 20, 10, 10, 10, 3, 2, 20, 20], {
+						type: 'line',
+						chartRangeMin: 0,
+						width: '200',
+						height: '50',
+						lineColor: '#B92626',
+						fillColor: 'rgba(255, 223, 223, 0.57)',
+						lineWidth: 2,
+						spotColor: '#B92626',
+						minSpotColor: '#B92626'
+					  });
+					  $(".sparkline_close_defect_per_week").sparkline([18, 20, 12, 10, 15, 9, 15, 2, 10, 43, 10, 12, 11, 11, 8, 4, 30, 10], {
+						type: 'line',
+						chartRangeMin: 0,
+						width: '200',
+						height: '50',
+						lineColor: '#26B99A',
+						fillColor: 'rgba(223, 255, 223, 0.57)',
+						lineWidth: 2,
+						spotColor: '#26B99A',
+						minSpotColor: '#26B99A'
+					  });
+					</script>
+				</body>
+			</html>
+		</template>
+	</data>
+</openerp>

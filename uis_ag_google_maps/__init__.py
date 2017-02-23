@@ -1,2 +1,3 @@
-print "!!!! start import controllers!!!"
+from . import models
 import controllers
+
