@@ -78,23 +78,53 @@ class uis_papl_pillar(models.Model):
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	
 	def _get_prev_base_pillar(self):
+		# bppppppbppppPILpppppb
+		for pil in self:
+			bp_pils_ids=[]
+			cp=None
+			_logger.debug('Start define prev pillar for pillar %r'%pil.name)
+			if pil.parent_id:
+				cp=pil.parent_id
+				while cp and(cp.tap_id==pil.tap_id) and (cp.pillar_type_id.base==False):
+					bp_pils_ids.append(cp.id)
+					cp=cp.parent_id
+				_logger.debug('---> Prev pillar for pil %r is pillar %r'%(pil.name,cp.name))
+				_logger.debug('---> Next pillar for P pil %r is pillar %r'%(cp.name, cp.next_base_pillar_id))
+				pil.prev_base_pillar_id=cp
+				if pil.pillar_type_id.base==True:
+					if pil.tap_id==cp.tap_id:
+						pil.prev_base_pillar_id.write({'next_base_pillar_id':pil.id})
+						_logger.debug('--->---> For P Pil %r write next_pillar_id %r'%(pil.prev_base_pillar_id.name,pil.name))
+			if not(pil.parent_id):
+				pil.write({'prev_base_pillar_id':None})
+			#pil.write({'next_base_pillar_id':None})
+			
+			
+	def _get_prev_base_pillar_old(self):
 		pp=None
 		cp=None
+		# bppppppbppppPpppppb
+		bp_pils=[] #pillars from prev base to current pillar
+		pb_pils=[] #pillars from current pillar to nex base pillar
 		for pil in self:
-			cp=None
+			cp=pil
 			_logger.debug('start define prev base pillar for pillar id=%r'%pil.id)
 			if pil.parent_id:
 				cp=pil.parent_id
 				while cp and (cp.tap_id==pil.tap_id) and (cp.pillar_type_id.base==False):
 					pp=cp
+					bp_pils.append(cp)
 					cp=cp.parent_id
+					
 					#_logger.debug('pil %r base=%r tap_id=%r'%(cp.name,cp.pillar_type_id.base, cp.tap_id))
 				if not cp:
-					cp=pp
-			
+					_logger.debug('!!!!!!!!!96 uis_papl_pillar')
 			pil.prev_base_pillar_id=cp
+			
 			if pil.pillar_type_id.base==True:
-				_logger.debug('!!!!!!!!!!!!!')
+				_logger.debug(bp_pils)
+				for bp in bp_pils:
+					bp.write({'next_base_pillar_id':pil.id})
 				try:
 					#pil.prev_base_pillar_id.next_base_pillar_id=pil
 					#pil.prev_base_pillar_id.write({'next_base_pillar_id': pil.id })
