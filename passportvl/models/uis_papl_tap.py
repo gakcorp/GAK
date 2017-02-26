@@ -514,16 +514,18 @@ class uis_papl_tap(models.Model):
 			if pillar.apl_id != self.apl_id:
 				pillar.apl_id=self.apl_id
 				
-	@api.multi #NUPD СChange define last_pillar, pillar_cnt and p
+	@api.multi #NUPD Сhange define last_pillar, pillar_cnt and p
 	def act_normalize_num(self):
 		tlr=_ulog(self,code='CALC_NORMALIZE_NUM_TAP',lib=__name__,desc='Start normalize num by APL (by TAP id=%r)'%(self.id))
 		max_num=0
 		max_id=0
-		pillar_cnt=0
-		for pillar in self.pillar_ids:
-			pillar_cnt=pillar_cnt+1
-			if pillar.num_by_vl>max_num:
-				max_num=pillar.num_by_vl
+		pillars=self.pillar_ids
+		pillar_cnt=len(pillars)
+		max_num=max(pillars.mapped('num_by_vl'))
+		for pillar in pillars:
+			#pillar_cnt=pillar_cnt+1
+			if pillar.num_by_vl>=max_num:
+				#max_num=pillar.num_by_vl
 				max_id=pillar.id
 				last_pillar=pillar
 				tlr.add_comment('[1] Last pillar is %r'%last_pillar.id)
@@ -552,22 +554,29 @@ class uis_papl_tap(models.Model):
 				pil.sys_fix_lpp()
 	
 	@api.multi
-	def do_normal_magni(self,cr,uid,ids,context=None):
+	def do_normal_magni(self,cr,uid,ids,context=None,pillar=None):
 		for tap in self:
 			tap.act_normalize_num()
 			#basepillars_ids=tap.pillar_ids.search(cr,uid,[],context=context)
 			tlr=_ulog(self,code='CLC_DO_NRML_MGNF_TAP',lib=__name__,desc='Start normalize for magnify for TAP id=%r)'%(tap.id))
 			base_pills=[]
-			for pil in tap.pillar_ids.filtered(lambda r: r.pillar_type_id.base == True).sorted(key=lambda r: r.num_by_vl, reverse=True):
-				base_pills.append(pil)
-			if tap.conn_pillar_id:
-				base_pills.append(tap.conn_pillar_id)
+			if not(pillar):
+				for pil in tap.pillar_ids.filtered(lambda r: r.pillar_type_id.base == True).sorted(key=lambda r: r.num_by_vl, reverse=True):
+					base_pills.append(pil)
+				if tap.conn_pillar_id:
+					base_pills.append(tap.conn_pillar_id)
+			if pillar:
+				if pillar.next_base_pillar_id:
+					base_pills.append(pillar.next_base_pillar_id)
+				base_pills.append(pillar)
+				if pillar.prev_base_pillar_id:
+					base_pills.append(pillar.prev_base_pillar_id)
 			cnt_base_pills=len(base_pills)
 			tlr.set_qnt(cnt_base_pills)
 			for i in range(0,cnt_base_pills-1):
 				cp=base_pills[i]
 				tdist=0
-				while not(cp==base_pills[i+1]):
+				while cp and not(cp==base_pills[i+1]):
 					if cp.fix_lpp:
 						tdist=tdist+cp.fix_lpp
 					if not(cp.fix_lpp):
