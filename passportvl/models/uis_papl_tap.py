@@ -516,7 +516,7 @@ class uis_papl_tap(models.Model):
 				
 	@api.multi #NUPD Сhange define last_pillar, pillar_cnt and p
 	def act_normalize_num(self):
-		tlr=_ulog(self,code='CALC_NORMALIZE_NUM_TAP',lib=__name__,desc='Start normalize num by APL (by TAP id=%r)'%(self.id))
+		tlr=_ulog(self,code='CALC_NRML_NUM_TAP',lib=__name__,desc='Start normalize num by APL (by TAP id=%r)'%(self.id))
 		max_num=0
 		max_id=0
 		pillars=self.pillar_ids
