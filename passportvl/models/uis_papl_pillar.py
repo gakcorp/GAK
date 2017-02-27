@@ -7,6 +7,7 @@ from . import uis_papl_logger
 import logging
 import datetime
 import openerp
+import googlemaps
 
 try:
     import cStringIO as StringIO
@@ -148,6 +149,7 @@ class uis_papl_pillar(models.Model):
 			if pil.tap_id:
 				tn=unicode(pil.tap_id.name)
 				tcpn=str(pil.tap_id.conn_pillar_id.num_by_vl)
+				tcpname=str(pil.tap_id.conn_pillar_id.name)
 				tnum=str(pil.tap_id.num_by_vl)
 			def_frm_mp=empapl.disp_mp_frm or ('pn+sp+an')
 			def_frm_tp=empapl.disp_tp_frm or ('"("+tnum+")"+sp+pn+sp+an')
@@ -249,38 +251,23 @@ class uis_papl_pillar(models.Model):
 		tlr.fix_end()
 	
 	@api.depends('longitude','latitude')
-	def _get_elevation_new(self):
+	def _get_elevation(self):
+		hcode_key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI'
+		key= self.env['uis.global.settings'].get_value('uis_google_api_key') or hcode_key
+		client=googlemaps.Client(key)
 		for pil in self:
 			lat,lng=pil.latitude,pil.longitude
-	@api.multi
-	@api.depends('longitude','latitude')
-	def _get_elevation(self): #NUPD Changes to google maps lib python
-		for record in self:
-			#print 'Get Elevation for '+str(record.id)
-			lat=record.latitude
-			lng=record.longitude
-			el=0
+			#el=0
 			if (lat<>0) and (lng<>0):
-				url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI" #NUPD Value from settings
-				#print url
-				response = urllib.urlopen(url)
-				data = json.loads(response.read())
-				#print data
-				if data["status"]=="OK":
-					el=data["results"][0]["elevation"]
-				else:
-					tlr=_ulog(self,code='WRN_GMAPS_API_PAUSE',lib=__name__,desc='Create pause for request to google elevation API')
-					time.sleep (100.0 / 1000.0)
-					response = urllib.urlopen(url)
-					data = json.loads(response.read())
-					#print data
-					if data["status"]=="OK":
-						el=data["results"][0]["elevation"]
-					tlr.fix_end()
-			record.elevation=el
-
-
-
+				try:
+					res=client.elevation((lat, lng))
+					_logger.debug('result google api elevation %r'%res)
+				except googlemaps.exceptions.ApiError:
+					pass
+				for item in res:
+					elv=item['elevation']
+					pil.elevation = elv
+			
 	#@api.depends('longitude','latitude','parent_id')
 	def _pillar_get_len(self):
 		for record in self:

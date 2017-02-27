@@ -119,7 +119,6 @@ class uis_papl_tap(models.Model):
 		point_per_ax=22
 		hcode_key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
 		key= self.env['uis.global.settings'].get_value('uis_google_api_key') or hcode_key
-		_logger.debug(key)
 		client=googlemaps.Client(key)
 		for tap in self:
 			tej=json.loads(tap.tap_elevation_json)

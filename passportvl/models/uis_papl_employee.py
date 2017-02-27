@@ -71,7 +71,8 @@ class uis_papl_apl(osv.osv):
 		('pn+sp+tn',openerp._('32.Tap name')),
 		('pn+sp+tcpn+sp+an', openerp._('32.64.APL Name')),
 		('tnum+sp+pn+sp+an', openerp._('3.64.32.APL Name')),
-		('tcpn+sp+pn',openerp._('64.32'))
+		('tcpn+sp+pn',openerp._('64.32')),
+		('tcpname+sp+pn',openerp._('21.64.32'))
 	]
 	_columns = {
 		#we need a related field in order to be able to sort the employee by name
