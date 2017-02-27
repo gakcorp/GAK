@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<record model="ir.actions.act_window" id="uis_ap_menu_pre_photo_list_action">
+		<field name="name">Pre Photos List</field>
+		<field name="res_model">uis.ap.pre_photo</field>
+	</record>
+
+	<record model="ir.ui.view" id="uis_ap_menu_pre_photo_list_tree">
+    		<field name="name">Pre Photo Tree</field>
+    		<field name="model">uis.ap.pre_photo</field>
+    		<field name="priority">1</field>
+    		<field name="arch" type="xml">
+			<tree string="Pre Photo Tree" colors="red:state=='critical';orange:state=='warning';green:state=='normal'">
+				<field name="id"/>
+				<field name="name"/>
+				<field name="image_date"/>
+				<field name="image_length"/>
+				<field name="image_width"/>
+				<field name="focal_length"/>
+				<field name="latitude"/>
+				<field name="longitude"/>
+				<field name="altitude"/>
+				<field name="image" filename="name"/>
+				<field name="state"/>
+			</tree>
+   		</field>
+	</record>
+
+	<record model="ir.ui.view" id="uis_ap_menu_pre_photo_list_form">
+    		<field name="name">Pre Photo Form</field>
+    		<field name="model">uis.ap.pre_photo</field>
+    		<field name="priority">2</field>
+    		<field name="arch" type="xml">
+			<form string="Pre Photo form">
+				<header>
+					<button string="Save as photo" type="object" name="save_photo"/>
+				</header>
+				<group>
+					<group>
+						<field name="image_800" widget="image" options='{"size":[800,600]}' nolabel="1" colspan="2"/>
+					</group>
+					<group>
+						<field name="id" nolabel="1"  colspan="2"/>
+						<field name="name"/>
+						<field name="image_date"/>
+						<field name="image_length"/>
+						<field name="image_width"/>
+						<field name="focal_length"/>
+						<field name="latitude"/>
+						<field name="longitude"/>
+						<field name="altitude"/>
+						<field name="image" filename="name"/>
+						<field name="image_400" filename="name"/>
+						<field name="state"/>
+					</group>
+				</group>
+			</form>
+		</field>
+	</record>
+
+	<record id="uis_ap_menu_pre_photo_list_action_savephoto" model="ir.actions.server">
+        	<field name="name">Save As Photo</field>
+        	<field name="model_id" ref="model_uis_ap_pre_photo"/>
+        	<field name="state">code</field>
+        	<field name="condition">True</field>
+        	<field name="code">if object: self.browse(cr,uid,context.get('active_ids', [])).save_photo()</field>
+	</record>
+
+	<record id="dditem1" model="ir.values">
+        	<field name="name">Save As Photo</field>
+        	<field name="model">uis.ap.pre_photo</field>
+        	<field name="key" >action</field>
+        	<field name="key2">client_action_multi</field>
+        	<field name="value" eval="'ir.actions.server,%d'%uis_ap_menu_pre_photo_list_action_savephoto"/>
+	</record>
+
+	<data>
+		<menuitem name="Pre Photos" id="uis_ap_menu_pre_photo_main" parent="passportvl.uis_papl_menu_root"/>
+		<menuitem name="Pre Photos List" parent="uis_ap_menu_pre_photo_main" id="uis_ap_menu_pre_photo_list" action="uis_ap_menu_pre_photo_list_action"/>
+	</data>
+</openerp>
