@@ -556,7 +556,8 @@ class uis_papl_tap(models.Model):
 	@api.multi
 	def do_normal_magni(self,cr,uid,ids,context=None,pillar=None):
 		for tap in self:
-			tap.act_normalize_num()
+			if not(pillar):
+				tap.act_normalize_num()
 			#basepillars_ids=tap.pillar_ids.search(cr,uid,[],context=context)
 			tlr=_ulog(self,code='CLC_DO_NRML_MGNF_TAP',lib=__name__,desc='Start normalize for magnify for TAP id=%r)'%(tap.id))
 			base_pills=[]
