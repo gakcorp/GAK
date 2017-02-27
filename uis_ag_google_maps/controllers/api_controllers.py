@@ -842,7 +842,7 @@ class maps_data_json(http.Controller):
 			if not(pil.pillar_type_id.base):
 				pil.tap_id.sys_pil_fix_lpp()
 			if (pil.pillar_type_id.base):
-				pil.tap_id.do_normal_magni(cr,uid,[pil.tap_id.id],context=context)
+				pil.tap_id.do_normal_magni(cr,uid,[pil.tap_id.id],context=context,pillar=pil)
 		values ={
 			'result':1
 		}

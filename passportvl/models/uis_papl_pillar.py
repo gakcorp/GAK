@@ -67,6 +67,8 @@ class uis_papl_pillar(models.Model):
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
 	tap_id=fields.Many2one('uis.papl.tap', string='Taps')
 	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
+	prev_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Prev base pillar', compute='_get_prev_base_pillar')
+	next_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Next base pillar')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='near_pillar_ids',
 									 column1='trans_id',
@@ -75,6 +77,48 @@ class uis_papl_pillar(models.Model):
 									 )
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	
+	def _get_prev_base_pillar(self):
+		# bppppppbppppPILpppppb
+		for pil in self:
+			bp_pils_ids=[]
+			cp=None
+			nb=None
+			pb=None
+			_logger.debug('Start define prev pillar for pillar %r'%pil.name)
+			if pil.parent_id:
+				cp=pil.parent_id
+				while cp and(cp.tap_id==pil.tap_id) and (cp.pillar_type_id.base==False):
+					bp_pils_ids.append(cp.id)
+					cp=cp.parent_id
+				_logger.debug('---> Prev pillar for pil %r is pillar %r'%(pil.name,cp.name))
+				_logger.debug('---> Next pillar for P pil %r is pillar %r'%(cp.name, cp.next_base_pillar_id))
+				pil.prev_base_pillar_id=cp
+				if pil.pillar_type_id.base==True:
+					if pil.tap_id==cp.tap_id:
+						if pil.prev_base_pillar_id.next_base_pillar_id and (pil.prev_base_pillar_id.next_base_pillar_id!=pil):
+							pil.next_base_pillar_id=pil.prev_base_pillar_id.next_base_pillar_id
+						pil.prev_base_pillar_id.write({'next_base_pillar_id':pil.id})
+					nb=pil
+					_logger.debug('--->---> For P Pil %r write next_pillar_id %r'%(pil.prev_base_pillar_id.name,pil.name))
+				if pil.pillar_type_id.base==False:
+					if pil.prev_base_pillar_id.next_base_pillar_id:
+						if pil.tap_id==cp.tap_id:
+							pil.next_base_pillar=nb
+						nb=pil.prev_base_pillar_id.next_base_pillar_id
+				if nb:
+					bp_pils=self.browse(bp_pils_ids)
+					_logger.debug('--->---> bp_pils is %r'%bp_pils)
+					bp_pils.write({'next_base_pillar_id':nb.id})
+				if not(nb):
+					tap_pils=self.browse(pil.tap_id.pillar_ids.mapped('id'))
+					tap_pils.sorted(key=lambda r: r.num_by_vl,reverse=True)
+					#tap_pils._get_prev_base_pillar()
+					_logger.debug('--->--->---> next pillar not defined search in list %r'%tap_pils)
+			if not(pil.parent_id):
+				pil.write({'prev_base_pillar_id':None})
+			#pil.write({'next_base_pillar_id':None})
+			
+
 	@api.depends('longitude','latitude','name','num_by_vl','pillar_material_id','pillar_type_id','pillar_cut_id','pillar_stay_rotation','parent_id')
 	def _get_hash(self):
 		for pil in self:
@@ -181,11 +225,11 @@ class uis_papl_pillar(models.Model):
 	def _get_near_pillar(self,cr,uid,ids,context=None):
 		tlr=_ulog(self,code='CALC_NR_PL_PL',lib=__name__,desc='Calculate near pillars for pillar')
 		for pil in self.browse(cr,uid,ids,context=context):
-			tlr.add_comment('[~] define new pillar for id:[%r]'%pil.id)
+			tlr.add_comment('[~] define new near pillar for id:[%r]'%pil.id)
 			lat1=pil.latitude
 			long1=pil.longitude
-			delta=0.01
-			max_dist=300
+			delta=0.001
+			max_dist=200
 			npillars = self.pool.get('uis.papl.pillar').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
@@ -196,14 +240,18 @@ class uis_papl_pillar(models.Model):
 						lat2=npil.latitude
 						long2=npil.longitude
 						dist=0
-						if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0) and (abs(lat1-lat2)<delta) and (abs(long1-long2)<delta):
+						if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0): # and (abs(lat1-lat2)<delta) and (abs(long1-long2)<delta):
 							dist=distance2points(lat1,long1,lat2,long2)
 						if (dist<max_dist) and (dist>0):
 							near_pillars.append(npil)
 							near_pillars_ids.append(npil.id)
 							pil.near_pillar_ids=[(4,npil.id,0)]
 		tlr.fix_end()
-
+	
+	@api.depends('longitude','latitude')
+	def _get_elevation_new(self):
+		for pil in self:
+			lat,lng=pil.latitude,pil.longitude
 	@api.multi
 	@api.depends('longitude','latitude')
 	def _get_elevation(self): #NUPD Changes to google maps lib python
