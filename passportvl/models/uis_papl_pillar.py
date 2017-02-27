@@ -93,11 +93,13 @@ class uis_papl_pillar(models.Model):
 					cp=cp.parent_id
 				_logger.debug('---> Prev pillar for pil %r is pillar %r'%(pil.name,cp.name))
 				_logger.debug('---> Next pillar for P pil %r is pillar %r'%(cp.name, cp.next_base_pillar_id))
-				pil.prev_base_pillar_id=cp
+				if pil.prev_base_pillar_id<>cp:				
+					pil.prev_base_pillar_id=cp
 				if pil.pillar_type_id.base==True:
 					if pil.tap_id==cp.tap_id:
 						if pil.prev_base_pillar_id.next_base_pillar_id and (pil.prev_base_pillar_id.next_base_pillar_id!=pil):
-							pil.next_base_pillar_id=pil.prev_base_pillar_id.next_base_pillar_id
+							if pil.next_base_pillar_id<>pil.prev_base_pillar_id.next_base_pillar_id:
+								pil.next_base_pillar_id=pil.prev_base_pillar_id.next_base_pillar_id
 						pil.prev_base_pillar_id.write({'next_base_pillar_id':pil.id})
 					nb=pil
 					_logger.debug('--->---> For P Pil %r write next_pillar_id %r'%(pil.prev_base_pillar_id.name,pil.name))
