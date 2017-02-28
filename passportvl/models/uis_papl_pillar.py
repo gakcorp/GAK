@@ -46,11 +46,28 @@ class uis_papl_pillar_cut(models.Model):
     _description='Pillar cut'
     name=fields.Char('Pillar cut')
     code=fields.Char('Code')
-    
+
+def _name_search(self, operator, value):
+		_logger.debug(self)
+		ids=[]
+		pil_ids=self.search([])
+		#_logger.debug(apl_ids)
+		value_split=value.split()
+		for pil in pil_ids:
+			#_logger.debug(apl.name)
+			for val in value_split:
+				if (pil.name) and (val.lower() in pil.name.lower()):
+					ids.append(pil.id)
+				if (pil.apl_id) and (val.lower() in pil.apl_id.name.lower()):
+					ids.append(pil.id)
+				if (pil.num_by_vl) and (val.lower() in str(pil.num_by_vl)):
+					ids.append(pil.id)
+		return [('id', 'in' , ids)]
+	
 class uis_papl_pillar(models.Model):
 	_name='uis.papl.pillar'
 	_description='Pillar models'
-	name = fields.Char('Name', compute='_get_pillar_full_name')
+	name = fields.Char('Name', compute='_get_pillar_full_name', search=_name_search)
 	num_by_vl = fields.Integer()
 	pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
 	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")

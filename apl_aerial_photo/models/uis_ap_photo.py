@@ -31,7 +31,7 @@ _ulog=uis_papl_logger.ulog
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
-def distance2points(lat1,long1,lat2,long2):
+def distance2points(lat1,long1,lat2,long2): #NUPD to system
 	dist=0
 	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
 		rad=6372795
@@ -658,6 +658,7 @@ class uis_ap_photo_load_hist(models.Model):
 					idate=parse_date(str(idate))
 					# !!!! Need validate name file
 					np=re_photos.create({'name':str(idate.year)+'_'+str(idate.month)+'_'+str(idate.day)+'_'+str(filen)})
+					#NUPD Write with 1 update
 					np.latitude=plat
 					np.longitude=plong
 					np.image_filename=filen
