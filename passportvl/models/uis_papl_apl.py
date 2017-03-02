@@ -339,15 +339,6 @@ class uis_papl_apl(models.Model):
 			dname=eval(def_frm)
 			apl.name=dname
 	
-	#@api.one
-	#def _name_search(self, name, args=None, operator='ilike', limit=100):
-	
-	#if operator == 'like': 
-	#		operator = 'ilike'
-	#	apls=self.search([('name', operator, name)], limit=limit)
-	#	_logger.debug(apls)
-	#	_logger.debug(self)
-		return []
 	
 	#@api.v8
 	def _name_search(self, operator, value):
@@ -421,8 +412,6 @@ class uis_papl_apl(models.Model):
 			res_cables_ids=[]
 			for res in apl.resistance_ids:
 				if res.cable_id:
-					#res_cables.append(res.cable_id)
-					#res_cable_ids.append(res.cable_id.id)
 					apl.cable_ids=[(4,res.cable_id.id,0)]
 	
 	@api.one
@@ -461,20 +450,7 @@ class uis_papl_apl(models.Model):
 			apl.scheme_image=drawscheme([apl],drawBP=True,drawTS=True,drawPS=True,drawCross=True, drawCrossObj=True, drawScale=True)
 		tlr.set_qnt(i)
 		tlr.fix_end()
-	'''def _get_scheme_image_2(self,cr,uid,ids,context=None):
-		tlr=_ulog(self,code='CALC_APL_SCHM',lib=__name__,desc='Calculate scheme images for apl')
-		i=0
-		for apl in self.browse(cr,uid,ids,context=context):
-			i=i+1
-			tlr.add_comment('[%r] Generate image for APL id %r'%(i,apl.id))
-			img = Image.new("RGBA", (schemeAPL_v2.scheme_width,schemeAPL_v2.scheme_height), (255,255,255,0))
-			draw = schemeAPL_v2.drawScheme(img,apl)
-			background_stream=StringIO.StringIO()
-			img.save(background_stream, format="PNG")
-			apl.scheme_image=background_stream.getvalue().encode('base64')
-		tlr.set_qnt(i)
-		tlr.fix_end()'''
-	
+
 	@api.onchange('department_id_as_substation')
 	def _get_set_department_id(self):
 		for apl in self:
@@ -514,7 +490,8 @@ class uis_papl_apl(models.Model):
 					for pil in tap.pillar_ids:
 						if pil.tap_id<>pil.parent_id.tap_id:
 							conpil=pil.parent_id.num_by_vl
-							tap.conn_pillar_id=pil.parent_id
+							#tap.conn_pillar_id=pil.parent_id
+							_logger.debug ('conpil from apl method is %r',tap.conn_pillar_id)
 					cpillar.append(conpil)
 			sortcpillar=sorted(cpillar)
 			cn_tap=1
@@ -536,7 +513,7 @@ class uis_papl_apl(models.Model):
 					hres=hres+str(tap.num_by_vl)+' ('+str(tap.conn_pillar_id.num_by_vl)+') - '+str(taplen)+ '(m); <br/>'
 			apl.tap_text=hres
 	
-	@api.depends('tap_ids','pillar_id')
+	@api.depends('tap_ids','pillar_id') #NUPD
 	def _get_cnt_pillar_wo_tap(self):
 		for apl in self:
 			cnt=0
@@ -547,7 +524,7 @@ class uis_papl_apl(models.Model):
 			apl.cnt_pillar_wo_tap=cnt
 			
 	
-	@api.multi
+	@api.multi #NUPD to cartography module
 	def act_show_map(self):
 		tlr=_ulog(self,code='STRT_SHW_MAP_APL',lib=__name__,desc='Start show map for APL id:[%r]'%self.id)
 		tlr.fix_end()
@@ -569,7 +546,6 @@ class uis_papl_apl(models.Model):
 			'type':'ir.actions.act_url',
 			'target':'new',
 			'url':self.url_scheme,
-			#'url':'http://www.yandex.ru'
 			}
 	
 	@api.depends('pillar_id')
@@ -581,21 +557,17 @@ class uis_papl_apl(models.Model):
 	def _apl_get_url_scheme(self):
 		for record in self:
 			record.url_scheme="/apl_scheme/?apl_ids="+unicode(str(record.id)) #NUPD from settings
-
+	
 	def _apl_get_len(self):
-		for record in self:
-			vsum,vmax,vmed,vcnt,vmin=0,0,0,0,1000
-			for pil in record.pillar_id:
-				vcnt=vcnt+1
-				lpp=pil.len_prev_pillar
-				if lpp>0:
-					vsum=vsum+lpp
-					vmed=vsum/vcnt
-					if lpp<vmin:
-						vmin=lpp
-					if lpp>vmax:
-						vmax=lpp
-			record.line_len_calc=vsum
-			record.prol_max_len=vmax
-			record.prol_min_len=vmin
-			record.prol_med_len=vmed
+		for apl in self:
+			pils=apl.pillar_id
+			vcnt=len(pils)
+			lpps=pils.mapped('len_prev_pillar')
+			if lpps:
+				vmax,vmin,vsum=max(lpps),min(lpps),sum(lpps)
+				vmed=vsum/vcnt
+				apl.line_len_calc=vsum
+				apl.prol_max_len=vmax
+				apl.prol_min_len=vmin
+				apl.prol_med_len=vmed
+	

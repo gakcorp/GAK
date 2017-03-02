@@ -17,12 +17,12 @@ _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
 
-sch_w=16
-sch_h=10
+sch_w=10
+sch_h=6
 sch_dpi=100
 ms=18
 
-def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=False, mark_cross_id=None, drawScale=False, drawCrossObj=False, w=sch_w, h=sch_h, dpi=sch_dpi, sizeTS=25, annotateTS=True):
+def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=False, mark_cross_id=None, drawScale=False, drawCrossObj=False, w=sch_w, h=sch_h, dpi=sch_dpi, sizeTS=15, annotateTS=True):
 	fig, ax = plt.subplots(figsize=(w,h))
 	pss=[]
 	for apl in apl_ids:
@@ -36,6 +36,45 @@ def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=Fals
 				ax.plot([d['lng'] for d in tap_points],[d['lat'] for d in tap_points],'b-')
 			except:
 				_logger.debug('Error for generate tap points fo tap')
+		
+		if drawCross==True:
+			for cross in apl.crossing_ids:
+				cpoint=[]
+				cpoint.append({
+					'lat':cross.from_pillar_id.latitude,
+					'lng':cross.from_pillar_id.longitude
+				})
+				if cross.to_pillar_id:
+					cpoint.append({
+						'lat':cross.to_pillar_id.latitude,
+						'lng':cross.to_pillar_id.longitude	
+						})
+				ax.plot([d['lng'] for d in cpoint],[d['lat'] for d in cpoint],'r-',linewidth=3.0)
+				if cross==mark_cross_id:
+					ax.plot([d['lng'] for d in cpoint],[d['lat'] for d in cpoint],'g+',mew=5,ms=12)
+		
+		if drawBP==True:
+			base_points=[]
+			for pil in apl.pillar_id.search([('apl_id','=',apl.id),('pillar_type_id.base','=',True)]):
+				base_point={
+					'lat':pil.latitude,
+					'lng':pil.longitude,
+					'lpb':pil.len_prev_base_pillar,
+					'n':pil.num_by_vl,
+					'd':pil.azimut_from_prev
+				}
+				base_points.append(base_point)
+			bpx=[d['lng'] for d in base_points]
+			bpy=[d['lat'] for d in base_points]
+			bplpbp=[d['lpb'] for d in base_points]
+			tl=sum(bplpbp)
+			bpn=[d['n'] for d in base_points]
+			ax.plot(bpx,bpy,'wo', markersize=4)
+			for i,txt in enumerate(bpn):
+				if (bplpbp[i]>tl/20):
+					ax.plot(bpx[i],bpy[i],'wo', markersize=ms)
+					ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center",size=8)
+		
 		if drawTS==True:
 			for ts in apl.transformer_ids:
 				lat,lng,plat,plng=ts.latitude,ts.longitude,ts.pillar_id.latitude,ts.pillar_id.longitude
@@ -54,38 +93,7 @@ def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=Fals
 				ax.plot([lng],[lat],'^',ms=sizeTS, markerfacecolor="white",markeredgecolor='blue')
 				if annotateTS==True:
 					ax.annotate(ts.name,(lng+alng,lat+alat),va="center",ha="center",size=8,fontproperties=fm.FontProperties(fname='/usr/share/fonts/truetype/verdana/verdana.ttf'))
-		if drawBP==True:
-			base_points=[]
-			for pil in apl.pillar_id.search([('apl_id','=',apl.id),('pillar_type_id.base','=',True)]):
-				base_point={
-					'lat':pil.latitude,
-					'lng':pil.longitude,
-					'n':pil.num_by_vl,
-					'd':pil.azimut_from_prev
-				}
-				base_points.append(base_point)
-			bpx=[d['lng'] for d in base_points]
-			bpy=[d['lat'] for d in base_points]
-			bpn=[d['n'] for d in base_points]
-			ax.plot(bpx,bpy,'wo', markersize=ms)
-			for i,txt in enumerate(bpn):
-				ax.annotate(txt,(bpx[i],bpy[i]),va="center",ha="center",size=8)
 		
-		if drawCross==True:
-			for cross in apl.crossing_ids:
-				cpoint=[]
-				cpoint.append({
-					'lat':cross.from_pillar_id.latitude,
-					'lng':cross.from_pillar_id.longitude
-				})
-				if cross.to_pillar_id:
-					cpoint.append({
-						'lat':cross.to_pillar_id.latitude,
-						'lng':cross.to_pillar_id.longitude	
-						})
-				ax.plot([d['lng'] for d in cpoint],[d['lat'] for d in cpoint],'r-',linewidth=3.0)
-				if cross==mark_cross_id:
-					ax.plot([d['lng'] for d in cpoint],[d['lat'] for d in cpoint],'g+',mew=5,ms=12)
 	if drawPS==True:
 		for ss in pss:
 			alng,alat=0,0
@@ -103,8 +111,8 @@ def drawscheme(apl_ids, drawBP=False, drawTS=False, drawPS=False, drawCross=Fals
 					alat=dlat*50/abs(llatpx)
 					alng=dlng*50/abs(llngpx)
 					ax.plot([olng,plng],[olat,plat],'b-')
-					lat+=alat
-					lng+=alng
+					#lat+=alat
+					#lng+=alng
 			ax.plot([lng],[lat],'8',ms=25, markerfacecolor="white",markeredgecolor='blue')
 			ax.annotate(ss.name,(lng+alng,lat+alat),va="center",ha="center",size=8,fontproperties=fm.FontProperties(fname='/usr/share/fonts/truetype/verdana/verdana.ttf'))
 		

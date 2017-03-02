@@ -50,7 +50,11 @@
 							<page string="Pillars">
 								<field name="pillar_ids"/>
 							</page>
-							
+							<page string="System details">
+								<group>
+									<field name="conn_pillar_id"/>
+								</group>
+							</page>
 						</notebook>
 					</sheet>
 				</form>

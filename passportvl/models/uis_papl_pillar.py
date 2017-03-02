@@ -87,6 +87,7 @@ class uis_papl_pillar(models.Model):
 	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
 	prev_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Prev base pillar', compute='_get_prev_base_pillar')
 	next_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Next base pillar')
+	len_prev_base_pillar=fields.Float(digits=(5,2), compute='_get_len_to_prev_base')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='near_pillar_ids',
 									 column1='trans_id',
@@ -94,6 +95,18 @@ class uis_papl_pillar(models.Model):
 									 compute='_get_near_pillar'
 									 )
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
+	
+	@api.depends('prev_base_pillar_id','prev_base_pillar_id.latitude','prev_base_pillar_id.longitude','latitude','longitude')
+	def _get_len_to_prev_base(self):
+		for pil in self:
+			ltpb=0
+			lat1,lng1=pil.latitude,pil.longitude
+			pbp=pil.prev_base_pillar_id
+			if pbp:
+				lat2,lng2=pbp.latitude,pbp.longitude
+				if (lat1<>0) and (lng1<>0) and (lat2<>0) and (lng2<>0): 
+					ltpb=distance2points(lat1,lng1,lat2,lng2)
+			pil.len_prev_base_pillar=ltpb
 	
 	def _get_prev_base_pillar(self):
 		# bppppppbppppPILpppppb
@@ -169,14 +182,14 @@ class uis_papl_pillar(models.Model):
 				tn=unicode(pil.tap_id.name)
 				tcpn=str(pil.tap_id.conn_pillar_id.num_by_vl)
 				tcpname=str(pil.tap_id.conn_pillar_id.name)
+				_logger.debug('tap connected pillar for define pillar name is %r (pillar %r)'%(tcpname,pil.tap_id.conn_pillar_id))
 				tnum=str(pil.tap_id.num_by_vl)
 			def_frm_mp=empapl.disp_mp_frm or ('pn+sp+an')
 			def_frm_tp=empapl.disp_tp_frm or ('"("+tnum+")"+sp+pn+sp+an')
 			ex_frm=def_frm_tp
 			if pil.tap_id.is_main_line:
 				ex_frm=def_frm_mp
-			#_logger.debug(pil.id)
-			#_logger.debug(ex_frm)
+
 			try:
 				dname=eval(ex_frm)
 			except:

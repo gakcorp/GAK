@@ -92,7 +92,7 @@ class uis_papl_tap(models.Model):
 	line_len_calc=fields.Float(digits=(6,2), compute='_tap_get_len', string="Tap lenght")
 	is_main_line=fields.Boolean(string='is main line')
 	num_by_vl=fields.Integer(string='Number', compute='_get_num_by_vl')
-	conn_pillar_id=fields.Many2one('uis.papl.pillar', string='Connect Pilar', compute='_get_num_by_vl')
+	conn_pillar_id=fields.Many2one('uis.papl.pillar', string='Connect Pilar', compute='_get_conn_pillar_id')
 	code=fields.Integer(string='Code', compute='_get_unicode')
 	full_code=fields.Char(string='UniCode', compute='_get_unicode')
 	tap_encode_path=fields.Text(string='Google API pillar path decode', compute='_get_pillar_path')
@@ -442,9 +442,17 @@ class uis_papl_tap(models.Model):
 			tap.full_code='XTR.'+str(tap.code)
 			tap.code=tap.num_by_vl
 	
+	def _get_conn_pillar_id(self):
+		for tap in self:
+			pils=tap.pillar_ids.filtered(lambda r: r.parent_id.tap_id <> tap)
+			if pils:
+				for pil in pils:
+					tap.conn_pillar_id=pil
+			
 	def _get_num_by_vl(self):
 		for tap in self:
 			tap.apl_id.define_taps_num()
+			_logger.debug('Tap %r is connected to pillar %r'%(tap.name,tap.conn_pillar_id.name))
 	
 	def _tap_get_len(self):
 		for tap in self:
