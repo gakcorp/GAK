@@ -375,6 +375,7 @@ class uis_papl_apl(models.Model):
 								)
 	line_len=fields.Float(digits=(3,2))
 	line_len_calc=fields.Float(digits=(6,2), compute='_apl_get_len')
+	line_len_calc_int=fields.Integer(string="Length of the APL (meters)", compute='_get_apl_int_len')
 	prol_max_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_med_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_min_len=fields.Float(digits=(2,2), compute='_apl_get_len')
@@ -385,6 +386,7 @@ class uis_papl_apl(models.Model):
 	climatic_conditions=fields.Char(string="Climatic conditions")
 	sw_point=fields.Char(string="Switching point")
 	pillar_id=fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
+	pillar_cnt=fields.Integer(string="Count of pillars", compute='_get_apl_pillar_cnt')
 	apl_pil_type_ids=fields.One2many('uis.papl.apl.pil_type', 'apl_id', string="Pillar types", compute='get_pil_type_ids')
 	apl_pil_material_ids=fields.One2many('uis.papl.apl.pil_materials','apl_id', string="Pillar materials", compute='_get_pil_material_ids')
 	cnt_pillar_wo_tap=fields.Integer(compute='_get_cnt_pillar_wo_tap', string="Pillars wo TAP")
@@ -399,11 +401,20 @@ class uis_papl_apl(models.Model):
 	tap_text=fields.Html(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()
-	url_maps=fields.Char(compute='_apl_get_url_maps')
 	url_scheme=fields.Char(compute='_apl_get_url_scheme')  #NUPD Old use. Need delete
 	image_file=fields.Char(string="Scheme File Name", compute='_get_scheme_image_file_name')
 	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image_3')
 	
+	@api.depends('pillar_id')
+	def _get_apl_pillar_cnt(self):
+		for apl in self:
+			apl.pillar_cnt=len(apl.pillar_id)
+	
+	@api.depends('line_len_calc')
+	def _get_apl_int_len(self):
+		#for apl in self:
+		self.line_len_calc_int=int(self.line_len_calc)
+		
 	#scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
 	@api.depends('resistance_ids')
 	def _get_cable_ids(self,cr,uid,ids,context=None):
@@ -524,18 +535,6 @@ class uis_papl_apl(models.Model):
 			apl.cnt_pillar_wo_tap=cnt
 			
 	
-	@api.multi #NUPD to cartography module
-	def act_show_map(self):
-		tlr=_ulog(self,code='STRT_SHW_MAP_APL',lib=__name__,desc='Start show map for APL id:[%r]'%self.id)
-		tlr.fix_end()
-		return{
-			'name': 'Maps',
-			'res_model':'ir.actions.act_url',
-			'type':'ir.actions.act_url',
-			'target':'new',
-			'url':self.url_maps,
-			}
-	
 	@api.multi
 	def act_show_scheme(self):
 		print "Debug info. Start Show_map"
@@ -547,12 +546,7 @@ class uis_papl_apl(models.Model):
 			'target':'new',
 			'url':self.url_scheme,
 			}
-	
-	@api.depends('pillar_id')
-	def _apl_get_url_maps(self):
-		for record in self:
-			record.url_maps="/apl_map/?apl_ids="+unicode(str(record.id)) #NUPD from settings
-	
+		
 	@api.depends('pillar_id')
 	def _apl_get_url_scheme(self):
 		for record in self:

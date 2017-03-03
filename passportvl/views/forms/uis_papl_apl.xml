@@ -139,7 +139,29 @@
 				</form>
 			</field>
 		</record>
+		<!--#APL Tree view!-->
+		<record model="ir.ui.view" id="uis_papl_apl_list">
+			<field name="name">APL List</field>
+			<field name="model">uis.papl.apl</field>
+			<field name="arch" type="xml">
+			  <tree string="List of Air power line" editable="top" create="false" edit="false">
+				<!--<field name="id"/>!-->
+				<field name="name" string="Name"/>
+				<field name="inv_num" string="Inventory Num"/>
+				<field name="bld_year" string="Build Year"/>
+				<field name="startexp_date" string="Start Explatation Date"/>
+				<!--<field name="line_len" string="Line Lengt (km)"/>!-->
+						  <field name="line_len_calc" string="Calculate line len(m)"/>
+				<field name="pillar_cnt" string="Pillars"/>
+						  <!--<field name="cnt_pillar_wo_tap"/>!-->
+				<field name="sup_substation_id" string="Supply Substation" widget='many2one'/>
+						  <!--<button name="act_show_map" string="Map" type="object" icon="STOCK_FIND"/>!-->
+			  </tree>
+			  </field>
+		</record>
+		
 		<!--#APL Form view!-->
+		
 		<record id="uis_papl_apl_form" model="ir.ui.view">
 			<field name="name">APL form view</field>
 			<field name="model">uis.papl.apl</field>
@@ -147,14 +169,10 @@
 			  <form string="APL form">
 				<sheet string="Details">
 				  <div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
-					<button class="oe_inline" name="act_show_scheme" type="object" 
+					<!--<button class="oe_inline" name="act_show_scheme" type="object" 
 							 icon="fa-object-group">
 							 Scheme
-						 </button>
-					 <button class="oe_inline" name="act_show_map" type="object" 
-							 icon="fa-map">
-							 Map
-						 </button><br/>
+						 </button>!-->
 				  </div>
 					  <h1 style="position:absolute;">
 						<field name="name"/>

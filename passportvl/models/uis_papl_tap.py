@@ -391,11 +391,13 @@ class uis_papl_tap(models.Model):
 			aml=empapl.code_abbr_ml or cv_tap_abbr_ml
 			tn=empapl.code_empty_tap_num_vl or cv_tap_empty_num_vl
 			cp=empapl.code_empty_tap_conn_pillar or cv_tap_empty_conn_pillar
+			cpn=empapl.code_empty_tap_conn_pillar or cv_tap_empty_conn_pillar
 			an=empapl.code_empty_tap_apl or cv_tap_empty_apl
 			if (tap.num_by_vl>0):
 				tn=str(tap.num_by_vl)
 			if tap.conn_pillar_id:
 				cp=str(tap.conn_pillar_id.num_by_vl)
+				cpn=str(tap.conn_pillar_id.name)
 			if tap.apl_id:
 				an=unicode(tap.apl_id.name)
 			def_frm_tap=empapl.disp_tap_frm or ('atp+"."+tn+"."+cp+"."+an')
@@ -447,7 +449,7 @@ class uis_papl_tap(models.Model):
 			pils=tap.pillar_ids.filtered(lambda r: r.parent_id.tap_id <> tap)
 			if pils:
 				for pil in pils:
-					tap.conn_pillar_id=pil
+					tap.conn_pillar_id=pil.parent_id
 			
 	def _get_num_by_vl(self):
 		for tap in self:

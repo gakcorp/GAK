@@ -59,7 +59,8 @@ class uis_papl_apl(osv.osv):
 		('atp+"."+tn+"("+cp+")."+an',openerp._('T.2(52).APL name')),
 		('"("+cp+")"+an',openerp._('(52)APL name')),
 		('tn+"("+cp+")"+an',openerp._('2(52)APL name')),
-		('tn+"("+cp+")"',openerp._('2(52)'))
+		('tn+"("+cp+")"',openerp._('2(52)')),
+		('tn+"("+cpn+")"',openerp._('2(34.52)'))
 	]
 	DISP_MP_FRM=[
 		('pn',openerp._('64')),

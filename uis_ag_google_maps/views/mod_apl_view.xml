@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-        <record id="view_papl_apl_layer_settings_form" model="ir.ui.view">
-            <field name="name">uis.papl.apl.form.inherit</field>
+        <record id="view_papl_apl_form_mod_cartography" model="ir.ui.view">
+            <field name="name">uis.papl.apl.form.inherit.cartography</field>
             <field name="model">uis.papl.apl</field>
             <field name="inherit_id" ref="passportvl.uis_papl_apl_form"/>
             <field name="arch" type="xml">
-                <xpath expr="/form/sheet/notebook" position="inside">
+                <xpath expr="//div[@name='buttons']" position="inside">
+                   <button class="oe_inline oe_stat_button" name="act_show_map" type="object" 
+                       icon="fa-map">
+                       <field string="Meters" name="line_len_calc_int" widget="statinfo"/>
+                   </button>
+                </xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
 					<page string="Maps Settings">
 						<field name="rec_layer_id"/>
 					</page>
 				</xpath>
             </field>
         </record>
+	
+		<record model="ir.ui.view" id="view_papl_apl_tree_mod_cartography">
+			<field name="name">uis.papl.apl.tree.inherit.cartography</field>
+			<field name="model">uis.papl.apl</field>
+			<field name="inherit_id" ref="passportvl.uis_papl_apl_list"/>
+			<field name="arch" type="xml">
+				<xpath expr="/tree" position="inside">
+					<button name="act_show_map" string="Map" type="object" icon="STOCK_FIND"/>
+				</xpath>
+			</field>
+		</record>
 	</data>
 </openerp>
