@@ -121,8 +121,9 @@ def strdiv(strdiv):
 	#print strdiv
 	parts=re.findall(r"[\d']+",str(strdiv))
 	#print parts
-	rval=int(parts[0])/int(parts[1])
+	rval=float(parts[0])/float(parts[1])
 	return rval
+
 def point_in_triangle(lat,lng,tripoints):
 	return 0
 def triangle_points(lat,lng,direction,angle,distance):
@@ -217,10 +218,15 @@ class uis_ap_photo(models.Model):
 										  column1='photo_id',
 										  column2='transformer_id',
 										  compute='_get_near_trans_ids')
+	transformer_ids=fields.Many2many('uis.papl.transformer',
+							relation='photo_trans_rel',
+							column1='photo_id',
+							column2='transformer_id',
+							compute='_get_photo_trans')
 	
 	def scheduler_rec_scheme(self, cr, uid, context=None):
 		#tlr=_ulog(self,code='CALC_PH_SHACT',lib=__name__,desc='Scheduled action for photos')
-		photo_obj = self.pool.get('uis.ap.photo')
+		photo_obj = self.pool.get(cr,uid,'uis.ap.photo',context=context)
 		#Contains all ids for the model uis.ap.photo
 		photo_ids = self.pool.get('uis.ap.photo').search(cr, uid, [])   
 		#Loops over every record in the model uis.ap.photo
@@ -398,7 +404,7 @@ class uis_ap_photo(models.Model):
 		return True
 	@api.depends('image')
 	def _get_400_img(self,cr,uid,ids,context=None):
-		tlr=_ulog(self,code='CALC_PH_GEN400',lib=__name__,desc='Generate (render) photo 400 px')
+		#tlr=_ulog(self,code='CALC_PH_GEN400',lib=__name__,desc='Generate (render) photo 400 px')
 		i=0
 		for ph in self.browse(cr,uid,ids,context=context):
 			#ph.image_400=tools.image.image_resize_image(ph.with_context(bin_size=False).image, size=(400,300))
@@ -432,8 +438,8 @@ class uis_ap_photo(models.Model):
 			
 			#tlr.add_comment('[~] Generate for %r'%ph.id)
 			i=i+1
-		tlr.set_qnt(i)
-		tlr.fix_end()
+		#tlr.set_qnt(i)
+		#tlr.fix_end()
 		return True
 	
 	 
@@ -600,7 +606,18 @@ class uis_ap_photo(models.Model):
 						#if (nstr!=''):
 						#	nstr=nstr+','+str(pillar.id)
 						#	print str(pillar.id)+':'+nstr
-			
+	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_transformer_ids')
+	def _get_photo_trans(self,cr,uid,ids,context=None):
+		for photo in self.browse(cr,uid,ids,context=context):
+			lat=photo.latitude
+			lng=photo.longitude
+			tri_points=triangle_points(lat,lng,photo.rotation,photo.focal_angles,photo.view_distance)
+			for trans in photo.near_transformer_ids:
+				inpoint=point_in_poly(trans.latitude,trans.longitude,tri_points)
+				#_logger.debug('For PH %r Trans %r is %r'%(photo.name,trans.name,inpoint))
+				if inpoint:
+					photo.transformer_ids=[(4,trans.id,0)]
+		
 class uis_ap_photo_load_hist(models.Model):
 	_name='uis.ap.photo.load_hist'
 	_description='Photo_apl_hist'
