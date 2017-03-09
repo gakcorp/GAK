@@ -412,8 +412,8 @@ class uis_papl_apl(models.Model):
 	
 	@api.depends('line_len_calc')
 	def _get_apl_int_len(self):
-		#for apl in self:
-		self.line_len_calc_int=int(self.line_len_calc)
+		for apl in self:
+			apl.line_len_calc_int=int(apl.line_len_calc)
 		
 	#scheme_image_old=fields.Binary(string="SchemeOld", compute='_get_scheme_image')
 	@api.depends('resistance_ids')

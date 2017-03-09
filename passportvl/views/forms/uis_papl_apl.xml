@@ -312,6 +312,16 @@
 							  </field>
 						  </group>
 					</page>
+					<page string="Transformers">
+						<field name="transformer_ids" nolabel="1" context="{'apl_id':active_id}">
+							<tree default_order="name">
+								<field name="name"/>
+								<field name="pillar_id"/>
+								<field name="tap_id"/>
+								<field name="state"/>
+							</tree>
+						</field>
+					</page>
 					<page string="Crossing">
 						<field name="crossing_rel_ids" nolabel="1" context="{'apl_id':active_id}">
 							<tree default_order="from_pillar_id">
