@@ -88,6 +88,7 @@ class uis_papl_pillar(models.Model):
 	prev_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Prev base pillar', compute='_get_prev_base_pillar')
 	next_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Next base pillar')
 	len_prev_base_pillar=fields.Float(digits=(5,2), compute='_get_len_to_prev_base')
+	len_start_apl=fields.Float(digits=(5,2),compute='_get_len_start_apl')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='near_pillar_ids',
 									 column1='trans_id',
@@ -96,6 +97,14 @@ class uis_papl_pillar(models.Model):
 									 )
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	
+	def _get_len_start_apl(self):
+		for pil in self:
+			pp=pil.parent_id
+			ltsapl=pil.len_prev_pillar
+			while (pp) and (pp.parent_id):
+				ltsapl+=pp.len_prev_pillar
+				pp=pp.parent_id
+			pil.len_start_apl=ltsapl
 	@api.depends('prev_base_pillar_id','prev_base_pillar_id.latitude','prev_base_pillar_id.longitude','latitude','longitude')
 	def _get_len_to_prev_base(self):
 		for pil in self:

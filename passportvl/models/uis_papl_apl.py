@@ -488,7 +488,15 @@ class uis_papl_apl(models.Model):
 			if apl.department_id_as_substation:
 				apl.department_id=apl.sup_substation_id.department_id
 	
-	
+	@api.depends('transformer_ids')
+	def define_ktp_num(self):
+		for apl in self:
+			ktps=apl.transformer_ids.sorted(key=lambda r:r.pillar_id.len_start_apl, reverse=False)
+			i=0
+			for ktp in ktps:
+				_logger.debug('Transformer %r connected to pillar with distance %r from start line'%(ktp.name,ktp.pillar_id.len_start_apl))
+				i+=1
+				ktp.sudo().num_by_vl=i
 	@api.multi
 	def define_taps_num(self):
 		for apl in self:

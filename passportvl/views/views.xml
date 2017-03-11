@@ -91,6 +91,7 @@
 							<field name="next_base_pillar_id"/>
 							<field name="prev_base_pillar_id"/>
 							<field name="len_prev_base_pillar"/>
+							<field name="len_start_apl"/>
 						</group>
 						
 					</page>

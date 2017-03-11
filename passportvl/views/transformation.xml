@@ -60,7 +60,7 @@
     </record>
     !-->
     <record model="ir.ui.view" id="uis_papl_transformer_form">
-        <field name="name">Department form</field>
+        <field name="name">Transformer form</field>
         <field name="model">uis.papl.transformer</field>
         <field name="arch" type="xml">
             <form>
@@ -172,6 +172,12 @@
 					  </group>
 					</group>
 				  </page>
+					<page string="System details">
+						<group>
+							<field name="num_by_vl"/>
+							<field name="len_start_apl"/>
+						</group>
+					</page>
 				</notebook>
 			  </sheet>
             </form>

@@ -9,6 +9,7 @@ from openerp.tools.translate import _
 from openerp.addons.passportvl.models import uis_papl_apl
 from openerp.addons.passportvl.models import uis_papl_tap
 from openerp.addons.passportvl.models import uis_papl_pillar
+from openerp.addons.passportvl.models import uis_papl_transformation
 
 cv_apl_def_type=uis_papl_apl.cv_apl_def_type
 cv_apl_voltage=uis_papl_apl.cv_apl_voltage
@@ -27,6 +28,10 @@ cv_pillar_sep=uis_papl_pillar.cv_pillar_sep
 cv_pillar_empty_num_vl=uis_papl_pillar.cv_pillar_empty_num_vl
 cv_pillar_empty_tap=uis_papl_pillar.cv_pillar_empty_tap
 
+cv_trans_abbr_transformer=uis_papl_transformation.cv_trans_abbr_transformer
+cv_trans_empty_feed=uis_papl_transformation.cv_trans_empty_feed
+cv_trans_empty_number=uis_papl_transformation.cv_trans_empty_number
+cv_trans_empty_tap=uis_papl_transformation.cv_trans_empty_tap
 
 #default abbreviation of volotage (if not defined ='kV')
 #cv_apl_feed_abbr	-	default abbreviation of feeder (if not defined ='F')
@@ -75,6 +80,11 @@ class uis_papl_apl(osv.osv):
 		('tcpn+sp+pn',openerp._('64.32')),
 		('tcpname+sp+pn',openerp._('21.64.32'))
 	]
+	DISP_KTP_FRM=[
+		('aktp+fn+ktpn',openerp._('TRF0203')),
+		('aktp+fn+tn+ktpn',openerp._('TRF020403')),
+		('aktp+fn+ktpn+"("+indnm+")"',openerp._('TRF0203(individual name)'))
+	]
 	_columns = {
 		#we need a related field in order to be able to sort the employee by name
 		'name_related': fields.related('resource_id', 'name', type='char', string='Name', readonly=True, store=True),
@@ -88,6 +98,14 @@ class uis_papl_apl(osv.osv):
 		'disp_apl_frm': fields.selection(DISP_APL_FRM, 'Dispathing APL name format', readonly=False,
 										help="Use dispathing APL name with next format\n\
 										if field is empty default format is ex.'APL-6kV F2-Substation name (short APL Name)'"),
+		#fields define value of dispathing transformers name
+		'tr_code_abbr_transformer':fields.char('Abbreviation of transformer',help="Default abbreviation of transformers is %r"%cv_trans_abbr_transformer),
+		'tr_code_empty_feed_number':fields.char('Code empty feeder number', help="Default empty code is %r"%cv_trans_empty_feed),
+		'tr_code_empty_trans_number':fields.char('Code empty transformer number', help="Default empty code is %r"%cv_trans_empty_number),
+		'tr_code_empty_tap_number':fields.char('Code empty tap number', help="Default empty code is %r"%cv_trans_empty_tap),
+		'disp_trans_frm':fields.selection(DISP_KTP_FRM,'Dispathing Transformers name format', readonly=False,
+										help="Use dispathing transformer name format\n\
+										if field is is empty default format is ex. 'TRF0203'"),
 		#fields define value of dispathing TAP name
 		'code_empty_tap_num_vl':fields.char('Code empty tap number', help="Default empty code is '%r'"%cv_tap_empty_num_vl),
 		'code_empty_tap_conn_pillar':fields.char('Code empty connected pillar', help="Default empty code is '%r'"%cv_tap_empty_conn_pillar),

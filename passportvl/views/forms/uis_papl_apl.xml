@@ -314,9 +314,11 @@
 					</page>
 					<page string="Transformers">
 						<field name="transformer_ids" nolabel="1" context="{'apl_id':active_id}">
-							<tree default_order="name">
+							<tree default_order="len_start_apl" colors="red:state=='defect'">
+								<field name="num_by_vl"/>
 								<field name="name"/>
 								<field name="pillar_id"/>
+								<field name="len_start_apl"/>
 								<field name="tap_id"/>
 								<field name="state"/>
 							</tree>
