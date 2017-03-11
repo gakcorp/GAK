@@ -80,6 +80,7 @@ class uis_papl_pillar(models.Model):
 	def _get_prev_base_pillar(self):
 		# bppppppbppppPILpppppb
 		for pil in self:
+			pil=pil.sudo()
 			bp_pils_ids=[]
 			cp=None
 			nb=None
@@ -106,11 +107,11 @@ class uis_papl_pillar(models.Model):
 							pil.next_base_pillar=nb
 						nb=pil.prev_base_pillar_id.next_base_pillar_id
 				if nb:
-					bp_pils=self.browse(bp_pils_ids)
+					bp_pils=self.browse(bp_pils_ids).sudo()
 					_logger.debug('--->---> bp_pils is %r'%bp_pils)
 					bp_pils.write({'next_base_pillar_id':nb.id})
 				if not(nb):
-					tap_pils=self.browse(pil.tap_id.pillar_ids.mapped('id'))
+					tap_pils=self.browse(pil.tap_id.pillar_ids.mapped('id')).sudo()
 					tap_pils.sorted(key=lambda r: r.num_by_vl,reverse=True)
 					#tap_pils._get_prev_base_pillar()
 					_logger.debug('--->--->---> next pillar not defined search in list %r'%tap_pils)
