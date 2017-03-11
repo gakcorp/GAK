@@ -18,7 +18,8 @@ class uis_ag_maps_mod_uis_papl_apl(models.Model):
 	url_maps=fields.Char(string="System cartography URL", compute='_get_apl_url_maps')
 	
 	def _get_apl_url_maps(self):
-		self.url_maps="/apl_map/?apl_ids="+unicode(str(self.id))
+		for apl in self:
+			apl.url_maps="/apl_map/?apl_ids="+unicode(str(apl.id))
 		
 		
 	@api.multi #NUPD to cartography module

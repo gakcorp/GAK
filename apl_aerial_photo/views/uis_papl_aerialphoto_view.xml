@@ -22,7 +22,7 @@
 									
 								<div name="tags"/>
 								<ul>
-									<li>Date: <field name="image_date"/></li>
+									<!--<li>Date: <field name="image_date"/></li>!-->
 									<!--<li>Alt : <field name="altitude"/></li>!-->
 								</ul>
 								</h4>
