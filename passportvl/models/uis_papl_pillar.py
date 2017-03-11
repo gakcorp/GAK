@@ -7,6 +7,7 @@ from . import uis_papl_logger
 import logging
 import datetime
 import openerp
+import googlemaps
 
 try:
     import cStringIO as StringIO
@@ -45,11 +46,28 @@ class uis_papl_pillar_cut(models.Model):
     _description='Pillar cut'
     name=fields.Char('Pillar cut')
     code=fields.Char('Code')
-    
+
+def _name_search(self, operator, value):
+		_logger.debug(self)
+		ids=[]
+		pil_ids=self.search([])
+		#_logger.debug(apl_ids)
+		value_split=value.split()
+		for pil in pil_ids:
+			#_logger.debug(apl.name)
+			for val in value_split:
+				if (pil.name) and (val.lower() in pil.name.lower()):
+					ids.append(pil.id)
+				if (pil.apl_id) and (val.lower() in pil.apl_id.name.lower()):
+					ids.append(pil.id)
+				if (pil.num_by_vl) and (val.lower() in str(pil.num_by_vl)):
+					ids.append(pil.id)
+		return [('id', 'in' , ids)]
+	
 class uis_papl_pillar(models.Model):
 	_name='uis.papl.pillar'
 	_description='Pillar models'
-	name = fields.Char('Name', compute='_get_pillar_full_name')
+	name = fields.Char('Name', compute='_get_pillar_full_name', search=_name_search)
 	num_by_vl = fields.Integer()
 	pillar_material_id=fields.Many2one('uis.papl.pillar.material', string="Material")
 	pillar_type_id=fields.Many2one('uis.papl.pillar.type', string="Type")
@@ -69,6 +87,8 @@ class uis_papl_pillar(models.Model):
 	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
 	prev_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Prev base pillar', compute='_get_prev_base_pillar')
 	next_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Next base pillar')
+	len_prev_base_pillar=fields.Float(digits=(5,2), compute='_get_len_to_prev_base')
+	len_start_apl=fields.Float(digits=(5,2),compute='_get_len_start_apl')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='near_pillar_ids',
 									 column1='trans_id',
@@ -76,6 +96,26 @@ class uis_papl_pillar(models.Model):
 									 compute='_get_near_pillar'
 									 )
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
+	
+	def _get_len_start_apl(self):
+		for pil in self:
+			pp=pil.parent_id
+			ltsapl=pil.len_prev_pillar
+			while (pp) and (pp.parent_id):
+				ltsapl+=pp.len_prev_pillar
+				pp=pp.parent_id
+			pil.len_start_apl=ltsapl
+	@api.depends('prev_base_pillar_id','prev_base_pillar_id.latitude','prev_base_pillar_id.longitude','latitude','longitude')
+	def _get_len_to_prev_base(self):
+		for pil in self:
+			ltpb=0
+			lat1,lng1=pil.latitude,pil.longitude
+			pbp=pil.prev_base_pillar_id
+			if pbp:
+				lat2,lng2=pbp.latitude,pbp.longitude
+				if (lat1<>0) and (lng1<>0) and (lat2<>0) and (lng2<>0): 
+					ltpb=distance2points(lat1,lng1,lat2,lng2)
+			pil.len_prev_base_pillar=ltpb
 	
 	def _get_prev_base_pillar(self):
 		# bppppppbppppPILpppppb
@@ -92,11 +132,13 @@ class uis_papl_pillar(models.Model):
 					cp=cp.parent_id
 				_logger.debug('---> Prev pillar for pil %r is pillar %r'%(pil.name,cp.name))
 				_logger.debug('---> Next pillar for P pil %r is pillar %r'%(cp.name, cp.next_base_pillar_id))
-				pil.prev_base_pillar_id=cp
+				if pil.prev_base_pillar_id<>cp:				
+					pil.prev_base_pillar_id=cp
 				if pil.pillar_type_id.base==True:
 					if pil.tap_id==cp.tap_id:
 						if pil.prev_base_pillar_id.next_base_pillar_id and (pil.prev_base_pillar_id.next_base_pillar_id!=pil):
-							pil.next_base_pillar_id=pil.prev_base_pillar_id.next_base_pillar_id
+							if pil.next_base_pillar_id<>pil.prev_base_pillar_id.next_base_pillar_id:
+								pil.next_base_pillar_id=pil.prev_base_pillar_id.next_base_pillar_id
 						pil.prev_base_pillar_id.write({'next_base_pillar_id':pil.id})
 					nb=pil
 					_logger.debug('--->---> For P Pil %r write next_pillar_id %r'%(pil.prev_base_pillar_id.name,pil.name))
@@ -148,14 +190,15 @@ class uis_papl_pillar(models.Model):
 			if pil.tap_id:
 				tn=unicode(pil.tap_id.name)
 				tcpn=str(pil.tap_id.conn_pillar_id.num_by_vl)
+				tcpname=str(pil.tap_id.conn_pillar_id.name)
+				_logger.debug('tap connected pillar for define pillar name is %r (pillar %r)'%(tcpname,pil.tap_id.conn_pillar_id))
 				tnum=str(pil.tap_id.num_by_vl)
 			def_frm_mp=empapl.disp_mp_frm or ('pn+sp+an')
 			def_frm_tp=empapl.disp_tp_frm or ('"("+tnum+")"+sp+pn+sp+an')
 			ex_frm=def_frm_tp
 			if pil.tap_id.is_main_line:
 				ex_frm=def_frm_mp
-			#_logger.debug(pil.id)
-			#_logger.debug(ex_frm)
+
 			try:
 				dname=eval(ex_frm)
 			except:
@@ -249,38 +292,23 @@ class uis_papl_pillar(models.Model):
 		tlr.fix_end()
 	
 	@api.depends('longitude','latitude')
-	def _get_elevation_new(self):
+	def _get_elevation(self):
+		hcode_key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI'
+		key= self.env['uis.global.settings'].get_value('uis_google_api_key') or hcode_key
+		client=googlemaps.Client(key)
 		for pil in self:
 			lat,lng=pil.latitude,pil.longitude
-	@api.multi
-	@api.depends('longitude','latitude')
-	def _get_elevation(self): #NUPD Changes to google maps lib python
-		for record in self:
-			#print 'Get Elevation for '+str(record.id)
-			lat=record.latitude
-			lng=record.longitude
-			el=0
+			#el=0
 			if (lat<>0) and (lng<>0):
-				url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI" #NUPD Value from settings
-				#print url
-				response = urllib.urlopen(url)
-				data = json.loads(response.read())
-				#print data
-				if data["status"]=="OK":
-					el=data["results"][0]["elevation"]
-				else:
-					tlr=_ulog(self,code='WRN_GMAPS_API_PAUSE',lib=__name__,desc='Create pause for request to google elevation API')
-					time.sleep (100.0 / 1000.0)
-					response = urllib.urlopen(url)
-					data = json.loads(response.read())
-					#print data
-					if data["status"]=="OK":
-						el=data["results"][0]["elevation"]
-					tlr.fix_end()
-			record.elevation=el
-
-
-
+				try:
+					res=client.elevation((lat, lng))
+					_logger.debug('result google api elevation %r'%res)
+				except googlemaps.exceptions.ApiError:
+					pass
+				for item in res:
+					elv=item['elevation']
+					pil.elevation = elv
+			
 	#@api.depends('longitude','latitude','parent_id')
 	def _pillar_get_len(self):
 		for record in self:

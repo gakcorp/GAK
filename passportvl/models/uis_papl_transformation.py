@@ -1,36 +1,24 @@
 # -*- coding: utf-8 -*-
-import math, urllib, json, time
+import math, urllib, json, time, logging
 import uismodels
 from openerp import models, fields, api
+import openerp
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
+
+distance2points=uismodels.distance2points
+distangle2points=uismodels.distangle2points
+
+cv_trans_abbr_transformer=openerp._('TRF')
+cv_trans_empty_feed=openerp._('NF')
+cv_trans_empty_number=openerp._('[0]')
+cv_trans_empty_tap=openerp._('[0]')
+
 class uis_papl_transformation_type(models.Model):
 	_name='uis.papl.transformer.type'
 	_description='Transformer Types'
 	name=fields.Char(string='Name')
-
-
-def distance2points(lat1,long1,lat2,long2):
-	dist=0
-	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
-		rad=6372795
-		#Convert to radians
-		la1=lat1*math.pi/180
-		la2=lat2*math.pi/180
-		lo1=long1*math.pi/180
-		lo2=long2*math.pi/180
-		#calculate sin and cos
-		cl1=math.cos(la1)
-		cl2=math.cos(la2)
-		sl1=math.sin(la1)
-		sl2=math.sin(la2)
-		delta=lo2-lo1
-		cdelta=math.cos(delta)
-		sdelta=math.sin(delta)
-		#calculate circle len
-		y = math.sqrt(math.pow(cl2*sdelta,2)+math.pow(cl1*sl2-sl1*cl2*cdelta,2))
-		x = sl1*sl2+cl1*cl2*cdelta
-		ad = math.atan2(y,x)
-		dist = ad*rad
-	return dist
 
 class uis_papl_transformation_t_type(models.Model):
 	_name='uis.papl.transformer.t_type'
@@ -49,11 +37,31 @@ class uis_papl_transformation(models.Model):
 	
 	_name='uis.papl.transformer'
 	_description='Transformer'
+	
+	def _name_search(self, operator, value):
+		_logger.debug(self)
+		ids=[]
+		ktp_ids=self.search([])
+		#_logger.debug(apl_ids)
+		value_split=value.split()
+		for ktp in ktp_ids:
+			#_logger.debug(apl.name)
+			for val in value_split:
+				if (ktp.name) and (val.lower() in ktp.name.lower()):
+					ids.append(ktp.id)
+				if (ktp.apl_id) and (val.lower() in ktp.apl_id.name.lower()):
+					ids.append(ktp.id)
+		return [('id', 'in' , ids)]
 	#Main data
-	name=fields.Char(string='Name')
+	
+	name=fields.Char(string='Name', compute='_get_full_name', search=_name_search)
+	ind_disp_name=fields.Char(string='Individual dispatch name')
 	state=fields.Selection(STATE_SELECTION,'Status',readonly=True,default='draft')
 	apl_id=fields.Many2one('uis.papl.apl', string='APL Name', store=True, compute='_get_apl_tap_id')
+	num_by_vl=fields.Integer(string='Number on the line', compute='_get_num_by_vl')
+	len_start_apl=fields.Float(string='Distance to start APL', compute='_get_len_start_apl')
 	tap_id=fields.Many2one('uis.papl.tap', string='Tap Name', store=True, compute='_get_apl_tap_id')
+	
 	pillar_id=fields.Many2one('uis.papl.pillar',string='Connected pillar (in)', domain="[('id','in',near_pillar_ids[0][2])]")
 	pass_type=fields.Boolean(string='Pass type')
 	pillar2_id=fields.Many2one('uis.papl.pillar',string='Connected pillar (out)', domain="[('id','in',near_pillar2_ids[0][2])]")
@@ -128,6 +136,49 @@ class uis_papl_transformation(models.Model):
 	t2_reg_voltage=fields.Char(string='Voltage regulator')
 	#near_pillar_ids=fields.function(_get_near_pillar_ids,type='many2one',obj="uis.papl.pillar",method=True,string='Near pillars id'),
 	
+	@api.depends('num_by_vl','apl_id','pillar_id')
+	def _get_full_name(self):
+		#variables:
+		#aktp = abbeviation of transformer
+		#fn = feeder (apl) number
+		#tn = tap number
+		#ktpn = transformer number
+		#indnm = individual name
+		'''
+		
+		aktp+fn+tn+ktpn',openerp._('TRF020403')),
+		('aktp+fn+ktpn+"("+indnm+")'''
+
+		empapl=self.env.user.employee_papl_ids
+		for trans in self:
+			dname=''
+			aktp=empapl.tr_code_abbr_transformer or cv_trans_abbr_transformer
+			fn=empapl.tr_code_empty_feed_number or cv_trans_empty_feed
+			tn=empapl.tr_code_empty_tap_number or cv_trans_empty_tap
+			ktpn=empapl.tr_code_empty_trans_number or cv_trans_empty_number
+			indnm=unicode(trans.ind_disp_name) or ''
+			if (trans.num_by_vl>0):
+				ktpn=str(trans.num_by_vl).zfill(2)
+			if (trans.apl_id.feeder_num>0):
+				fn=str(trans.apl_id.feeder_num).zfill(2)
+			if (trans.tap_id.num_by_vl>0):
+				tn=str(trans.tap_id.num_by_vl).zfill(2)
+			if (trans.tap_id.is_main_line):
+				tn='00'
+			ex_frm=empapl.disp_trans_frm or ('aktp+fn+ktpn')
+			dname=eval(ex_frm)
+			trans.name=dname
+			
+	@api.depends('pillar_id','pillar_id.len_start_apl','apl_id.line_len_calc')
+	def _get_len_start_apl(self):
+		for ktp in self:
+			if ktp.pillar_id:
+				ktp.sudo().len_start_apl=ktp.sudo().pillar_id.len_start_apl
+	def _get_num_by_vl(self):
+		for ktp in self:
+			if ktp.apl_id:
+				ktp.apl_id.define_ktp_num()
+				
 	def _get_trans_state_rotation(self,cr,uid,ids,context=None):
 		for trans in self.browse(cr,uid,ids,context=context):
 			rot=0

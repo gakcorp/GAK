@@ -44,6 +44,12 @@
 										<field name="pv_pillar_sep" placeholder="If not specified, it uses the system default"/>
 										<field name="pv_pillar_empty_num_vl" placeholder="If not specified, it uses the system default"/>
 										<field name="pv_pillar_empty_tap" placeholder="If not specified, it uses the system default"/>
+										<!--Trans fields!-->
+										<separator string="Variables for transformers" colspan="4"/>
+										<field name="tr_code_abbr_transformer" placeholder="If not specified, it uses the system default"/>
+										<field name="tr_code_empty_feed_number" placeholder="If not specified, it uses the system default"/>
+										<field name="tr_code_empty_trans_number" placeholder="If not specified, it uses the system default"/>
+										<field name="tr_code_empty_tap_number" placeholder="If not specified, it uses the system default"/>
 									</group>
 									<group string="Dispathing format">
 										<field name="disp_apl_frm" placeholder="If not specified, it uses the system default"/>
@@ -51,6 +57,7 @@
 										<field name="disp_tap_frm" placeholder="If not specified, it uses the system default"/>
 										<field name="disp_mp_frm" placeholder="If not specified, it uses the system default"/>
 										<field name="disp_tp_frm" placeholder="If not specified, it uses the system default"/>
+										<field name="disp_trans_frm" placeholder="If not specified, it uses the system default"/>
 									</group>
 								</group>
 							</page>

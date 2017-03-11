@@ -92,7 +92,7 @@ class uis_papl_tap(models.Model):
 	line_len_calc=fields.Float(digits=(6,2), compute='_tap_get_len', string="Tap lenght")
 	is_main_line=fields.Boolean(string='is main line')
 	num_by_vl=fields.Integer(string='Number', compute='_get_num_by_vl')
-	conn_pillar_id=fields.Many2one('uis.papl.pillar', string='Connect Pilar', compute='_get_num_by_vl')
+	conn_pillar_id=fields.Many2one('uis.papl.pillar', string='Connect Pilar', compute='_get_conn_pillar_id')
 	code=fields.Integer(string='Code', compute='_get_unicode')
 	full_code=fields.Char(string='UniCode', compute='_get_unicode')
 	tap_encode_path=fields.Text(string='Google API pillar path decode', compute='_get_pillar_path')
@@ -119,7 +119,6 @@ class uis_papl_tap(models.Model):
 		point_per_ax=22
 		hcode_key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
 		key= self.env['uis.global.settings'].get_value('uis_google_api_key') or hcode_key
-		_logger.debug(key)
 		client=googlemaps.Client(key)
 		for tap in self:
 			tej=json.loads(tap.tap_elevation_json)
@@ -392,11 +391,13 @@ class uis_papl_tap(models.Model):
 			aml=empapl.code_abbr_ml or cv_tap_abbr_ml
 			tn=empapl.code_empty_tap_num_vl or cv_tap_empty_num_vl
 			cp=empapl.code_empty_tap_conn_pillar or cv_tap_empty_conn_pillar
+			cpn=empapl.code_empty_tap_conn_pillar or cv_tap_empty_conn_pillar
 			an=empapl.code_empty_tap_apl or cv_tap_empty_apl
 			if (tap.num_by_vl>0):
 				tn=str(tap.num_by_vl)
 			if tap.conn_pillar_id:
 				cp=str(tap.conn_pillar_id.num_by_vl)
+				cpn=str(tap.conn_pillar_id.name)
 			if tap.apl_id:
 				an=unicode(tap.apl_id.name)
 			def_frm_tap=empapl.disp_tap_frm or ('atp+"."+tn+"."+cp+"."+an')
@@ -443,9 +444,17 @@ class uis_papl_tap(models.Model):
 			tap.full_code='XTR.'+str(tap.code)
 			tap.code=tap.num_by_vl
 	
+	def _get_conn_pillar_id(self):
+		for tap in self:
+			pils=tap.pillar_ids.filtered(lambda r: r.parent_id.tap_id <> tap)
+			if pils:
+				for pil in pils:
+					tap.conn_pillar_id=pil.parent_id
+			
 	def _get_num_by_vl(self):
 		for tap in self:
 			tap.apl_id.define_taps_num()
+			_logger.debug('Tap %r is connected to pillar %r'%(tap.name,tap.conn_pillar_id.name))
 	
 	def _tap_get_len(self):
 		for tap in self:
@@ -481,73 +490,43 @@ class uis_papl_tap(models.Model):
 			tap.cnt_np=cnt
 			tap.pillar_cnt=t_pillar
 			
-			
+	
 	@api.multi
 	def get_elevation(self):
 		for tap in self:
-			for record in tap.pillar_ids:
-				print 'Request _get_elevation'
-				if record.elevation==0:
-					print 'Get Elevation for '+str(record.id)
-					lat=record.latitude
-					lng=record.longitude
-					if (lat<>0) and (lng<>0):
-						url="https://maps.googleapis.com/maps/api/elevation/json?locations="+str(lat)+","+str(lng)+"&key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE" #NUPD From settings
-						el=0
-						response = urllib.urlopen(url)
-						data = json.loads(response.read())
-						if data["status"]=="OK":
-							el=data["results"][0]["elevation"]
-						else:
-							print '!!!!!!!!!!!!!!!PAUSE!!!!!!!!!!!!!!!!!!!!!!!!!'
-							time.sleep (0.5)
-							response = urllib.urlopen(url)
-							data = json.loads(response.read())
-							print data
-							if data["status"]=="OK":
-								el=data["results"][0]["elevation"]
-						record.elevation=el
-	
+			tap.pillar_ids._get_elevation()
+
 	@api.multi
 	def do_pillar_apl_id_by_tap(self):
 		for pillar in self.pillar_ids:
 			if pillar.apl_id != self.apl_id:
 				pillar.apl_id=self.apl_id
-				
-	@api.multi #NUPD Сhange define last_pillar, pillar_cnt and p
+	
+	@api.multi
 	def act_normalize_num(self):
-		tlr=_ulog(self,code='CALC_NRML_NUM_TAP',lib=__name__,desc='Start normalize num by APL (by TAP id=%r)'%(self.id))
+		tlr=_ulog(self,code='CALC_NRML_NUM_TAP', lib=__name__,desc='Start normalize num by tap (for tap id=%r)'%(self.id))
 		max_num=0
-		max_id=0
-		pillars=self.pillar_ids
-		pillar_cnt=len(pillars)
-		max_num=max(pillars.mapped('num_by_vl'))
-		for pillar in pillars:
-			#pillar_cnt=pillar_cnt+1
-			if pillar.num_by_vl>=max_num:
-				#max_num=pillar.num_by_vl
-				max_id=pillar.id
-				last_pillar=pillar
-				tlr.add_comment('[1] Last pillar is %r'%last_pillar.id)
-				tlr.add_comment('[2] Max number is %r'%max_num)
-				_logger.debug('New las pillar %r with num by vl is %r'%(pillar, pillar.num_by_vl))
+		for tap in self:
+			pillars=tap.pillar_ids
+			pillar_cnt=len(pillars)
+			max_num=max(pillars.mapped('num_by_vl'))
+			#cp=filter(lambda pil: pil.num_by_vl == max_num, pillars)
+			lp=pillars.filtered(lambda r: r.num_by_vl == max_num)
+			tlr.add_comment('[1] Last pillar is %r'%lp.id)
+			tlr.add_comment('[2] Max number is %r'%max_num)
+			if pillars and lp:
+				cp=lp
+				num=pillar_cnt
+				while cp and (num>0) and (cp.tap_id==tap):
+					if cp.num_by_vl<>num:
+						cp.num_by_vl=num
+					num-=1
+					cp=cp.parent_id
+					#_logger.debug("Set to Pillar id: %r num_by_vl value is %r"%(cp.id,num))
 		tlr.set_qnt(pillar_cnt)
-		if pillar_cnt>0:
-			i=0
-			cp=last_pillar
-			np=last_pillar.parent_id
-			n_id=np.id
-			while (n_id>0) and (pillar_cnt-i>=1) and (cp.tap_id==np.tap_id):
-				_logger.debug("Set to Pillar id:"+str(cp.id)+" num_by_vl value is "+str(pillar_cnt-i))
-				cp.num_by_vl=pillar_cnt-i
-				np=cp.parent_id
-				n_id=np.id
-				if n_id>0:
-					#if np.
-					cp=np
-				i=i+1
 		tlr.fix_end()
-
+	@api.multi #NUPD Сhange define last_pillar, pillar_cnt and p
+	
 	def sys_pil_fix_lpp(self):
 		for tap in self:
 			for pil in tap.pillar_ids:
@@ -598,8 +577,10 @@ class uis_papl_tap(models.Model):
 						cdist=cdist+cp.len_prev_pillar
 					latitude=base_pills[i].latitude+tdlatpm*cdist*k
 					longitude=base_pills[i].longitude+tdlngpm*cdist*k
-					cp.parent_id.latitude=latitude
-					cp.parent_id.longitude=longitude
+					if cp.parent_id.latitude<>latitude:
+						cp.parent_id.latitude=latitude
+					if cp.parent_id.longitude<>longitude:
+						cp.parent_id.longitude=longitude
 					cp=cp.parent_id
 			tap.sys_pil_fix_lpp()
 			tlr.fix_end()
