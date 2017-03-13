@@ -57,6 +57,8 @@
 		<field name="arch" type="xml">
 			<form string="Pillar form">
 			<sheet string="Details">
+				<div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+			  </div>
 				<h1>
 					<field name="name"/>
 				</h1>
