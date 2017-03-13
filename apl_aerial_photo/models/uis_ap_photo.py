@@ -189,7 +189,8 @@ class uis_ap_photo(models.Model):
 								relation='photo_pillar_rel',
 								column1='photo_id',
 								column2='pillar_id',
-								compute='_get_photo_pillar')
+								compute='_get_photo_pillar',
+								store=True)
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='photo_near_pillar',
 									 column1='photo_id',
