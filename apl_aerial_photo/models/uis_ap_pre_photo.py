@@ -24,6 +24,7 @@ class uis_ap_pre_photo(models.Model):
 		path=self.env['uis.global.settings'].get_value('uis_prephoto_folder')
 		#path='/tmp/photo'
 		ImageFile.LOAD_TRUNCATED_IMAGES=True
+		LoadCount=0
 		for filen in os.listdir(path):
 			if filen.lower().endswith(".jpg"):
 				try:
@@ -68,14 +69,12 @@ class uis_ap_pre_photo(models.Model):
 						except:
 							#_logger.debug('Error in EXIF GPS Altitude tag=%r'%tags["GPS GPSAltitude"])
 							calt=-1
-
-						for tag in tags:
-							_logger.debug('%r %r'%(tag,tags[tag]))
 						
 						prph=self.create({'name':str(idate.year)+'_'+str(idate.month)+'_'+str(idate.day)+'_'+str(filen)})
+						prph.write({'latitude':plat,'longitude':plong,'focal_length':cfl,'altitude':calt,'elevation_point':elv})
 
-						prph.latitude=plat
-						prph.longitude=plong
+						#prph.latitude=plat
+						#prph.longitude=plong
 						prph.image_filename=filen
 						prph.image=img
 						try:
@@ -86,14 +85,16 @@ class uis_ap_pre_photo(models.Model):
 						prph.image_date=idate
 						prph.image_length=int(cil)
 						prph.image_width=int(ciw)
-						prph.focal_length=cfl
-						prph.altitude=calt
-						prph.elevation_point=elv
-
+						#prph.focal_length=cfl
+						#prph.altitude=calt
+						#prph.elevation_point=elv
 						try:
 							os.remove(path+'/'+filen)
 						except Exception as e:
 							_logger.debug('Error Delete File %r %r'%(path+'/'+filen,str(e)))
+						LoadCount+=1
+						if (LoadCount>20):
+							return
 				except Exception as e:
 					_logger.debug('Error Parse File %r %r'%(path+'/'+filen,str(e)))
 						

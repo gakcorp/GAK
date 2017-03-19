@@ -1,6 +1,8 @@
 from openerp import api
 from openerp.osv import fields, osv
+import logging
 
+_logger=logging.getLogger(__name__)
 
 class res_users(osv.Model):
     """ Update of res.users class
@@ -13,4 +15,5 @@ class res_users(osv.Model):
 
     _columns = {
         'employee_papl_ids': fields.one2many('uis.papl.employee', 'user_id', 'Related ActivGIS employees'),
+	'papl_dept_ids': fields.many2many('uis.papl.department',string="Departments",store=True),
     }
