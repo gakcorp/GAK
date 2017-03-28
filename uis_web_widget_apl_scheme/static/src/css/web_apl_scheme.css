@@ -16,3 +16,8 @@
     right: 5%;
     position: absolute;
 }
+#sigma-container{
+	position: absolute;
+    width: 100%;
+    height: 100%;
+}

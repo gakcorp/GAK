@@ -18,13 +18,13 @@ odoo.define('uis_web_widget_apl_scheme.apl_scheme_form_widget', function(require
 								//var fields=this.get_fields_values();
 								//console.debug(fields);
 								$(document.body).append('<div id="scheme_wrap" class="scheme_wrap"></div>');
-								$("#scheme_wrap").append('<div id="container"></div>');
+								$("#scheme_wrap").append('<div id="sigma-container"></div>');
 								$("#scheme_wrap").append('<a id="hrefid" href="#" class="close-thik">Close</i></a>');
 								$("#hrefid").click(function()
 												   {
 													$("#scheme_wrap").remove();
 													});
-								var s=new sigma('container');
+								var s=new sigma('sigma-container');
 								//console.debug(this);
 								console.debug(this.baseURI);
 								var a_baseURI=this.baseURI.split('&');
@@ -34,11 +34,13 @@ odoo.define('uis_web_widget_apl_scheme.apl_scheme_form_widget', function(require
 								for (var i=0;i<a_baseURI.length;i++){
 									var mas_id=IdExpr.exec(a_baseURI[i]);
 									var mas_model=ModelExpr.exec(a_baseURI[i]);
-									//console.debug(mas_id,mas_model);
-									if ((mas_id)&&(mas_id.length>1)) ID=mas_id[1];
-									if ((mas_model)&&(mas_model.length>1)) ModelName=mas_model[1];
+									console.debug(mas_id,mas_model);
+									if ((mas_id)&&(mas_id.length>1)){
+										ID=mas_id[1];}
+									if ((mas_model)&&(mas_model.length>1)){
+										ModelName=mas_model[1];}
 								}
- 							
+								console.debug(ID,ModelName);
 								//if ((ModelName=='uis.papl.apl')&&(ID)){
 									var AplModel=new Model('uis.papl.apl');
 									AplModel.query(['sup_substation_id','pillar_id','pillar_id.latitude','pillar_id.longitude']).filter([['id','=',ID]]).all().then(function(pillars){
