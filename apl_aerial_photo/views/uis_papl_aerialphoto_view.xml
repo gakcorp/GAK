@@ -3,10 +3,13 @@
     <data>
 	 <template id="assets_backend" name="fotorama" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
+		<script type="text/javascript" src="/apl_aerial_photo/static/src/js/fabric.js"/>
+		<script type="text/javascript" src="/apl_aerial_photo/static/src/js/jquery.elevatezoom.js"/>
 		<link rel="stylesheet" href="/apl_aerial_photo/static/src/css/apl_aerial_photo.css"/>
                 <script type="text/javascript" src="/apl_aerial_photo/static/src/js/apl_aerial_photo.js"/>
 		<link rel="stylesheet" href="/apl_aerial_photo/static/src/css/fotorama.css"/>
 		<script type="text/javascript" src="/apl_aerial_photo/static/src/js/fotorama.js"/>
+		<link rel="stylesheet" href="/apl_aerial_photo/static/src/css/l_panel.css"/>
             </xpath>
         </template>
 	<record model="ir.ui.view" id="uis_ap_photo_kanban">
