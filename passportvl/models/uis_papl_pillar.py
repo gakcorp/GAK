@@ -289,8 +289,8 @@ class uis_papl_pillar(models.Model):
 			long2=record.longitude
 			lat1=record.parent_id.latitude
 			long1=record.parent_id.longitude
-			record.prev_longitude=lat1
-			record.prev_latitude=lat2
+			record.prev_longitude=long1
+			record.prev_latitude=lat1
 			dist=0
 			angledeg=0
 			dist,angledeg=distangle2points(lat1,long1,lat2,long2)
