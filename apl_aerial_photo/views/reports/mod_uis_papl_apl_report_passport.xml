@@ -51,7 +51,7 @@
                                         <span t-field="ph_id.image_date" t-field-options='{"format":"d MMMM y"}'/>
                                     </div>
                                 </div>
-                                <t t-foreach="ph_id.near_pillar_ids" t-as="pil">
+                                <t t-foreach="ph_id.pillar_ids" t-as="pil">
                                     <div class="row">
                                         <div class="col-xs-2">
                                             <t t-if="pil.apl_id.id == o.id">
@@ -63,6 +63,21 @@
                                         </div>
                                     </div>
                                 </t>
+								<t t-foreach="ph_id.transformer_ids" t-as="ktp">
+									<div class="row">
+										<div class="col-xs-2">
+											<t t-if="ktp.apl_id.id == o.id">
+												<span class="glyphicon glyphicon-ok"/>
+											</t>
+										</div>
+										<div class="col-xs-10">
+											<span t-field="ktp.name"/>
+										</div>
+									</div>
+								</t>
+								<div class="row">
+									<span t-field="ph_id.image_scheme" t-field-options='{"widget":"image"}'/>
+								</div>
                             </div>
                         </div>
                     </t>

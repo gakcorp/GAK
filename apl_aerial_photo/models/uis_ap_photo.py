@@ -185,11 +185,13 @@ class uis_ap_photo(models.Model):
 	view_distance=fields.Float(digits=(2,0), string='View distance', default=100)
 	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=60)
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
+	checker_stored__ind=fields.Integer(string="Checker (indicate) stored Null fields",  compute='_get_stored_calc')
 	pillar_ids=fields.Many2many('uis.papl.pillar',
 								relation='photo_pillar_rel',
 								column1='photo_id',
 								column2='pillar_id',
-								compute='_get_photo_pillar')
+								compute='_get_photo_pillar',
+								store=True)
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='photo_near_pillar',
 									 column1='photo_id',
@@ -223,6 +225,13 @@ class uis_ap_photo(models.Model):
 							column1='photo_id',
 							column2='transformer_id',
 							compute='_get_photo_trans')
+	def _get_stored_calc(self):
+		for ph in self:
+			_logger.debug('Start full stored calc')
+			if not ph.pillar_ids:
+				ph._get_photo_pillar()
+			if not ph.apl_ids:
+				ph._get_photo_apl()
 	
 	def scheduler_rec_scheme(self, cr, uid, context=None):
 		#tlr=_ulog(self,code='CALC_PH_SHACT',lib=__name__,desc='Scheduled action for photos')
@@ -238,6 +247,7 @@ class uis_ap_photo(models.Model):
 			ph._get_scheme_position()
 			#tlr.add_comment('[%r] Recalculate apls for photo'%ph.id)
 			ph._get_photo_apl()
+			ph._get_photo_pillar()
 			cr.commit()
 		#tlr.set_qnt(i)
 		#tlr.fix_end()
@@ -556,7 +566,8 @@ class uis_ap_photo(models.Model):
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
 	@api.depends('pillar_ids','near_apl_ids')
-	def _get_photo_apl(self,cr,uid,ids,context=None):
+	def _get_photo_apl(self,cr,uid
+,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
 			apl_ids=[]
 			for pil in photo.pillar_ids:
@@ -576,6 +587,7 @@ class uis_ap_photo(models.Model):
 				#_logger.debug('For PH %r Pilar %r is %r'%(photo.name,pil.name,inpoint))
 				if inpoint:
 					photo.pillar_ids=[(4,pil.id,0)]
+	
 	#@api.depends('latitude','longitude')
 	def _get_near_photo_pillar(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
