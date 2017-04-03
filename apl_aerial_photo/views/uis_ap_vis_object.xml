@@ -26,6 +26,8 @@
 					<group>
 						<group>
 							<field name="photo_id" invisible="context.get('photo_id',False)"/>
+							<field name="pillar_id" invisible="context.get('pillar_id',False)"/>
+							<field name="transformer_id" invisible="context.get('transformer_id',False)"/>
 							<field name="rect_coordinate_json"/>
 							<field name="distance_from_photo_point"/>
 							<!--
@@ -42,7 +44,7 @@
 			</field>
 		</record>
 		<!--Modernize Photo form!-->
-		<record id="uis_ap_photo_form_add_visobj_page" model="ir.ui.view">
+	<record id="uis_ap_photo_form_add_visobj_page" model="ir.ui.view">
             <field name="name">Modern (Visual object) Photo form</field>
             <field name="model">uis.ap.photo</field>
             <field name="inherit_id" ref="apl_aerial_photo.uis_ap_photo_form"/>
@@ -52,7 +54,14 @@
 						<field name="vis_objects_ids" context="{'apl_id':active_id}"/>
 					</page>
 				</xpath>
-			</field>
-		</record>
+		</field>
+	</record>
+
+	<record model="ir.actions.act_window" id="uis_ap_menu_vis_object_list_action">
+		<field name="name">Vis Objects List</field>
+		<field name="res_model">uis.ap.vis_object</field>
+	</record>
+
+	<menuitem name="Vis Objects List" parent="uis_ap_menu_photo_main" id="uis_ap_menu_vis_object_list" action="uis_ap_menu_vis_object_list_action"/>
 	</data>
 </openerp>
