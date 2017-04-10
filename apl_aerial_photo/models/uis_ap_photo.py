@@ -31,7 +31,7 @@ _ulog=uis_papl_logger.ulog
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
-def distance2points(lat1,long1,lat2,long2): #NUPD to system
+def distance2points(lat1,long1,lat2,long2):
 	dist=0
 	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
 		rad=6372795
@@ -185,13 +185,11 @@ class uis_ap_photo(models.Model):
 	view_distance=fields.Float(digits=(2,0), string='View distance', default=100)
 	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=60)
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
-	checker_stored__ind=fields.Integer(string="Checker (indicate) stored Null fields",  compute='_get_stored_calc')
 	pillar_ids=fields.Many2many('uis.papl.pillar',
 								relation='photo_pillar_rel',
 								column1='photo_id',
 								column2='pillar_id',
-								compute='_get_photo_pillar',
-								store=True)
+								compute='_get_photo_pillar')
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='photo_near_pillar',
 									 column1='photo_id',
@@ -225,13 +223,6 @@ class uis_ap_photo(models.Model):
 							column1='photo_id',
 							column2='transformer_id',
 							compute='_get_photo_trans')
-	def _get_stored_calc(self):
-		for ph in self:
-			_logger.debug('Start full stored calc')
-			if not ph.pillar_ids:
-				ph._get_photo_pillar()
-			if not ph.apl_ids:
-				ph._get_photo_apl()
 	
 	def scheduler_rec_scheme(self, cr, uid, context=None):
 		#tlr=_ulog(self,code='CALC_PH_SHACT',lib=__name__,desc='Scheduled action for photos')
@@ -247,7 +238,6 @@ class uis_ap_photo(models.Model):
 			ph._get_scheme_position()
 			#tlr.add_comment('[%r] Recalculate apls for photo'%ph.id)
 			ph._get_photo_apl()
-			ph._get_photo_pillar()
 			cr.commit()
 		#tlr.set_qnt(i)
 		#tlr.fix_end()
@@ -566,15 +556,13 @@ class uis_ap_photo(models.Model):
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
 	@api.depends('pillar_ids','near_apl_ids')
-	def _get_photo_apl(self,cr,uid
-,ids,context=None):
+	def _get_photo_apl(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
 			apl_ids=[]
 			for pil in photo.pillar_ids:
 				if pil.apl_id.id not in apl_ids:
-					if pil.apl_id.id:
-						apl_ids.append(pil.apl_id.id)
-						photo.apl_ids=[(4,pil.apl_id.id,0)]
+					apl_ids.append(pil.apl_id.id)
+					photo.apl_ids=[(4,pil.apl_id.id,0)]
 					
 	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
 	def _get_photo_pillar(self,cr,uid,ids,context=None):
@@ -587,7 +575,6 @@ class uis_ap_photo(models.Model):
 				#_logger.debug('For PH %r Pilar %r is %r'%(photo.name,pil.name,inpoint))
 				if inpoint:
 					photo.pillar_ids=[(4,pil.id,0)]
-	
 	#@api.depends('latitude','longitude')
 	def _get_near_photo_pillar(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
@@ -688,7 +675,6 @@ class uis_ap_photo_load_hist(models.Model):
 					idate=parse_date(str(idate))
 					# !!!! Need validate name file
 					np=re_photos.create({'name':str(idate.year)+'_'+str(idate.month)+'_'+str(idate.day)+'_'+str(filen)})
-					#NUPD Write with 1 update
 					np.latitude=plat
 					np.longitude=plong
 					np.image_filename=filen
