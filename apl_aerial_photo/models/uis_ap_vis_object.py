@@ -40,15 +40,14 @@ class uis_ap_vis_object(models.Model):
 			_logger.debug(rect_data)
 			_logger.debug('ch= %r, cw=%r'%(rect_data['canvasheight'],rect_data['canvaswidth']))
 			image = Image.open(StringIO.StringIO(vo.photo_id.with_context(bin_size=False).image.decode('base64')))
-			or_width, or_height = image.size
-			kw=rect_data['canvaswidth']/or_width
-			kh=rect_data['canvasheight']/or_height
+			or_width, or_height = vo.photo_id.image_width,vo.photo_id.image_length
+			kw=or_width/rect_data['canvaswidth']
+			kh=or_height/rect_data['canvasheight']
 			_logger.debug('ow= %r, oh= %r'%(or_width,or_height))
-			kw=rect_data['canvaswidth']/or_width
-			kh=rect_data['canvasheight']/or_height
 			_logger.debug('kw= %r, kh=%r'%(kw,kh))
-			lp=rect_data['groupleft']/kw
-			rp=lp+rect_data['rectwidth']/kw
+			lp=rect_data['groupleft']*kw
+			rp=lp+rect_data['rectwidth']*kw
+			tp=rect_data['']
 			rp=or_width
 			bp=or_height
 			_logger.debug('lp= %r, tp= %r , rp= %r, bp=%r'%(lp,tp,rp,bp))
