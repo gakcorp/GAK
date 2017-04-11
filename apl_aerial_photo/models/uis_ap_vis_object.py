@@ -5,7 +5,7 @@ import json
 #AGBase lib
 from openerp import models, fields, api, tools
 from openerp.addons.passportvl.models import uis_papl_logger
-from PIL import Image
+from PIL import Image, ImageDraw
 import StringIO
 import cStringIO
 
@@ -38,20 +38,22 @@ class uis_ap_vis_object(models.Model):
 		for vo in self:
 			rect_data= json.loads(vo.rect_coordinate_json)
 			_logger.debug(rect_data)
-			_logger.debug('ch= %r, cw=%r'%(rect_data['canvasheight'],rect_data['canvaswidth']))
+			_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
 			image = Image.open(StringIO.StringIO(vo.photo_id.with_context(bin_size=False).image.decode('base64')))
 			or_width, or_height = vo.photo_id.image_width,vo.photo_id.image_length
-			kw=or_width/rect_data['canvaswidth']
-			kh=or_height/rect_data['canvasheight']
+			kw=float(or_width)/rect_data['canvaswidth']
+			kh=float(or_height)/rect_data['canvasheight']
 			_logger.debug('ow= %r, oh= %r'%(or_width,or_height))
+			_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
 			_logger.debug('kw= %r, kh=%r'%(kw,kh))
-			lp=rect_data['groupleft']*kw
-			rp=lp+rect_data['rectwidth']*kw
-			tp=rect_data['']
-			rp=or_width
-			bp=or_height
+			lp=int(rect_data['groupleft']*kw)
+			rp=int(lp+rect_data['rectwidth']*kw)
+			tp=int(rect_data['grouptop']*kh)
+			bp=int(tp+rect_data['rectheight']*kh)
 			_logger.debug('lp= %r, tp= %r , rp= %r, bp=%r'%(lp,tp,rp,bp))
+			#dr=ImageDraw.Draw(image)
 			image=image.crop((lp,tp,rp,bp))
+			#dr.rectangle(((lp,tp),(rp,bp)),fill="blue", outline="black")
 			background_stream = StringIO.StringIO()
 			image.save(background_stream, format="PNG")
 			vo.image=background_stream.getvalue().encode('base64')
