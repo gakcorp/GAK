@@ -57,7 +57,7 @@
 			<field name="name">Visual Objects</field>
 			<field name="model">uis.ap.vis_object</field>
 			<field name="arch" type="xml">
-				<form string="Visual object">
+				<form string="Visual object" editable="false" create="false" edit="false">
 					<header>
 						<button string="CORRECT" type="object" name="correct_select"/>
 						<button string="INCORRECT" type="object" name="incorrect_select"/>
@@ -65,13 +65,15 @@
 					</header>
 					<group>
 						<group>
-							<field name="image" options='{"size":[400,400]}' widget="fotoramanew" nolabel="1" colspan="2"/>	
+							<field name="image" options='{"size":[400,400]}' widget="image" nolabel="1" colspan="2"/>	
 						</group>
 						
 						<group>
 							<field name="photo_id" invisible="context.get('photo_id',False)"/>
 							<field name="pillar_id" invisible="context.get('pillar_id',False)"/>
+							
 							<field name="transformer_id" invisible="context.get('transformer_id',False)"/>
+							<field name="apl_id"/>
 							<!--<field name="rect_coordinate_json"/>!-->
 							<field name="distance_from_photo_point"/>
 							<!--

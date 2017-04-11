@@ -66,6 +66,16 @@ class uis_ap_vis_object(models.Model):
 			for obj in obj_mas:
 				obj.unlink()
 	
+	@api.multi
+	def correct_select(self):
+		for vo in self:
+			vo.state="correct"
+	
+	@api.multi
+	def incorrect_select(self):
+		for vo in self:
+			vo.state="incorrect"
+
 	@api.depends('pillar_id','transformer_id')
 	def _get_name(self):
 		for vo in self:
