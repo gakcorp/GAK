@@ -80,11 +80,17 @@
 			</field>
 		</record>
 
-		<record model="ir.actions.act_window.view" id="uis_papl_users_list_action_window_tree">
-    			<field name="view_mode">tree</field>
-    			<field name="view_id" ref="uis_papl_users_list_view_tree"/>
-   			<field name="act_window_id" ref="uis_papl_users_list_action_window" />
-			<field eval="1" name="sequence"/>
+		<record model="ir.ui.view" id="uis_papl_users_list_view_form">
+    			<field name="name">User Settings</field>
+    			<field name="model">res.users</field>
+    			<field name="arch" type="xml">
+				<form string="User Settings">
+    					<field name="id"/>
+    					<field name="name"/>
+					<field name="login"/>
+					<field name="papl_dept_ids" widget="many2many_tags"/>
+				</form>
+   			</field>
 		</record>
 
 		<record model="ir.actions.act_window.view" id="uis_papl_users_list_action_window_form">
@@ -107,18 +113,14 @@
    			</field>
 		</record>
 
-		<record model="ir.ui.view" id="uis_papl_users_list_view_form">
-    			<field name="name">User Settings</field>
-    			<field name="model">res.users</field>
-    			<field name="arch" type="xml">
-				<form string="User Settings">
-    					<field name="id"/>
-    					<field name="name"/>
-					<field name="login"/>
-					<field name="papl_dept_ids" widget="many2many_tags"/>
-				</form>
-   			</field>
+		<record model="ir.actions.act_window.view" id="uis_papl_users_list_action_window_tree">
+    			<field name="view_mode">tree</field>
+    			<field name="view_id" ref="uis_papl_users_list_view_tree"/>
+   			<field name="act_window_id" ref="uis_papl_users_list_action_window" />
+			<field eval="1" name="sequence"/>
 		</record>
+
+		
 
 
 		<!-- Menu items!-->
