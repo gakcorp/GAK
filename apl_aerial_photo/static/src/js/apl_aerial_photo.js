@@ -964,3 +964,5 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 	core.form_widget_registry.add('fotorama', fotorama);
 	core.form_widget_registry.add('fotoramanew', fotoramanew);
 });
+
+

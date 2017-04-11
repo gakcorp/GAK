@@ -45,6 +45,7 @@ odoo.define('uis_web_widget_apl_scheme.apl_scheme_form_widget', function(require
 									var AplModel=new Model('uis.papl.apl');
 									AplModel.query(['sup_substation_id','pillar_id','pillar_id.latitude','pillar_id.longitude']).filter([['id','=',ID]]).all().then(function(pillars){
 										console.debug(pillars);
+										s.graph.addNode({});
 										});
 								//}
 								

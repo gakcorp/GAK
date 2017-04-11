@@ -120,6 +120,7 @@ class uis_papl_pillar(models.Model):
 	def _get_prev_base_pillar(self):
 		# bppppppbppppPILpppppb
 		for pil in self:
+			pil=pil.sudo()
 			bp_pils_ids=[]
 			cp=None
 			nb=None
@@ -148,11 +149,11 @@ class uis_papl_pillar(models.Model):
 							pil.next_base_pillar=nb
 						nb=pil.prev_base_pillar_id.next_base_pillar_id
 				if nb:
-					bp_pils=self.browse(bp_pils_ids)
+					bp_pils=self.browse(bp_pils_ids).sudo()
 					_logger.debug('--->---> bp_pils is %r'%bp_pils)
 					bp_pils.write({'next_base_pillar_id':nb.id})
 				if not(nb):
-					tap_pils=self.browse(pil.tap_id.pillar_ids.mapped('id'))
+					tap_pils=self.browse(pil.tap_id.pillar_ids.mapped('id')).sudo()
 					tap_pils.sorted(key=lambda r: r.num_by_vl,reverse=True)
 					#tap_pils._get_prev_base_pillar()
 					_logger.debug('--->--->---> next pillar not defined search in list %r'%tap_pils)
@@ -316,8 +317,8 @@ class uis_papl_pillar(models.Model):
 			long2=record.longitude
 			lat1=record.parent_id.latitude
 			long1=record.parent_id.longitude
-			record.prev_longitude=lat1
-			record.prev_latitude=lat2
+			record.prev_longitude=long1
+			record.prev_latitude=lat1
 			dist=0
 			angledeg=0
 			dist,angledeg=distangle2points(lat1,long1,lat2,long2)
