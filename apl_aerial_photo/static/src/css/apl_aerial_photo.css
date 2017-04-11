@@ -7,12 +7,12 @@ right: 0;
 top: 0;
 bottom: 0;
 background-color: rgba(1, 1, 1, 0.725);
-z-index: 100;
+z-index: 1100;
 overflow: auto;
 }
  
 .cfotorama{
-z-index: 200;
+z-index: 1200;
 }
 
 [class*='close-'] {
@@ -27,4 +27,14 @@ z-index: 200;
 
 .close-thik:after {
   content: '✖'; /* UTF-8 symbol */
+
+}
+.div_map
+{
+	width: 400px;
+	height: 200px;
+	right: 0;
+	bottom: 0;
+	position: fixed;
+	z-index: 1200;
 }

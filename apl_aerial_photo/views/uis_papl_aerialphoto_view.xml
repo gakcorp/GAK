@@ -10,6 +10,9 @@
 		<link rel="stylesheet" href="/apl_aerial_photo/static/src/css/fotorama.css"/>
 		<script type="text/javascript" src="/apl_aerial_photo/static/src/js/fotorama.js"/>
 		<link rel="stylesheet" href="/apl_aerial_photo/static/src/css/l_panel.css"/>
+		<script type="text/javascript" src="/apl_aerial_photo/static/src/js/spin.min.js"/>
+		<script type="text/javascript" src="/apl_aerial_photo/static/src/js/ol.js"/>
+		<link rel="stylesheet" href="/apl_aerial_photo/static/src/css/ol.css"/>
             </xpath>
         </template>
 	<record model="ir.ui.view" id="uis_ap_photo_kanban">
@@ -33,7 +36,7 @@
 									
 								<div name="tags"/>
 								<ul>
-									<!--<li>Date: <field name="image_date"/></li>!-->
+									<li>Date: <field name="image_date"/></li>
 									<!--<li>Alt : <field name="altitude"/></li>!-->
 								</ul>
 								</h4>
@@ -78,7 +81,7 @@
 					
 					<!--<field name="image" widget="binary" filename="name"  height="480"/>!-->
 					<!--<field name="image" widget="image" filename="fimage"/>!-->
-					<field name="image_800" options='{"size":[800,600]}' widget="fotorama" nolabel="1" colspan="2"/>
+					<field name="image_800" options='{"size":[800,600]}' widget="fotoramanew" nolabel="1" colspan="2"/>
 					<!--<field name="image_800" widget="image" />!-->
 					
 					<!--<field name="thumbnail" widget="image"/>
