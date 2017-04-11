@@ -65,7 +65,7 @@
 					</header>
 					<group>
 						<group>
-							<field name="image" options='{"size":[600,400]}' widget="fotoramanew" nolabel="1" colspan="2"/>	
+							<field name="image" options='{"size":[400,400]}' widget="fotoramanew" nolabel="1" colspan="2"/>	
 						</group>
 						
 						<group>
@@ -80,9 +80,7 @@
 							<field name="cross_type"/>
 							<field name="length"/>!-->
 						</group>
-						<group>
-							 <field name="image" widget="image" options='{"size":[400,400]}'/>
-						</group>
+
 					</group>
 				</form>
 			</field>
