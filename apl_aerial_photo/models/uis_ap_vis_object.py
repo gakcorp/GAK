@@ -5,6 +5,8 @@ import json
 #AGBase lib
 from openerp import models, fields, api, tools
 from openerp.addons.passportvl.models import uis_papl_logger
+from openerp.addons.passportvl.models.uismodels import distance2points
+from openerp.addons.passportvl.models.uismodels import distangle2points
 from PIL import Image, ImageDraw
 import StringIO
 import cStringIO
@@ -22,16 +24,17 @@ class uis_ap_vis_object(models.Model):
 	
 	_name='uis.ap.vis_object'
 	_description='Detected visual objects on the photo'
-	name=fields.Char("Visual object name")
+	name=fields.Char("Visual object name", compute='_get_name')
 	state=fields.Selection(STATE_SELECTION,'Status',readonly=True,default='draft')
 	photo_id=fields.Many2one('uis.ap.photo', string='Photo')
 	pillar_id=fields.Many2one('uis.papl.pillar', string='Pillar')
+	apl_id=fields.Many2one('uis.papl.apl',string='APL', compute='_get_apl_id')
 	transformer_id=fields.Many2one('uis.papl.transformer', string='Transformer')
 	rect_coordinate_json=fields.Text(string='Visual Object Rectangle')
 	color=fields.Char("Color of selection")
 	image=fields.Binary(string='Image', compute='_get_vo_img')
 	auto_detected=fields.Boolean(string='Auto Detected')
-	distance_from_photo_point=fields.Float(digits=(2,2), string='Distance from photo point')
+	distance_from_photo_point=fields.Float(digits=(2,2), string='Distance from photo point', compute='_get_dist_from_photo_point')
 	@api.model
 	def create_update_vis_object(self,PhotoID, ObjName, ObjID, ObjType, JSON, IMG):
 		visObject=None;
@@ -62,8 +65,31 @@ class uis_ap_vis_object(models.Model):
 			obj_mas=self.search([('photo_id.id','=',PhotoID),('transformer_id.id','not in',Ref_Object_IDs)])
 			for obj in obj_mas:
 				obj.unlink()
-
 	
+	@api.depends('pillar_id','transformer_id')
+	def _get_name(self):
+		for vo in self:
+			vo.name=vo.pillar_id.name or vo.transformer_id.name
+	
+	@api.depends('pillar_id','transformer_id')
+	def _get_apl_id(self):
+		for vo in self:
+			vo.apl_id=vo.pillar_id.apl_id or vo.transformer_id.apl_id
+			
+	@api.depends('pillar_id','transformer_id','photo_id')
+	def _get_dist_from_photo_point(self):
+		for vo in self:
+			lat1,lng1=vo.photo_id.latitude,vo.photo_id.longitude
+			lat2,lng2=0,0
+			if vo.transformer_id:
+				lat2,lng2=vo.transformer_id.latitude,vo.transformer_id.longitude
+			if vo.pillar_id:
+				lat2,lng2=vo.pillar_id.latitude,vo.pillar_id.longitude
+			_logger.debug('lat1=%r, lng1=%r, lat2=%r, lng2=%r'%(lat1,lng1,lat2,lng2))
+			if (lat1<>0) and (lng1<>0) and (lat2<>0) and (lng2<>0): 
+				dfpp=distance2points(lat1,lng1,lat2,lng2)
+			vo.distance_from_photo_point=dfpp
+			
 	@api.depends('rect_coordinate_json')
 	def _get_vo_img(self):
 		for vo in self:

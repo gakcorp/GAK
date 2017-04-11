@@ -31,7 +31,7 @@ _ulog=uis_papl_logger.ulog
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
-def distance2points(lat1,long1,lat2,long2):
+def distance2points(lat1,long1,lat2,long2): #NUPD use standart
 	dist=0
 	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
 		rad=6372795
