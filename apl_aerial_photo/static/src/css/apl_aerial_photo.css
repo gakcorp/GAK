@@ -1,0 +1,39 @@
+.cwrap{
+display: block;
+opacity: 1;
+position: fixed;
+left: 0;
+right: 0;
+top: 0;
+bottom: 0;
+background-color: rgba(1, 1, 1, 0.725);
+z-index: 1100;
+overflow: auto;
+}
+ 
+.cfotorama{
+z-index: 1200;
+}
+
+[class*='close-'] {
+  color: #FFFFFF;
+  font: 50px/100% arial, sans-serif;
+  position: absolute;
+  right: 5%;
+  text-decoration: none;
+  text-shadow: 0 1px 0 #fff;
+  top: 2%;
+}
+
+.close-thik:after {
+  content: '✖'; /* UTF-8 symbol */
+}
+.div_map
+{
+	width: 400px;
+	height: 200px;
+	right: 0;
+	bottom: 0;
+	position: fixed;
+	z-index: 1200;
+}

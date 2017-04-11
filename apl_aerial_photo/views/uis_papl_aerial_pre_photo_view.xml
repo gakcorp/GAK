@@ -111,7 +111,6 @@
 	</record>
 
 	<data>
-		<menuitem name="Pre Photos" id="uis_ap_menu_pre_photo_main" parent="passportvl.uis_papl_menu_root"/>
-		<menuitem name="Pre Photos List" parent="uis_ap_menu_pre_photo_main" id="uis_ap_menu_pre_photo_list" action="uis_ap_menu_pre_photo_list_action"/>
+		<menuitem name="Pre Photos List" parent="uis_ap_menu_photo_main" id="uis_ap_menu_pre_photo_list" action="uis_ap_menu_pre_photo_list_action"/>
 	</data>
 </openerp>

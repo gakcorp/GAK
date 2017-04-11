@@ -1,0 +1,552 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* apl_aerial_photo
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 9.0c-20161202\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-04-10 18:42+0000\n"
+"PO-Revision-Date: 2017-04-10 22:04+0300\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: ru\n"
+"X-Generator: Poedit 1.8.7\n"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_papl_apl_photo_count
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_papl_pillar_photo_count
+msgid "# Photo"
+msgstr "# Photo"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.mod_uis_google_map
+msgid ""
+"<span class=\"glyphicon glyphicon-camera\"/>\n"
+"\t\t\t\t\t\tPhoto\n"
+"\t\t\t\t\t\t<span class=\"cust_badge badge\" id=\"photo_count_badge\"/>"
+msgstr ""
+"<span class=\"glyphicon glyphicon-camera\"/>\n"
+"\t\t\t\t\t\tPhoto\n"
+"\t\t\t\t\t\t<span class=\"cust_badge badge\" id=\"photo_count_badge\"/>"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_menu_pre_photo_list_form
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_form
+msgid "Admins"
+msgstr "Админ."
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.mod_uis_papl_apl_report_passport
+msgid "Aero photos"
+msgstr "Аэроснимки"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_altitude
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_altitude
+msgid "Altitude"
+msgstr "Высота"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.mod_uis_papl_apl_report_passport
+msgid "Altitude:"
+msgstr "Высота:"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_apl_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_apl_ids
+msgid "Apl ids"
+msgstr "ВЛ на снимке"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_auto_detected
+msgid "Auto Detected"
+msgstr "Auto Detected"
+
+#. module: apl_aerial_photo
+#: selection:uis.ap.vis_object,state:0
+msgid "CORRECT"
+msgstr "КОРРЕКТНО"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.wizard_create_pillar
+msgid "Cancel"
+msgstr "Отмена"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_color
+msgid "Color of selection"
+msgstr "Цвет выделения"
+
+#. module: apl_aerial_photo
+#: model:ir.actions.act_window,help:apl_aerial_photo.uis_ap_photo_action_window
+msgid "Create new Photo"
+msgstr "Создать новый снимок"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_create_uid
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_create_uid
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_create_uid
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_create_uid
+msgid "Created by"
+msgstr "Создано"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_create_date
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_create_date
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_create_date
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_create_date
+msgid "Created on"
+msgstr "Создан"
+
+#. module: apl_aerial_photo
+#: selection:uis.ap.pre_photo,state:0
+msgid "Critical"
+msgstr "Критично"
+
+#. module: apl_aerial_photo
+#: selection:uis.ap.vis_object,state:0
+msgid "DRAFT"
+msgstr "ЧЕРНОВИК"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.mod_uis_papl_apl_report_passport
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_kanban
+msgid "Date:"
+msgstr "Дата:"
+
+#. module: apl_aerial_photo
+#: model:ir.model,name:apl_aerial_photo.model_uis_ap_vis_object
+msgid "Detected visual objects on the photo"
+msgstr "Визуальные объекты на снимкм"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_display_name
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_display_name
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_display_name
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_display_name
+msgid "Display Name"
+msgstr "Отображаемое Имя"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_distance_from_photo_point
+msgid "Distance from photo point"
+msgstr "Дистанция от места съемки"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_menu_pre_photo_list_form
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_form
+msgid "ExifData"
+msgstr "Данные EXIF"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_focal_length
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_focal_length
+msgid "Focal Length"
+msgstr "Фокусное растояние"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_focal_angles
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_focal_angles
+msgid "Focal angle"
+msgstr "Угол обзора"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_folder_name
+msgid "Folder"
+msgstr "Папка"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_menu_pre_photo_list_form
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_form
+msgid "Generate small photos"
+msgstr "Перегенерация"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_elevation_point
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_elevation_point
+msgid "Ground Elevation"
+msgstr "Уровень земли "
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_hash_summ
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_hash_summ
+msgid "Hash summ"
+msgstr "Хэш сумма"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_id
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_id_2168
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_id
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_id
+msgid "ID"
+msgstr "ИД"
+
+#. module: apl_aerial_photo
+#: selection:uis.ap.vis_object,state:0
+msgid "INCORRECT"
+msgstr "ОШИБОЧНО"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_image
+msgid "Image"
+msgstr "Изображение"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_vis_obj_800
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_vis_obj_800
+msgid "Image (800px) wuth visual objects"
+msgstr "Image (800px) wuth visual objects"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_length
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_length
+msgid "Image Length"
+msgstr "Высота снимка"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_width
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_width
+msgid "Image Width"
+msgstr "Ширина снимка"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_date
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_date
+msgid "Image date"
+msgstr "Дата снимка"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_filename
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_filename
+msgid "Image file name"
+msgstr "Имя файла"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_vis_obj
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_vis_obj
+msgid "Image with visual objects"
+msgstr "Снимок с визуальными объектами"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_400
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_400
+msgid "Image400"
+msgstr "Снимок (400 px)"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_800
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_800
+msgid "Image800"
+msgstr "Снимок (800 px)"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_edge
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_edge
+msgid "ImageEdge"
+msgstr "ImageEdge"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo___last_update
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist___last_update
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo___last_update
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object___last_update
+msgid "Last Modified on"
+msgstr "Последнее Изменение"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_write_uid
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_write_uid
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_write_uid
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_write_uid
+msgid "Last Updated by"
+msgstr "Последний раз обновлено"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_write_date
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_write_date
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_write_date
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_write_date
+msgid "Last Updated on"
+msgstr "Последний раз обновлено"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_latitude
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_latitude
+msgid "Latitude"
+msgstr "Широта"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.mod_uis_papl_apl_report_passport
+msgid "Latitude:"
+msgstr "Широта:"
+
+#. module: apl_aerial_photo
+#: model:ir.actions.act_window,name:apl_aerial_photo.uis_ap_photo_action_window
+msgid "List of Photo"
+msgstr "Аэроснимки"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_list
+msgid "List of Photos"
+msgstr "Аэроснимки"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_visual_object_list
+msgid "List of Visual objects"
+msgstr "Визуальные объекты"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.wizard_create_pillar
+msgid "Load"
+msgstr "Загрузить"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_id
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_load_hist_id
+msgid "Load data"
+msgstr "Load data"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_load_date
+msgid "Load date"
+msgstr "Дата загрузки"
+
+#. module: apl_aerial_photo
+#: model:ir.actions.act_window,name:apl_aerial_photo.uis_ap_load_photos_action_window
+#: model:ir.ui.menu,name:apl_aerial_photo.uis_ap_menu_photo_load
+msgid "Load photos"
+msgstr "Загрузка снимков"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_longitude
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_longitude
+msgid "Longitude"
+msgstr "Долгота"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.mod_uis_papl_apl_report_passport
+msgid "Longitude:"
+msgstr "Долгота:"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_name
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_name
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_name
+msgid "Name"
+msgstr "Наименование"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_near_apl_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_near_apl_ids
+msgid "Near apl ids"
+msgstr "Ближайшие ВЛ"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_near_pillar_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_near_pillar_ids
+msgid "Near pillar ids"
+msgstr "Ближайшие опоры"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_near_transformer_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_near_transformer_ids
+msgid "Near transformer ids"
+msgstr "Ближайшие трансформаторы"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_next_photo_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_next_photo_ids
+msgid "Next photo ids"
+msgstr "Соседние снимки"
+
+#. module: apl_aerial_photo
+#: selection:uis.ap.pre_photo,state:0
+msgid "Normal"
+msgstr "Норма"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_menu_pre_photo_list_form
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_form
+msgid "Objects"
+msgstr "Объекты снимка"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_photo_id
+#: model:ir.ui.view,arch_db:apl_aerial_photo.view_papl_apl_aerophoto_buttons_form
+msgid "Photo"
+msgstr "Фото"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_menu_pre_photo_list_form
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_form
+msgid "Photo form"
+msgstr "Фотография"
+
+#. module: apl_aerial_photo
+#: model:ir.model,name:apl_aerial_photo.model_uis_ap_photo
+msgid "Photo_apl"
+msgstr "Photo_apl"
+
+#. module: apl_aerial_photo
+#: model:ir.model,name:apl_aerial_photo.model_uis_ap_photo_load_hist
+msgid "Photo_apl_hist"
+msgstr "Photo_apl_hist"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_photo_count
+msgid "Photo_count"
+msgstr "Photo_count"
+
+#. module: apl_aerial_photo
+#: code:addons/apl_aerial_photo/models/mod/mod_uis_papl_pillar.py:36
+#: code:addons/apl_aerial_photo/models/mod_uis_papl_apl.py:28
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_load_hist_photo_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_papl_apl_photo_ids
+#: model:ir.ui.menu,name:apl_aerial_photo.uis_ap_menu_photo
+#: model:ir.ui.menu,name:apl_aerial_photo.uis_ap_menu_photo_main
+#: model:ir.ui.view,arch_db:apl_aerial_photo.view_papl_apl_aerophoto_buttons_form
+#, python-format
+msgid "Photos"
+msgstr "Снимки"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_pillar_id
+msgid "Pillar"
+msgstr "Опора"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_pillar_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_pillar_ids
+msgid "Pillar ids"
+msgstr "Опоры"
+
+#. module: apl_aerial_photo
+#: model:ir.model,name:apl_aerial_photo.model_uis_papl_pillar
+msgid "Pillar models"
+msgstr "Модель опоры"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_menu_pre_photo_list_tree
+msgid "Pre Photo Tree"
+msgstr "Предзагрузка (дерево)"
+
+#. module: apl_aerial_photo
+#: model:ir.actions.act_window,name:apl_aerial_photo.uis_ap_menu_pre_photo_list_action
+#: model:ir.ui.menu,name:apl_aerial_photo.uis_ap_menu_pre_photo_list
+msgid "Pre Photos List"
+msgstr "Предзагрузка снимков"
+
+#. module: apl_aerial_photo
+#: model:ir.model,name:apl_aerial_photo.model_uis_ap_pre_photo
+msgid "Pre_Photo"
+msgstr "Pre_Photo"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_rotation
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_rotation
+msgid "Rotation"
+msgstr "Угол поворота"
+
+#. module: apl_aerial_photo
+#: model:ir.actions.server,name:apl_aerial_photo.uis_ap_menu_pre_photo_list_action_savephoto
+msgid "Save As Photo"
+msgstr "Сохранить как снимок"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_image_scheme
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_image_scheme
+msgid "Scheme position"
+msgstr "Схема"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_state
+msgid "State"
+msgstr "Статус"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_state_desc
+msgid "State Description"
+msgstr "Описание статуса"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_state
+msgid "Status"
+msgstr "Статус"
+
+#. module: apl_aerial_photo
+#: sql_constraint:uis.ap.pre_photo:0
+msgid "The name pre photo must be unique !"
+msgstr "Имя предзагруженной фотографии (снимка) должно быть уникально !"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_thumbnail
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_thumbnail
+msgid "Thumbnail"
+msgstr "Иконка"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_transformer_id
+msgid "Transformer"
+msgstr "Трансформатор"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_transformer_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_transformer_ids
+msgid "Transformer ids"
+msgstr "Трансформаторы"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_view_distance
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_view_distance
+msgid "View distance"
+msgstr "Дальность обзора"
+
+#. module: apl_aerial_photo
+#: model:ir.actions.act_window,name:apl_aerial_photo.uis_ap_menu_vis_object_list_action
+#: model:ir.ui.menu,name:apl_aerial_photo.uis_ap_menu_vis_object_list
+msgid "Vis Objects List"
+msgstr "Визуальные объекты"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_rect_coordinate_json
+msgid "Visual Object Rectangle"
+msgstr "Визуальный объект (прямоугольник)"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_visual_object_form
+msgid "Visual object"
+msgstr "Визуальный объект"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_vis_object_name
+msgid "Visual object name"
+msgstr "Наименование визуального объекта"
+
+#. module: apl_aerial_photo
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_photo_vis_objects_ids
+#: model:ir.model.fields,field_description:apl_aerial_photo.field_uis_ap_pre_photo_vis_objects_ids
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_form_add_visobj_page
+msgid "Visual objects"
+msgstr "Визуальные объекты"
+
+#. module: apl_aerial_photo
+#: selection:uis.ap.pre_photo,state:0
+msgid "Warning"
+msgstr "Внимание"
+
+#. module: apl_aerial_photo
+#: model:ir.ui.view,arch_db:apl_aerial_photo.uis_ap_photo_list
+msgid "small photos generate"
+msgstr "Малые изображения"
+
+#. module: apl_aerial_photo
+#: model:ir.model,name:apl_aerial_photo.model_uis_papl_apl
+msgid "uis.papl.apl"
+msgstr "uis.papl.apl"
