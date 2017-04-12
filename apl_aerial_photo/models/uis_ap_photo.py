@@ -16,7 +16,9 @@ import matplotlib.font_manager as fm
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 import googlemaps
-
+from openerp.addons.passportvl.models.uismodels import distance2points
+from openerp.addons.passportvl.models.uismodels import distangle2points
+from libxmp.utils import file_to_dict
 import cv2
 import numpy as np
 
@@ -30,61 +32,6 @@ _ulog=uis_papl_logger.ulog
 
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
-
-def distance2points(lat1,long1,lat2,long2): #NUPD use standart
-	dist=0
-	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
-		rad=6372795
-		#Convert to radians
-		la1=lat1*math.pi/180
-		la2=lat2*math.pi/180
-		lo1=long1*math.pi/180
-		lo2=long2*math.pi/180
-		#calculate sin and cos
-		cl1=math.cos(la1)
-		cl2=math.cos(la2)
-		sl1=math.sin(la1)
-		sl2=math.sin(la2)
-		delta=lo2-lo1
-		cdelta=math.cos(delta)
-		sdelta=math.sin(delta)
-		#calculate circle len
-		y = math.sqrt(math.pow(cl2*sdelta,2)+math.pow(cl1*sl2-sl1*cl2*cdelta,2))
-		x = sl1*sl2+cl1*cl2*cdelta
-		ad = math.atan2(y,x)
-		dist = ad*rad
-	return dist
-def distangle2points(lat1,long1,lat2,long2):
-	dist=0
-	angle=0
-	dist=distance2points(lat1,long1,lat2,long2)
-	if (lat1<>0) and (long1<>0) and (lat2<>0) and (long2<>0):
-		la1=lat1*math.pi/180
-		la2=lat2*math.pi/180
-		lo1=long1*math.pi/180
-		lo2=long2*math.pi/180
-		#calculate sin and cos
-		cl1=math.cos(la1)
-		cl2=math.cos(la2)
-		sl1=math.sin(la1)
-		sl2=math.sin(la2)
-		delta=lo2-lo1
-		cdelta=math.cos(delta)
-		sdelta=math.sin(delta)
-		#calculate start azimut
-		x = (cl1*sl2) - (sl1*cl2*cdelta)
-		y = sdelta*cl2
-		try:
-			z = math.degrees(math.atan(-y/x))
-		except ZeroDivisionError:
-			z=0
-		if (x < 0):
-			z = z+180.
-		z2 = (z+180.) % 360. - 180.
-		z2 = - math.radians(z2)
-		anglerad2 = z2 - ((2*math.pi)*math.floor((z2/(2*math.pi))) )
-		angle = (anglerad2*180.)/math.pi
-	return dist,angle
 
 def dms2dd(degrees,minutes,seconds, direction):
 	dd=float(degrees)+float(minutes)/60+float(seconds)/(60*60)
@@ -185,6 +132,7 @@ class uis_ap_photo(models.Model):
 	view_distance=fields.Float(digits=(2,0), string='View distance', default=100)
 	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=60)
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
+	xmp_data_json=fields.Text(string='XMP data')
 	pillar_ids=fields.Many2many('uis.papl.pillar',
 								relation='photo_pillar_rel',
 								column1='photo_id',
@@ -223,7 +171,52 @@ class uis_ap_photo(models.Model):
 							column1='photo_id',
 							column2='transformer_id',
 							compute='_get_photo_trans')
+	def set_from_xmp_data(self):
+		for ph in self:
+			xmp=json.loads(ph.xmp_data_json)
+			if xmp['GimbalYawDegree']:
+				ph.rotation=xmp['GimbalYawDegree']
+				
+	def get_xmp_data(self):
+		for ph in self:
+			_logger.debug('Load XMP data for photo %r'%ph.name)
+			d = ph.with_context(bin_size=False).image.decode('base64')
+			xmp_start = d.find('<x:xmpmeta')
+			xmp_end = d.find('</x:xmpmeta')
+			xmp_str = d[xmp_start:xmp_end+12]
+			xmp_dict={}
+			regex=r"drone-dji\:((?:[a-z][a-z0-9_]*))\=\"([+-]?\d*\.\d+)(?![-+0-9\.])\""
+			xmp_atrs=re.finditer(regex,xmp_str,re.IGNORECASE)
+			for matchNum, match in enumerate(xmp_atrs):
+				vname,vv=match.groups()
+				xmp_dict[vname]=float(vv)
+			_logger.debug(xmp_dict)
+			ph.xmp_data_json=json.dumps(xmp_dict)
+			'''
+			{'FlightYSpeed': 0.6,
+			'FlightRollDegree': 0.2,
+			'GimbalYawDegree': 95.7,
+			'RelativeAltitude': 13.2,
+			'GimbalRollDegree': 0.0,
+			'FlightYawDegree': 96.3,
+			'FlightXSpeed': 0.4,
+			'GimbalPitchDegree': -32.4,
+			'FlightZSpeed': 0.0,
+			'AbsoluteAltitude': 195.02,
+			'FlightPitchDegree': 2.2}
+
+			'''
+			#	for groupNum in range(0, len(match.groups())):
+			#		groupNum = groupNum + 1
+			#		print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+	@api.multi
+	def action_get_xmp_data(self):
+		self.get_xmp_data()
 	
+	@api.multi
+	def action_set_from_xmp_data(self):
+		self.set_from_xmp_data()
+		
 	def scheduler_rec_scheme(self, cr, uid, context=None):
 		#tlr=_ulog(self,code='CALC_PH_SHACT',lib=__name__,desc='Scheduled action for photos')
 		photo_obj = self.pool.get(cr,uid,'uis.ap.photo',context=context)

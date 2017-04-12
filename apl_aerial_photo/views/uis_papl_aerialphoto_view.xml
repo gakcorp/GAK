@@ -105,6 +105,7 @@
 						</page>
 						<page string='ExifData'>
 							<group>
+								
 								<field name="latitude"/>
 								<field name="longitude"/>
 								<field name="altitude"/>
@@ -115,7 +116,8 @@
 									<button name="rotate_plus" string="+" class="oe_highlight oe_edit_only" type="object" />
 									<button name="rotate_minus" string="-" class="oe_highlight oe_edit_only" type="object" />
 								</div>
-								
+								<button string="Get XMP data" type="object" name="action_get_xmp_data"/>
+								<button string="Set from XMP data" type="object" name="action_set_from_xmp_data"/>
 							</group>
 						</page>
 						<page string='Admins'>
