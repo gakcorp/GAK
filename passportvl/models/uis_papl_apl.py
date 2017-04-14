@@ -494,7 +494,7 @@ class uis_papl_apl(models.Model):
 			ktps=apl.transformer_ids.sorted(key=lambda r:r.pillar_id.len_start_apl, reverse=False)
 			i=0
 			for ktp in ktps:
-				_logger.debug('Transformer %r connected to pillar with distance %r from start line'%(ktp.name,ktp.pillar_id.len_start_apl))
+				#_logger.debug('Transformer %r connected to pillar with distance %r from start line'%(ktp.name,ktp.pillar_id.len_start_apl))
 				i+=1
 				ktp.sudo().num_by_vl=i
 	@api.multi
@@ -510,7 +510,7 @@ class uis_papl_apl(models.Model):
 						if pil.tap_id<>pil.parent_id.tap_id:
 							conpil=pil.parent_id.num_by_vl
 							#tap.conn_pillar_id=pil.parent_id
-							_logger.debug ('conpil from apl method is %r',tap.conn_pillar_id)
+							#_logger.debug ('conpil from apl method is %r',tap.conn_pillar_id)
 					cpillar.append(conpil)
 			sortcpillar=sorted(cpillar)
 			cn_tap=1

@@ -82,31 +82,60 @@ def latlng_from_point(lat,lng,direction=0,distance=0):
 	d=distance/1000
 	latr=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dirm))
 	lngr =lng0+math.atan2(math.sin(dirm)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(latr))
-	return latr,lngr
-def triangle_points(lat,lng,direction,angle,distance):
+	return math.degrees(latr),math.degrees(lngr)
+def get_vis_points(lat,lng,l1,l2,yaw,ang,segments):
 	points=[]
-	R=6378.1
-	dirm=math.radians(direction)
-	dir1=math.radians(direction-angle/2)
-	dir2=math.radians(direction+angle/2)
-	d=distance/1000
-	lat0=math.radians(lat)
-	lng0=math.radians(lng)
-	latm,lngm=latlng_from_point(lat,lng,direction,distance)
-	lat1,lng1=latlng_from_point(lat,lng,direction-angle/2,distance)
-	lat2,lng2=latlng_from_point(lat,lng,direction+angle/2,distance)
+	dangle=ang/segments
+	cur_angle=yaw-ang/2
+	i=1
+	_logger.debug('Get visual data for point lat=%r lng=%r'%(lat,lng))
+	while i<=segments:
+		latp,lngp=latlng_from_point(lat,lng,cur_angle,l1)
+		datap={'lat':latp,'lng':lngp}
+		points.append(datap)
+		cur_angle+=dangle
+		#_logger.debug('%r get values lat lng for visible area angle=%r (lat=%r, lng=%r)'%(i,cur_angle,latp,lngp))
+		i+=1
+	i=1
+	while i<=segments:
+		latp,lngp=latlng_from_point(lat,lng,cur_angle,l2)
+		datap={
+			'lat':latp,
+			'lng':lngp}
+		points.append(datap)
+		#_logger.debug(points)
+		cur_angle-=dangle
+		#_logger.debug('%r get values lat lng for visible area angle=%r (lat=%r, lng=%r)'%(i,cur_angle,latp,lngp))
+		i+=1
+	latp,lngp=latlng_from_point(lat,lng,cur_angle,l1)
+	datap={'lat':latp,'lng':lngp}
+	points.append(datap)
+	return points
+def triangle_points(lat,lng,direction,angle,distance):
+	#points=[]
+	#R=6378.1
+	#dirm=math.radians(direction)
+	#dir1=math.radians(direction-angle/2)
+	#dir2=math.radians(direction+angle/2)
+	#d=distance/1000
+	#lat0=math.radians(lat)
+	#lng0=math.radians(lng)
+	#latm,lngm=latlng_from_point(lat,lng,direction,distance)
+	#lat1,lng1=latlng_from_point(lat,lng,direction-angle/2,distance)
+	#lat2,lng2=latlng_from_point(lat,lng,direction+angle/2,distance)
 	#latm=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dirm))
 	#lngm =lng0+math.atan2(math.sin(dirm)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(latm))
 	#lat1=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dir1))
 	#lng1 =lng0+math.atan2(math.sin(dir1)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(lat1))
 	#lat2=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dir2))
 	#lng2 =lng0+math.atan2(math.sin(dir2)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(lat2))
-	rval=[{'lat':math.degrees(lat0),'lng':math.degrees(lng0)},
-		{'lat':math.degrees(lat1),'lng':math.degrees(lng1)},
-		{'lat':math.degrees(latm),'lng':math.degrees(lngm)},
-		{'lat':math.degrees(latm),'lng':math.degrees(lngm)},
-		{'lat':math.degrees(lat2),'lng':math.degrees(lng2)},
-		{'lat':math.degrees(lat0),'lng':math.degrees(lng0)}]
+	#rval=[{'lat':lat,'lng':lng},
+	#	{'lat':lat1,'lng':lng1},
+	#	{'lat':latm,'lng':lngm},
+	#	{'lat':lat2,'lng':lng2},
+	#	{'lat':lat,'lng':lng}]
+	rval=get_vis_points(lat,lng,15,distance,direction,angle,7)
+	#yaw,ang,segments
 	#_logger.debug(rval)
 	return rval
 def point_in_poly(lat,lng,poly):
@@ -146,7 +175,12 @@ class uis_ap_photo(models.Model):
 	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=60)
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	xmp_data_json=fields.Text(string='XMP data')
-	visable_view_json=fields.Text(string='Visable area')
+	vd_min=fields.Float(digits=(2,0), string='Near visibility distance',default=10)
+	vd_max=fields.Float(digits=(2,0), string='Distant visibility distance ',default=100)
+	relative_altitude=fields.Float(digits=(2,0),string='Relative Altitude', default=12)
+	visable_view_json=fields.Text(string='Visibility area', compute='_get_visable_view_json')
+	vert_angle=fields.Float(digits=(2,0), string='Vertical angle', default=45)
+	hori_angle=fields.Float(digits=(2,0), string='Horizontal angle', default=60)
 	pillar_ids=fields.Many2many('uis.papl.pillar',
 								relation='photo_pillar_rel',
 								column1='photo_id',
@@ -185,21 +219,37 @@ class uis_ap_photo(models.Model):
 							column1='photo_id',
 							column2='transformer_id',
 							compute='_get_photo_trans')
+	
+	@api.depends('rotation','vd_min','vd_max', 'relative_altitude', 'vert_angle', 'hori_angle', 'latitude','longitude')
+	def _get_visable_view_json(self):
+		for ph in self:
+			lat=ph.latitude
+			lng=ph.longitude
+			l1=ph.vd_min
+			l2=ph.vd_max
+			yaw=ph.rotation
+			ang_o=ph.hori_angle
+			ps=get_vis_points(lat,lng,l1,l2,yaw,ang_o,7) #NUPD
+			ph.visable_view_json=json.dumps(ps)
 	def set_from_xmp_data(self):
 		for ph in self:
 			xmp=json.loads(ph.xmp_data_json)
 			h,l0,l1,l2,a0,a1,a2=0,0,0,0,0,0,0
-			ang_a,ang_b,ang_g,ang_d,ang_o=0,0,0,43,60
-			
+			ang_a,ang_b,ang_g,ang_d,ang_o=0,0,0,ph.vert_angle,ph.hori_angle
 			if xmp:
-				ph.rotation=xmp['GimbalYawDegree']
+				yaw=xmp['GimbalYawDegree']
+				ph.rotation=yaw
 				h=xmp['RelativeAltitude']
+				ph.relative_altitude=h
 				ang_a = math.radians(-xmp['GimbalPitchDegree']-xmp['FlightPitchDegree'])
 				#insert code for define ang_d from xmp data
 				ang_d=math.radians(ang_d)
 				l1=h*math.tan(math.pi/2-ang_a-ang_d/2)
-				l2=h*math.tan(math.pi/2-ang_a+ang_d/2)
-				_logger.debug('Visable distance l1 = %r l2=%r'%(l1,l2))
+				l2=min(200,h*math.tan(math.pi/2-ang_a+ang_d/2)) #NUPD 200 to config
+				ph.vd_min=l1
+				ph.vd_max=l2
+				l0=h*math.tan(math.pi/2-ang_a)
+				
 	def get_xmp_data(self):
 		for ph in self:
 			_logger.debug('Load XMP data for photo %r'%ph.name)
@@ -384,7 +434,11 @@ class uis_ap_photo(models.Model):
 					'd':ph.rotation
 				}
 				ph_points.append(ph_point)
-				tri_points=triangle_points(ph.latitude,ph.longitude,ph.rotation,ph.focal_angles,ph.view_distance)
+				#tri_points=get_vis_points(ph.latitude,ph.longitude,15,ph.view_distance,ph.rotation,ph.focal_angles,7)
+				#try:
+				tri_points=json.loads(ph.visable_view_json)
+				#except:
+				#	_logger.debug('json error')
 				ax.plot([d['lng'] for d in tri_points],[d['lat'] for d in tri_points],'--', color='#cccccc')
 			
 			ppx=[d['lng'] for d in ph_points]
@@ -395,8 +449,12 @@ class uis_ap_photo(models.Model):
 				ax.plot(d['lng'],d['lat'],marker='o', markersize=ms//2, markerfacecolor="white", markeredgecolor='blue')
 			#ax.scatter(ppx,ppy,c='blue', angles=ppa)
 			pil_points=[]
-			tri_points=triangle_points(photo.latitude,photo.longitude,photo.rotation,photo.focal_angles,photo.view_distance)
-			ax.plot([d['lng'] for d in tri_points],[d['lat'] for d in tri_points],'rx-')
+			#tri_points=triangle_points(photo.latitude,photo.longitude,photo.rotation,photo.focal_angles,photo.view_distance)
+			#try:
+			tri_points=json.loads(ph.visable_view_json)
+			#except:
+			#	_logger.debug('json error')
+			ax.plot([d['lng'] for d in tri_points],[d['lat'] for d in tri_points],'r-')
 			ax.spines['top'].set_visible(False)
 			ax.spines['right'].set_visible(False)
 			ax.axis('off')
@@ -585,7 +643,11 @@ class uis_ap_photo(models.Model):
 		for photo in self.browse(cr,uid,ids,context=context):
 			lat=photo.latitude
 			lng=photo.longitude
-			tri_points=triangle_points(lat,lng,photo.rotation,photo.focal_angles,photo.view_distance)
+			tri_points=triangle_points(photo.latitude,photo.longitude,photo.rotation,photo.focal_angles,photo.view_distance)
+			try:
+				tri_points=json.loads(ph.visable_view_json)
+			except:
+				_logger.debug('json error')
 			for pil in photo.near_pillar_ids:
 				inpoint=point_in_poly(pil.latitude,pil.longitude,tri_points)
 				#_logger.debug('For PH %r Pilar %r is %r'%(photo.name,pil.name,inpoint))
