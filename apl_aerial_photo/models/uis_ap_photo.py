@@ -73,6 +73,16 @@ def strdiv(strdiv):
 
 def point_in_triangle(lat,lng,tripoints):
 	return 0
+def latlng_from_point(lat,lng,direction=0,distance=0):
+	R=6378.1
+	latr,lngr=-1,-1
+	dirm=math.radians(direction)
+	lat0=math.radians(lat)
+	lng0=math.radians(lng)
+	d=distance/1000
+	latr=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dirm))
+	lngr =lng0+math.atan2(math.sin(dirm)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(latr))
+	return latr,lngr
 def triangle_points(lat,lng,direction,angle,distance):
 	points=[]
 	R=6378.1
@@ -82,12 +92,15 @@ def triangle_points(lat,lng,direction,angle,distance):
 	d=distance/1000
 	lat0=math.radians(lat)
 	lng0=math.radians(lng)
-	latm=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dirm))
-	lngm =lng0+math.atan2(math.sin(dirm)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(latm))
-	lat1=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dir1))
-	lng1 =lng0+math.atan2(math.sin(dir1)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(lat1))
-	lat2=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dir2))
-	lng2 =lng0+math.atan2(math.sin(dir2)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(lat2))
+	latm,lngm=latlng_from_point(lat,lng,direction,distance)
+	lat1,lng1=latlng_from_point(lat,lng,direction-angle/2,distance)
+	lat2,lng2=latlng_from_point(lat,lng,direction+angle/2,distance)
+	#latm=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dirm))
+	#lngm =lng0+math.atan2(math.sin(dirm)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(latm))
+	#lat1=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dir1))
+	#lng1 =lng0+math.atan2(math.sin(dir1)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(lat1))
+	#lat2=math.asin(math.sin(lat0)*math.cos(d/R)+math.cos(lat0)*math.sin(d/R)*math.cos(dir2))
+	#lng2 =lng0+math.atan2(math.sin(dir2)*math.sin(d/R)*math.cos(lat0),math.cos(d/R)-math.sin(lat0)*math.sin(lat2))
 	rval=[{'lat':math.degrees(lat0),'lng':math.degrees(lng0)},
 		{'lat':math.degrees(lat1),'lng':math.degrees(lng1)},
 		{'lat':math.degrees(latm),'lng':math.degrees(lngm)},
@@ -133,6 +146,7 @@ class uis_ap_photo(models.Model):
 	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=60)
 	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
 	xmp_data_json=fields.Text(string='XMP data')
+	visable_view_json=fields.Text(string='Visable area')
 	pillar_ids=fields.Many2many('uis.papl.pillar',
 								relation='photo_pillar_rel',
 								column1='photo_id',
@@ -174,9 +188,18 @@ class uis_ap_photo(models.Model):
 	def set_from_xmp_data(self):
 		for ph in self:
 			xmp=json.loads(ph.xmp_data_json)
-			if xmp['GimbalYawDegree']:
+			h,l0,l1,l2,a0,a1,a2=0,0,0,0,0,0,0
+			ang_a,ang_b,ang_g,ang_d,ang_o=0,0,0,43,60
+			
+			if xmp:
 				ph.rotation=xmp['GimbalYawDegree']
-				
+				h=xmp['RelativeAltitude']
+				ang_a = math.radians(-xmp['GimbalPitchDegree']-xmp['FlightPitchDegree'])
+				#insert code for define ang_d from xmp data
+				ang_d=math.radians(ang_d)
+				l1=h*math.tan(math.pi/2-ang_a-ang_d/2)
+				l2=h*math.tan(math.pi/2-ang_a+ang_d/2)
+				_logger.debug('Visable distance l1 = %r l2=%r'%(l1,l2))
 	def get_xmp_data(self):
 		for ph in self:
 			_logger.debug('Load XMP data for photo %r'%ph.name)
