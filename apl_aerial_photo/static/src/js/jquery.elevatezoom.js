@@ -257,9 +257,10 @@ if ( typeof Object.create !== 'function' ) {
 				//create the div's                                                + ""
 				//self.zoomContainer = $('<div/>').addClass('zoomContainer').css({"position":"relative", "height":self.nzHeight, "width":self.nzWidth});
 
-				self.zoomContainer = $('<div class="zoomContainer" style="-webkit-transform: translateZ(0);position:absolute;left:'+self.nzOffset.left+'px;top:'+self.nzOffset.top+'px;height:'+self.nzHeight+'px;width:'+self.nzWidth+'px;"></div>');
+				self.zoomContainer = $('<div class="zoomContainer" style="-webkit-transform: translateZ(0);position:absolute;left:'+self.nzOffset.left+'px;top:'+self.nzOffset.top+'px;height:'+self.nzHeight+'px;width:'+self.nzWidth+'px;z-index:2000"></div>');
 				if ($('#cwrap')[0]) $('#cwrap').append(self.zoomContainer);
-				else $('body').append(self.zoomContainer);	
+				else $('body').append(self.zoomContainer);
+				$(".spinner").remove();
 
 
 				//this will add overflow hidden and contrain the lens on lens mode       
@@ -317,7 +318,7 @@ if ( typeof Object.create !== 'function' ) {
 						self.$elem.trigger('click');
 					});
 				}              
-				self.zoomWindowContainer = $('<div/>').addClass('zoomWindowContainer').css("width",self.options.zoomWindowWidth);
+				self.zoomWindowContainer = $('<div/>').addClass('zoomWindowContainer').css({"width":self.options.zoomWindowWidth});
 				self.zoomWindow.wrap(self.zoomWindowContainer);
 
 
