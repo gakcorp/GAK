@@ -229,6 +229,7 @@ class uis_ap_photo(models.Model):
 			l2=ph.vd_max
 			yaw=ph.rotation
 			ang_o=ph.hori_angle
+			_logger.debug('Get PS value (visibility area for lat=%r, lng=%r, minview=%r,maxview=%r,yaw=%r,ang_o=%r'%(lat,lng,l1,l2,yaw,ang_o))
 			ps=get_vis_points(lat,lng,l1,l2,yaw,ang_o,7) #NUPD
 			ph.visable_view_json=json.dumps(ps)
 	def set_from_xmp_data(self):
