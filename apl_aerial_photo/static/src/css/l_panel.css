@@ -8,6 +8,7 @@
 	font: 40px Georgia;
 	color: #fff;
 	text-align: center;
+	z-index:1300;
 	}
 .l_panel {
 	position: fixed;
@@ -17,17 +18,21 @@
 	width: 200px;
 	height: 100%;
 	padding: 0 0 0 0;
+	z-index:1300;
 	}
 .l_controle_block{
 position: absolute;
 padding: 50px 0 0 0;
+z-index:1300;
 }
 .l_rectangle_icon {
 	padding: 0 0 0 0;
 	margin: 20px 10px 10px 10px;
+	z-index:1300;
 }
 .l_text_icon {
 	margin: 20px 10px 10px 10px;
+	z-index:1300;
 }
 .l_table
 {
@@ -36,6 +41,7 @@ padding: 50px 0 0 0;
 	border: 1px solid white;
 	margin: 0 5px 0 5px;
 	width: 90%;
+	z-index:1300;
 }
 td, th
 {
