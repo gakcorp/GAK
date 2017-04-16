@@ -12,7 +12,9 @@ overflow: auto;
 }
  
 .cfotorama{
-z-index: 1200;
+position: relative;
+z-index: 1100;
+pointer-events: none;
 }
 
 [class*='close-'] {
@@ -22,19 +24,46 @@ z-index: 1200;
   right: 5%;
   text-decoration: none;
   text-shadow: 0 1px 0 #fff;
-  top: 5%;
+  top: 2%;
 }
 
 .close-thik:after {
   content: '✖'; /* UTF-8 symbol */
-
 }
 .div_map
 {
-	width: 400px;
-	height: 200px;
+	width: 600px;
+	height: 300px;
 	right: 0;
 	bottom: 0;
 	position: fixed;
-	z-index: 1200;
+	z-index: 1100;
+}
+.defectForm {
+    width: 50%;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+    z-index: 2000;
+    position: absolute;
+    top: 0;
+}
+
+.defectInputText {
+    width: 100%;
+    padding: 3px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 6px;
+    resize: vertical;
+}
+
+.defectInputSubmit {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
