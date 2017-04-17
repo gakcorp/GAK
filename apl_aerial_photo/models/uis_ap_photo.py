@@ -88,7 +88,8 @@ def get_vis_points(lat,lng,l1,l2,yaw,ang,segments):
 	dangle=ang/segments
 	cur_angle=yaw-ang/2
 	i=1
-	_logger.debug('Get visual data for point lat=%r lng=%r'%(lat,lng))
+	kk=1
+	#_logger.debug('Get visual data for point lat=%r lng=%r'%(lat,lng))
 	while i<=segments:
 		latp,lngp=latlng_from_point(lat,lng,cur_angle,l1)
 		datap={'lat':latp,'lng':lngp}
@@ -97,6 +98,9 @@ def get_vis_points(lat,lng,l1,l2,yaw,ang,segments):
 		#_logger.debug('%r get values lat lng for visible area angle=%r (lat=%r, lng=%r)'%(i,cur_angle,latp,lngp))
 		i+=1
 	i=1
+	if (l1*l2<0):
+		kk=-1
+		cur_angle=yaw-ang/2
 	while i<=segments:
 		latp,lngp=latlng_from_point(lat,lng,cur_angle,l2)
 		datap={
@@ -104,9 +108,11 @@ def get_vis_points(lat,lng,l1,l2,yaw,ang,segments):
 			'lng':lngp}
 		points.append(datap)
 		#_logger.debug(points)
-		cur_angle-=dangle
+		cur_angle-=dangle*kk
 		#_logger.debug('%r get values lat lng for visible area angle=%r (lat=%r, lng=%r)'%(i,cur_angle,latp,lngp))
 		i+=1
+	if (l1*l2<0):
+		cur_angle=yaw-ang/2
 	latp,lngp=latlng_from_point(lat,lng,cur_angle,l1)
 	datap={'lat':latp,'lng':lngp}
 	points.append(datap)
@@ -220,7 +226,7 @@ class uis_ap_photo(models.Model):
 							column2='transformer_id',
 							compute='_get_photo_trans')
 	
-	@api.depends('rotation','vd_min','vd_max', 'relative_altitude', 'vert_angle', 'hori_angle', 'latitude','longitude')
+	#@api.depends('rotation','vd_min','vd_max', 'relative_altitude', 'vert_angle', 'hori_angle', 'latitude','longitude')
 	def _get_visable_view_json(self):
 		for ph in self:
 			lat=ph.latitude
@@ -229,7 +235,7 @@ class uis_ap_photo(models.Model):
 			l2=ph.vd_max
 			yaw=ph.rotation
 			ang_o=ph.hori_angle
-			_logger.debug('Get PS value (visibility area for lat=%r, lng=%r, minview=%r,maxview=%r,yaw=%r,ang_o=%r'%(lat,lng,l1,l2,yaw,ang_o))
+			#_logger.debug('Get PS value (visibility area for lat=%r, lng=%r, minview=%r,maxview=%r,yaw=%r,ang_o=%r'%(lat,lng,l1,l2,yaw,ang_o))
 			ps=get_vis_points(lat,lng,l1,l2,yaw,ang_o,7) #NUPD
 			ph.visable_view_json=json.dumps(ps)
 	def set_from_xmp_data(self):
@@ -246,14 +252,16 @@ class uis_ap_photo(models.Model):
 				#insert code for define ang_d from xmp data
 				ang_d=math.radians(ang_d)
 				l1=h*math.tan(math.pi/2-ang_a-ang_d/2)
-				l2=min(200,h*math.tan(math.pi/2-ang_a+ang_d/2)) #NUPD 200 to config
+				ang=min(math.pi/2-0.001,math.pi/2-ang_a+ang_d/2)
+				#_logger.debug(ang_d)
+				l2=min(200,h*math.tan(ang)) #NUPD 200 to config
 				ph.vd_min=l1
 				ph.vd_max=l2
 				l0=h*math.tan(math.pi/2-ang_a)
 				
 	def get_xmp_data(self):
 		for ph in self:
-			_logger.debug('Load XMP data for photo %r'%ph.name)
+			#_logger.debug('Load XMP data for photo %r'%ph.name)
 			d = ph.with_context(bin_size=False).image.decode('base64')
 			xmp_start = d.find('<x:xmpmeta')
 			xmp_end = d.find('</x:xmpmeta')
@@ -264,7 +272,7 @@ class uis_ap_photo(models.Model):
 			for matchNum, match in enumerate(xmp_atrs):
 				vname,vv=match.groups()
 				xmp_dict[vname]=float(vv)
-			_logger.debug(xmp_dict)
+			#_logger.debug(xmp_dict)
 			ph.xmp_data_json=json.dumps(xmp_dict)
 			'''
 			{'FlightYSpeed': 0.6,
@@ -291,7 +299,21 @@ class uis_ap_photo(models.Model):
 	def action_set_from_xmp_data(self):
 		self.set_from_xmp_data()
 		
-	def scheduler_rec_scheme(self, cr, uid, context=None):
+	@api.model
+	def scheduler_rec_scheme(self):
+		photo_ids=self.env['uis.ap.photo'].search([])
+		for ph_id in random.sample(photo_ids,50):
+			if not(ph_id.xmp_data_json):
+				_logger.debug('Photo %r (%r) does not contain data from xmp meta '%(ph_id.name,ph_id.id))
+				ph_id.get_xmp_data()
+				ph_id.set_from_xmp_data()
+			ph_id._get_scheme_position()
+			ph_id._get_photo_apl()
+			self.env.cr.commit()
+			#_logger.debug(ph_id)
+	
+	@api.model		
+	def scheduler_rec_scheme_old(self, cr, uid, context=None):
 		#tlr=_ulog(self,code='CALC_PH_SHACT',lib=__name__,desc='Scheduled action for photos')
 		photo_obj = self.pool.get(cr,uid,'uis.ap.photo',context=context)
 		#Contains all ids for the model uis.ap.photo
@@ -339,7 +361,7 @@ class uis_ap_photo(models.Model):
 		for ph in self:
 			try:
 				res=client.elevation((ph.latitude, ph.longitude))
-				_logger.debug('result google api elevation %r'%res)
+				#_logger.debug('result google api elevation %r'%res)
 			except googlemaps.exceptions.ApiError:
 				pass
 			for item in res:
@@ -452,7 +474,8 @@ class uis_ap_photo(models.Model):
 			pil_points=[]
 			#tri_points=triangle_points(photo.latitude,photo.longitude,photo.rotation,photo.focal_angles,photo.view_distance)
 			#try:
-			tri_points=json.loads(ph.visable_view_json)
+			tri_points=json.loads(photo.visable_view_json)
+			#_logger.debug(tri_points)
 			#except:
 			#	_logger.debug('json error')
 			ax.plot([d['lng'] for d in tri_points],[d['lat'] for d in tri_points],'r-')
@@ -648,7 +671,8 @@ class uis_ap_photo(models.Model):
 			try:
 				tri_points=json.loads(ph.visable_view_json)
 			except:
-				_logger.debug('json error')
+				_logger.debug('je')
+				
 			for pil in photo.near_pillar_ids:
 				inpoint=point_in_poly(pil.latitude,pil.longitude,tri_points)
 				#_logger.debug('For PH %r Pilar %r is %r'%(photo.name,pil.name,inpoint))
@@ -708,7 +732,7 @@ class uis_ap_photo_load_hist(models.Model):
 	
 	def load_photos(self, cr,uid,ids,context=None):
 		re_photos=self.pool.get('uis.ap.photo').browse(cr,uid,ids,context=context)
-		_logger.debug("Start load photos")
+		#_logger.debug("Start load photos")
 		path='/home'
 		i=1
 		val=self.browse(cr,uid,ids,context=context)

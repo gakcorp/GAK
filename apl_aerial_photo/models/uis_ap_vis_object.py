@@ -35,8 +35,9 @@ class uis_ap_vis_object(models.Model):
 	image=fields.Binary(string='Image', compute='_get_vo_img')
 	auto_detected=fields.Boolean(string='Auto Detected')
 	distance_from_photo_point=fields.Float(digits=(2,2), string='Distance from photo point', compute='_get_dist_from_photo_point')
+	
 	@api.model
-	def create_update_vis_object(self,PhotoID, ObjName, ObjID, ObjType, JSON, IMG):
+	def create_update_vis_object(self,PhotoID, ObjName, ObjID, ObjType, JSON):
 		visObject=None;
 		if (ObjType=='uis.papl.pillar'):
 			obj_mas=self.search([('photo_id.id','=',PhotoID),('pillar_id.id','=',ObjID)])
@@ -50,7 +51,6 @@ class uis_ap_vis_object(models.Model):
 			visObject=self.create({'name':ObjName})
 		visObject.photo_id=int(PhotoID)
 		visObject.rect_coordinate_json=JSON
-		visObject.image=IMG
 		if (ObjType=='uis.papl.pillar'):
 			visObject.pillar_id=int(ObjID)
 		if (ObjType=='uis.papl.transformer'):
@@ -125,8 +125,9 @@ class uis_ap_vis_object(models.Model):
 			image.save(background_stream, format="PNG")
 			vo.image=background_stream.getvalue().encode('base64')
 	
+	#NUPD Need delete create_update_vis_object_old and delete_objects_old 
 	@api.model
-	def create_update_vis_object(self,PhotoID, ObjName, ObjID, ObjType, JSON, IMG):
+	def create_update_vis_object_old(self,PhotoID, ObjName, ObjID, ObjType, JSON, IMG):
 		visObject=None;
 		if (ObjType=='uis.papl.pillar'):
 			obj_mas=self.search([('photo_id.id','=',PhotoID),('pillar_id.id','=',ObjID)])
@@ -146,7 +147,7 @@ class uis_ap_vis_object(models.Model):
 		if (ObjType=='uis.papl.transformer'):
 			visObject.transformer_id=int(ObjID)
 	@api.model
-	def delete_objects(self,PhotoID,ObjType,Ref_Object_IDs):
+	def delete_objects_old(self,PhotoID,ObjType,Ref_Object_IDs):
 		if (ObjType=='uis.papl.pillar'):
 			obj_mas=self.search([('photo_id.id','=',PhotoID),('pillar_id.id','not in',Ref_Object_IDs)])
 			for obj in obj_mas:
