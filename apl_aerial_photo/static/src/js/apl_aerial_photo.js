@@ -551,7 +551,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						PolygonFeature.setStyle(mainStyle);
 						vectorSource.addFeature(PolygonFeature);
 						var NextPhotoModel=new Model(ModelName);
-						NextPhotoModel.query(['id','name','longitude','latitude','rotation','view_distance','focal_angles']).filter([['id','in',next_photo_ids]]).limit(100).all().then(function(nextphotos)
+						NextPhotoModel.query(['id','name','longitude','latitude','rotation','view_distance','focal_angles','visable_view_json']).filter([['id','in',next_photo_ids]]).limit(100).all().then(function(nextphotos)
 						{
 								
 							for (var i=0;i<nextphotos.length;i++)
@@ -564,6 +564,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 								var rotation=nextphotos[i]['rotation'];
 								var viewDistance=nextphotos[i]['view_distance'];
 								var focalAngle=nextphotos[i]['focal_angles'];
+								var VisibilityViewJSON=nextphotos[i]['visable_view_json'];
 								var nextFill=new ol.style.Fill({color: 'transparent'});
 								var nextStroke=new ol.style.Stroke({color : 'orange',width : 0.3});
 								var nextPoint=new ol.style.Circle({radius: 5,stroke: nextStroke});
@@ -573,7 +574,9 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 								pointFeature.setStyle(nextStyle);
 								pointFeature.attributes = {"vistype":"photo","visid":PhotoID};
 								vectorSource.addFeature(pointFeature);
-								var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
+								console.log(VisibilityViewJSON);
+								//var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
+								var PhotoPolygon=getPhotoPolygonByJSON(point,VisibilityViewJSON);
 								var PolygonFeature = new ol.Feature(PhotoPolygon);
 								PolygonFeature.setStyle(nextStyle);
 								vectorSource.addFeature(PolygonFeature);
@@ -674,7 +677,18 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						photoClicked=false;
 					});
 				}
-
+				function getPhotoPolygonByJSON(point, json_data){
+					data=$.parseJSON(json_data);
+					console.debug(data);
+					arr_points=[];
+					data.forEach(function(item, i, arr) {
+						arr_points.push([item.latitude,item.longitude]);
+						
+					})
+					console.log(arr_points);
+					var polygon=new ol.geom.Polygon([arr_points]);
+					return polygon
+				}
 				function getPhotoPolygon(point,viewDistance,focalAngle,rotation)
 				{
 					focalAngle=focalAngle*Math.PI/180;

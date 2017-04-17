@@ -226,7 +226,7 @@ class uis_ap_photo(models.Model):
 							column2='transformer_id',
 							compute='_get_photo_trans')
 	
-	#@api.depends('rotation','vd_min','vd_max', 'relative_altitude', 'vert_angle', 'hori_angle', 'latitude','longitude')
+	@api.onchange('latitude','longitude','rotation','vd_min','vd_max', 'relative_altitude', 'vert_angle', 'hori_angle')
 	def _get_visable_view_json(self):
 		for ph in self:
 			lat=ph.latitude
@@ -368,7 +368,7 @@ class uis_ap_photo(models.Model):
 				elv=item['elevation']
 				ph.elevation_point = elv
 		return True
-	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
+	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids','visable_view_json')
 	def _get_scheme_position(self):
 		#_logger.debug('Start')
 		sch_w, sch_h,sch_dpi=8,6,200
@@ -653,25 +653,27 @@ class uis_ap_photo(models.Model):
 					apl_ids.append(pil.apl_id.id)
 					photo.near_apl_ids=[(4,pil.apl_id.id,0)]
 			
-	@api.depends('pillar_ids','near_apl_ids')
+	@api.depends('pillar_ids','near_apl_ids','visable_view_json')
 	def _get_photo_apl(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
 			apl_ids=[]
+			
 			for pil in photo.pillar_ids:
 				if pil.apl_id.id not in apl_ids:
 					apl_ids.append(pil.apl_id.id)
 					photo.apl_ids=[(4,pil.apl_id.id,0)]
 					
-	@api.depends('latitude','longitude','rotation','view_distance','focal_angles','near_pillar_ids')
+	@api.depends('latitude','longitude','rotation','view_distance','vd_min','vd_max','focal_angles','near_pillar_ids','visable_view_json')
 	def _get_photo_pillar(self,cr,uid,ids,context=None):
 		for photo in self.browse(cr,uid,ids,context=context):
 			lat=photo.latitude
 			lng=photo.longitude
-			tri_points=triangle_points(photo.latitude,photo.longitude,photo.rotation,photo.focal_angles,photo.view_distance)
-			try:
-				tri_points=json.loads(ph.visable_view_json)
-			except:
-				_logger.debug('je')
+			tri_points=json.loads(photo.visable_view_json)
+			#tri_points=triangle_points(photo.latitude,photo.longitude,photo.rotation,photo.focal_angles,photo.view_distance)
+			#try:
+			#	tri_points=json.loads(ph.visable_view_json)
+			#except:
+			#	_logger.debug('je')
 				
 			for pil in photo.near_pillar_ids:
 				inpoint=point_in_poly(pil.latitude,pil.longitude,tri_points)
