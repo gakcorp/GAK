@@ -575,8 +575,8 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 								pointFeature.attributes = {"vistype":"photo","visid":PhotoID};
 								vectorSource.addFeature(pointFeature);
 								console.log(VisibilityViewJSON);
-								//var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
-								var PhotoPolygon=getPhotoPolygonByJSON(point,VisibilityViewJSON);
+								var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
+								//var PhotoPolygon=getPhotoPolygonByJSON(point,VisibilityViewJSON);
 								var PolygonFeature = new ol.Feature(PhotoPolygon);
 								PolygonFeature.setStyle(nextStyle);
 								vectorSource.addFeature(PolygonFeature);
@@ -682,7 +682,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					console.debug(data);
 					arr_points=[];
 					data.forEach(function(item, i, arr) {
-						arr_points.push([item.latitude,item.longitude]);
+						#arr_points.push([item.latitude,item.longitude]);
 						
 					})
 					console.log(arr_points);
