@@ -682,7 +682,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					console.debug(data);
 					arr_points=[];
 					data.forEach(function(item, i, arr) {
-						#arr_points.push([item.latitude,item.longitude]);
+						//arr_points.push([item.latitude,item.longitude]);
 						
 					})
 					console.log(arr_points);
