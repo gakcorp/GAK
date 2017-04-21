@@ -39,3 +39,23 @@ pointer-events: none;
 	position: fixed;
 	z-index: 1100;
 }
+
+ .div_map:-moz-full-screen {
+        height: 100%;
+				width: 100%;
+      }
+      .div_map:-webkit-full-screen {
+        height: 100%;
+				width: 100%;
+      }
+      .div_map:-ms-fullscreen {
+        height: 100%;
+				width: 100%;
+      }
+      .div_map:fullscreen {
+        height: 100%;
+				width: 100%;
+      }
+      .ol-rotate {
+        top: 3em;
+      }

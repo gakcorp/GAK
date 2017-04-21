@@ -470,7 +470,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					}
 					$(".zoomContainer").remove();
 					var PhotoModel=new Model(ModelName);
-					PhotoModel.query(['longitude','latitude','rotation','view_distance','focal_angles','next_photo_ids','pillar_ids','near_pillar_ids','transformer_ids','near_transformer_ids']).filter([['id','=',ID]]).all().then(function(photos)
+					PhotoModel.query(['longitude','latitude','rotation','view_distance','focal_angles','next_photo_ids','pillar_ids','near_pillar_ids','transformer_ids','near_transformer_ids','visable_view_json']).filter([['id','=',ID]]).all().then(function(photos)
 					{
 						var mainPhotoPoint;
 						var next_photo_ids=photos[0]['next_photo_ids'];
@@ -493,9 +493,9 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						var latitude=photos[0]['latitude'];
 						var longitude=photos[0]['longitude'];
 						var rotation=photos[0]['rotation'];
-						var viewDistance=photos[0]['view_distance'];
+						var viewDistance=photos[0]['view_distance'];//NUPD migrate to visibledatajson
 						var focalAngle=photos[0]['focal_angles'];
-
+						var VisibilityViewJSON=photos[0]['visable_view_json'];
 						var pillar_ids=photos[0]['pillar_ids'];
 						var near_pillar_ids=photos[0]['near_pillar_ids'];
 
@@ -520,6 +520,9 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 							var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
 							OsmLayer.setVisible(true);
 							map = new ol.Map({
+											controls:ol.control.defaults().extend([
+												new ol.control.FullScreen()
+											]),
                			 					target: 'map',  // The DOM element that will contains the map
                 							renderer: 'canvas', // Force the renderer to be used
                 							layers: [				
@@ -546,12 +549,14 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
                     							zoom: 18
                 							}));
 						}
-						var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
+						//var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
+						var PhotoPolygon=getPhotoPolygonByJSON(point,VisibilityViewJSON);
 						var PolygonFeature = new ol.Feature(PhotoPolygon);
 						PolygonFeature.setStyle(mainStyle);
 						vectorSource.addFeature(PolygonFeature);
 						var NextPhotoModel=new Model(ModelName);
 						NextPhotoModel.query(['id','name','longitude','latitude','rotation','view_distance','focal_angles','visable_view_json']).filter([['id','in',next_photo_ids]]).limit(100).all().then(function(nextphotos)
+						//NextPhotoModel.query(['id','name','longitude','latitude','rotation','view_distance','focal_angles','visable_view_json']).filter([]).all().then(function(nextphotos)																																																					
 						{
 								
 							for (var i=0;i<nextphotos.length;i++)
@@ -574,9 +579,10 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 								pointFeature.setStyle(nextStyle);
 								pointFeature.attributes = {"vistype":"photo","visid":PhotoID};
 								vectorSource.addFeature(pointFeature);
-								console.log(VisibilityViewJSON);
-								var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
-								//var PhotoPolygon=getPhotoPolygonByJSON(point,VisibilityViewJSON);
+								console.log(PhotoID);
+								//var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
+								var PhotoPolygon=getPhotoPolygonByJSON(point,VisibilityViewJSON);
+								console.log(PhotoPolygon.getCoordinates());
 								var PolygonFeature = new ol.Feature(PhotoPolygon);
 								PolygonFeature.setStyle(nextStyle);
 								vectorSource.addFeature(PolygonFeature);
@@ -584,7 +590,8 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						});
 
 						var PillarModel=new Model('uis.papl.pillar');
-						PillarModel.query(['id','num_by_vl','longitude','latitude','prev_longitude','prev_latitude']).filter([['id','in',near_pillar_ids]]).limit(100).all().then(function(pillars)
+						//PillarModel.query(['id','num_by_vl','longitude','latitude','prev_longitude','prev_latitude']).filter([['id','in',near_pillar_ids]]).limit(100).all().then(function(pillars)
+						PillarModel.query(['id','num_by_vl','longitude','latitude','prev_longitude','prev_latitude']).filter([]).all().then(function(pillars)
 						{
 							for (var i in pillars)
 							{
@@ -678,14 +685,18 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					});
 				}
 				function getPhotoPolygonByJSON(point, json_data){
+					//console.debug(json_data)
 					data=$.parseJSON(json_data);
 					console.debug(data);
-					arr_points=[];
-					data.forEach(function(item, i, arr) {
-						//arr_points.push([item.latitude,item.longitude]);
+					var arr_points=[];
+					
+					for (var i=0;i<data.length; i++){
 						
-					})
-					console.log(arr_points);
+						arr_points[i]=ol.proj.transform([data[i].lng,data[i].lat], 'EPSG:4326', 'EPSG:3857')
+						//console.debug()
+					//	arr_points.push([data[i].lat,data[i].lng])
+					}
+					//console.log(arr_points);
 					var polygon=new ol.geom.Polygon([arr_points]);
 					return polygon
 				}

@@ -660,8 +660,9 @@ class uis_ap_photo(models.Model):
 			
 			for pil in photo.pillar_ids:
 				if pil.apl_id.id not in apl_ids:
-					apl_ids.append(pil.apl_id.id)
-					photo.apl_ids=[(4,pil.apl_id.id,0)]
+					if pil.apl_id.id:
+						apl_ids.append(pil.apl_id.id)
+						photo.apl_ids=[(4,pil.apl_id.id,0)]
 					
 	@api.depends('latitude','longitude','rotation','view_distance','vd_min','vd_max','focal_angles','near_pillar_ids','visable_view_json')
 	def _get_photo_pillar(self,cr,uid,ids,context=None):
@@ -716,13 +717,25 @@ class uis_ap_photo(models.Model):
 		for photo in self.browse(cr,uid,ids,context=context):
 			lat=photo.latitude
 			lng=photo.longitude
-			tri_points=triangle_points(lat,lng,photo.rotation,photo.focal_angles,photo.view_distance)
+			#tri_points=triangle_points(lat,lng,photo.rotation,photo.focal_angles,photo.view_distance)
+			tri_points=json.loads(photo.visable_view_json)
 			for trans in photo.near_transformer_ids:
 				inpoint=point_in_poly(trans.latitude,trans.longitude,tri_points)
 				#_logger.debug('For PH %r Trans %r is %r'%(photo.name,trans.name,inpoint))
 				if inpoint:
 					photo.transformer_ids=[(4,trans.id,0)]
-		
+	
+	def view_photo_action(self,cr,uid,id,context=None):
+		return{
+			'type': 'ir.actions.act_window',
+			'name': 'Photo', 
+			'view_type': 'form',
+			'view_mode': 'form',
+			'res_model': self._name,
+			'res_id': id[0],
+			'target': 'current',
+		}
+	
 class uis_ap_photo_load_hist(models.Model):
 	_name='uis.ap.photo.load_hist'
 	_description='Photo_apl_hist'

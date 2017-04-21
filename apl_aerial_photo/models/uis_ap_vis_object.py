@@ -104,20 +104,20 @@ class uis_ap_vis_object(models.Model):
 	def _get_vo_img(self):
 		for vo in self:
 			rect_data= json.loads(vo.rect_coordinate_json)
-			_logger.debug(rect_data)
-			_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
+			#_logger.debug(rect_data)
+			#_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
 			image = Image.open(StringIO.StringIO(vo.photo_id.with_context(bin_size=False).image.decode('base64')))
 			or_width, or_height = vo.photo_id.image_width,vo.photo_id.image_length
 			kw=float(or_width)/rect_data['canvaswidth']
 			kh=float(or_height)/rect_data['canvasheight']
-			_logger.debug('ow= %r, oh= %r'%(or_width,or_height))
-			_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
-			_logger.debug('kw= %r, kh=%r'%(kw,kh))
+			#_logger.debug('ow= %r, oh= %r'%(or_width,or_height))
+			#_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
+			#_logger.debug('kw= %r, kh=%r'%(kw,kh))
 			lp=int(rect_data['groupleft']*kw)
 			rp=int(lp+rect_data['rectwidth']*kw)
 			tp=int(rect_data['grouptop']*kh)
 			bp=int(tp+rect_data['rectheight']*kh)
-			_logger.debug('lp= %r, tp= %r , rp= %r, bp=%r'%(lp,tp,rp,bp))
+			#_logger.debug('lp= %r, tp= %r , rp= %r, bp=%r'%(lp,tp,rp,bp))
 			#dr=ImageDraw.Draw(image)
 			image=image.crop((lp,tp,rp,bp))
 			#dr.rectangle(((lp,tp),(rp,bp)),fill="blue", outline="black")
@@ -161,6 +161,11 @@ class uis_ap_vis_object(models.Model):
 class uis_ap_photo_mod_vis_object(models.Model):
 	_inherit='uis.ap.photo'
 	vis_objects_ids=fields.One2many('uis.ap.vis_object','photo_id','Visual objects')
+	vis_objects_cnt=fields.Integer(string ="Number of visual objects", compute='_get_cnt_visual_objects')
 	image_vis_obj=fields.Binary(string='Image with visual objects')
 	image_vis_obj_800=fields.Binary(string='Image (800px) wuth visual objects')
 	
+	@api.depends('vis_objects_ids')
+	def _get_cnt_visual_objects(self):
+		for ph in self:
+			ph.vis_object_cnt=len(vis_objects_ids)
