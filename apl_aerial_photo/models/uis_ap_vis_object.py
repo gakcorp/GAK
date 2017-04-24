@@ -28,7 +28,7 @@ class uis_ap_vis_object(models.Model):
 	auto_detected=fields.Boolean(string='Auto Detected')
 	distance_from_photo_point=fields.Float(digits=(2,2), string='Distance from photo point')
 	@api.model
-	def create_update_vis_object(self,PhotoID, ObjName, ObjID, ObjType, JSON, IMG):
+	def create_update_vis_object(self,PhotoID, ObjName, ObjID, ObjType, JSON):
 		visObject=None;
 		if (ObjType=='uis.papl.pillar'):
 			obj_mas=self.search([('photo_id.id','=',PhotoID),('pillar_id.id','=',ObjID)])
@@ -42,7 +42,6 @@ class uis_ap_vis_object(models.Model):
 			visObject=self.create({'name':ObjName})
 		visObject.photo_id=int(PhotoID)
 		visObject.rect_coordinate_json=JSON
-		visObject.image=IMG
 		if (ObjType=='uis.papl.pillar'):
 			visObject.pillar_id=int(ObjID)
 		if (ObjType=='uis.papl.transformer'):

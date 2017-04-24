@@ -20,6 +20,7 @@
                         <notebook>
 							<page name="main" string="Main information">
 								<field name="user_id" on_change="onchange_user(name, image, user_id)" string="Related User"/>
+								<field name="dept_ids" string="Department References" options="{'no_create_edit': True}" widget="many2many_tags"/>
 							</page>
 							<page name="apl_settings" string="APL display settings">
 								<group>
