@@ -1,67 +1,57 @@
-# -*- coding: utf-8 -*-
-import time
+from openerp import models, fields, api
 
-from openerp.osv import fields, osv
-import openerp.addons.decimal_precision as dp
-from openerp.tools.translate import _
-from openerp import netsvc
-
-'''
-class apl_mro_defect_type(osv.osv):
-    _name='uis.papl.defect.type'
-    _description='Transformer Types'
-    name=fields.Char(string='Name')
-    f_apl=fields.Boolean(string='APL')
-    f_pillar=fields.Boolean(string="Pillar")
-    f_trans=fields.Boolean(string="Pillar")
-  '''  
-class apl_mro_defect(osv.osv):
-    """
-    Defects
-    """
-    _name = 'uis.papl.mro.defect'
-    _description = 'Defects'
-    _inherit = ['mail.thread', 'ir.needaction_mixin']
-
-    STATE_SELECTION = [
-        ('draft', 'DRAFT'),
-        ('confirmed', 'CONFIRMED'),
-        ('planed', 'PLANED'),
-        ('work', 'WORK'),
-        ('done', 'DONE'),
-        ('cancel', 'CANCELED')
-    ]
-
-    DEFECT_CATEGORY = [
-        ('0', 'No Category'),
-        ('1', 'Critical'),
-        ('2', 'Normal'),
-        ('3', 'Not critical')
-    ]
-    def _defect_total_labor(self,cr,uid,ids,field_name,arg,context=None):
-        res =dict.fromkeys(ids,0)
-        for defect in self.browse(cr,uid,ids,context=context):
-            res[defect.id]=defect.labor_cost*defect.qnty
-        return res
-    
-    _columns = {
-        'number': fields.char('Defect No', readonly=True),
-        'name': fields.char('Defect name', size=64),
-        #'defect_type':fields.many2one('uis.papl.mro.defect.type','Defect type',required=False, readonly=True, states={'draft': [('readonly', False)]}),
-        'apl_id': fields.many2one('uis.papl.apl', 'Air power line', readonly=True, required=False, states={'draft': [('readonly', False)]}),
-        'tap_id': fields.many2one('uis.papl.tap', 'Tap of APL', required=False, readonly=True, states={'draft':[('readonly',False)]}),
-        'pillar_id': fields.many2one('uis.papl.pillar', 'Pillar',required=False, readonly=True, states={'draft':[('readonly',False)]}),
-        'transformer_id': fields.many2one('uis.papl.transformer','Transformer',required=False, readonly=True, domain="[('apl_id','in',[apl_id])]",states={'draft':[('readonly',False)]}),
-        'unicode': fields.char('UniCode'),
-        'state': fields.selection(STATE_SELECTION, 'Status', readonly=True),
-        'category': fields.selection(DEFECT_CATEGORY,'Category', readonly=True),
-        'qnty':fields.integer('Qnt'),
-        'labor_cost':fields.integer('Labor Cost per defect'),
-        'total_labor_cost':fields.function(_defect_total_labor, string='Total laborcost', type='integer'),
-        'defect_description': fields.text('Defect Description'),
-    }
-    _defaults = {
-        'state': lambda *a: 'draft',
-        'qnty':1,
-        'category': lambda *a: '2'
-    }
+class apl_mro_defect(models.Model):
+	DEFECT_CATEGORY = [('1', 'Minor'),('2', 'Major'),('3', 'Pre-fault'),('4', 'Emergency')]
+	STATE_SELECTION = [('draft', 'DRAFT'),('confirmed', 'CONFIRMED'),('planed', 'PLANED'),('work', 'WORK'),('done', 'DONE'),('cancel', 'CANCELED')]
+	 
+	_name='uis.papl.mro.defect'
+	_description='Defects'
+	name=fields.Char('Defect name', size=64)
+	description=fields.Text('Defect Description')
+	apl_id=fields.Many2one('uis.papl.apl', 'Air power line',required=True, readonly=True)
+	pillar_id=fields.Many2many('uis.papl.pillar', relation='defect_pillar_rel',column1='defect_id', column2='pillar_id')
+	pillar_id_2=fields.Many2many('uis.papl.pillar', store=False,compute='_get_pillar')
+	tap_id=fields.Many2many('uis.papl.tap', relation='defect_tap_rel',column1='defect_id', column2='tap_id')
+	tap_id_2=fields.Many2many('uis.papl.tap', store=False, compute='_get_tap')
+	transformer_id=fields.Many2many('uis.papl.transformer',relation='defect_transformer_rel',column1='defect_id', column2='transformer_id')
+	transformer_id_2=fields.Many2many('uis.papl.transformer',store=False,compute='_get_transformer')
+	state=fields.Selection(STATE_SELECTION, 'Status', readonly=True, default='draft')
+	category=fields.Selection(DEFECT_CATEGORY,'Category',default='1')
+	defect_photo_area=fields.Text('Defect Photo Area')
+	photo_id=fields.Many2one('uis.ap.photo', string='Photo', readonly=True)
+	image_800=fields.Binary(string='Image800', store=False,related='photo_id.image_800')
+	longitude=fields.Float(digits=(2,6), string='Longitude', readonly=True)
+	latitude=fields.Float(digits=(2,6), string='Latitude', readonly=True)
+	create_date=fields.Datetime(string='Create date', readonly=True)
+	create_uid=fields.Char('Creator', readonly=True)
+	@api.model
+	def create_defect(self,DName, AplID, ObjType, ObjIDS, DCat, DDesc, PhotoID, Longitude, Latitude, DJSON):
+		defect=self.create({'name':DName,'apl_id':int(AplID)})
+		if (ObjType=='uis.papl.pillar'):
+			for pillarID in ObjIDS:
+				defect.pillar_id=[(4,int(pillarID),0)]
+		if (ObjType=='uis.papl.transformer'):
+			for transID in ObjIDS:
+				defect.transformer_id=[(4,int(transID),0)]
+		defect.category=DCat
+		defect.description=DDesc
+		defect.photo_id=int(PhotoID)
+		defect.longitude=Longitude
+		defect.latitude=Latitude
+		defect.defect_photo_area=DJSON
+		return defect.id
+	@api.depends('pillar_id')
+	def _get_pillar(self):
+		for defect in self:
+			for pillar in defect.pillar_id:
+				defect.pillar_id_2=[(4,pillar.id,0)]
+	@api.depends('tap_id')
+	def _get_tap(self):
+		for defect in self:
+			for tap in defect.tap_id:
+				defect.tap_id_2=[(4,tap.id,0)]
+	@api.depends('transformer_id')
+	def _get_transformer(self):
+		for defect in self:
+			for transfomer in defect.transformer_id:
+				defect.transformer_id_2=[(4,transfomer.id,0)]

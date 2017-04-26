@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-
+		<template id="assets_backend" name="defectmap" inherit_id="web.assets_backend">
+			<xpath expr="." position="inside">
+				<script type="text/javascript" src="/apl_mro/static/src/js/apl_mro.js"/>
+			</xpath>
+		</template>
         <!-- Top menu item -->
         <!--<menuitem name="Maintenance"
             id="base.menu_mro_root"
@@ -19,15 +23,15 @@
             <field name="name">uis.papl.mro.defect.tree</field>
             <field name="model">uis.papl.mro.defect</field>
             <field name="arch" type="xml">
-                <tree fonts="bold:message_unread==True" string="Maintenance Orders">
-                    <field name="message_unread" invisible="1"/>
+                <tree>
                     <field name="name"/>
                     <!--<field name="date_execution" string="Order Date" widget="date"/>!-->
                     <field name="apl_id"/>
 					<field name="tap_id"/>
 					<field name="pillar_id"/>
 					<field name="transformer_id"/>
-                     <field name="state"/>
+                    <field name="state"/>
+					<field name="category"/>
                 </tree>
             </field>
         </record>
@@ -45,7 +49,6 @@
 					<field name="pillar_id"/>
 					<field name="transformer_id"/>
 					
-                    <filter icon="terp-mail-message-new" string="Unread Messages" name="message_unread" domain="[('message_unread','=',True)]"/>
                     <separator/>
                     <group expand="0" string="Group By">
                       <filter name="group_state"
@@ -58,6 +61,78 @@
                               />
                     </group>
                 </search>
+            </field>
+        </record>
+		
+		<record id="mro_defect_form_view" model="ir.ui.view">
+            <field name="name">uis.papl.mro.defect.form</field>
+            <field name="model">uis.papl.mro.defect</field>
+            <field name="arch" type="xml">
+                <form string="Defect Form">
+					<header>
+						<field name="state" widget="statusbar"/>
+					</header>
+					<sheet>
+						<group>
+							<group>
+								<field name="id" attrs="{'invisible':[('id', '>', 0)]}"/>
+								<field name="name"/>
+								<field name="category"/>
+								<field name="create_date"/>
+							</group>
+							<group>
+								<field name="apl_id" widget="many2one_tags"/>
+								<field name="pillar_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('pillar_id', '=', [])]}"/>
+								<field name="transformer_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('transformer_id', '=', [])]}"/>
+								<field name="tap_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('tap_id', '=', [])]}"/>
+							</group>
+						</group>
+						<notebook>
+							<page string="Description">
+								<field name="description"/>
+							</page>
+							<page string="Photo">
+								<field name="defect_photo_area" attrs="{'invisible':[('id', '>', 0)]}"/>
+								<field name="image_800" options='{"size":[800,600]}' widget="defectphoto" nolabel="1" colspan="2"/>
+							</page>
+							<page string="Map">
+								<field name="longitude" widget="defectmap"/>
+								<field name="latitude"/>
+							</page>
+							<page string="Pillars" attrs="{'invisible':[('pillar_id', '=', [])]}">
+								<field name="pillar_id_2">
+									<tree default_order="tap_id,num_by_vl">
+										<field name="name"/>
+										<field name="tap_id" invisible="1"/>
+										<field name="num_by_vl"/>
+										<field name="pillar_material_id"/>
+										<field name="pillar_type_id"/>
+										<field name="pillar_cut_id"/>
+									</tree>
+								</field>
+							</page>
+							<page string="Transformers" attrs="{'invisible':[('transformer_id', '=', [])]}">
+								<field name="transformer_id_2">
+									<tree>
+										<field name="name"/>
+									</tree>
+								</field>
+							</page>
+							<page string="Taps" attrs="{'invisible':[('tap_id', '=', [])]}">
+								<field name="tap_id_2">
+									<tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
+										<field name="num_by_vl" invisible="1"/>
+										<field name="name"/>
+										<field name="conn_pillar_id"/>
+										<field name="pillar_cnt"/>
+										<field name="line_len_calc"/>
+										<field name="is_main_line" invisible="1"/>
+									</tree>
+								</field>
+							</page>
+						</notebook>
+                    </sheet>
+                </form>
             </field>
         </record>
 
