@@ -130,7 +130,8 @@ class uis_papl_apl(osv.osv):
 										if field is empty default format is ex. '(3).2.APL name'"),
 		#personal fields
 		'color': fields.integer('Color Index'),
-		'work_email': fields.char('Work Email', size=240)
+		'work_email': fields.char('Work Email', size=240),
+		'dept_ids' : fields.many2many('uis.papl.department','employee_dept_ref','employee_id','dept_id',stirng="Departments Reference"),
 	}
 	 # image: all image fields are base64 encoded and PIL-supported
 	image = openerp.fields.Binary("Photo", attachment=True,

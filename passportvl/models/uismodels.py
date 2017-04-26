@@ -223,3 +223,5 @@ class uis_papl_substation(models.Model):
 			'target':'new',
 			'url':self.url_maps
 			}
+		
+
