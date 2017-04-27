@@ -28,7 +28,7 @@ Main Features
         'views/reports/mod_uis_papl_apl_report_passport.xml',
         'views/uis_ap_vis_object.xml',
         'action/uis_ap_action_recalc_scheme.xml',
-	'views/uis_papl_aerial_pre_photo_view.xml'
+		'views/uis_papl_aerial_pre_photo_view.xml'
     ],
     'application': True,
 }
