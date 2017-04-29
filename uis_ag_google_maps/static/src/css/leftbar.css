@@ -19,6 +19,17 @@
     border-radius: 5px;
     -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5); 
 }
+.chb_apl_menu{
+    overflow-x: hidden;
+    width: 190px;
+}
+.apl_list{
+    font-size: x-small;
+    white-space: nowrap;
+    display: flex;
+    padding-top: 4px;
+    height: 20px;
+}
 .marker_list{
     white-space: nowrap;
     height: 20px;
@@ -99,15 +110,33 @@
     border-top-width: 1px;
     border-top-style: dashed;
     position:absolute;
-    bottom:1px;
+    bottom:15px;
     height: 300px;
     max-height: 300px;
     overflow-y: auto;
     left: 1px;
     right: 1px;
 }
+#left_status_bar{
+    font-family: Roboto;
+    color: dimgrey;
+    font-size: x-small;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: dimgrey;
+    position: absolute;
+    bottom: 1px;
+    height: 15px;
+    overflow-y: auto;
+    left: 0px;
+    right: 0px;
+}
 #menu_button_bar{
     padding-left: 10px;
+    display: table-row-group;
+    overflow-x: auto;
 }
 .menu_button{
     border: none;

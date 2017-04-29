@@ -12,16 +12,17 @@
 		<!--<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/bootstrap.min.css"/>!-->
 		<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/leftbar.css"/>
 		<link rel="stylesheet" type="text/css" href="/uis_ag_google_maps/static/src/css/rightbar.css"/>
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="https://maps.google.com/maps/api/js?key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"></script>
     </head>
     <body style="overflow-x: hidden;"> <!--t-att-data-partner-url="pillar_url or ''"!-->
          <script>
 			var apl_ids=<t t-raw="apl_ids"/>;
-            var lines_data=<t t-raw="lines_data"/>;
+            <!--var lines_data=<t t-raw="lines_data"/>;
 			var ktp_data=<t t-raw="ktp_data"/>;
-			var odoo_pillar_data = <t t-raw="pillar_data"/>;
+			var odoo_pillar_data = <t t-raw="pillar_data"/>;!-->
         </script>
 		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/refresher.js"></script>
 		<div id="wrapper">
@@ -32,9 +33,11 @@
 				<div>
 					<div id="menu_button_bar">
 						Select Map Type<br/>
-						<img src="/uis_ag_google_maps/static/src/img/site_icons/map_ico_120.png" class="img-circle menu_button" alt="Map" width="60" height="60" id="map_button"/>
-						<img src="/uis_ag_google_maps/static/src/img/site_icons/earth_ico_120.png" class="img-circle menu_button" alt="Map" width="60" height="60" id="earth_button"/>
-						<img src="/uis_ag_google_maps/static/src/img/site_icons/rosreestr_ico_120.png" class="img-circle menu_button" alt="Map" width="60" height="60" id="rosreestr_button"/>
+						<img src="/uis_ag_google_maps/static/src/img/site_icons/map_ico_120.png" class="img-circle menu_button" alt="Map" width="50" height="50" id="map_button"/>
+						<img src="/uis_ag_google_maps/static/src/img/site_icons/earth_ico_120.png" class="img-circle menu_button" alt="Map" width="50" height="50" id="earth_button"/>
+						<!--<img src="/uis_ag_google_maps/static/src/img/site_icons/rosreestr_ico_120.png" class="img-circle menu_button" alt="Map" width="50" height="50" id="rosreestr_button"/>
+						<img src="/uis_ag_google_maps/static/src/img/site_icons/yandex_sat_120.png" class="img-circle menu_button" alt="Yandex Satelite" width="50" height="50" id="yandex_satelite_button"/>
+						<img src="/uis_ag_google_maps/static/src/img/site_icons/esri_ico_120.jpg" class="img-circle menu_button" alt="Esri" width="50" height="50" id="esri_button"/>!-->
 					</div>
 					<div>
 						Status 
@@ -68,9 +71,8 @@
 					</li>
 				</ul>
 				</div>
-				<div id="left_info_bar">
-					
-				</div>
+				<div id="left_info_bar"></div>
+				<div id="left_status_bar"></div>	
 			</div>
 			<div id="page-content-wrapper">
 				<!--<div class="container-fluid">!-->
@@ -94,7 +96,7 @@
 				</div>
 			</div>
 		</div>
-        <script src="http://maps.google.com/maps/api/js?key=AIzaSyBISxqdmShLk0Lca8RC_0AZgZcI5xhFriE"></script>
+		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/mod/uis_maps_pillar_events.js"></script>
 		<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/Chart.js"></script>
         <script type="text/javascript" src="/uis_ag_google_maps/static/src/js/markerclusterer_compiled.js"></script>
         <!--<script type="text/javascript" src="/uis_ag_google_maps/static/src/js/google_map.js"></script>!-->

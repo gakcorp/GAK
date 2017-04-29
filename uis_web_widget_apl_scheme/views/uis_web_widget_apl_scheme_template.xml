@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<template id="assets_backend" name="apl_scheme" inherit_id="web.assets_backend">
+			<xpath expr="." position="inside">
+				<link rel="stylesheet" href="/uis_web_widget_apl_scheme/static/src/css/web_apl_scheme.css"/>
+				<script type="text/javascript" src="/uis_web_widget_apl_scheme/static/src/js/sigmajs/sigma.min.js"/>
+				<script type="text/javascript" src="/uis_web_widget_apl_scheme/static/src/js/web_apl_scheme.js"/>
+			</xpath>
+		</template>
+	</data>
+</openerp>

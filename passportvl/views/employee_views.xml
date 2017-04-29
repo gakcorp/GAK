@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+		 <record id="view_papl_employee_form" model="ir.ui.view">
+            <field name="name">uis.papl.employee.form</field>
+            <field name="model">uis.papl.employee</field>
+            <field name="arch" type="xml">
+                <form string="Employee">
+                    <!--<sheet>!-->
+                        <!--NUPD Add images !-->
+						<!--<field name="image" widget='image' class="oe_avatar" options='{"preview_image":"image_medium"}'/>!-->
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="Employee's Name"/>
+                            </h1>
+                        </div>
+                        <!--NUPD Add main department!-->
+						<!--<field name="category_ids" widget="many2many_tags" placeholder="e.g. Part Time" groups="base.group_hr_user"/>!-->
+                        <notebook>
+							<page name="main" string="Main information">
+								<field name="user_id" on_change="onchange_user(name, image, user_id)" string="Related User"/>
+								<field name="dept_ids" string="Department References" options="{'no_create_edit': True}" widget="many2many_tags"/>
+							</page>
+							<page name="apl_settings" string="APL display settings">
+								<group>
+									<group string="Default variables">
+										<field name="code_empty_type_apl" placeholder="If not specified, it uses the system default"/>
+										<field name="code_empty_voltage_apl" placeholder="If not specified, it uses the system default"/>
+										<field name="code_empty_feed_apl" placeholder="If not specified, it uses the system default"/>
+										<field name="code_empty_substation_apl" placeholder="If not specified, it uses the system default"/>
+										<separator string="Abbreviations" colspan="4"/>
+										<field name="code_abbr_voltage_apl" placeholder="If not specified, it uses the system default"/>
+										<field name="code_abbr_feed_apl" placeholder="If not specified, it uses the system default"/>
+										<!--TAP fields!-->
+										<separator string="Variables for TAP" colspan="4"/>
+										<field name="code_empty_tap_apl" placeholder="If not specified, it uses the system default"/>
+										<field name="code_empty_tap_num_vl" placeholder="If not specified, it uses the system default"/>
+										<field name="code_empty_tap_conn_pillar" placeholder="If not specified, it uses the system default"/>
+										<separator string="Abbreviations for TAP" colspan="4"/>
+										<field name="code_abbr_tap" placeholder="If not specified, it uses the system default"/>
+										<field name="code_abbr_ml" placeholder="If not specified, it uses the system default"/>
+										<!-- Pillar fields!-->
+										<separator string="Variables for Pillar" colspan="4"/>
+										<field name="pv_pillar_sep" placeholder="If not specified, it uses the system default"/>
+										<field name="pv_pillar_empty_num_vl" placeholder="If not specified, it uses the system default"/>
+										<field name="pv_pillar_empty_tap" placeholder="If not specified, it uses the system default"/>
+										<!--Trans fields!-->
+										<separator string="Variables for transformers" colspan="4"/>
+										<field name="tr_code_abbr_transformer" placeholder="If not specified, it uses the system default"/>
+										<field name="tr_code_empty_feed_number" placeholder="If not specified, it uses the system default"/>
+										<field name="tr_code_empty_trans_number" placeholder="If not specified, it uses the system default"/>
+										<field name="tr_code_empty_tap_number" placeholder="If not specified, it uses the system default"/>
+									</group>
+									<group string="Dispathing format">
+										<field name="disp_apl_frm" placeholder="If not specified, it uses the system default"/>
+										<field name="disp_ml_frm" placeholder="If not specified, it uses the system default"/>
+										<field name="disp_tap_frm" placeholder="If not specified, it uses the system default"/>
+										<field name="disp_mp_frm" placeholder="If not specified, it uses the system default"/>
+										<field name="disp_tp_frm" placeholder="If not specified, it uses the system default"/>
+										<field name="disp_trans_frm" placeholder="If not specified, it uses the system default"/>
+									</group>
+								</group>
+							</page>
+                            <!--<page name="public" string="Public Information">
+                                <group>
+                                    <group string="Contact Information">
+                                        <field name="address_id" on_change="onchange_address_id(address_id)"
+                                            context="{'show_address': 1}"
+                                            options='{"always_reload": True, "highlight_first_line": True}'/>
+                                        <field name="mobile_phone"/>
+                                        <field name="work_location"/>
+                                        <field name="work_email" widget="email"/>
+                                        <field name="work_phone"/>
+                                    </group>
+                                    <group string="Position">
+                                        <field name="department_id" on_change="onchange_department_id(department_id)"/>
+                                        <field name="job_id"/>
+                                        <field name="parent_id"/>
+                                        <field name="coach_id"/>
+                                    </group>
+                                </group>
+                                <field name="notes" placeholder="Other Information ..." colspan="4"/>
+                            </page>
+                            <page string="Personal Information" groups="base.group_hr_user">
+                                <group>
+                                    <group string="Citizenship &amp; Other Information">
+                                        <field name="country_id" options='{"no_open": True, "no_create": True}'/>
+                                        <field name="identification_id" groups="base.group_hr_user"/>
+                                        <field name="passport_id" groups="base.group_hr_user"/>
+                                        <field name="bank_account_id"/>
+                                    </group>
+                                    <group string="Contact Information">
+                                        <field name="address_home_id"
+                                            context="{'show_address': 1}"
+                                            options='{"always_reload": True, "highlight_first_line": True}'/>
+                                    </group>
+                                    <group string="Status">
+                                        <field name="gender"/>
+                                        <field name="marital"/>
+                                    </group>
+                                    <group string="Birth">
+                                        <field name="birthday"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="HR Settings" groups="base.group_hr_user">
+                                <group>
+                                    <group string='Status' name="active_group">
+                                        <field name="company_id" groups="base.group_multi_company" on_change="onchange_company(company_id)"/>
+                                        <field name="user_id" on_change="onchange_user(name, image, user_id)" string="Related User"
+                                            context="{'default_groups_ref': ['base.group_user']}"/>
+                                    </group>
+                                </group>
+                            </page>!-->
+                        </notebook> 
+                    <!--</sheet>!-->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+	</data>
+</openerp>

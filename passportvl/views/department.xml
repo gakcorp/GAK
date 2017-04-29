@@ -97,12 +97,14 @@
 	  </field>
 	</record>
 	
-	
-    <menuitem name="Departments" id="uis_papl_menu_department" parent="uis_papl_menu_management"/>
-    
+  <menuitem name="Departments" id="uis_papl_menu_department" parent="uis_papl_menu_management"/>
+  
     <!-- actions -->
-    <menuitem name="List of Departments" id="uis_papl_menu_department_list" parent="uis_papl_menu_department"
+  <menuitem name="List of Departments" id="uis_papl_menu_department_list" parent="uis_papl_menu_department"
               action="uis_papl_department_action_window"/>
+		
+		  <!--<menuitem name="List of Departments" id="uis_papl_menu_department_list" parent="uis_papl_menu_department"
+              action="uis_papl_department_action_window"/>!-->
     
   </data>
 </openerp>

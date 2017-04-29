@@ -19,18 +19,24 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base','mail','resource','uis_web_widget_apl_scheme'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/views.xml',
-        'views/templates.xml',
+        'views/forms/uis_papl_tap.xml',
+        'views/forms/uis_papl_apl.xml',
         'views/department.xml',
+        'views/templates.xml',
         'views/transformation.xml',
+        'views/employee_views.xml',
+        'views/settings.xml',
+        'views/logger.xml',
         'views/reports/uis_papl_apl_report.xml',
         'views/reports/uis_papl_apl_report_passport.xml',
         'views/schemas/apl_scheme.xml',
+        
 
     ],
     # only loaded in demonstration mode

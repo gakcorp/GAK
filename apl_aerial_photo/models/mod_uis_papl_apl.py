@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+from openerp.osv import fields, osv
+from openerp.tools.translate import _
+import logging
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
+class uis_apl_aerial_photo_mod_uis_papl_apl(osv.Model):
+	_name = 'uis.papl.apl'
+	_inherit = 'uis.papl.apl'
+
+	def _apl_photo_count(self,cr,uid,ids,field_name, arg, context=None):
+		res=dict.fromkeys(ids,0)
+		for apl in self.browse(cr,uid,ids,context=context):
+			photo_count=len(apl.photo_ids)
+			res[apl.id] = photo_count
+		return res
+
+	_columns = {
+		'photo_count': fields.function(_apl_photo_count, string='# Photo', type='integer'),
+		'photo_ids':fields.many2many('uis.ap.photo',rel='photo_apl_rel', id1='apl_id', id2='photo_id',string="Photos")
+	}
+
+	def action_view_photos(self, cr, uid, ids, context=None):
+		_logger.debug('Request photos for apl ids = %r'%ids)
+		return {
+			'domain': "[('apl_ids','in',[" + ','.join(map(str, ids)) + "])]",
+			'name': _('Photos'),
+			'view_type': 'kanban',
+			'view_mode': 'kanban',
+			'res_model': 'uis.ap.photo',
+			'type': 'ir.actions.act_window',
+			'target': 'current'
+		}

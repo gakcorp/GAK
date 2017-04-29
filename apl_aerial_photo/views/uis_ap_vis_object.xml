@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+		<record model="ir.ui.view" id="uis_ap_vis_object_kanban">
+			<field name="name">Visual object kanban view</field>
+			<field name="model">uis.ap.vis_object</field>
+			<field name="arch" type="xml">
+				<kanban>
+					<field name="name"/>
+					<field name="apl_id"/>
+						   
+					<templates>
+						<t t-name="kanban-box" create="false"><!--default_group_by="field"!-->
+							<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+								<!--<a type="open">!-->
+									<!--<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.photo','image_400',record.id.value)" class="oe_kanban_image"/>!-->
+									<img style="max-width:100%;" t-att-src="kanban_image('uis.ap.vis_object','image',record.id.value)" class="oe_kanban_image"/>
+								<!--</a>!-->
+								<div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
+									<h4>
+										<a type="open">
+											<field name="name"/>
+										</a>
+										
+									<div name="tags"/>
+									<ul>
+										<li>APL: <field name="apl_id"/></li>
+										<li>Distance from photo point: <field name="distance_from_photo_point"/></li>
+										<!--<li>Alt : <field name="altitude"/></li>!-->
+									</ul>
+									</h4>
+								</div>
+							</div>
+						</t>
+					</templates>
+					
+				</kanban>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="uis_ap_visual_object_list">
+		<field name="name">Visual Object List</field>
+		<field name="model">uis.ap.vis_object</field>
+		<field name="arch" type="xml">
+			<tree string="List of Visual objects" editable="false" create="false" edit="false">
+				<field name="id"/>
+				<field name="name"/>
+				<field name="apl_id"/>
+				<field name="photo_id"/>
+				<field name="distance_from_photo_point"/>
+				<field name="state"/>
+				<field name="auto_detected"/>
+			</tree>
+		</field>
+		</record>
+		<!--FORM Visual object!-->
+		<record id="uis_ap_visual_object_form" model="ir.ui.view">
+			<field name="name">Visual Objects</field>
+			<field name="model">uis.ap.vis_object</field>
+			<field name="arch" type="xml">
+				<form string="Visual object" editable="false" create="false" edit="false">
+					<header>
+						<button string="CORRECT" type="object" name="correct_select"/>
+						<button string="INCORRECT" type="object" name="incorrect_select"/>
+						<field name="state" widget="statusbar" statusbar_visible="draft,correct,incorrect" statusbar_colors='{"draft":"blue","correct":"green","incorrect":"red"}'/>
+					</header>
+					<group>
+						<group>
+							<field name="image" options='{"size":[400,400]}' widget="image" nolabel="1" colspan="2"/>	
+						</group>
+						
+						<group>
+							<field name="photo_id" invisible="context.get('photo_id',False)"/>
+							<field name="pillar_id" invisible="context.get('pillar_id',False)"/>
+							
+							<field name="transformer_id" invisible="context.get('transformer_id',False)"/>
+							<field name="apl_id"/>
+							<!--<field name="rect_coordinate_json"/>!-->
+							<field name="distance_from_photo_point"/>
+							<!--
+							<field name="from_pillar_id"/>
+							<field name="to_pillar_id"/>
+							<field name="cross_type"/>
+							<field name="length"/>!-->
+						</group>
+
+					</group>
+				</form>
+			</field>
+		</record>
+		<!--Modernize Photo form!-->
+	<record id="uis_ap_photo_form_add_visobj_page" model="ir.ui.view">
+            <field name="name">Modern (Visual object) Photo form</field>
+            <field name="model">uis.ap.photo</field>
+            <field name="inherit_id" ref="apl_aerial_photo.uis_ap_photo_form"/>
+            <field name="arch" type="xml">
+				<xpath expr="/form/group/group/notebook" position="inside">
+					<page string="Visual objects">
+						<field name="vis_objects_ids" context="{'apl_id':active_id}"/>
+					</page>
+				</xpath>
+		</field>
+	</record>
+
+	<record model="ir.actions.act_window" id="uis_ap_menu_vis_object_list_action">
+		<field name="name">Vis Objects List</field>
+		<field name="res_model">uis.ap.vis_object</field>
+		<field name="view_mode">tree,form,kanban</field>
+	</record>
+
+	<menuitem name="Vis Objects List" parent="uis_ap_menu_photo_main" id="uis_ap_menu_vis_object_list" action="uis_ap_menu_vis_object_list_action"/>
+	</data>
+</openerp>
