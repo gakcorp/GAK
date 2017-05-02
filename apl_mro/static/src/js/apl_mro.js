@@ -5,45 +5,46 @@ odoo.define('apl_mro.form_widgets', function (require)
 	var session = require('web.session');
 	var instance = openerp;
 	var FieldBinaryImage=core.form_widget_registry.get('image');
+	var AplMAP=core.form_widget_registry.get('aplmap');
 
-	defectmap=instance.web.form.AbstractField.extend(
+	defectmap=AplMAP.extend(
 	{
-			start: function()
+			GetAplID: function()
 			{
-				var longitude=this.field_manager.get_field_value("longitude");
-				var latitude=this.field_manager.get_field_value("latitude");
-				var defMap=$('<div id="defmap"></div>');
-				defMap.css('width','800px');
-				defMap.css('height','600px');
-				this.$el.append(defMap);
-				var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
-				OsmLayer.setVisible(true);
-				var point = new ol.geom.Point(ol.proj.transform([longitude,latitude], 'EPSG:4326', 'EPSG:3857'));
-				var pointFeature = new ol.Feature(point);
-				var vectorSource = new ol.source.Vector({projection: 'EPSG:4326',features: [pointFeature]});
-				var vectorLayer = new ol.layer.Vector({source: vectorSource});
-				var map = new ol.Map({
-               			 				target: defMap.get()[0],  // The DOM element that will contains the map
-                						renderer: 'canvas', // Force the renderer to be used
-                						layers: [				
-												OsmLayer,
-												vectorLayer],
-										view: new ol.View({
-														center: ol.proj.transform([longitude, latitude], 'EPSG:4326', 'EPSG:3857'),
-														zoom: 10
-														}),
-            						});
-				map.setSize([defMap.width(),defMap.height()]);
+				return this.field_manager.get_field_value("apl_id");
+			},
+			
+			render_value: function()
+			{
+				this._super.apply(this, arguments);
+				var map=this.map;
+				
+				var defectID=this.field_manager.get_field_value("id");
+				var DefectModel=new Model("uis.papl.mro.defect");
+				
+				DefectModel.query(['pillar_id','transformer_id']).filter([['id','=',defectID]]).all().then(function(defects)
+				{
+					var Pillar_IDs=defects[0].pillar_id;
+					var Layers=map.getLayers().getArray();
+					for (var i in Layers)
+					{
+						if (Layers[i].attributes['type']=="pillar")
+						{
+							console.log(Layers[i].getSource());
+						}
+					}
+				});
 			},
 	});
 	
 	defectphoto=FieldBinaryImage.extend(
 	{
-		start: function()
+		render_value: function()
 		{
 			this._super.apply(this, arguments);
 			try
 			{
+				this.$el.find('#defCanvas').remove();
 				var ImgWidth=this.options.size[0];
 				var ImgHeight=this.options.size[1];
 				var DJSON=JSON.parse(this.field_manager.get_field_value("defect_photo_area"));
@@ -90,7 +91,7 @@ odoo.define('apl_mro.form_widgets', function (require)
 			{
 				console.log(exception)
 			}
-		}
+		},
 	});
 	
 	core.form_widget_registry.add('defectmap', defectmap);
