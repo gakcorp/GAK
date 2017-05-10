@@ -38,7 +38,7 @@ class uis_papl_transformation(models.Model):
 	_name='uis.papl.transformer'
 	_description='Transformer'
 	
-	def _name_search(self, operator, value):
+	def _name_search_custom(self, operator, value):
 		_logger.debug(self)
 		ids=[]
 		ktp_ids=self.search([])
@@ -54,7 +54,7 @@ class uis_papl_transformation(models.Model):
 		return [('id', 'in' , ids)]
 	#Main data
 	
-	name=fields.Char(string='Name', compute='_get_full_name', search=_name_search)
+	name=fields.Char(string='Name', compute='_get_full_name', search=_name_search_custom)
 	ind_disp_name=fields.Char(string='Individual dispatch name')
 	state=fields.Selection(STATE_SELECTION,'Status',readonly=True,default='draft')
 	apl_id=fields.Many2one('uis.papl.apl', string='APL Name', store=True, compute='_get_apl_tap_id')

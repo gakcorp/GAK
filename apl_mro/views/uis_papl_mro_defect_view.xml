@@ -6,19 +6,7 @@
 				<script type="text/javascript" src="/apl_mro/static/src/js/apl_mro.js"/>
 			</xpath>
 		</template>
-        <!-- Top menu item -->
-        <!--<menuitem name="Maintenance"
-            id="base.menu_mro_root"
-            groups="asset.group_mro_customer"
-            sequence="80"/>!-->
 
-        <!-- Maintenance menu -->
-        <!--<menuitem name="Maintenance"
-            id="menu_mro_maintenance"
-            parent="base.menu_mro_root"
-            sequence="1"/>!-->
-         
-        <!-- Maintenance order menu -->
         <record id="mro_defect_tree_view" model="ir.ui.view">
             <field name="name">uis.papl.mro.defect.tree</field>
             <field name="model">uis.papl.mro.defect</field>
@@ -64,6 +52,27 @@
             </field>
         </record>
 		
+		<record id="wizard_create_defect_form" model="ir.actions.act_window.view">
+			<field eval="3" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="wizard_create_defect"/>
+			<field name="act_window_id" ref="uis_papl_menu_wiz_create_defect"/>
+		</record>
+		
+		<record id="defect_form" model="ir.actions.act_window.view">
+			<field eval="3" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="mro_defect_form_view"/>
+			<field name="act_window_id" ref="papl_action_apl_defects"/>
+		</record>
+		
+		<record id="defect_tree" model="ir.actions.act_window.view">
+			<field eval="1" name="sequence"/>
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="mro_defect_tree_view"/>
+			<field name="act_window_id" ref="papl_action_apl_defects"/>
+		</record>
+		
 		<record id="mro_defect_form_view" model="ir.ui.view">
             <field name="name">uis.papl.mro.defect.form</field>
             <field name="model">uis.papl.mro.defect</field>
@@ -78,10 +87,11 @@
 								<field name="id" attrs="{'invisible':[('id', '>', 0)]}"/>
 								<field name="name"/>
 								<field name="category"/>
-								<field name="create_date"/>
+								<field name="create_date" class="oe_read_only"/>
+								<field name="create_uid" class="oe_read_only"/>
 							</group>
 							<group>
-								<field name="apl_id" widget="many2one_tags"/>
+								<field name="apl_id" widget="many2one_tags" class="oe_read_only"/>
 								<field name="pillar_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('pillar_id', '=', [])]}"/>
 								<field name="transformer_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('transformer_id', '=', [])]}"/>
 								<field name="tap_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('tap_id', '=', [])]}"/>
@@ -97,7 +107,6 @@
 							</page>
 							<page string="Map">
 								<field name="longitude" widget="defectmap"/>
-								<field name="latitude"/>
 							</page>
 							<page string="Pillars" attrs="{'invisible':[('pillar_id', '=', [])]}">
 								<field name="pillar_id_2">
@@ -142,8 +151,45 @@
             <field name="res_model">uis.papl.mro.defect</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <!--<field name="context" eval="{'default_categ_id': ref('mro.product_category_mro')}"/>!-->
         </record>
+		
+		<record model="ir.ui.view" id="wizard_create_defect">
+			<field name="name">Create new defect</field>
+			<field name="type">form</field>
+			<field name="model">uis.papl.mro.defect</field>
+			<field name="arch" type="xml">
+				<form>
+					<group col="1">
+						<h1>Form for creation of new defect</h1>
+						<field name="name"/>
+						<laber for="apl_id" string="APL"/>
+						<field name="apl_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
+						<laber for="def_object_type"/>
+						<field name="def_object_type"/>
+						<laber for="pillar_id"/>
+						<field name="pillar_id" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'pillar')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
+						<laber for="transformer_id"/>
+						<field name="transformer_id" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'transformer')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
+						<laber for="tap_id"/>
+						<field name="tap_id" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'tap')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
+						<field name="category"/>
+						<field name="description"/>
+					</group>
+						<button string="Cancel" special="cancel"/>
+						<button name="create_defect_from_wizard" type="object" string="Create" class="oe_highlight"/>
+					<footer>
+					</footer>
+				</form>
+			</field>
+		</record>
+		
+		<record id="uis_papl_menu_wiz_create_defect" model="ir.actions.act_window">
+			<field name="name">Create new defect</field>
+			<field name="res_model">uis.papl.mro.defect</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
 
 
         <menuitem name="Defects"
@@ -151,6 +197,12 @@
 			action="papl_action_apl_defects"
 			sequence="10"
 			/>
+		
+		<menuitem name="Create Defect"
+				  id="uis_papl_menu_defect_wiz"
+				  parent="uis_papl_menu_mro"
+				  action="uis_papl_menu_wiz_create_defect"
+				  />
 
  	</data>
 </openerp>

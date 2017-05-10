@@ -5,45 +5,108 @@ odoo.define('apl_mro.form_widgets', function (require)
 	var session = require('web.session');
 	var instance = openerp;
 	var FieldBinaryImage=core.form_widget_registry.get('image');
+	var AplMAP=core.form_widget_registry.get('aplmap');
 
-	defectmap=instance.web.form.AbstractField.extend(
+	defectmap=AplMAP.extend(
 	{
-			start: function()
+			GetAplID: function()
 			{
-				var longitude=this.field_manager.get_field_value("longitude");
-				var latitude=this.field_manager.get_field_value("latitude");
-				var defMap=$('<div id="defmap"></div>');
-				defMap.css('width','800px');
-				defMap.css('height','600px');
-				this.$el.append(defMap);
-				var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
-				OsmLayer.setVisible(true);
-				var point = new ol.geom.Point(ol.proj.transform([longitude,latitude], 'EPSG:4326', 'EPSG:3857'));
-				var pointFeature = new ol.Feature(point);
-				var vectorSource = new ol.source.Vector({projection: 'EPSG:4326',features: [pointFeature]});
-				var vectorLayer = new ol.layer.Vector({source: vectorSource});
-				var map = new ol.Map({
-               			 				target: defMap.get()[0],  // The DOM element that will contains the map
-                						renderer: 'canvas', // Force the renderer to be used
-                						layers: [				
-												OsmLayer,
-												vectorLayer],
-										view: new ol.View({
-														center: ol.proj.transform([longitude, latitude], 'EPSG:4326', 'EPSG:3857'),
-														zoom: 10
-														}),
-            						});
-				map.setSize([defMap.width(),defMap.height()]);
+				return this.field_manager.get_field_value("apl_id");
+			},
+			
+			LoadAllObjects: function()
+			{
+				this._super.apply(this, arguments);
+				var map=this.map;
+				
+				var defectID=this.field_manager.get_field_value("id");
+				var DefectModel=new Model("uis.papl.mro.defect");
+				var vectorDefectSource=new ol.source.Vector({projection: 'EPSG:4326'});
+				var vectorDefectLayer=new ol.layer.Vector({source: vectorDefectSource});
+				vectorDefectLayer.attributes={"type":"defect"};
+				map.addLayer(vectorDefectLayer);
+				
+				DefectModel.query(['pillar_id','transformer_id']).filter([['id','=',defectID]]).all().then(function(defects)
+				{
+					var Pillar_IDs=defects[0].pillar_id;
+					var Trans_IDs=defects[0].transformer_id;
+					var Layers=map.getLayers().getArray();
+					if (Pillar_IDs)
+					{
+						var chView=false;
+						for (var i in Layers)
+						{
+							if (Layers[i].attributes['type']=="pillar")
+							{
+								var Features=Layers[i].getSource().getFeatures();
+								for (var a in Features)
+								{
+									if ((Features[a].attributes['type']=="pillar") && (Pillar_IDs.indexOf(Features[a].attributes['id'])!=-1))
+									{
+										var oFeature=Features[a];
+										oFeature.getStyle().getText().setStroke(new ol.style.Stroke({color : 'red',width : 0.5}));
+										Layers[i].getSource().removeFeature(oFeature);
+										vectorDefectSource.addFeature(oFeature);
+										if (!chView)
+										{
+											chView=true;
+											map.setView(new ol.View({
+																	center: oFeature.getGeometry().getCoordinates(),
+																	zoom: 17
+																	}));
+										}
+									}
+								}
+							}
+						}
+					}
+					
+					if (Trans_IDs)
+					{
+						var chView=false;
+						for (var i in Layers)
+						{
+							if (Layers[i].attributes['type']=="trans")
+							{
+								var Features=Layers[i].getSource().getFeatures();
+								for (var a in Features)
+								{
+									if ((Features[a].attributes['type']=="trans") && (Trans_IDs.indexOf(Features[a].attributes['id'])!=-1))
+									{
+										var oFeature=Features[a];
+										oFeature.getStyle().getText().setStroke(new ol.style.Stroke({color : 'red',width : 0.5}));
+										Layers[i].getSource().removeFeature(oFeature);
+										vectorDefectSource.addFeature(oFeature);
+										if (!chView)
+										{
+											chView=true;
+											map.setView(new ol.View({
+																	center: oFeature.getGeometry().getCoordinates(),
+																	zoom: 17
+																	}));
+										}
+									}
+								}
+							}
+						}
+					}
+				});
+			},
+			
+			render_value: function()
+			{
+				this._super.apply(this, arguments);
 			},
 	});
 	
 	defectphoto=FieldBinaryImage.extend(
 	{
-		start: function()
+		render_value: function()
 		{
 			this._super.apply(this, arguments);
 			try
 			{
+				this.$el.find('#defCanvas').remove();
 				var ImgWidth=this.options.size[0];
 				var ImgHeight=this.options.size[1];
 				var DJSON=JSON.parse(this.field_manager.get_field_value("defect_photo_area"));
@@ -90,7 +153,7 @@ odoo.define('apl_mro.form_widgets', function (require)
 			{
 				console.log(exception)
 			}
-		}
+		},
 	});
 	
 	core.form_widget_registry.add('defectmap', defectmap);

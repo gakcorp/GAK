@@ -397,7 +397,7 @@ class uis_papl_tap(models.Model):
 				tn=str(tap.num_by_vl)
 			if tap.conn_pillar_id:
 				cp=str(tap.conn_pillar_id.num_by_vl)
-				cpn=str(tap.conn_pillar_id.name)
+				cpn=unicode(tap.conn_pillar_id.name)
 			if tap.apl_id:
 				an=unicode(tap.apl_id.name)
 			def_frm_tap=empapl.disp_tap_frm or ('atp+"."+tn+"."+cp+"."+an')

@@ -18,7 +18,7 @@ from shapely.geometry.polygon import Polygon
 import googlemaps
 from openerp.addons.passportvl.models.uismodels import distance2points
 from openerp.addons.passportvl.models.uismodels import distangle2points
-from libxmp.utils import file_to_dict
+##from libxmp.utils import file_to_dict
 import cv2
 import numpy as np
 

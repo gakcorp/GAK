@@ -11,6 +11,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 		start: function()
 		{
 			this._super.apply(this, arguments);
+			var WContext=this.view.dataset.get_context();
 			if (this.options.editmode=="true") var editMode=true;
 			else var editMode=false;
 			this.$el.dblclick(function()
@@ -1182,7 +1183,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						}
 						DJSON=DJSON+']}';
 						var DefModel=new Model('uis.papl.mro.defect');
-						DefModel.call('create_defect',[defname,AplID,ObjType,ObjIDs,DefCat,defdefin,ID,mainPhotoLongitude,mainPhotoLatitude,DJSON]).then(function(result)
+						DefModel.call('create_defect',[defname,AplID,ObjType,ObjIDs,DefCat,defdefin,ID,mainPhotoLongitude,mainPhotoLatitude,DJSON],{context:WContext}).then(function(result)
 						{
 							spinner.stop();
 							defectForm.remove();
