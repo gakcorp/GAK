@@ -191,7 +191,7 @@ class uis_papl_pillar(models.Model):
 			if pil.tap_id:
 				tn=unicode(pil.tap_id.name)
 				tcpn=str(pil.tap_id.conn_pillar_id.num_by_vl)
-				tcpname=str(pil.tap_id.conn_pillar_id.name)
+				tcpname=unicode(pil.tap_id.conn_pillar_id.name)
 				#_logger.debug('tap connected pillar for define pillar name is %r (pillar %r)'%(tcpname,pil.tap_id.conn_pillar_id))
 				tnum=str(pil.tap_id.num_by_vl)
 			def_frm_mp=empapl.disp_mp_frm or ('pn+sp+an')

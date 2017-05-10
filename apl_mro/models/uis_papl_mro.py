@@ -1,5 +1,27 @@
 # -*- coding: utf-8 -*-
-import time
+from openerp import models, fields, api
+
+class apl_mro_order(models.Model):
+    _name='uis.papl.mro.order'
+    _description='Order'
+    name=fields.Char('Order name', size=64,required=True)
+    description=fields.Text('Order Description')
+    apl_id=fields.Many2one('uis.papl.apl',string='Air power line',required=True)
+    pillar_id=fields.Many2many('uis.papl.pillar', relation='defect_pillar_rel',column1='order_id', column2='pillar_id')
+    tap_id=fields.Many2many('uis.papl.tap', relation='defect_tap_rel',column1='order_id', column2='tap_id')
+    transformer_id=fields.Many2many('uis.papl.transformer',relation='defect_transformer_rel',column1='order_id', column2='transformer_id')
+    
+    start_planned_date=fields.Datetime('Planned start date', required=True)
+    end_planned_date=fields.Datetime('Planned end date', required=True)
+    take_to_work_date=fields.Datetime('Take to work date')
+    start_date=fields.Datetime('Start date')
+    end_date=fields.Datetime('End date')
+    
+
+
+
+
+'''import time
 
 from openerp.osv import fields, osv
 import openerp.addons.decimal_precision as dp
@@ -117,7 +139,7 @@ class mro_order(osv.osv):
         else:
             value['value'] = {'date_scheduled': date}
         return value
-'''
+
     _track = {
         'state': {
             'mro.mt_order_confirmed': lambda self, cr, uid, obj, ctx=None: obj['state'] == 'ready',

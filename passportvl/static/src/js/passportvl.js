@@ -11,10 +11,16 @@ odoo.define('passportvl.form_widgets', function (require)
             return this.field_manager.get_field_value("id");
         },
         
+        LoadAllObjects: function()
+        {
+            return;
+        },
+        
         map: null,
         
         render_value: function()
 		{
+            var spClass=this;
             this._super.apply(this, arguments);
             var AplID=this.GetAplID();
             this.$el.find('#defmap').remove();
@@ -91,6 +97,7 @@ odoo.define('passportvl.form_widgets', function (require)
                             var point = new ol.geom.Point(ol.proj.transform([pillarLongitude,pillarLatitude], 'EPSG:4326', 'EPSG:3857'));
                             var pointFeature = new ol.Feature(point);
                             pointFeature.setStyle(pillarStyle);
+                            pointFeature.attributes={"type":"pillar","id":pillarID};
                             if (PillarTypeBaseMap.get(pillarTypeID)) vectorPillarBaseSource.addFeature(pointFeature);
                             else vectorPillarSource.addFeature(pointFeature);
                             
@@ -117,6 +124,7 @@ odoo.define('passportvl.form_widgets', function (require)
                         {
                             for (var i in transformers)
                             {
+                                var transID=transformers[i].id;
                                 var transName=transformers[i].name;
                                 var transLongitude=transformers[i].longitude;
                                 var transLatitude=transformers[i].latitude;
@@ -147,6 +155,7 @@ odoo.define('passportvl.form_widgets', function (require)
                                                         });
                         
                                 iconFeature.setStyle(iconStyle);
+                                iconFeature.attributes={"type":"trans","id":transID};
                         
                                 vectorTransSource.addFeature(iconFeature);
                                 
@@ -176,6 +185,7 @@ odoo.define('passportvl.form_widgets', function (require)
                                     vectorLineSource.addFeature(lineFeature);
                                 }
                             }
+                            spClass.LoadAllObjects();
                         });
                         
                         var SubstationModel=new Model('uis.papl.substation');
