@@ -52,26 +52,7 @@
             </field>
         </record>
 		
-		<record id="wizard_create_defect_form" model="ir.actions.act_window.view">
-			<field eval="3" name="sequence"/>
-			<field name="view_mode">form</field>
-			<field name="view_id" ref="wizard_create_defect"/>
-			<field name="act_window_id" ref="uis_papl_menu_wiz_create_defect"/>
-		</record>
 		
-		<record id="defect_form" model="ir.actions.act_window.view">
-			<field eval="3" name="sequence"/>
-			<field name="view_mode">form</field>
-			<field name="view_id" ref="mro_defect_form_view"/>
-			<field name="act_window_id" ref="papl_action_apl_defects"/>
-		</record>
-		
-		<record id="defect_tree" model="ir.actions.act_window.view">
-			<field eval="1" name="sequence"/>
-			<field name="view_mode">tree</field>
-			<field name="view_id" ref="mro_defect_tree_view"/>
-			<field name="act_window_id" ref="papl_action_apl_defects"/>
-		</record>
 		
 		<record id="mro_defect_form_view" model="ir.ui.view">
             <field name="name">uis.papl.mro.defect.form</field>
@@ -191,7 +172,27 @@
 			<field name="target">new</field>
 		</record>
 
-
+		<record id="wizard_create_defect_form" model="ir.actions.act_window.view">
+			<field eval="3" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="wizard_create_defect"/>
+			<field name="act_window_id" ref="uis_papl_menu_wiz_create_defect"/>
+		</record>
+		
+		<record id="defect_form" model="ir.actions.act_window.view">
+			<field eval="3" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="mro_defect_form_view"/>
+			<field name="act_window_id" ref="papl_action_apl_defects"/>
+		</record>
+		
+		<record id="defect_tree" model="ir.actions.act_window.view">
+			<field eval="1" name="sequence"/>
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="mro_defect_tree_view"/>
+			<field name="act_window_id" ref="papl_action_apl_defects"/>
+		</record>
+		
         <menuitem name="Defects"
 			id="uis_papl_menu_defect_list" parent="uis_papl_menu_mro"
 			action="papl_action_apl_defects"
