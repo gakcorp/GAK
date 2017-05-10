@@ -81,7 +81,7 @@
 					
 					<!--<field name="image" widget="binary" filename="name"  height="480"/>!-->
 					<!--<field name="image" widget="image" filename="fimage"/>!-->
-					<field name="image_800" options='{"size":[800,600],"editmode":"false"}' widget="fotorama" nolabel="1" colspan="2"/>
+					<field name="image_800" options='{"size":[800,600],"editmode":"true"}' widget="fotorama" nolabel="1" colspan="2"/>
 					<!--<field name="image_800" widget="image" />!-->
 					
 					<!--<field name="thumbnail" widget="image"/>
