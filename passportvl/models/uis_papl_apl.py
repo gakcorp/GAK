@@ -341,7 +341,7 @@ class uis_papl_apl(models.Model):
 	
 	
 	#@api.v8
-	def _name_search(self, operator, value):
+	def _name_search_custom(self, operator, value):
 		_logger.debug(self)
 		ids=[]
 		apl_ids=self.search([])
@@ -353,8 +353,8 @@ class uis_papl_apl(models.Model):
 				if val.lower() in apl.name.lower():
 					ids.append(apl.id)
 		return [('id', 'in' , ids)]
-	
-	name = fields.Char(string="Name", compute=_get_name, search=_name_search)
+
+	name = fields.Char(string="Name", compute=_get_name, search=_name_search_custom)
 	short_name=fields.Char(string="Short name")
 	locality=fields.Char(string="Locality")
 	apl_type=fields.Char(string="Type APL")

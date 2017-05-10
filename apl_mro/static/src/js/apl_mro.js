@@ -14,26 +14,87 @@ odoo.define('apl_mro.form_widgets', function (require)
 				return this.field_manager.get_field_value("apl_id");
 			},
 			
-			render_value: function()
+			LoadAllObjects: function()
 			{
 				this._super.apply(this, arguments);
 				var map=this.map;
 				
 				var defectID=this.field_manager.get_field_value("id");
 				var DefectModel=new Model("uis.papl.mro.defect");
-				
+				var vectorDefectSource=new ol.source.Vector({projection: 'EPSG:4326'});
+				var vectorDefectLayer=new ol.layer.Vector({source: vectorDefectSource});
+				vectorDefectLayer.attributes={"type":"defect"};
+				map.addLayer(vectorDefectLayer);
 				DefectModel.query(['pillar_id','transformer_id']).filter([['id','=',defectID]]).all().then(function(defects)
 				{
 					var Pillar_IDs=defects[0].pillar_id;
+					var Trans_IDs=defects[0].transformer_id;
 					var Layers=map.getLayers().getArray();
-					for (var i in Layers)
+					if (Pillar_IDs)
 					{
-						if (Layers[i].attributes['type']=="pillar")
+						var chView=false;
+						for (var i in Layers)
 						{
-							console.log(Layers[i].getSource());
+							if (Layers[i].attributes['type']=="pillar")
+							{
+								var Features=Layers[i].getSource().getFeatures();
+								for (var a in Features)
+								{
+									if ((Features[a].attributes['type']=="pillar") && (Pillar_IDs.indexOf(Features[a].attributes['id'])!=-1))
+									{
+										var oFeature=Features[a];
+										oFeature.getStyle().getText().setStroke(new ol.style.Stroke({color : 'red',width : 0.5}));
+										Layers[i].getSource().removeFeature(oFeature);
+										vectorDefectSource.addFeature(oFeature);
+										if (!chView)
+										{
+											chView=true;
+											map.setView(new ol.View({
+																	center: oFeature.getGeometry().getCoordinates(),
+																	zoom: 17
+																	}));
+										}
+									}
+								}
+							}
+						}
+					}
+					
+					if (Trans_IDs)
+					{
+						var chView=false;
+						for (var i in Layers)
+						{
+							if (Layers[i].attributes['type']=="trans")
+							{
+								var Features=Layers[i].getSource().getFeatures();
+								for (var a in Features)
+								{
+									if ((Features[a].attributes['type']=="trans") && (Trans_IDs.indexOf(Features[a].attributes['id'])!=-1))
+									{
+										var oFeature=Features[a];
+										oFeature.getStyle().getText().setStroke(new ol.style.Stroke({color : 'red',width : 0.5}));
+										Layers[i].getSource().removeFeature(oFeature);
+										vectorDefectSource.addFeature(oFeature);
+										if (!chView)
+										{
+											chView=true;
+											map.setView(new ol.View({
+																	center: oFeature.getGeometry().getCoordinates(),
+																	zoom: 17
+																	}));
+										}
+									}
+								}
+							}
 						}
 					}
 				});
+			},
+			
+			render_value: function()
+			{
+				this._super.apply(this, arguments);
 			},
 	});
 	

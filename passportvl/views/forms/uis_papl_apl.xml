@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
+		<template id="assets_backend" name="aplmap" inherit_id="web.assets_backend">
+			<xpath expr="." position="inside">
+				<script type="text/javascript" src="/passportvl/static/src/js/passportvl.js"/>
+			</xpath>
+		</template>
 		<record id="uis_papl_apl_resistance_form" model="ir.ui.view">
 			<field name="name">Resistance apl view</field>
 			<field name="model">uis.papl.apl.resistance</field>
@@ -182,6 +187,7 @@
 					</h2>
 				  <group>
 					<group>
+					  <field name="id" attrs="{'invisible':[('id', '>', 0)]}"/>
 					  <field name="locality"/>
 					  <field name="bld_year"/>
 					  <field name="startexp_date"/>
@@ -203,7 +209,7 @@
 					  <div id="scheme_holder"></div>
 					  <div id="scheme_id_apls">
 						<!--<field name="scheme_image_old" widget="image" class="imagescheme" options='{"size":[800,400]}'/>!-->
-						  <field name="scheme_image" widget="apl_scheme" class="imagescheme2" options='{"size":[800,800]}'/>
+						<field name="scheme_image" widget="aplmap"/>
 					  </div>
 					</page>
 					<page string="Main details">
