@@ -4,6 +4,7 @@
 		<template id="assets_backend" name="aplmap" inherit_id="web.assets_backend">
 			<xpath expr="." position="inside">
 				<script type="text/javascript" src="/passportvl/static/src/js/passportvl.js"/>
+				<link rel="stylesheet" href="/passportvl/static/src/css/passportvl.css"/>
 			</xpath>
 		</template>
 		<record id="uis_papl_apl_resistance_form" model="ir.ui.view">

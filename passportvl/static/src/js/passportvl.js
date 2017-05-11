@@ -24,7 +24,7 @@ odoo.define('passportvl.form_widgets', function (require)
             this._super.apply(this, arguments);
             var AplID=this.GetAplID();
             this.$el.find('#defmap').remove();
-            var defMap=$('<div id="defmap"></div>');
+            var defMap=$('<div id="defmap" class="apl_map"></div>');
             defMap.css('width','800px');
 			defMap.css('height','800px');
 			this.$el.append(defMap);
@@ -46,10 +46,14 @@ odoo.define('passportvl.form_widgets', function (require)
             vectorPillarLayer.setVisible(false);
             vectorPillarBaseLayer.setVisible(false);
             
+			var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
             var map = new ol.Map({
-               			 			target: defMap.get()[0],  // The DOM element that will contains the map
+               			 			controls:ol.control.defaults().extend([
+												new ol.control.FullScreen()
+											]),
+									target: defMap.get()[0],  // The DOM element that will contains the map
                 					renderer: 'canvas', // Force the renderer to be used
-                					layers: [vectorLineLayer, vectorPillarBaseLayer,vectorPillarLayer,vectorTransLayer,vectorSubLayer],
+                					layers: [OsmLayer,vectorLineLayer, vectorPillarBaseLayer,vectorPillarLayer,vectorTransLayer,vectorSubLayer],
             					});
 			map.setSize([defMap.width(),defMap.height()]);
             
