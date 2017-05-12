@@ -25,8 +25,8 @@ odoo.define('passportvl.form_widgets', function (require)
             var AplID=this.GetAplID();
             this.$el.find('#defmap').remove();
             var defMap=$('<div id="defmap" class="apl_map"></div>');
-            defMap.css('width','800px');
-			defMap.css('height','800px');
+            //defMap.css('width','800px');
+			//defMap.css('height','800px');
 			this.$el.append(defMap);
             var vectorLineSource=new ol.source.Vector({projection: 'EPSG:4326'});
             var vectorLineLayer=new ol.layer.Vector({source: vectorLineSource});
@@ -47,9 +47,20 @@ odoo.define('passportvl.form_widgets', function (require)
             vectorPillarBaseLayer.setVisible(false);
             
 			var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
+			var rrLayer=new ol.layer.Tile({
+				preload:1,
+				source: new ol.source.TileImage({
+					url:'/maps/rosreestr_cadastre/{z}/{x}/{y}',
+					projection: 'EPSG:4326'
+					})
+				});
             var map = new ol.Map({
                			 			controls:ol.control.defaults().extend([
-												new ol.control.FullScreen()
+												new ol.control.FullScreen(),
+												new ol.control.OverviewMap({
+													layers:[vectorTransLayer],
+													label: 'Transformers'
+													})
 											]),
 									target: defMap.get()[0],  // The DOM element that will contains the map
                 					renderer: 'canvas', // Force the renderer to be used
@@ -95,7 +106,7 @@ odoo.define('passportvl.form_widgets', function (require)
                             
                             var pillarFill=new ol.style.Fill({color: 'transparent'});
                             var pillarStroke=new ol.style.Stroke({color : 'black',width : 0.5});
-                            var pillarPoint=new ol.style.Circle({radius: 7});
+                            var pillarPoint=new ol.style.Circle({radius: 17});
                             var pillarText=new ol.style.Text({text: pillarNum.toString(), fill:pillarFill, stroke:pillarStroke,scale:1.2});
                             var pillarStyle=new ol.style.Style({fill: pillarFill,stroke: pillarStroke, image: pillarPoint, text: pillarText});
                             var point = new ol.geom.Point(ol.proj.transform([pillarLongitude,pillarLatitude], 'EPSG:4326', 'EPSG:3857'));

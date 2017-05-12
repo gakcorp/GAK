@@ -1,16 +1,24 @@
+.apl_map
+{
+	width: 800px;
+	height: 800px;
+	right: 0;
+	bottom: 0;
+}
+
 .apl_map:-moz-full-screen {
         height: 100%;
-				width: 100%;
+		width: 100%;
       }
 .apl_map:-webkit-full-screen {
         height: 100%;
-				width: 100%;
+		width: 100%;
       }
 .apl_map:-ms-fullscreen {
         height: 100%;
-				width: 100%;
+		width: 100%;
       }
 .apl_map:fullscreen {
         height: 100%;
-				width: 100%;
+		width: 100%;
       }
