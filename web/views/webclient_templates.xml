@@ -191,7 +191,7 @@
                         <t t-if="not disable_database_manager">
                             <a class="" href="/web/database/manager">Manage Databases</a> |
                         </t>
-                        <a href="http://www.uisgis.ru" target="_blank">Powered by <span>ActivGIS Platform</span> 2016 (C) Russia Moscow</a>
+                        <a href="http://www.uisgis.ru" target="_blank">Powered by <span>Intellium ServicePlatform (ISP)</span> 2017 (C) Russia Moscow</a>
                     </div>
 
                   </div>
@@ -274,7 +274,7 @@
                 </t>
             </div>
             <div class="oe_footer">
-                <a href="http://www.uisgis.ru" target="_blank">Powered by <span>ActivGIS Platform</span> 2016 (C) Russia Moscow</a>
+                <a href="http://www.uisgis.ru" target="_blank">Powered by <span>Intellium Service Platform</span> 2017 (C) Russia Moscow</a>
             </div>
         </template>
         <template id="web.menu_secondary_submenu">

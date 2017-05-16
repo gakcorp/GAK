@@ -13,5 +13,9 @@ body {
 }
 
 .o_database_list{
-    top:100px;
+    top: 100px;
+    padding: 20px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.6);
+    font-size: larger;
 }
