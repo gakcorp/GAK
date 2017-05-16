@@ -11,3 +11,7 @@ body {
     background-image: url(/web/static/src/img/bg.jpg);
     background-size:cover;
 }
+
+.o_database_list{
+    top:100px;
+}
