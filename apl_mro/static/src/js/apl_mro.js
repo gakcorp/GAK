@@ -25,10 +25,11 @@ odoo.define('apl_mro.form_widgets', function (require)
 				var vectorDefectLayer=new ol.layer.Vector({source: vectorDefectSource});
 				vectorDefectLayer.attributes={"type":"defect"};
 				map.addLayer(vectorDefectLayer);
-				DefectModel.query(['pillar_id','transformer_id']).filter([['id','=',defectID]]).all().then(function(defects)
+				
+				DefectModel.query(['pillar_ids','transformer_ids']).filter([['id','=',defectID]]).all().then(function(defects)
 				{
-					var Pillar_IDs=defects[0].pillar_id;
-					var Trans_IDs=defects[0].transformer_id;
+					var Pillar_IDs=defects[0].pillar_ids;
+					var Trans_IDs=defects[0].transformer_ids;
 					var Layers=map.getLayers().getArray();
 					if (Pillar_IDs)
 					{

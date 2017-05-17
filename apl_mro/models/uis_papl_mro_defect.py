@@ -10,12 +10,12 @@ class apl_mro_defect(models.Model):
 	name=fields.Char('Defect name', size=64,required=True)
 	description=fields.Text('Defect Description')
 	apl_id=fields.Many2one('uis.papl.apl',string='Air power line',required=True)
-	pillar_id=fields.Many2many('uis.papl.pillar', relation='defect_pillar_rel',column1='defect_id', column2='pillar_id')
-	pillar_id_2=fields.Many2many('uis.papl.pillar', store=False,compute='_get_pillar')
-	tap_id=fields.Many2many('uis.papl.tap', relation='defect_tap_rel',column1='defect_id', column2='tap_id')
-	tap_id_2=fields.Many2many('uis.papl.tap', store=False, compute='_get_tap')
-	transformer_id=fields.Many2many('uis.papl.transformer',relation='defect_transformer_rel',column1='defect_id', column2='transformer_id')
-	transformer_id_2=fields.Many2many('uis.papl.transformer',store=False,compute='_get_transformer')
+	pillar_ids=fields.Many2many('uis.papl.pillar', relation='defect_pillar_rel',column1='defect_id', column2='pillar_id')
+	pillar_ids_2=fields.Many2many('uis.papl.pillar', store=False,compute='_get_pillar')
+	tap_ids=fields.Many2many('uis.papl.tap', relation='defect_tap_rel',column1='defect_id', column2='tap_id')
+	tap_ids_2=fields.Many2many('uis.papl.tap', store=False, compute='_get_tap')
+	transformer_ids=fields.Many2many('uis.papl.transformer',relation='defect_transformer_rel',column1='defect_id', column2='transformer_id')
+	transformer_ids_2=fields.Many2many('uis.papl.transformer',store=False,compute='_get_transformer')
 	state=fields.Selection(STATE_SELECTION, 'Status', readonly=True, default='draft')
 	category=fields.Selection(DEFECT_CATEGORY,'Category',default='1')
 	defect_photo_area=fields.Text('Defect Photo Area')
@@ -30,11 +30,11 @@ class apl_mro_defect(models.Model):
 		if (ObjType=='uis.papl.pillar'):
 			defect.def_object_type='pillar'
 			for pillarID in ObjIDS:
-				defect.pillar_id=[(4,int(pillarID),0)]
+				defect.pillar_ids=[(4,int(pillarID),0)]
 		if (ObjType=='uis.papl.transformer'):
 			defect.def_object_type='transformer'
 			for transID in ObjIDS:
-				defect.transformer_id=[(4,int(transID),0)]
+				defect.transformer_ids=[(4,int(transID),0)]
 		defect.category=DCat
 		defect.description=DDesc
 		defect.photo_id=int(PhotoID)
@@ -42,26 +42,34 @@ class apl_mro_defect(models.Model):
 		defect.latitude=Latitude
 		defect.defect_photo_area=DJSON
 		return defect.id
-	@api.depends('pillar_id')
+	@api.depends('pillar_ids')
 	def _get_pillar(self):
 		for defect in self:
-			for pillar in defect.pillar_id:
-				defect.pillar_id_2=[(4,pillar.id,0)]
-	@api.depends('tap_id')
+			for pillar in defect.pillar_ids:
+				defect.pillar_ids_2=[(4,pillar.id,0)]
+	@api.depends('tap_ids')
 	def _get_tap(self):
 		for defect in self:
-			for tap in defect.tap_id:
-				defect.tap_id_2=[(4,tap.id,0)]
-	@api.depends('transformer_id')
+			for tap in defect.tap_ids:
+				defect.tap_ids_2=[(4,tap.id,0)]
+	@api.depends('transformer_ids')
 	def _get_transformer(self):
 		for defect in self:
-			for transfomer in defect.transformer_id:
-				defect.transformer_id_2=[(4,transfomer.id,0)]
+			for transfomer in defect.transformer_ids:
+				defect.transformer_ids_2=[(4,transfomer.id,0)]
 	@api.onchange('apl_id','def_object_type')
 	def change_def_object(self):
-		self.transformer_id=[]
-		self.pillar_id=[]
-		self.tap_id=[]
+		self.transformer_ids=[]
+		self.pillar_ids=[]
+		self.tap_ids=[]
 	@api.multi
 	def create_defect_from_wizard(self):
 		return
+	@api.multi
+	def defect_confirmed(self):
+		for defect in self:
+			defect.state='confirmed'
+	@api.multi
+	def defect_canceled(self):
+		for defect in self:
+			defect.state='cancel'

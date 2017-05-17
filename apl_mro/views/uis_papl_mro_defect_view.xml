@@ -15,11 +15,11 @@
                     <field name="name"/>
                     <!--<field name="date_execution" string="Order Date" widget="date"/>!-->
                     <field name="apl_id"/>
-					<field name="tap_id"/>
-					<field name="pillar_id"/>
-					<field name="transformer_id"/>
+		    <field name="tap_ids"/>
+		    <field name="pillar_ids"/>
+	            <field name="transformer_ids"/>
                     <field name="state"/>
-					<field name="category"/>
+		    <field name="category"/>
                 </tree>
             </field>
         </record>
@@ -33,9 +33,9 @@
                 <search string="Search Defect">
                     <field name="name"/>
                     <field name="apl_id"/>
-					<field name="tap_id"/>
-					<field name="pillar_id"/>
-					<field name="transformer_id"/>
+					<field name="tap_ids"/>
+					<field name="pillar_ids"/>
+					<field name="transformer_ids"/>
 					
                     <separator/>
                     <group expand="0" string="Group By">
@@ -52,7 +52,26 @@
             </field>
         </record>
 		
+		<record id="wizard_create_defect_form" model="ir.actions.act_window.view">
+			<field eval="3" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="wizard_create_defect"/>
+			<field name="act_window_id" ref="uis_papl_menu_wiz_create_defect"/>
+		</record>
 		
+		<record id="defect_form" model="ir.actions.act_window.view">
+			<field eval="3" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="mro_defect_form_view"/>
+			<field name="act_window_id" ref="papl_action_apl_defects"/>
+		</record>
+		
+		<record id="defect_tree" model="ir.actions.act_window.view">
+			<field eval="1" name="sequence"/>
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="mro_defect_tree_view"/>
+			<field name="act_window_id" ref="papl_action_apl_defects"/>
+		</record>
 		
 		<record id="mro_defect_form_view" model="ir.ui.view">
             <field name="name">uis.papl.mro.defect.form</field>
@@ -60,6 +79,8 @@
             <field name="arch" type="xml">
                 <form string="Defect Form">
 					<header>
+						<button name="defect_confirmed" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible':[('state', '!=', 'draft')]}"/>
+						<button name="defect_canceled" type="object" string="Cancel" class="oe_highlight" attrs="{'invisible':[('state', '!=', 'draft')]}"/>
 						<field name="state" widget="statusbar"/>
 					</header>
 					<sheet>
@@ -73,9 +94,9 @@
 							</group>
 							<group>
 								<field name="apl_id" widget="many2one_tags" class="oe_read_only"/>
-								<field name="pillar_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('pillar_id', '=', [])]}"/>
-								<field name="transformer_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('transformer_id', '=', [])]}"/>
-								<field name="tap_id" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('tap_id', '=', [])]}"/>
+								<field name="pillar_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('pillar_ids', '=', [])]}"/>
+								<field name="transformer_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('transformer_ids', '=', [])]}"/>
+								<field name="tap_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('tap_ids', '=', [])]}"/>
 							</group>
 						</group>
 						<notebook>
@@ -89,8 +110,8 @@
 							<page string="Map">
 								<field name="longitude" widget="defectmap"/>
 							</page>
-							<page string="Pillars" attrs="{'invisible':[('pillar_id', '=', [])]}">
-								<field name="pillar_id_2">
+							<page string="Pillars" attrs="{'invisible':[('pillar_ids', '=', [])]}">
+								<field name="pillar_ids_2">
 									<tree default_order="tap_id,num_by_vl">
 										<field name="name"/>
 										<field name="tap_id" invisible="1"/>
@@ -101,15 +122,15 @@
 									</tree>
 								</field>
 							</page>
-							<page string="Transformers" attrs="{'invisible':[('transformer_id', '=', [])]}">
-								<field name="transformer_id_2">
+							<page string="Transformers" attrs="{'invisible':[('transformer_ids', '=', [])]}">
+								<field name="transformer_ids_2">
 									<tree>
 										<field name="name"/>
 									</tree>
 								</field>
 							</page>
-							<page string="Taps" attrs="{'invisible':[('tap_id', '=', [])]}">
-								<field name="tap_id_2">
+							<page string="Taps" attrs="{'invisible':[('tap_ids', '=', [])]}">
+								<field name="tap_ids_2">
 									<tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
 										<field name="num_by_vl" invisible="1"/>
 										<field name="name"/>
@@ -147,12 +168,12 @@
 						<field name="apl_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
 						<laber for="def_object_type"/>
 						<field name="def_object_type"/>
-						<laber for="pillar_id"/>
-						<field name="pillar_id" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'pillar')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
-						<laber for="transformer_id"/>
-						<field name="transformer_id" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'transformer')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
-						<laber for="tap_id"/>
-						<field name="tap_id" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'tap')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
+						<laber for="pillar_ids"/>
+						<field name="pillar_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'pillar')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
+						<laber for="transformer_ids"/>
+						<field name="transformer_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'transformer')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
+						<laber for="tap_ids"/>
+						<field name="tap_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'tap')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
 						<field name="category"/>
 						<field name="description"/>
 					</group>
@@ -172,27 +193,7 @@
 			<field name="target">new</field>
 		</record>
 
-		<record id="wizard_create_defect_form" model="ir.actions.act_window.view">
-			<field eval="3" name="sequence"/>
-			<field name="view_mode">form</field>
-			<field name="view_id" ref="wizard_create_defect"/>
-			<field name="act_window_id" ref="uis_papl_menu_wiz_create_defect"/>
-		</record>
-		
-		<record id="defect_form" model="ir.actions.act_window.view">
-			<field eval="3" name="sequence"/>
-			<field name="view_mode">form</field>
-			<field name="view_id" ref="mro_defect_form_view"/>
-			<field name="act_window_id" ref="papl_action_apl_defects"/>
-		</record>
-		
-		<record id="defect_tree" model="ir.actions.act_window.view">
-			<field eval="1" name="sequence"/>
-			<field name="view_mode">tree</field>
-			<field name="view_id" ref="mro_defect_tree_view"/>
-			<field name="act_window_id" ref="papl_action_apl_defects"/>
-		</record>
-		
+
         <menuitem name="Defects"
 			id="uis_papl_menu_defect_list" parent="uis_papl_menu_mro"
 			action="papl_action_apl_defects"

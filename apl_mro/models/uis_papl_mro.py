@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api
+import logging
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
 
 class apl_mro_order(models.Model):
     _name='uis.papl.mro.order'
@@ -7,9 +11,13 @@ class apl_mro_order(models.Model):
     name=fields.Char('Order name', size=64,required=True)
     description=fields.Text('Order Description')
     apl_id=fields.Many2one('uis.papl.apl',string='Air power line',required=True)
-    pillar_id=fields.Many2many('uis.papl.pillar', relation='defect_pillar_rel',column1='order_id', column2='pillar_id')
-    tap_id=fields.Many2many('uis.papl.tap', relation='defect_tap_rel',column1='order_id', column2='tap_id')
-    transformer_id=fields.Many2many('uis.papl.transformer',relation='defect_transformer_rel',column1='order_id', column2='transformer_id')
+    pillar_ids=fields.Many2many('uis.papl.pillar', relation='order_pillar_rel',column1='order_id', column2='pillar_id')
+    pillar_ids_from_defect=fields.Many2many('uis.papl.pillar', relation='order_pillar_from_defect_rel',column1='order_id', column2='pillar_id',compute='get_def_pillars',store=True)
+    tap_ids=fields.Many2many('uis.papl.tap', relation='order_tap_rel',column1='order_id', column2='tap_id')
+    tap_ids_from_defect=fields.Many2many('uis.papl.tap', relation='order_tap_from_defect_rel',column1='order_id', column2='tap_id',compute='get_def_taps',store=True)
+    transformer_ids=fields.Many2many('uis.papl.transformer',relation='order_transformer_rel',column1='order_id', column2='transformer_id')
+    transformer_ids_from_defect=fields.Many2many('uis.papl.transformer',relation='order_transformer_from_defect_rel',column1='order_id', column2='transformer_id',compute='get_def_trans',store=True)
+
     
     start_planned_date=fields.Datetime('Planned start date', required=True)
     end_planned_date=fields.Datetime('Planned end date', required=True)
@@ -17,9 +25,41 @@ class apl_mro_order(models.Model):
     start_date=fields.Datetime('Start date')
     end_date=fields.Datetime('End date')
     
-
-
-
+    defect_ids=fields.Many2many('uis.papl.mro.defect',relation='order_tdefect_rel',column1='order_id', column2='defect_id')
+    
+    @api.onchange('apl_id')
+    def change_order_object(self):
+        self.transformer_ids=[]
+        self.pillar_ids=[]
+        self.tap_ids=[]
+        self.defect_ids=[]
+    @api.depends('defect_ids','defect_ids.pillar_ids')
+    def get_def_pillars(self):
+       for order in self:
+	  pillar_ids=[]
+	  for defect in order.defect_ids:
+		for pillar in defect.pillar_ids:
+			if pillar.id not in pillar_ids:
+				pillar_ids.append(pillar.id)
+	  order.pillar_ids_from_defect=pillar_ids
+    @api.depends('defect_ids','defect_ids.tap_ids')
+    def get_def_taps(self):
+       for order in self:
+	  tap_ids=[]
+	  for defect in order.defect_ids:
+		for tap in defect.tap_ids:
+			if tap.id not in tap_ids:
+				tap_ids.append(tap.id)
+	  order.tap_ids_from_defect=tap_ids
+    @api.depends('defect_ids','defect_ids.transformer_ids')
+    def get_def_trans(self):
+       for order in self:
+	  trans_ids=[]
+	  for defect in order.defect_ids:
+		for trans in defect.transformer_ids:
+			if trans.id not in trans_ids:
+				trans_ids.append(trans.id)
+	  order.transformer_ids_from_defect=trans_ids
 
 '''import time
 

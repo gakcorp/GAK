@@ -9,7 +9,7 @@
 						<sheet>
 							<group>
 								<group>
-									<field name="id" attrs="{'invisible':[('id', '>', 0)]}"/>
+									<field name="id" attrs="{'invisible':'1'}"/>
 									<field name="name"/>
 									<field name="apl_id" widget="many2one_tags"/>
 									<field name="create_date" class="oe_read_only"/>
@@ -23,6 +23,91 @@
 									<field name="end_date" class="oe_read_only"/>
 								</group>
 							</group>
+							<notebook>
+								<page string="Description">
+									<field name="description"/>
+								</page>
+								<page string="Defects">
+									<field name="defect_ids" domain="[('apl_id','=',apl_id),('state','=','confirmed')]">
+										<tree>
+											<field name="name"/>
+											<field name="tap_ids"/>
+											<field name="pillar_ids"/>
+											<field name="transformer_ids"/>
+											<field name="state"/>
+											<field name="category"/>
+										</tree>
+									</field>>
+								</page>
+								<page string="Pillars">
+									<group string="Pillars List">
+										<field name="pillar_ids" nolabel="1" domain="[('apl_id','=',apl_id)]">
+											<tree default_order="tap_id,num_by_vl">
+												<field name="name"/>
+												<field name="tap_id" invisible="1"/>
+												<field name="num_by_vl"/>
+												<field name="pillar_material_id"/>
+												<field name="pillar_type_id"/>
+												<field name="pillar_cut_id"/>
+											</tree>
+										</field>
+									</group>
+									<group string="Pillars from Defects" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}">
+										<field name="pillar_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}">
+											<tree default_order="tap_id,num_by_vl">
+												<field name="name"/>
+												<field name="tap_id" invisible="1"/>
+												<field name="num_by_vl"/>
+												<field name="pillar_material_id"/>
+												<field name="pillar_type_id"/>
+												<field name="pillar_cut_id"/>
+											</tree>
+										</field>
+									</group>
+								</page>
+								<page string="Transformers">
+									<group string="Transformers List">
+										<field name="transformer_ids" nolabel="1" domain="[('apl_id','=',apl_id)]">
+											<tree>
+												<field name="name"/>
+											</tree>
+										</field>
+									</group>
+									<group string="Transfromers from Defects" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}">
+										<field name="transformer_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}">
+											<tree>
+												<field name="name"/>
+											</tree>
+										</field>
+									</group>
+								</page>
+								<page string="Taps">
+									<group string="Taps List">
+										<field name="tap_ids" nolabel="1" domain="[('apl_id','=',apl_id)]">
+											<tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
+												<field name="num_by_vl" invisible="1"/>
+												<field name="name"/>
+												<field name="conn_pillar_id"/>
+												<field name="pillar_cnt"/>
+												<field name="line_len_calc"/>
+												<field name="is_main_line" invisible="1"/>
+											</tree>
+										</field>
+									</group>
+									<group string="Taps from Defects" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}">
+										<field name="tap_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}">
+											<tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
+												<field name="num_by_vl" invisible="1"/>
+												<field name="name"/>
+												<field name="conn_pillar_id"/>
+												<field name="pillar_cnt"/>
+												<field name="line_len_calc"/>
+												<field name="is_main_line" invisible="1"/>
+											</tree>
+										</field>
+									</group>
+								</page>
+							</notebook>
 						</sheet>
                 </form>
             </field>
