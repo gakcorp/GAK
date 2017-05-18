@@ -1,7 +1,7 @@
 .apl_map
 {
-	width: 800px;
-	height: 800px;
+	width: 100%;
+	height: 300px;
 	right: 0;
 	bottom: 0;
 }
@@ -23,5 +23,8 @@
 		width: 100%;
       }
 .passport_vl_form_sheet{
-	max-width: 100%;
+	    max-width: 100% !important;
+    background-image: url(/passportvl/static/src/img/apl_form_bg.png) !important;
+    background-repeat: no-repeat !important;
+    background-position: right top !important;
 }

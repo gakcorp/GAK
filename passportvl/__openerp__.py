@@ -39,6 +39,8 @@
         
 
     ],
+    #css
+    'css':['static/src/css/passportvl.css'],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',

@@ -12,7 +12,7 @@ information for which information is availeble in Activ.GIS system
         """,
     'depends': ['passportvl','base_geolocalize'],
     'data': [
-        'views/web.xml',
+        'views/google_map.xml',
         'views/layers_views.xml',
         'views/mod_apl_view.xml',
         'views/v2/carto_template.xml'
