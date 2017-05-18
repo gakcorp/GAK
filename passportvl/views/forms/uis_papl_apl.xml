@@ -174,8 +174,7 @@
 			<field name="arch" type="xml">
 			  <form string="APL form">
 				<sheet string="Details">
-					<attribute name="class">passport_vl_form_sheet</attribute>
-				  <div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
+				  <div class="oe_right oe_button_box" style="width: 50%;" name="buttons">
 					<!--<button class="oe_inline" name="act_show_scheme" type="object" 
 							 icon="fa-object-group">
 							 Scheme
@@ -394,8 +393,22 @@
 				  </notebook>
 				</sheet>
 			  </form>
+			  
 			</field>
 		  </record>
+		
+		
+		
+		<record id="mod_uis_papl_apl_form_css" model="ir.ui.view">
+            <field name="name">uis.papl.apl.inherit.css.custom</field>
+            <field name="model">uis.papl.apl</field>
+            <field name="inherit_id" ref="passportvl.uis_papl_apl_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="attributes">
+					<attribute name="class">passport_vl_form_sheet</attribute>   
+				</xpath>
+			</field>
+		</record>
 		
 	</data>
 </openerp>
