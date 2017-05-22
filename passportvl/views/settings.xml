@@ -76,6 +76,16 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 			<field name="help" type="html">
+			<p class="oe_view_nocontent_create">Create new apl display view</p>
+			</field>
+		</record>
+
+		<record id="uis_papl_companies_list_action_window" model="ir.actions.act_window">
+			<field name="name">Companies List</field>
+			<field name="res_model">res.company</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">Create new apl display view</p>
 			</field>
 		</record>
@@ -85,19 +95,121 @@
     			<field name="model">res.users</field>
     			<field name="arch" type="xml">
 				<form string="User Settings">
-    					<field name="id"/>
-    					<field name="name"/>
-					<field name="login"/>
-					<field name="papl_dept_ids" widget="many2many_tags"/>
+					<header>
+                        			<button string="Change Password" type="action" name="67" help="Change the user password."/>
+                    			</header>
+					<sheet>
+						<field name="id" invisible="1"/>
+                        			<div class="oe_button_box" name="button_box">
+                            				<button name="toggle_active" type="object" class="oe_stat_button" icon="fa-check">
+                                				<field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;active&quot;}"/>
+                            				</button>
+                        			</div>
+                        			<field name="image" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;image_medium&quot;}"/>
+                        			<div class="oe_title">
+                            				<label for="name" class="oe_edit_only"/>
+                            				<h1><field name="name" required="1"/></h1>
+							<label for="email" class="oe_edit_only" string="Email Address"/>
+                            				<h2><field name="email" required="1"/></h2>
+                            				<label for="login" class="oe_edit_only" string="Login"/>
+                            				<h2><field name="login" required="1"/></h2>
+                        			</div>
+						<notebook>
+							<page name="access_rights" string="Access Rights">
+								<group>
+									<group>
+										<field string="Allowed Companies" name="company_ids" widget="many2many_tags"/>
+                                    						<field string="Current Company" name="company_id" context="{'user_preference': 0}"/>
+										<field name="is_manager"/>
+									</group>
+									<group>
+										<field name="papl_dept_ids" widget="many2many_tags"/>
+										<field name="groups_id" domain="[('full_name', 'ilike', '%air%power%line%')]"/>
+									</group>
+								</group>
+							</page>
+							<page name="contact_details" string="Contact details">
+								<group>
+									<field name="lang"/>
+									<field name="login_date" class="oe_read_only"/>
+								</group>
+							</page>
+						</notebook>
+					</sheet>
 				</form>
    			</field>
+		</record>
+
+		<record model="ir.ui.view" id="uis_papl_companies_list_view_form">
+			<field name="name">Company Settings</field>
+    			<field name="model">res.company</field>
+    			<field name="arch" type="xml">
+				<form string="Company">
+					<sheet>
+						<field name="logo" widget="image" class="oe_avatar"/>
+                    				<div class="oe_title">
+                        				<label for="name" class="oe_edit_only"/>
+                        				<h1>
+                            					<field name="name" class="oe_inline"/>
+                        				</h1>
+                        				<label for="rml_header1" class="oe_edit_only"/>
+                        				<h3>
+                            					<field name="rml_header1" placeholder="e.g. Global Business Solutions"/>
+                        				</h3>
+                    				</div>
+						<notebook>
+							<page string="General Information">
+                            					<group>
+                                					<group>
+                                    						<field name="partner_id" readonly="1" required="0" groups="base.group_no_one"/>
+                                    						<label for="street" string="Address"/>
+                                    						<div class="o_address_format">
+                                       							<field name="street" placeholder="Street..." class="o_address_street"/>
+                                        						<field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                        						<field name="city" placeholder="City" class="o_address_city"/>
+                                        						<field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" on_change="onchange_state(state_id)"/>
+                                        						<field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                        						<field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True}" on_change="on_change_country(country_id)"/>
+                                    						</div>
+                                    						<field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
+                                					</group>
+                               	 					<group>
+                                    						<field name="phone"/>
+                                    						<field name="fax"/>
+                                    						<field name="email"/>
+                                   			 			<field name="vat"/>
+                                    						<field name="company_registry"/>
+                                    						<field name="parent_id" groups="base.group_multi_company"/>
+                                					</group>
+                            					</group>
+                        				</page>
+							<page string="Workers">
+								<field name="user_ids">
+									<tree>
+										<field name="name"/>
+										<field name="email"/>
+										<field name="is_manager"/>
+									</tree>
+								</field>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
 		</record>
 
 		<record model="ir.actions.act_window.view" id="uis_papl_users_list_action_window_form">
     			<field name="view_mode">form</field>
     			<field name="view_id" ref="uis_papl_users_list_view_form"/>
    			<field name="act_window_id" ref="uis_papl_users_list_action_window" />
-			<field eval="1" name="sequence"/>
+			<field eval="2" name="sequence"/>
+		</record>
+
+		<record model="ir.actions.act_window.view" id="uis_papl_companies_list_action_window_form">
+    			<field name="view_mode">form</field>
+    			<field name="view_id" ref="uis_papl_companies_list_view_form"/>
+   			<field name="act_window_id" ref="uis_papl_companies_list_action_window" />
+			<field eval="2" name="sequence"/>
 		</record>
 
 		<record model="ir.ui.view" id="uis_papl_users_list_view_tree">
@@ -108,7 +220,20 @@
     					<field name="id"/>
     					<field name="name"/>
 					<field name="login"/>
+					<field name="lang"/>
 					<field name="papl_dept_ids" widget="many2many_tags"/>
+					<field name="login_date"/>
+				</tree>
+   			</field>
+		</record>
+
+		<record model="ir.ui.view" id="uis_papl_companies_list_view_tree">
+    			<field name="name">Companies List</field>
+    			<field name="model">res.company</field>
+    			<field name="arch" type="xml">
+				<tree string="Companies List">
+    					<field name="id"/>
+    					<field name="name"/>
 				</tree>
    			</field>
 		</record>
@@ -120,8 +245,12 @@
 			<field eval="1" name="sequence"/>
 		</record>
 
-		
-
+		<record model="ir.actions.act_window.view" id="uis_papl_companies_list_action_window_tree">
+    			<field name="view_mode">tree</field>
+    			<field name="view_id" ref="uis_papl_companies_list_view_tree"/>
+   			<field name="act_window_id" ref="uis_papl_companies_list_action_window" />
+			<field eval="1" name="sequence"/>
+		</record>
 
 		<!-- Menu items!-->
         <menuitem name="aGIS Settings" id="uis_settings_menu_root"/>
@@ -131,7 +260,8 @@
 		<menuitem name="Employees" id="uis_papl_employee_menu" parent="uis_settings_menu_root" action="uis_papl_employee_action_window"/>
 		<menuitem name="Pillar Types" id="uis_pillar_type_settings_menu" parent="uis_settings_menu_root" action="uis_pillar_type_settings_action_window"/>
 		<menuitem name="APL display settings" id="uis_papl_view_settings_apl_menu" parent="uis_settings_menu_root" action="uis_papl_view_settings_apl_action_window"/>
-		<menuitem name="Users List" id="uis_papl_users_list_meny" parent="uis_settings_menu_root" action="uis_papl_users_list_action_window"/>
+		<menuitem name="Users List" id="uis_papl_users_list_menu" parent="uis_settings_menu_root" action="uis_papl_users_list_action_window"/>
+		<menuitem name="Companies List" id="uis_papl_companies_list_menu" parent="uis_settings_menu_root" action="uis_papl_companies_list_action_window"/>
 		<!-- views !-->
 		<record model="ir.ui.view" id="uis_global_settings_list">
 			<field name="name">Global settings list</field>

@@ -16,4 +16,5 @@ class res_users(osv.Model):
     _columns = {
         'employee_papl_ids': fields.one2many('uis.papl.employee', 'user_id', 'Related ActivGIS employees'),
 	'papl_dept_ids': fields.many2many('uis.papl.department',string="Departments",store=True),
+	'is_manager': fields.boolean(string='Is Manager'),
     }
