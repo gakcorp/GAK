@@ -8,18 +8,12 @@
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='buttons']" position="inside">
                    <!--<script type="text/javascript" src="../apl_aerial_photo/static/src/js/jquery.magnify.js"></script>!-->
-				   <script>
-					$.getScript("../apl_aerial_photo/static/src/js/jquery.magnify.js",function(){
-						console.debug('magnify loaded but not necessarily executed.');
-						//$('.zoom').magnify();
-					});
-				   </script>
 				   <button class="oe_inline oe_stat_button" name="action_view_photos" type="object" 
                        icon="fa-camera">
                        <field string="Photo" name="photo_count" widget="statinfo"/>
                    </button>
                 </xpath>
-				<!--
+				
 				<xpath expr="/form/sheet/notebook" position="inside">
 					<page string="Photos">
 						<field name="photo_ids" widget="many2many_kanban">
@@ -53,7 +47,7 @@
 
 
 					</page>
-				</xpath>!-->
+				</xpath>
             </field>
         </record>
     </data>

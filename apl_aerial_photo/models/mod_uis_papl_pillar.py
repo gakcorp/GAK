@@ -18,7 +18,9 @@ class uis_papl_photo_mod_uis_papl_pillar(models.Model):
 			pillar.photo_count=len(pillar.photo_ids)+1
 	
 	def _get_pillar_image(self):
-		vis_obj_ids=self.env['uis.ap.vis_object'].sudo().search(['pillar_id','in',self.mapped('id')])
-		_logger.debug(vis_obj_ids)
+		for pil in self:
+			_logger.debug(pil.id)
+			vis_obj_ids=self.env['uis.ap.vis_object'].sudo().search(['pillar_id','==',pil.id])
+			_logger.debug(vis_obj_ids)
 		#for pillar in self:
 			

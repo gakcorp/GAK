@@ -47,13 +47,13 @@ odoo.define('passportvl.form_widgets', function (require)
             vectorPillarBaseLayer.setVisible(false);
             
 			var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
-			var rrLayer=new ol.layer.Tile({
+			/*var rrLayer=new ol.layer.Tile({
 				preload:1,
 				source: new ol.source.TileImage({
 					url:'/maps/rosreestr_cadastre/{z}/{x}/{y}',
 					projection: 'EPSG:4326'
 					})
-				});
+				});*/
             var map = new ol.Map({
                			 			controls:ol.control.defaults().extend([
 												new ol.control.FullScreen(),
