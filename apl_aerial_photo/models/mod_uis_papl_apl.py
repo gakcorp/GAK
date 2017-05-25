@@ -2,6 +2,7 @@
 from openerp import models, fields, api, tools
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
+from uis_ap_photo import point_in_poly
 import math, urllib, json, time, random
 import logging
 
@@ -38,17 +39,19 @@ class uis_photo_mod_uis_papl_apl(models.Model):
 				while curlat<=latmax:
 					curlng=lngmin
 					while curlng<=lngmax:
-						rlat,rlng=round(curlat,4),round(curlng,4)
-						vl=0
-						fv=next((d for d in heat_photo_data if ((d['lat']==rlat) and (d['lng']==rlng))), None)
-						if fv:
-							vl=fv['cnt']
-							_logger.debug(fv)
-							heat_photo_data[:]=[d for d in heat_photo_data if not((d['lat']==rlat) and (d['lng']==rlng))]
-						heat_photo_data.append({
-							'lat':rlat,
-							'lng':rlng,
-							'cnt':vl+1})
+						pip=point_in_poly(curlat,curlng,vv)
+						if pip:
+							rlat,rlng=round(curlat,5),round(curlng,5)
+							vl=0
+							fv=next((d for d in heat_photo_data if ((d['lat']==rlat) and (d['lng']==rlng))), None)
+							if fv:
+								vl=fv['cnt']
+								_logger.debug(fv)
+								heat_photo_data[:]=[d for d in heat_photo_data if not((d['lat']==rlat) and (d['lng']==rlng))]
+							heat_photo_data.append({
+								'lat':rlat,
+								'lng':rlng,
+								'cnt':vl+1})
 						curlng+=dlng
 					curlat+=dlat
 				#_logger.debug('min/max lat = %r/%r min/max lng = %r/%r'%(latmin,latmax,lngmin,lngmax))
