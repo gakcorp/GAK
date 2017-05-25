@@ -7,6 +7,12 @@
 				<link rel="stylesheet" href="/passportvl/static/src/css/passportvl.css"/>
 			</xpath>
 		</template>
+		<template id="heatmap_assets_backend" name="heatmap" inherit_id="web.assets_backend">
+			<xpath expr="." position="inside">
+				<script type="text/javascript" src="/passportvl/static/src/js/heatmap.js"/>
+				<link rel="stylesheet" href="/passportvl/static/src/css/heatmap.css"/>
+			</xpath>
+		</template>
 		<record id="uis_papl_apl_resistance_form" model="ir.ui.view">
 			<field name="name">Resistance apl view</field>
 			<field name="model">uis.papl.apl.resistance</field>
@@ -186,7 +192,7 @@
 					<h2>
 					  <field name="short_name"/>
 					</h2>
-				  <group>
+				  <group col="3">
 					<group>
 					  <field name="id" attrs="{'invisible':[('id', '>', 0)]}"/>
 					  <field name="locality"/>
@@ -196,7 +202,7 @@
 					  <field name="build_company"/>
 					</group>
 					<group>
-			  <field name="department_id"/><!-- attrs="{'readonly':['|',('department_id_as_substation','==',True)]}"/>!-->
+					  <field name="department_id"/><!-- attrs="{'readonly':['|',('department_id_as_substation','==',True)]}"/>!-->
 					  <field name="department_id_as_substation"/>
 					  <field name="department_id_save" invisible="1"/><!-- attrs="{'invisible':[('department_id_as_substation','==',False)]}"/>!-->
 					  <field name="sup_substation_id" options="{&quot;no_open&quot;: True}"/>

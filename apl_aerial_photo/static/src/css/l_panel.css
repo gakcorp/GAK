@@ -1,11 +1,11 @@
 .l_button {
 	position: fixed;
-	top: 50%;
+	top: 0px;
 	left: 0;
 	background: #586371;
-	width: 35px;
-	height: 50px;
-	font: 40px Georgia;
+	width: 15px;
+	height: 100%;
+	font: 15px Georgia;
 	color: #fff;
 	text-align: center;
 	z-index:1300;

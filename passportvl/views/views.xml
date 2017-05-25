@@ -59,13 +59,15 @@
 			<sheet string="Details">
 				<div class="oe_right oe_button_box" style="width: 300px;" name="buttons">
 			  </div>
-				<h1>
-					<field name="name"/>
-				</h1>
-				<h2>
-					<field name="apl_id"/>
-					<field name="tap_id"/>
-				</h2>
+				<div style="position:absolute; min-width:200px; ">
+					<h1>
+						<field name="name"/>
+					</h1>
+					<h2>
+						<field name="apl_id"/>
+						<field name="tap_id"/>
+					</h2>
+				</div>
 				<notebook>
 					<page string="Main">
 						<group>

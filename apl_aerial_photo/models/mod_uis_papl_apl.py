@@ -1,28 +1,69 @@
 # -*- coding: utf-8 -*-
-from openerp.osv import fields, osv
-from openerp.tools.translate import _
+from openerp import models, fields, api, tools
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
+import math, urllib, json, time, random
 import logging
 
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
-class uis_apl_aerial_photo_mod_uis_papl_apl(osv.Model):
-	_name = 'uis.papl.apl'
+
+class uis_photo_mod_uis_papl_apl(models.Model):
 	_inherit = 'uis.papl.apl'
+	_name = 'uis.papl.apl'
+	photo_count=fields.Integer(string="Photo count", compute='_get_photo_count')
+	photo_ids=fields.Many2many(string="Photos", comodel_name="uis.ap.photo", relation="photo_apl_rel", column1="apl_id", column2="photo_id")
+	heatmap_photo_data=fields.Text(string='Heatmap photo data', compute='_get_heatmap_photo_data')
 
-	def _apl_photo_count(self,cr,uid,ids,field_name, arg, context=None):
-		res=dict.fromkeys(ids,0)
-		for apl in self.browse(cr,uid,ids,context=context):
-			photo_count=len(apl.photo_ids)
-			res[apl.id] = photo_count
-		return res
-
-	_columns = {
-		'photo_count': fields.function(_apl_photo_count, string='# Photo', type='integer'),
-		'photo_ids':fields.many2many('uis.ap.photo',rel='photo_apl_rel', id1='apl_id', id2='photo_id',string="Photos")
-	}
-
-	def action_view_photos(self, cr, uid, ids, context=None):
-		_logger.debug('Request photos for apl ids = %r'%ids)
+	
+	def _get_photo_count(self):
+		for apl in self:
+			apl.photo_count=len(apl.photo_ids)
+	
+	def _get_heatmap_photo_data(self):
+		for apl in self:
+			dlat,dlng=0.0005,0.0005
+			heat_photo_data=[]
+			for ph in apl.photo_ids:
+				vv=json.loads(ph.visable_view_json)
+				
+				latmin=min([d['lat'] for d in vv])
+				lngmin=min([d['lng'] for d in vv])
+				latmax=max([d['lat'] for d in vv])
+				lngmax=max([d['lng'] for d in vv])
+				#fv=any( for d in heat_photo_data)
+				
+				
+				curlat,curlng=latmin,lngmin
+				while curlat<=latmax:
+					curlng=lngmin
+					while curlng<=lngmax:
+						rlat,rlng=round(curlat,4),round(curlng,4)
+						vl=0
+						fv=next((d for d in heat_photo_data if ((d['lat']==rlat) and (d['lng']==rlng))), None)
+						if fv:
+							vl=fv['cnt']
+							_logger.debug(fv)
+							heat_photo_data[:]=[d for d in heat_photo_data if not((d['lat']==rlat) and (d['lng']==rlng))]
+						heat_photo_data.append({
+							'lat':rlat,
+							'lng':rlng,
+							'cnt':vl+1})
+						curlng+=dlng
+					curlat+=dlat
+				#_logger.debug('min/max lat = %r/%r min/max lng = %r/%r'%(latmin,latmax,lngmin,lngmax))
+			apl.heatmap_photo_data=json.dumps(heat_photo_data)
+				#define min lat
+				#define max lat
+				#define minlng
+				#define max lng
+				#Cycle for grid
+				#if point in vv then need add current latitude and longitude to array
+	def action_view_photos(self):
+		#_logger.debug('Request photos for apl ids = %r'%ids)
+		ids=[]
+		for apl in self:
+			ids.append(apl.id)
 		return {
 			'domain': "[('apl_ids','in',[" + ','.join(map(str, ids)) + "])]",
 			'name': _('Photos'),

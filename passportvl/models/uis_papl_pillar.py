@@ -125,14 +125,14 @@ class uis_papl_pillar(models.Model):
 			cp=None
 			nb=None
 			pb=None
-			_logger.debug('Start define prev pillar for pillar %r'%pil.name)
+			#_logger.debug('Start define prev pillar for pillar %r'%pil.name)
 			if pil.parent_id:
 				cp=pil.parent_id
 				while cp and(cp.tap_id==pil.tap_id) and (cp.pillar_type_id.base==False):
 					bp_pils_ids.append(cp.id)
 					cp=cp.parent_id
-				_logger.debug('---> Prev pillar for pil %r is pillar %r'%(pil.name,cp.name))
-				_logger.debug('---> Next pillar for P pil %r is pillar %r'%(cp.name, cp.next_base_pillar_id))
+				#_logger.debug('---> Prev pillar for pil %r is pillar %r'%(pil.name,cp.name))
+				#_logger.debug('---> Next pillar for P pil %r is pillar %r'%(cp.name, cp.next_base_pillar_id))
 				if pil.prev_base_pillar_id<>cp:				
 					pil.prev_base_pillar_id=cp
 				if pil.pillar_type_id.base==True:
@@ -142,7 +142,7 @@ class uis_papl_pillar(models.Model):
 								pil.next_base_pillar_id=pil.prev_base_pillar_id.next_base_pillar_id
 						pil.prev_base_pillar_id.write({'next_base_pillar_id':pil.id})
 					nb=pil
-					_logger.debug('--->---> For P Pil %r write next_pillar_id %r'%(pil.prev_base_pillar_id.name,pil.name))
+					#_logger.debug('--->---> For P Pil %r write next_pillar_id %r'%(pil.prev_base_pillar_id.name,pil.name))
 				if pil.pillar_type_id.base==False:
 					if pil.prev_base_pillar_id.next_base_pillar_id:
 						if pil.tap_id==cp.tap_id:
@@ -150,13 +150,13 @@ class uis_papl_pillar(models.Model):
 						nb=pil.prev_base_pillar_id.next_base_pillar_id
 				if nb:
 					bp_pils=self.browse(bp_pils_ids).sudo()
-					_logger.debug('--->---> bp_pils is %r'%bp_pils)
+					#_logger.debug('--->---> bp_pils is %r'%bp_pils)
 					bp_pils.write({'next_base_pillar_id':nb.id})
 				if not(nb):
 					tap_pils=self.browse(pil.tap_id.pillar_ids.mapped('id')).sudo()
 					tap_pils.sorted(key=lambda r: r.num_by_vl,reverse=True)
 					#tap_pils._get_prev_base_pillar()
-					_logger.debug('--->--->---> next pillar not defined search in list %r'%tap_pils)
+					#_logger.debug('--->--->---> next pillar not defined search in list %r'%tap_pils)
 			if not(pil.parent_id):
 				pil.write({'prev_base_pillar_id':None})
 			#pil.write({'next_base_pillar_id':None})
