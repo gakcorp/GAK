@@ -8,11 +8,20 @@
             <!--<field name="groups_id" eval="[(4, ref('asset.group_mro_user'))]"/>!-->
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='buttons']" position="inside">
-                   <button class="oe_inline oe_stat_button" name="action_view_maintenance" type="object" 
+                   <button class="oe_inline oe_stat_button" name="action_view_defect" type="object"
+						icon="fa-exclamation-triangle">
+						<field string="Defect" name="all_defect_count" widget="statinfo"/>
+				   </button>
+				   <button class="oe_inline oe_stat_button" name="action_view_maintenance" type="object" 
                        icon="fa-cogs">
                        <field string="Maintenance" name="mro_count" widget="statinfo"/>
                    </button>
                 </xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page string="Defects">
+						<field name="all_defect_ids" />
+					</page>
+				</xpath>
             </field>
         </record>
 <!--

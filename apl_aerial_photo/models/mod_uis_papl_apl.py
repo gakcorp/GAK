@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+
 from openerp import models, fields, api, tools
+from openerp.tools.translate import _
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 from uis_ap_photo import point_in_poly
@@ -62,6 +64,8 @@ class uis_photo_mod_uis_papl_apl(models.Model):
 				#define max lng
 				#Cycle for grid
 				#if point in vv then need add current latitude and longitude to array
+	
+	@api.multi
 	def action_view_photos(self):
 		#_logger.debug('Request photos for apl ids = %r'%ids)
 		ids=[]
