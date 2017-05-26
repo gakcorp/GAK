@@ -15,7 +15,7 @@
                 </xpath>
 				<xpath expr="/form/sheet/group/group" position="before">
 					<group>
-						<div id="photo_heat_map">
+						<div id="photo_heat_map" style="height:200px; width:450px;">
 							<field name="heatmap_photo_data" widget="heatmap"/>
 						</div>
 					</group>

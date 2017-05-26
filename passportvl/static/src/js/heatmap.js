@@ -5,28 +5,29 @@ odoo.define('passportvl.form_widgets', function (require)
 	var instance = openerp;
 	heatmap=instance.web.form.AbstractField.extend(
     {
-        map: null,
-        render_value: function()
+        hmap: null,
+		render_value: function()
 		{
 			this.$el.find('#heat_def_map').remove();
             var def_heat_map=$('<div id="heat_def_map" class="heat_map"></div>');
-            def_heat_map.css('width','400px');
-			def_heat_map.css('height','200px');
+            /*def_heat_map.css('width','100%');
+			#def_heat_map.css('height','100%');*/
 			this.$el.append(def_heat_map);
 			data = new ol.source.Vector();
 			var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
 			
-			cwm=this;
+			cwm=this.$el;
 			hmap=new ol.Map({
+				controls:[new ol.control.FullScreen()],
 				target:def_heat_map.get()[0],
 				renderer: 'canvas',
-				layers: [OsmLayer],
-				controls:[]
-			});
+				layers: [OsmLayer]});
 			
-			hmap.setSize([def_heat_map.width(),def_heat_map.height()]);
+			this.$el.width(this.$el.parent().width());
+			this.$el.height(this.$el.parent().height());
+			hmap.setSize([def_heat_map.parent().width(),def_heat_map.parent().height()]);
             this.hmap=hmap;
-			
+				
 			a_val=$.parseJSON(this.get_value());
 			sumlat=0;
 			sumlng=0;

@@ -213,8 +213,7 @@
 				  </group>
 				  <notebook>
 					<page string="Scheme">
-					  <div id="scheme_holder"></div>
-					  <div id="scheme_id_apls">
+					  <div id="scheme_id_apls" style="height:300px; width:1000px;">
 						<!--<field name="scheme_image_old" widget="image" class="imagescheme" options='{"size":[800,400]}'/>!-->
 						<field name="scheme_image" widget="aplmap"/>
 					  </div>

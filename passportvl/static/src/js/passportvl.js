@@ -25,8 +25,8 @@ odoo.define('passportvl.form_widgets', function (require)
             var AplID=this.GetAplID();
             this.$el.find('#defmap').remove();
             var defMap=$('<div id="defmap" class="apl_map"></div>');
-            defMap.css('width','900px');
-			defMap.css('height','300px');
+            /*defMap.css('width','900px');
+			defMap.css('height','300px');*/
 			this.$el.append(defMap);
             var vectorLineSource=new ol.source.Vector({projection: 'EPSG:4326'});
             var vectorLineLayer=new ol.layer.Vector({source: vectorLineSource});
@@ -55,18 +55,24 @@ odoo.define('passportvl.form_widgets', function (require)
 					})
 				});*/
             var map = new ol.Map({
-             			 			controls:ol.control.defaults().extend([
-												new ol.control.FullScreen()/*,
-												new ol.control.OverviewMap({
-													layers:[vectorTransLayer],
-													label: 'Transformers'
-													})*/
-											]),
+             			 			//controls:ol.control.defaults().extend([
+									//			new ol.control.FullScreen()/*,
+									//			new ol.control.OverviewMap({
+									//				layers:[vectorTransLayer],
+									//				label: 'Transformers'
+									//				})*/
+									//		]),
+									controls:[new ol.control.FullScreen()],
 									target: defMap.get()[0],  // The DOM element that will contains the map
                 					renderer: 'canvas', // Force the renderer to be used
                 					layers: [OsmLayer, vectorLineLayer, vectorPillarBaseLayer,vectorPillarLayer,vectorTransLayer,vectorSubLayer],
             					});
-			map.setSize([defMap.width(),defMap.height()]);
+			
+			this.$el.width(this.$el.parent().width());
+			this.$el.height(this.$el.parent().height());
+			map.setSize([defMap.parent().width(),defMap.parent().height()]);
+			
+			//map.setSize([defMap.width(),defMap.height()]);
             
             this.map=map;
             
