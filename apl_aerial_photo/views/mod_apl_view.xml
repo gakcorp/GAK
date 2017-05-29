@@ -13,13 +13,13 @@
                        <field string="Photo" name="photo_count" widget="statinfo"/>
                    </button>
                 </xpath>
-				<xpath expr="/form/sheet/group/group" position="before">
+				<!--<xpath expr="/form/sheet/group/group" position="before">
 					<group>
 						<div id="photo_heat_map" style="height:200px; width:450px;">
-							<field name="heatmap_photo_data" widget="heatmap"/>
+							<field name="heatmap_photo_data" widget="heatmap" options='{"radius":20}'/>
 						</div>
 					</group>
-				</xpath>
+				</xpath>!-->
 				<xpath expr="/form/sheet/notebook" position="inside">
 					<page string="Photos">
 						<field name="photo_ids" widget="many2many_kanban">

@@ -15,7 +15,36 @@ class uis_apl_mro_mod_uis_papl_apl_defects(models.Model):
 	all_defect_ids=fields.One2many(string="All defects", comodel_name="uis.papl.mro.defect", inverse_name="apl_id")
 	all_defect_count=fields.Integer(string="All defect count", compute='_get_defect_count')
 	mro_count=fields.Integer(string="All maintenance count", compute='_get_mro_count')
+	defect_heatmap_data_json=fields.Text(string='Heatmap defect data', compute='_get_defect_heatmap_data')
 	
+	def _get_defect_heatmap_data(self):
+		for apl in self:
+			defect_heat_data=[]
+			for pil in apl.pillar_id:
+				rlat,rlng=round(pil.latitude,5),round(pil.longitude,5)
+				defect_heat_data.append({'lat':rlat,'lng':rlng,'cnt':1})
+			for dfct in apl.all_defect_ids:
+				for pil in dfct.pillar_ids:
+					rlat,rlng=round(pil.latitude,5),round(pil.longitude,5)
+					vl=float(dfct.category)*100
+					#_logger.debug(vl)
+					fv=next((d for d in defect_heat_data if ((d['lat']==rlat) and (d['lng']==rlng))), None)
+					if fv:
+						vl+=fv['cnt']
+						_logger.debug(vl)
+						defect_heat_data[:]=[d for d in defect_heat_data if not((d['lat']==rlat) and (d['lng']==rlng))]
+						defect_heat_data.append({'lat':rlat,'lng':rlng,'cnt':vl})
+				for tr in dfct.transformer_ids:
+					rlat,rlng=round(tr.latitude,5),round(tr.longitude,5)
+					vl=float(dfct.category)*100
+					#_logger.debug(vl)
+					fv=next((d for d in defect_heat_data if ((d['lat']==rlat) and (d['lng']==rlng))), None)
+					if fv:
+						vl+=fv['cnt']
+						_logger.debug(vl)
+						defect_heat_data[:]=[d for d in defect_heat_data if not((d['lat']==rlat) and (d['lng']==rlng))]
+						defect_heat_data.append({'lat':rlat,'lng':rlng,'cnt':vl})
+			apl.defect_heatmap_data_json=json.dumps(defect_heat_data)
 	def _get_mro_count(self):
 		for apl in self:
 			apl.mro_count=0

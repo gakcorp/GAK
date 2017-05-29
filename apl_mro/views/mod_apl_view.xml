@@ -22,6 +22,13 @@
 						<field name="all_defect_ids" />
 					</page>
 				</xpath>
+				<xpath expr="/form/sheet/group/group" position="before">
+					<group>
+						<div id="defect_heat_map" style="height:200px; width:450px;">
+							<field name="defect_heatmap_data_json" widget="heatmap" options='{"radius":100}'/>
+						</div>
+					</group>
+				</xpath>
             </field>
         </record>
 <!--

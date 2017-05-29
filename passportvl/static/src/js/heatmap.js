@@ -6,8 +6,14 @@ odoo.define('passportvl.form_widgets', function (require)
 	heatmap=instance.web.form.AbstractField.extend(
     {
         hmap: null,
+		c_radius:10,
+
 		render_value: function()
 		{
+			if (this.options.radius>0){
+				c_radius=this.options.radius;
+			}
+			console.log(c_radius);
 			this.$el.find('#heat_def_map').remove();
             var def_heat_map=$('<div id="heat_def_map" class="heat_map"></div>');
             /*def_heat_map.css('width','100%');
