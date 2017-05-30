@@ -6,22 +6,89 @@ odoo.define('passportvl.form_widgets', function (require)
 	series_chart=instance.web.form.AbstractField.extend(
     {
 		hchart: null,
-		title:null,
+		title: null,
 		
 		render_value: function()
 		{
 			if (this.options.title){title=this.options.title;}
 			
-			this.$el.find('#series_chart_div').remove();
-            var series_chart_div=$('<div id="series_chart_div" class="series_chart"></div>');
+			this.$el.find('#scont').remove();
+            series_chart_div=$('<div id="scont" class="series_chart"></div>');
             /*def_heat_map.css('width','100%');
 			#def_heat_map.css('height','100%');*/
 			this.$el.append(series_chart_div);
-			Highcharts.chart('series_chart_div',{
+			
+			this.$el.width(this.$el.parent().width());
+			this.$el.height(this.$el.parent().height());
+			sc_val=$.parseJSON(this.get_value());
+			//console.log(sc_val);
+			//series_chart_div.append(sc_val);
+			var categories=[], flags=[];
+			for (i=0;i<sc_val.length;i++){
+				if (flags[sc_val[i].category]) continue;
+				flags[sc_val[i].category]=true;
+				categories.push(sc_val[i].category);
+			}
+			chart=series_chart_div.highcharts({
 				credits:{enabled:false},
 				chart:{type:'bar'},
-				title:{text:title},
+				xAxis: {
+					categories: categories
+				},
+				yAxis: {
+				    min: 0,
+					title: {
+					    text: null
+					}
+				},
+				legend: {
+				    reversed: false
+				},
+				plotOptions: {
+					series: {
+						stacking: 'percent'
+					}
+				},
+				series: [ {
+					showInLegend:false,
+					color:'#00ff00',
+					name: 'DONE',
+					data: [3, 4, 4, 2, 5]
+					},{
+					showInLegend:false,
+					name: 'WORK',
+					color:'#0000ff',
+					data: [3, 4, 4, 2, 5]
+					}, {
+					showInLegend:false,
+					name: 'PLANED',
+					color:'#ffff00',
+					data: [3, 4, 4, 2, 5]
+					},{
+					showInLegend:false,
+					color:'#aa00ff',
+					name: 'CONFIRMED',
+					data: [2, 2, 3, 2, 1]
+					},{
+					showInLegend:false,
+					name: 'DRAFT',
+					color:'#aaaaaa',
+					data: [5, 3, 4, 7, 2]
+					},{
+					showInLegend:false,
+					name: 'CANCELED',
+					color:'#ccffcc',
+					data: [5, 3, 4, 7, 2]
+					},
+					]
 				});
+			//chart.setSize([series_chart_div.parent().width(),series_chart_div.parent().height()]);
+			/*chart=Highcharts.chart({
+				credits:{enabled:false},
+				chart:{type:'bar'},
+				title:{text:null},
+				});*/
+			
 		}
 	});
 	core.form_widget_registry.add('series_chart', series_chart);

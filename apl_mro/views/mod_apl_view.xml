@@ -24,8 +24,15 @@
 				</xpath>
 				<xpath expr="/form/sheet/group/group" position="before">
 					<group>
-						<div id="defect_heat_map" style="height:200px; width:450px;">
+						<div id="defect_state_category_series_chart" style="height:200px; width:400px;">
 							<field name="defect_heatmap_data_json" widget="heatmap" options='{"radius":100}'/>
+						</div>
+					</group>
+				</xpath>
+				<xpath expr="/form/sheet/group/group" position="before">
+					<group>
+						<div id="defect_heat_map" style="height:200px; width:400px;">
+							<field name="defect_state_category_data_json" widget="series_chart" options='{}'/>
 						</div>
 					</group>
 				</xpath>
