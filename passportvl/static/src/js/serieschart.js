@@ -1,4 +1,5 @@
 /* https://jsfiddle.net/vLL4jLdg/ */
+/*https://jsfiddle.net/kgnkh50v/*/
 odoo.define('passportvl.form_widgets', function (require)
 {
     var core = require('web.core');
@@ -22,21 +23,70 @@ odoo.define('passportvl.form_widgets', function (require)
 			this.$el.width(this.$el.parent().width());
 			this.$el.height(this.$el.parent().height());
 			sc_val=$.parseJSON(this.get_value());
-			//console.log(sc_val);
-			//series_chart_div.append(sc_val);
-			var categories=[], flags=[];
+			var categories=[], flags=[], states=[];
 			for (i=0;i<sc_val.length;i++){
 				if (flags[sc_val[i].category]) continue;
 				flags[sc_val[i].category]=true;
 				categories.push(sc_val[i].category);
 			}
+			flags=[];
+			for (i=0;i<sc_val.length;i++){
+			  if (flags[sc_val[i].state]) continue;
+			  flags[sc_val[i].state]=true;
+			  states.push(sc_val[i].state);
+			}
+			o_val=[];
+				for (i=0;i<categories.length;i++){
+					o_val[i]=[];
+					for (j=0; j<states.length;j++){
+						o_val[i][j]=0;
+					}
+				}
+			for (i=0;i<sc_val.length;i++){
+				cti=categories.indexOf(sc_val[i].category);
+				sti=states.indexOf(sc_val[i].state);
+				o_val[cti][sti]=o_val[cti][sti]+sc_val[i].cnt;
+				}      
+			
+			series=[];
+			for (i=0;i<states.length;i++){
+			 series.push({
+					name:states[i],
+					data:o_val[i]
+			 });
+			}
 			chart_options={
+				credits:{
+					enabled:false
+				},
 				chart:{
 					renderTo:series_chart_div[0],
-					type:'bar'
-				}
+					type:'bar',
+					backgroundColor:'rgba(255, 255, 255, 0.1)'
+				},
+				title:{
+					text: null
+				},
+				xAxis:{
+					categories:categories
+				},
+				yAxis: {
+				    min: 0,
+					title: {
+					    text: null
+					}
+				},
+				plotOptions:{
+					series:{
+						stacking:'normal'
+					}
+				},
+				series:series
 			};
+			//schart=series_chart_div[0].highcharts(chart_options);
 			schart=new Highcharts.Chart(chart_options);
+			schart.update(chart_options);
+			schart.reflow();
 			//chart_options.credits.enabled=false;
 			
 			/*chart=series_chart_div.highcharts({

@@ -543,6 +543,17 @@ class uis_papl_apl(models.Model):
 			apl.cnt_pillar_wo_tap=cnt
 			
 	
+	def view_apl_action(self,cr,uid,id,context=None):
+		return{
+			'type': 'ir.actions.act_window',
+			'name': 'APL', 
+			'view_type': 'form',
+			'view_mode': 'form',
+			'res_model': self._name,
+			'res_id': id[0],
+			'target': 'current',
+		}
+	
 	@api.multi
 	def act_show_scheme(self):
 		print "Debug info. Start Show_map"

@@ -23,7 +23,7 @@ class uis_apl_mro_mod_uis_papl_apl_defects(models.Model):
 			dsc_data=[]
 			for dfct in apl.all_defect_ids:
 				vl=1
-				state, category=dfct.state, dfct.category
+				state, category=dfct.state, dfct.category.value
 				find_position=next((d for d in dsc_data if ((d['category']==category) and (d['state']==state))),None)
 				if find_position:
 					vl+=find_position['cnt']
