@@ -1,3 +1,4 @@
+/* https://jsfiddle.net/vLL4jLdg/ */
 odoo.define('passportvl.form_widgets', function (require)
 {
     var core = require('web.core');
@@ -29,9 +30,20 @@ odoo.define('passportvl.form_widgets', function (require)
 				flags[sc_val[i].category]=true;
 				categories.push(sc_val[i].category);
 			}
-			chart=series_chart_div.highcharts({
+			chart_options={
+				chart:{
+					renderTo:series_chart_div[0],
+					type:'bar'
+				}
+			};
+			schart=new Highcharts.Chart(chart_options);
+			//chart_options.credits.enabled=false;
+			
+			/*chart=series_chart_div.highcharts({
 				credits:{enabled:false},
-				chart:{type:'bar'},
+				chart:{
+					type:'bar',
+					renderTo:'scont'},
 				xAxis: {
 					categories: categories
 				},
@@ -81,7 +93,7 @@ odoo.define('passportvl.form_widgets', function (require)
 					data: [5, 3, 4, 7, 2]
 					},
 					]
-				});
+				});*/
 			//chart.setSize([series_chart_div.parent().width(),series_chart_div.parent().height()]);
 			/*chart=Highcharts.chart({
 				credits:{enabled:false},
