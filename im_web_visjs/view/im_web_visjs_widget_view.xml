@@ -3,9 +3,9 @@
     <data>
         <template id="assets_backend" name="im_web_visjs_widget assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
-				<link href="/im_web_visjs/static/src/vendors/dist/vis.css" rel="stylesheet" type="text/css" />
+				<link href="/im_web_visjs/static/src/vendors/visjs/dist/vis.min.css" rel="stylesheet" type="text/css" />
 				<link href="/im_web_visjs/static/src/css/im_web_visjs.css" rel="stylesheet" type="text/css" />
-				<script src="/im_web_visjs/static/src/vendors/dist/vis.js"></script>
+				<script src="/im_web_visjs/static/src/vendors/visjs/dist/vis.js"></script>
 				<script src="/im_web_visjs/static/src/js/im_web_visjs.js"></script>
             </xpath>
         </template>
