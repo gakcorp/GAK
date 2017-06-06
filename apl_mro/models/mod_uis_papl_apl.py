@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#from __future__ import unicode_literals
 
 from openerp.tools.translate import _
 import math, urllib, json, time, random
@@ -17,13 +18,33 @@ class uis_apl_mro_mod_uis_papl_apl_defects(models.Model):
 	mro_count=fields.Integer(string="All maintenance count", compute='_get_mro_count')
 	defect_heatmap_data_json=fields.Text(string='Heatmap defect data', compute='_get_defect_heatmap_data')
 	defect_state_category_data_json=fields.Text(string='Data about defects', compute='_get_defect_state_category_data')
+	mro_ids=fields.One2many(string="All mro", comodel_name="uis.papl.mro.order", inverse_name="apl_id")
+	mro_timeline_data_json=fields.Text(string="MRO Timeline", compute='_get_mro_timeline_data')
 	
+	def _get_mro_timeline_data(self):
+		for apl in self:
+			tldata=[]
+			for mro in apl.mro_ids:
+				cur_id=mro.id
+				perc_done=random.randint(0,98)
+				mro_name=unicode(mro.name)#s = unicode(your_object).encode('utf8')
+				content=unicode('<div><div>%r</div><div class="progress-bar" role="progressbar" aria-valuenow="%r" aria-valuemin="0" aria-valuemax="100" style="width: %r%%;">%r</div></div>'%(mro_name,perc_done,perc_done,perc_done))
+				tldata.append({
+					'id':cur_id,
+					'content':content,
+					'start': mro.start_planned_date,
+					'end': mro.end_planned_date
+				})
+			apl.mro_timeline_data_json=json.dumps(tldata)
+			_logger.debug(tldata)
+				#div><div>Устранение дефектов</div><div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">60%</div></div>
 	def _get_defect_state_category_data(self):
 		for apl in self:
 			dsc_data=[]
 			for dfct in apl.all_defect_ids:
+				_logger.debug(dfct)
 				vl=1
-				state, category=dfct.state, dfct.category.value
+				state, category=dfct.state, dfct.category#.value
 				find_position=next((d for d in dsc_data if ((d['category']==category) and (d['state']==state))),None)
 				if find_position:
 					vl+=find_position['cnt']
@@ -70,7 +91,7 @@ class uis_apl_mro_mod_uis_papl_apl_defects(models.Model):
 			apl.defect_heatmap_data_json=json.dumps(defect_heat_data)
 	def _get_mro_count(self):
 		for apl in self:
-			apl.mro_count=0
+			apl.mro_count=len(apl.mro_ids)
 			
 	def _get_defect_count(self):
 		for apl in self:

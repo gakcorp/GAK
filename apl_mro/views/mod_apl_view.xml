@@ -36,6 +36,13 @@
 						</div>
 					</group>
 				</xpath>
+				<xpath expr="/form/sheet/group/group" position="before">
+					<group>
+						<div id="timeline_mro" style="height:200px; width:400px;">
+							<field name="mro_timeline_data_json" widget="imvis_timeline" options='{}'/>
+						</div>
+					</group>
+				</xpath>
             </field>
         </record>
 <!--

@@ -27,4 +27,5 @@
     background-image: url(/passportvl/static/src/img/apl_form_bg.png) !important;
     background-repeat: no-repeat !important;
     background-position: right top !important;
+	padding-top: 0px !important;
 }
