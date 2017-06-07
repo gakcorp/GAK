@@ -28,7 +28,7 @@ class uis_apl_mro_mod_uis_papl_apl_defects(models.Model):
 				cur_id=mro.id
 				perc_done=random.randint(0,98)
 				mro_name=unicode(mro.name)#s = unicode(your_object).encode('utf8')
-				content=unicode('<div><div>%r</div><div class="progress-bar" role="progressbar" aria-valuenow="%r" aria-valuemin="0" aria-valuemax="100" style="width: %r%%;">%r</div></div>'%(mro_name,perc_done,perc_done,perc_done))
+				content='<div><div>%r</div><div class="progress-bar" role="progressbar" aria-valuenow="%r" aria-valuemin="0" aria-valuemax="100" style="width: %r%%;">%r</div></div>'%(mro_name,perc_done,perc_done,perc_done)
 				tldata.append({
 					'id':cur_id,
 					'content':content,

@@ -20,7 +20,7 @@
 						</div>
 					</group>
 				</xpath>!-->
-				<xpath expr="/form/sheet/notebook" position="inside">
+				<xpath expr="/form/sheet/div[@id='im_main']/notebook" position="inside">
 					<page string="Photos">
 						<field name="photo_ids" widget="many2many_kanban">
                             <kanban>

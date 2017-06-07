@@ -17,26 +17,30 @@
                        <field string="Maintenance" name="mro_count" widget="statinfo"/>
                    </button>
                 </xpath>
-				<xpath expr="/form/sheet/notebook" position="inside">
+				<xpath expr="/form/sheet/div[@id='im_main']/notebook" position="inside">
 					<page string="Defects">
 						<field name="all_defect_ids" />
 					</page>
 				</xpath>
-				<xpath expr="/form/sheet/group/group" position="before">
+				<!--<xpath expr="/form/sheet/group/group" position="before">!-->
+				
+				<xpath expr="//div[@name='infobar']" position="inside">
 					<group>
-						<div id="defect_state_category_series_chart" style="height:200px; width:400px;">
-							<field name="defect_heatmap_data_json" widget="heatmap" options='{"radius":100}'/>
+						<div id="defect_heat_map" style="height:200px; width:400px;">
+							<field name="defect_heatmap_data_json" widget="heatmap" options='{"radius":200}'/>
 						</div>
 					</group>
 				</xpath>
-				<xpath expr="/form/sheet/group/group" position="before">
+				
+				<xpath expr="//div[@name='infobar']" position="inside">
 					<group>
-						<div id="defect_heat_map" style="height:200px; width:400px;">
+						<div id="defect_state_category_series_chart" style="height:200px; width:400px;">
 							<field name="defect_state_category_data_json" widget="series_chart" options='{}'/>
 						</div>
 					</group>
 				</xpath>
-				<xpath expr="/form/sheet/group/group" position="before">
+				
+				<xpath expr="//div[@name='infobar']" position="inside">
 					<group>
 						<div id="timeline_mro" style="height:200px; width:400px;">
 							<field name="mro_timeline_data_json" widget="imvis_timeline" options='{}'/>
@@ -45,31 +49,5 @@
 				</xpath>
             </field>
         </record>
-<!--
-        <record id="view_asset_tree_mro" model="ir.ui.view">
-            <field name="name">asset tree view mro</field>
-            <field name="model">asset.asset</field>
-            <field name="inherit_id" ref="asset.assets_tree_view"/>
-            <field name="arch" type="xml">
-                <field name="user_id" position="after">
-                    <field name="maintenance_state_id"/>
-                </field>
-            </field>
-        </record>
-
-        <record id="view_asset_search_mro" model="ir.ui.view">
-            <field name="name">asset search view mro</field>
-            <field name="model">asset.asset</field>
-            <field name="inherit_id" ref="asset.assets_search"/>
-            <field name="arch" type="xml">
-                <xpath expr="//filter[@name='group_user']" position="after">
-                  <filter name="group_maintenance_state"
-                          string="Status"
-                          context="{'group_by': 'maintenance_state_id'}"
-                          />
-                </xpath>
-            </field>
-        </record>
-!-->
  	</data>
 </openerp>
