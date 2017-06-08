@@ -19,7 +19,8 @@
                 </xpath>
 				<xpath expr="/form/sheet/div[@id='im_main']/notebook" position="inside">
 					<page string="Defects">
-						<field name="all_defect_ids" />
+						<field name="all_defect_ids" context="{'form_view_ref': 'apl_mro.mro_defect_form_view',}"/>
+						<!-- try 'target': 'current'!-->
 					</page>
 				</xpath>
 				<!--<xpath expr="/form/sheet/group/group" position="before">!-->
