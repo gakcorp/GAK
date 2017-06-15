@@ -97,7 +97,7 @@
 							<field name="near_pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="pillar_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="near_apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
-							<field name="apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
+							<field name="apl_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>-->
 							<field name="near_transformer_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="transformer_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>
 							<field name="next_photo_ids" widget="many2many_tags" options="{'no_create_edit':True,'no_quick_create':True}"/>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-        <record id="view_papl_apl_form_mod_cartography" model="ir.ui.view">
-            <field name="name">uis.papl.apl.form.inherit.cartography</field>
+        <record id="view_papl_apl_layer_settings_form" model="ir.ui.view">
+            <field name="name">uis.papl.apl.form.inherit</field>
             <field name="model">uis.papl.apl</field>
             <field name="inherit_id" ref="passportvl.uis_papl_apl_form"/>
             <field name="arch" type="xml">
@@ -19,16 +19,5 @@
 				</xpath>!-->
             </field>
         </record>
-	
-		<record model="ir.ui.view" id="view_papl_apl_tree_mod_cartography">
-			<field name="name">uis.papl.apl.tree.inherit.cartography</field>
-			<field name="model">uis.papl.apl</field>
-			<field name="inherit_id" ref="passportvl.uis_papl_apl_list"/>
-			<field name="arch" type="xml">
-				<xpath expr="/tree" position="inside">
-					<button name="act_show_map" string="Map" type="object" icon="STOCK_FIND"/>
-				</xpath>
-			</field>
-		</record>
 	</data>
 </openerp>

@@ -6,18 +6,32 @@
             <field name="model">uis.papl.mro.order</field>
             <field name="arch" type="xml">
                 <form string="Order Form">
+						<header>
+							<button name="order_confirmed" type="object" string="Confirm" class="oe_highlight, oe_read_only" attrs="{'invisible':[('state', '!=', 2)]}" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to confirm this order?"/>
+							<button name="order_assigned" type="object" string="Assign" attrs="{'invisible':['|',('contractor_id','==',False),('state', '!=', 3)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to assign this order?"/>
+							<button name="order_take_to_work" type="object" string="Take To Work" attrs="{'invisible':[('state', '!=', 4)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to take to work this order?"/>
+							<button name="order_get_started" type="object" string="Get Started" attrs="{'invisible':[('state', '!=', 5)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to start working on this order?"/>
+							<button name="order_completed" type="object" string="Complete" attrs="{'invisible':[('state', '!=', 6)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to complete this order?"/>
+							<button name="order_not_accepted" type="object" string="Not Accepted" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to not accept this order?"/>
+							<button name="order_done" type="object" string="Done" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to finish this order?"/>
+							<button name="order_cancel" type="object" string="Cancel" attrs="{'invisible':['|',('state', '==', 1),('state', '==', 8)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to cancel this order?"/>
+							<button name="order_draft" type="object" string="Draft" attrs="{'invisible':[('state', '!=', 1)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to draft this order?"/>
+							<field name="state" widget="statusbar"/>
+						</header>
 						<sheet>
 							<group>
 								<group>
 									<field name="id" attrs="{'invisible':'1'}"/>
-									<field name="name"/>
-									<field name="apl_id" widget="many2one_tags"/>
+									<field name="name" attrs="{'readonly':[('state', '!=', 2)]}"/>
+									<field name="apl_id" widget="many2one_tags" attrs="{'readonly':[('state', '!=', 2)]}"/>
 									<field name="create_date" class="oe_read_only"/>
 									<field name="create_uid" class="oe_read_only"/>
+									<field name="contractor_id" attrs="{'readonly':[('state', '!=', 2)]}"/>
+									<field name="contractor_logo" widget="image" class="oe_avatar"/>
 								</group>>
 								<group>
-									<field name="start_planned_date"/>
-									<field name="end_planned_date"/>
+									<field name="start_planned_date" attrs="{'readonly':[('state', '!=', 2)]}"/>
+									<field name="end_planned_date" attrs="{'readonly':[('state', '!=', 2)]}"/>
 									<field name="take_to_work_date" class="oe_read_only"/>
 									<field name="start_date" class="oe_read_only"/>
 									<field name="end_date" class="oe_read_only"/>
@@ -25,10 +39,10 @@
 							</group>
 							<notebook>
 								<page string="Description">
-									<field name="description"/>
+									<field name="description" attrs="{'readonly':[('state', '!=', 2)]}"/>
 								</page>
 								<page string="Defects">
-									<field name="defect_ids" domain="[('apl_id','=',apl_id),('state','=','confirmed')]">
+									<field name="defect_ids" domain="[('apl_id','=',apl_id),('state','=','confirmed')]" attrs="{'readonly':[('state', '!=', 2)]}">
 										<tree>
 											<field name="name"/>
 											<field name="tap_ids"/>
@@ -41,7 +55,7 @@
 								</page>
 								<page string="Pillars">
 									<group string="Pillars List">
-										<field name="pillar_ids" nolabel="1" domain="[('apl_id','=',apl_id)]">
+										<field name="pillar_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
 											<tree default_order="tap_id,num_by_vl">
 												<field name="name"/>
 												<field name="tap_id" invisible="1"/>
@@ -67,7 +81,7 @@
 								</page>
 								<page string="Transformers">
 									<group string="Transformers List">
-										<field name="transformer_ids" nolabel="1" domain="[('apl_id','=',apl_id)]">
+										<field name="transformer_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
 											<tree>
 												<field name="name"/>
 											</tree>
@@ -83,7 +97,7 @@
 								</page>
 								<page string="Taps">
 									<group string="Taps List">
-										<field name="tap_ids" nolabel="1" domain="[('apl_id','=',apl_id)]">
+										<field name="tap_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
 											<tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
 												<field name="num_by_vl" invisible="1"/>
 												<field name="name"/>
@@ -107,8 +121,41 @@
 										</field>
 									</group>
 								</page>
+								<page string="Attachments">
+									<field name="attachments">
+										<tree>
+											<field name="name"/>
+											<field name="mimetype"/>
+											<field name="datas"/>
+											<field name="create_uid"/>
+											<field name="create_date"/>
+										</tree>
+									</field>
+								</page>
+								<page string="Defect Photos">
+									<field name="defect_ids_kanban" widget="many2many_kanban">
+										<kanban>
+											<templates>
+												<t t-name="kanban-box">
+													<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+														<a type="object" name="view_defect_action">
+															<img style="max-width:100%;" t-att-src="kanban_image('uis.papl.mro.defect','image_800',record.id.value)" class="oe_kanban_image"/>
+														</a>
+													</div>
+												</t>
+											</templates>
+										</kanban>
+									</field>
+								</page>
+								<page string="Timeline">
+									<field name="order_steps_json" widget="order_timeline"/>
+								</page>
 							</notebook>
 						</sheet>
+						<div class="oe_chatter">
+							<field name="message_follower_ids" widget="mail_followers" group="base.group_user"/>
+							<field name="message_ids" widget="mail_thread"/>
+						</div>
                 </form>
             </field>
         </record>

@@ -23,7 +23,7 @@ Main Features
     'website': 'http://www.uisgis.ru',
     'category': 'Air Power Line Management',
     'sequence': 0,
-    'depends': ['passportvl','base','mail'],
+    'depends': ['passportvl','base','mail','document','base_suspend_security'],
     'demo': ['demo/demo.xml'],
     'data':[
             'views/mod_apl_view.xml',
