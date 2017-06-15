@@ -1,0 +1,36 @@
+.apl_map
+{
+	width: 100%;
+	height: 100%;
+	right: 0;
+	bottom: 0;
+}
+
+.apl_map:-moz-full-screen {
+        height: 100%;
+		width: 100%;
+      }
+.apl_map:-webkit-full-screen {
+        height: 100%;
+		width: 100%;
+      }
+.apl_map:-ms-fullscreen {
+        height: 100%;
+		width: 100%;
+      }
+.apl_map:fullscreen {
+        height: 100%;
+		width: 100%;
+      }
+.passport_vl_form_sheet{
+	max-width: 100% !important;
+    background-image: url(/passportvl/static/src/img/apl_form_bg.png) !important;
+    background-repeat: no-repeat !important;
+    background-position: right top !important;
+	padding-top: 0px !important;
+	display:flex;
+}
+.im_pvl_infobar{
+	width:400px;
+	margin-right: 10px;
+}

@@ -6,11 +6,17 @@
             <field name="model">uis.papl.apl</field>
             <field name="inherit_id" ref="passportvl.uis_papl_apl_form"/>
             <field name="arch" type="xml">
-                <xpath expr="/form/sheet/notebook" position="inside">
+                <xpath expr="//div[@name='buttons']" position="inside">
+                   <button class="oe_inline oe_stat_button" name="act_show_map" type="object" 
+                       icon="fa-map">
+                       <field string="Meters" name="line_len_calc_int" widget="statinfo"/>
+                   </button>
+                </xpath>
+				<!--<xpath expr="/form/sheet/notebook" position="inside">
 					<page string="Maps Settings">
 						<field name="rec_layer_id"/>
 					</page>
-				</xpath>
+				</xpath>!-->
             </field>
         </record>
 	</data>

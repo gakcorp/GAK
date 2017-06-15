@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import math, urllib, json, time
 from openerp import models, fields, api
+from openerp.tools.translate import _
 
 class uis_papl_department(models.Model):
 	_name='uis.papl.department'

@@ -105,11 +105,11 @@
                 </div>
                 <div class="user-info-block">
                     <div class="user-heading">
-                        <h1>ActivGIS</h1>
+                        <h1>Intellium Service Platform</h1>
                         <h3>
                             <!--Version <t t-esc="db_info.server_version"/>
                             (Community Edition)!-->
-                            Version v 0.6 (Development version)
+                            Version v 0.7.15.ak (Prp-production version)
                         </h3>
                         <t t-if="db_info.expiration_date">
                             <h5>Database expiration: <t t-esc="new moment(db_info.expiration_date).format('LL')"/></h5>
@@ -118,8 +118,8 @@
                     <div class="user-body">
                         <div class="tab-content">
                             <div id="settings" class="tab-pane active">
-                                <h4>Copyright © 2016 ActivGIS</h4>
-                                <p>System Contorol object management platform by ActivGIS.BasePlatform</p>
+                                <h4>Copyright © 2017 Intellium Service Platform</h4>
+                                <p>System Contorol object management platform byIntellium Service Platform</p>
                                 <p>This is development version. No production use. Demo only</p>
                                 <!--<p>Odoo is a trademark of <a target="_blank" href="https://www.odoo.com" style="text-decoration: underline;">Odoo S.A.</a></p>!-->
                                 <!--<p>Licenced under the terms of <a target="_blank" href="http://www.gnu.org/licenses/lgpl.html" style="text-decoration: underline;">GNU Lesser General Public License</a></p>!-->

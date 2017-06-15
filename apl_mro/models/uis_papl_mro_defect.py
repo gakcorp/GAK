@@ -85,3 +85,4 @@ class apl_mro_defect(models.Model):
     			"url": "http://odoo.com",
     			"target": "self",
 		}
+

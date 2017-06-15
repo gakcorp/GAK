@@ -32,7 +32,7 @@ class uis_ap_vis_object(models.Model):
 	transformer_id=fields.Many2one('uis.papl.transformer', string='Transformer')
 	rect_coordinate_json=fields.Text(string='Visual Object Rectangle')
 	color=fields.Char("Color of selection")
-	image=fields.Binary(string='Image', compute='_get_vo_img')
+	image=fields.Binary(string='Image', compute='_get_vo_img', store=True)
 	auto_detected=fields.Boolean(string='Auto Detected')
 	distance_from_photo_point=fields.Float(digits=(2,2), string='Distance from photo point', compute='_get_dist_from_photo_point')
 	
@@ -95,35 +95,36 @@ class uis_ap_vis_object(models.Model):
 				lat2,lng2=vo.transformer_id.latitude,vo.transformer_id.longitude
 			if vo.pillar_id:
 				lat2,lng2=vo.pillar_id.latitude,vo.pillar_id.longitude
-			_logger.debug('lat1=%r, lng1=%r, lat2=%r, lng2=%r'%(lat1,lng1,lat2,lng2))
+			#_logger.debug('lat1=%r, lng1=%r, lat2=%r, lng2=%r'%(lat1,lng1,lat2,lng2))
 			if (lat1<>0) and (lng1<>0) and (lat2<>0) and (lng2<>0): 
 				dfpp=distance2points(lat1,lng1,lat2,lng2)
 			vo.distance_from_photo_point=dfpp
 			
-	@api.depends('rect_coordinate_json')
+	@api.depends('rect_coordinate_json','photo_id')
 	def _get_vo_img(self):
 		for vo in self:
-			rect_data= json.loads(vo.rect_coordinate_json)
-			#_logger.debug(rect_data)
-			#_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
-			image = Image.open(StringIO.StringIO(vo.photo_id.with_context(bin_size=False).image.decode('base64')))
-			or_width, or_height = vo.photo_id.image_width,vo.photo_id.image_length
-			kw=float(or_width)/rect_data['canvaswidth']
-			kh=float(or_height)/rect_data['canvasheight']
-			#_logger.debug('ow= %r, oh= %r'%(or_width,or_height))
-			#_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
-			#_logger.debug('kw= %r, kh=%r'%(kw,kh))
-			lp=int(rect_data['groupleft']*kw)
-			rp=int(lp+rect_data['rectwidth']*kw)
-			tp=int(rect_data['grouptop']*kh)
-			bp=int(tp+rect_data['rectheight']*kh)
-			#_logger.debug('lp= %r, tp= %r , rp= %r, bp=%r'%(lp,tp,rp,bp))
-			#dr=ImageDraw.Draw(image)
-			image=image.crop((lp,tp,rp,bp))
-			#dr.rectangle(((lp,tp),(rp,bp)),fill="blue", outline="black")
-			background_stream = StringIO.StringIO()
-			image.save(background_stream, format="PNG")
-			vo.image=background_stream.getvalue().encode('base64')
+			if vo.rect_coordinate_json and vo.photo_id:
+				rect_data= json.loads(vo.rect_coordinate_json)
+				#_logger.debug(rect_data)
+				#_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
+				image = Image.open(StringIO.StringIO(vo.photo_id.with_context(bin_size=False).image.decode('base64')))
+				or_width, or_height = vo.photo_id.image_width,vo.photo_id.image_length
+				kw=float(or_width)/rect_data['canvaswidth']
+				kh=float(or_height)/rect_data['canvasheight']
+				#_logger.debug('ow= %r, oh= %r'%(or_width,or_height))
+				#_logger.debug('cw= %r, ch=%r'%(rect_data['canvaswidth'],rect_data['canvasheight']))
+				#_logger.debug('kw= %r, kh=%r'%(kw,kh))
+				lp=int(rect_data['groupleft']*kw)
+				rp=int(lp+rect_data['rectwidth']*kw)
+				tp=int(rect_data['grouptop']*kh)
+				bp=int(tp+rect_data['rectheight']*kh)
+				#_logger.debug('lp= %r, tp= %r , rp= %r, bp=%r'%(lp,tp,rp,bp))
+				#dr=ImageDraw.Draw(image)
+				image=image.crop((lp,tp,rp,bp))
+				#dr.rectangle(((lp,tp),(rp,bp)),fill="blue", outline="black")
+				background_stream = StringIO.StringIO()
+				image.save(background_stream, format="PNG")
+				vo.image=background_stream.getvalue().encode('base64')
 	
 	#NUPD Need delete create_update_vis_object_old and delete_objects_old 
 	@api.model

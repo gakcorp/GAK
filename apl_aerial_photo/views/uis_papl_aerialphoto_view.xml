@@ -122,15 +122,20 @@
 						</page>
 						<page string='Admins'>
 							<group>
-								<field name="view_distance"/>
-								<field name="vd_min"/>
-								<field name="vd_max"/>
-								<field name="focal_angles"/>
-								<field name="vert_angle"/>
-								<field name="hori_angle"/>
-								<field name="xmp_data_json"/>
-								<field name="visable_view_json"/>
+								<group>
+									<field name="view_distance"/>
+									<field name="vd_min"/>
+									<field name="vd_max"/>
+									<field name="focal_angles"/>
+									<field name="vert_angle"/>
+									<field name="hori_angle"/>
+								</group>
+								<group>
+									<field name="image_400" options='{"size":[200,150],"editmode":"true"}' widget="fotorama" nolabel="1" colspan="2"/>	
+								</group>
 							</group>
+							
+							
 						</page>
 					
 					
