@@ -4,6 +4,9 @@
 		<template id="assets_backend" name="defectmap" inherit_id="web.assets_backend">
 			<xpath expr="." position="inside">
 				<script type="text/javascript" src="/apl_mro/static/src/js/apl_mro.js"/>
+				<script type="text/javascript" src="/apl_mro/static/src/js/vis.js"/>
+				<link rel="stylesheet" href="/apl_mro/static/src/css/vis.css"/>
+				<link rel="stylesheet" href="/apl_mro/static/src/css/order_timeline.css"/>
 			</xpath>
 		</template>
 

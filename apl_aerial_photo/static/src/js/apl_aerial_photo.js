@@ -57,10 +57,10 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 				var pillarVisMap=new Map();
 				var transformerVisMap=new Map();
 				var polylineMode=false;
-				var defAPLMap=new Map();
-				var defPillarMap=new Map();
-				var defTransMap=new Map();
-				var defCircleMap=new Map();
+				var defAPLMap=[];
+				var defPillarMap=[];
+				var defTransMap=[];
+				var defCircleMap={};
 
 				var pillar_table=$('<table class="l_table"><caption>Опоры</caption><thead><tr><th style="display:none;">ID</th><th>Имя</th><th>Дистанция</th></tr></thead></table>')
 				var pillar_tbody=$('<tbody></tbody>');
@@ -413,7 +413,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						{
 							for (var i=0;i<APLs.length;i++)
 							{
-								defAPLMap.set(Number(APLs[i].id),APLs[i].name);
+								defAPLMap.push({id: Number(APLs[i].id),name: APLs[i].name});
 							}
 						});
 					}
@@ -474,11 +474,11 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					trans_tbody.find('tr').remove();
 					pillar_tbody.find('tr').remove();
 
-					defAPLMap=new Map();
-					defPillarMap=new Map();
-					defTransMap=new Map();
+					defAPLMap=[];
+					defPillarMap=[];
+					defTransMap=[];
 
-					defCircleMap=new Map();
+					defCircleMap={};
 
 					if (map)
 					{
@@ -606,10 +606,8 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 								pointFeature.setStyle(nextStyle);
 								pointFeature.attributes = {"vistype":"photo","visid":PhotoID};
 								vectorSource.addFeature(pointFeature);
-								console.log(PhotoID);
 								//var PhotoPolygon=getPhotoPolygon(point,viewDistance,focalAngle,rotation);
 								var PhotoPolygon=getPhotoPolygonByJSON(point,VisibilityViewJSON);
-								console.log(PhotoPolygon.getCoordinates());
 								var PolygonFeature = new ol.Feature(PhotoPolygon);
 								PolygonFeature.setStyle(nextStyle);
 								vectorSource.addFeature(PolygonFeature);
@@ -652,19 +650,19 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						
 						PillarModel.query(['id','name','longitude','latitude','apl_id']).filter([['id','in',pillar_ids]]).limit(100).all().then(function(pillars)
 						{
-							var tempMap=new Map();
+							var tempMas=[];
 							for (var i in pillars)
 							{
 								var longitude=pillars[i]['longitude'];
 								var latitude=pillars[i]['latitude'];
 								var wgs84Sphere = new ol.Sphere(6378137);
-								tempMap.set(i, wgs84Sphere.haversineDistance([longitude,latitude],[mainPhotoLongitude,mainPhotoLatitude]));	
-								defPillarMap.set(pillars[i]['apl_id'][0]+"_"+pillars[i].id,pillars[i].name);
+								tempMas.push({id: i, distance: wgs84Sphere.haversineDistance([longitude,latitude],[mainPhotoLongitude,mainPhotoLatitude])});	
+								defPillarMap.push({id: pillars[i]['apl_id'][0]+"_"+pillars[i].id,name: pillars[i].name});
 							}
-							var sortMas=sortMapByDistance(tempMap);
+							var sortMas=sortMasByDistance(tempMas);
 							for (var i in sortMas)
 							{
-								pillar_tbody.append('<tr><td style="display:none;">'+pillars[sortMas[i]].id+'</td><td>'+pillars[sortMas[i]].name+'</td><td>'+Math.floor(tempMap.get(sortMas[i]))+'</td></tr>');
+								pillar_tbody.append('<tr><td style="display:none;">'+pillars[sortMas[i].id].id+'</td><td>'+pillars[sortMas[i].id].name+'</td><td>'+Math.floor(sortMas[i].distance)+'</td></tr>');
 							}
 						});
 
@@ -695,19 +693,19 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 
 						TransformerModel.query(['id','name','longitude','latitude','apl_id']).filter([['id','in',transformer_ids]]).limit(100).all().then(function(transformers)
 						{
-							var tempMap=new Map();
+							var tempMas=[];
 							for (var i in transformers)
 							{
 								var longitude=transformers[i]['longitude'];
 								var latitude=transformers[i]['latitude'];
 								var wgs84Sphere = new ol.Sphere(6378137);
-								tempMap.set(i, wgs84Sphere.haversineDistance([longitude,latitude],[mainPhotoLongitude,mainPhotoLatitude]));
-								defTransMap.set(transformers[i]['apl_id'][0]+"_"+transformers[i].id,transformers[i].name);	
+								tempMas.push({id: i, distance: wgs84Sphere.haversineDistance([longitude,latitude],[mainPhotoLongitude,mainPhotoLatitude])});
+								defTransMap.push({id: transformers[i]['apl_id'][0]+"_"+transformers[i].id,name: transformers[i].name});	
 							}
-							var sortMas=sortMapByDistance(tempMap);
+							var sortMas=sortMasByDistance(tempMas);
 							for (var i in sortMas)
 							{
-								trans_tbody.append('<tr><td style="display:none;">'+transformers[sortMas[i]].id+'</td><td>'+transformers[sortMas[i]].name+'</td><td>'+Math.floor(tempMap.get(sortMas[i]))+'</td></tr>');
+								trans_tbody.append('<tr><td style="display:none;">'+transformers[sortMas[i].id].id+'</td><td>'+transformers[sortMas[i].id].name+'</td><td>'+Math.floor(sortMas[i].distance)+'</td></tr>');
 							}
 						});
 						photoClicked=false;
@@ -716,7 +714,6 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 				function getPhotoPolygonByJSON(point, json_data){
 					//console.debug(json_data)
 					data=$.parseJSON(json_data);
-					console.debug(data);
 					var arr_points=[];
 					
 					for (var i=0;i<data.length; i++){
@@ -740,27 +737,25 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					return polygon;
 				}
 
-				function sortMapByDistance(exSortMap)
+				function sortMasByDistance(exSortMas)
 				{
-					var sortMap=new Map(exSortMap);
+					objArray=exSortMas.slice();
 					var sortMas=[];
-					var ch=sortMap.size
-					for(;;)
+					for (;;)
 					{
-						if (sortMap.size<=0) break;
-						var keys=Array.from(sortMap.keys());
-						var ind=keys[0];
-						var minValue=sortMap.get(ind);
-						for (var i in keys)
+						if (objArray.length<=0) break;
+						var minValue=objArray[0].distance;
+						var ind=0;
+						for (var i in objArray)
 						{
-							if (sortMap.get(keys[i])<minValue)
+							if (objArray[i].distance<minValue)
 							{
-								minValue=sortMap.get(keys[i]);
-								ind=keys[i];
-							} 
+								ind=i;
+								minValue=objArray[i].distance;
+							}
 						}
-						sortMas.push(ind);
-						sortMap.delete(ind);
+						sortMas.push(objArray[ind]);
+						objArray.splice(ind,1);
 					}
 					return sortMas;
 				}
@@ -974,7 +969,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 							if (!firstCircle)
 							{ 
 								firstCircle=circle;
-								defCircleMap.set(circle.MyID,firstCircle);
+								defCircleMap[circle.MyID]=firstCircle;;
 							}
 						}
 					});
@@ -1026,10 +1021,10 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 							nextCircle.inline=newLine;
 							prevCircle.nextCircle=nextCircle;
 							nextCircle.prevCircle=prevCircle;
-							if (defCircleMap.get(visObject.MyID))
+							if (defCircleMap[visObject.MyID])
 							{
-								defCircleMap.delete(visObject.MyID);
-								if ((nextCircle)&&(nextCircle!=visObject)) defCircleMap.set(nextCircle.MyID,nextCircle);
+								delete defCircleMap[visObject.MyID];
+								if ((nextCircle)&&(nextCircle!=visObject)) defCircleMap[nextCircle.MyID]=nextCircle;
 							}
 							fabricCanvas.remove(visObject);
 							fabricCanvas.renderAll();
@@ -1076,8 +1071,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					defectForm.append('<input type="submit" id="createdef" class="defectInputSubmit" value="Создать">');
 					defectForm.append('<input type="submit" id="canceldef" class="defectInputSubmit" value="Отмена">');
 					
-					var keys=Array.from(defAPLMap.keys());
-					for (var i in keys) $('#apl').append('<option value="'+keys[i]+'">'+defAPLMap.get(keys[i])+'</option>');
+					for (var i in defAPLMap) $('#apl').append('<option value="'+defAPLMap[i].id+'">'+defAPLMap[i].name+'</option>');
 					
 					setDefObject();
 					
@@ -1098,13 +1092,12 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						var actMap;
 						if ($('#objtype').val()=="pillar") actMap=defPillarMap;
 						if ($('#objtype').val()=="transformer") actMap=defTransMap;
-						var keys=Array.from(actMap.keys());
-						for (var i in keys)
+						for (var i in actMap)
 						{
-							var masID=keys[i].split('_');
+							var masID=actMap[i].id.split('_');
 							if (masID.length>1)
 							{
-								if (masID[0]==aplID) $('#obj').append('<option value="'+masID[1]+'">'+actMap.get(keys[i])+'</option>');
+								if (masID[0]==aplID) $('#obj').append('<option value="'+masID[1]+'">'+actMap[i].name+'</option>');
 							}
 						}
 					}
@@ -1142,13 +1135,13 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 						var AplID=$('#apl').val();
 						var DefCat=$('#defcat').val();
 						var DJSON='{"canvaswidth":'+fabricCanvas.getWidth()+',"canvasheight":'+fabricCanvas.getHeight();
-						var keys=Array.from(defCircleMap.keys());
-						if (keys)
+						if (Object.keys(defCircleMap).length)
 						{
 							DJSON=DJSON+',"coordinates": [';
-							for (var i in keys)
+							var firstCircleCh=true;
+							for (var i in defCircleMap)
 							{
-								var firstCircle=defCircleMap.get(keys[i]);
+								var firstCircle=defCircleMap[i];
 								var CJSON='[['+firstCircle.left+','+firstCircle.top+']';
 								var a=0;
 								var circle=firstCircle;
@@ -1161,7 +1154,11 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 									CJSON=CJSON+',['+circle.left+','+circle.top+']';
 								}
 								CJSON=CJSON+']';
-								if (i==0) DJSON=DJSON+CJSON;
+								if (firstCircleCh) 
+								{
+									DJSON=DJSON+CJSON;
+									firstCircleCh=false;
+								}
 								else DJSON=DJSON+','+CJSON;
 							}
 							DJSON=DJSON+']';

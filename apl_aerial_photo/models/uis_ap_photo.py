@@ -163,10 +163,10 @@ class uis_ap_photo(models.Model):
 	image=fields.Binary(string='Image')
 	image_length=fields.Integer(string='Image Length')
 	image_width=fields.Integer(string='Image Width')
-	image_800=fields.Binary(string='Image800', compute='_get_800_img', store=True)
-	image_400=fields.Binary(string='Image400', compute='_get_400_img', store=True)
-	image_edge=fields.Binary(string='ImageEdge', compute='_get_edge_img')
-	image_scheme=fields.Binary(string='Scheme position', compute='_get_scheme_position',store=True)
+	image_800=fields.Binary(string='Image800', compute='_get_800_img', store=True, compute_sudo=True)
+	image_400=fields.Binary(string='Image400', compute='_get_400_img',store=True, compute_sudo=True)
+	image_edge=fields.Binary(string='ImageEdge', compute='_get_edge_img', compute_sudo=True)
+	image_scheme=fields.Binary(string='Scheme position', compute='_get_scheme_position',store=True, compute_sudo=True)
 	focal_length=fields.Float(digits=(2,2), string="Focal Length")
 	thumbnail=fields.Binary(string="Thumbnail")
 	image_filename=fields.Char(string='Image file name')
@@ -175,56 +175,56 @@ class uis_ap_photo(models.Model):
 	longitude=fields.Float(digits=(2,6), string='Longitude')
 	latitude=fields.Float(digits=(2,6), string='Latitude')
 	altitude=fields.Float(digits=(2,2), string='Altitude')
-	elevation_point=fields.Float(digits=(2,2), string="Ground Elevation", compute='_get_photo_elev', store=True)
+	elevation_point=fields.Float(digits=(2,2), string="Ground Elevation", compute='_get_photo_elev', store=True, compute_sudo=True)
 	rotation=fields.Float(digits=(2,2),string='Rotation')
 	view_distance=fields.Float(digits=(2,0), string='View distance', default=100)
 	focal_angles=fields.Float(digits=(2,0), string='Focal angle', default=60)
-	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True)
+	hash_summ=fields.Char(string='Hash summ', compute='_get_hash', store=True, compute_sudo=True)
 	xmp_data_json=fields.Text(string='XMP data')
 	vd_min=fields.Float(digits=(2,0), string='Near visibility distance',default=10)
 	vd_max=fields.Float(digits=(2,0), string='Distant visibility distance ',default=100)
 	relative_altitude=fields.Float(digits=(2,0),string='Relative Altitude', default=12)
-	visable_view_json=fields.Text(string='Visibility area', compute='_get_visable_view_json')
+	visable_view_json=fields.Text(string='Visibility area', compute='_get_visable_view_json', compute_sudo=True)
 	vert_angle=fields.Float(digits=(2,0), string='Vertical angle', default=45)
 	hori_angle=fields.Float(digits=(2,0), string='Horizontal angle', default=60)
 	pillar_ids=fields.Many2many('uis.papl.pillar',
 								relation='photo_pillar_rel',
 								column1='photo_id',
 								column2='pillar_id',
-								compute='_get_photo_pillar')
+								compute='_get_photo_pillar', compute_sudo=True)
 	near_pillar_ids=fields.Many2many('uis.papl.pillar',
 									 relation='photo_near_pillar',
 									 column1='photo_id',
 									 column2='pillar_id',
-									 compute='_get_near_photo_pillar'
+									 compute='_get_near_photo_pillar', compute_sudo=True
 									 )
 	next_photo_ids=fields.Many2many('uis.ap.photo',
 								   realation='next_photo_ids',
 								   column1='photo_id',
 								   column2='next_photo_id',
-								   compute='_get_next_photo')
+								   compute='_get_next_photo', compute_sudo=True)
 	apl_ids=fields.Many2many('uis.papl.apl',
 							 relation='photo_apl_rel',
 							 column1='photo_id',
 							 column2='apl_id',
 							 compute='_get_photo_apl',
-							 store=True
+							 store=True, compute_sudo=True
 							 )
 	near_apl_ids=fields.Many2many('uis.papl.apl',
 							 relation='photo_near_apl',
 							 column1='photo_id',
 							 column2='apl_id',
-							 compute='_get_near_photo_apl')
+							 compute='_get_near_photo_apl', compute_sudo=True)
 	near_transformer_ids=fields.Many2many('uis.papl.transformer',
 										  relation='photo_near_trans',
 										  column1='photo_id',
 										  column2='transformer_id',
-										  compute='_get_near_trans_ids')
+										  compute='_get_near_trans_ids', compute_sudo=True)
 	transformer_ids=fields.Many2many('uis.papl.transformer',
 							relation='photo_trans_rel',
 							column1='photo_id',
 							column2='transformer_id',
-							compute='_get_photo_trans')
+							compute='_get_photo_trans', compute_sudo=True)
 	
 	@api.onchange('latitude','longitude','rotation','vd_min','vd_max', 'relative_altitude', 'vert_angle', 'hori_angle')
 	def _get_visable_view_json(self):
@@ -606,7 +606,7 @@ class uis_ap_photo(models.Model):
 		for photo in self.browse(cr,uid,ids,context=context):
 			lat1, lng1=photo.latitude, photo.longitude
 			domain_np=[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',lng1-delta),('longitude','<',lng1+delta)]
-			pos_next_photo_ids=self.pool.get('uis.ap.photo').search(cr,openerp.SUPERUSER_ID,domain_np,context=context)
+			pos_next_photo_ids=self.pool.get('uis.ap.photo').search(cr,uid,domain_np,context=context)
 			#next_photo=[]
 			#next_photo_ids=[]
 			for pid in pos_next_photo_ids:
@@ -630,11 +630,11 @@ class uis_ap_photo(models.Model):
 			delta=0.01
 			nstr=''
 			max_dist=150
-			trans = self.pool.get('uis.papl.transformer').search(cr,openerp.SUPERUSER_ID,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
+			trans = self.pool.get('uis.papl.transformer').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
 			for tr in trans:
-				transformer=self.pool.get('uis.papl.transformer').browse(cr,openerp.SUPERUSER_ID,[tr],context=context)
+				transformer=self.pool.get('uis.papl.transformer').browse(cr,uid,[tr],context=context)
 				if transformer:
 					lat2=transformer.latitude
 					long2=transformer.longitude
@@ -646,7 +646,7 @@ class uis_ap_photo(models.Model):
 		
 	@api.depends('near_pillar_ids','latitude','longitude')
 	def _get_near_photo_apl(self,cr,uid,ids,context=None):
-		for photo in self.browse(cr,openerp.SUPERUSER_ID,ids,context=context):
+		for photo in self.browse(cr,uid,ids,context=context):
 			apl_ids=[]
 			for pil in photo.near_pillar_ids:
 				if pil.apl_id.id not in apl_ids:
@@ -691,11 +691,11 @@ class uis_ap_photo(models.Model):
 			delta=0.01
 			nstr=''
 			max_dist=150
-			pillars = self.pool.get('uis.papl.pillar').search(cr,openerp.SUPERUSER_ID,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
+			pillars = self.pool.get('uis.papl.pillar').search(cr,uid,[('latitude','>',lat1-delta),('latitude','<',lat1+delta),('longitude','>',long1-delta),('longitude','<',long1+delta)],context=context)
 			near_pillars=[]
 			near_pillars_ids=[]
 			for pid in pillars:
-				pillar=self.pool.get('uis.papl.pillar').browse(cr,openerp.SUPERUSER_ID,[pid],context=context)
+				pillar=self.pool.get('uis.papl.pillar').browse(cr,uid,[pid],context=context)
 				if pillar:
 					lat2=pillar.latitude
 					long2=pillar.longitude

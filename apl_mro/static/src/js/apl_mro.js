@@ -155,7 +155,128 @@ odoo.define('apl_mro.form_widgets', function (require)
 			}
 		},
 	});
+
+	order_timeline=instance.web.form.AbstractField.extend(
+	{
+		render_value: function()
+		{
+			this._super.apply(this, arguments);
+			this.$el.find('#timeline_div').remove();
+			var order_id=this.field_manager.get_field_value("id")
+			var OrderModel=new Model('uis.papl.mro.order');
+			var TimeLineDiv=$('<div id="timeline_div"></div>');
+			this.$el.append(TimeLineDiv);
+			var stateName={
+				1: "Отменен",
+				2: "Проект",
+				3: "Подтвержден",
+				4: "Назначен",
+				5: "Принят в работу",
+				6: "В работе",
+				7: "Завершен",
+				8: "Выполнен"
+			};
+			var stateColor={
+				1: "#C5C0D1",
+				2: "#A6CF41",
+				3: "#1E9E1E",
+				4: "#E3E534",
+				5: "#FFA500",
+				6: "#EB6444",
+				7: "#00AEEF",
+				8: "#00AEEF"
+			};
+			OrderModel.query(['create_date','start_planned_date','end_planned_date','order_steps_json']).filter([['id','=',order_id]]).all().then(function(Order)
+            		{
+				try
+				{
+					var create_date=Date.parse(Order[0].create_date.replace(' ','T')+'Z');
+					var start_planned_date=Date.parse(Order[0].start_planned_date.replace(' ','T')+'Z');
+					var end_planned_date=Date.parse(Order[0].end_planned_date.replace(' ','T')+'Z');
+                                	var order_steps_json=Order[0].order_steps_json;
+					var currentTime = new Date().getTime();
+
+					var groups = new vis.DataSet([
+						{
+            						id: 'gr3', 
+            						content:'Ответственные',       					
+						},
+        					{
+            						id: 'gr1', 
+            						content:'Работа'
+        					},
+						{
+            						id: 'gr2', 
+            						content:'Планируемое время',
+        					},
+    					]);
+
+					var items = new vis.DataSet([
+    						{id: 1, content: 'Подготовка', start: create_date, end: start_planned_date, group: 'gr2'},
+						{id: 2, content: 'Проведение работ', start: start_planned_date+1, end: end_planned_date, group: 'gr2'},
+  					]);
+					
+					try
+					{
+						var SJSON=JSON.parse(order_steps_json);
+						var ids=3;
+						for (var i=0; i<SJSON.steps.length; i++)
+						{
+							if (i==SJSON.steps.length-1)
+							{
+								if ((SJSON.steps[i].state!=1) && (SJSON.steps[i].state!=8))
+								{
+									var startDate=Date.parse(SJSON.steps[i].date.replace(' ','T')+'Z');
+									var item={id: ids, content: stateName[SJSON.steps[i].state], start: startDate, end: currentTime, group: 'gr1', style: 'background-color:'+stateColor[SJSON.steps[i].state]};
+									ids++;
+									var eitem={id: ids, content: SJSON.steps[i].author, start: startDate, type: 'box', group: 'gr3', className: 'timeline_employee'};
+									ids++;
+									items.add(item);
+									items.add(eitem);
+								}
+								else
+								{
+									var tContent=SJSON.steps[i].author;
+									if (SJSON.steps[i].state==1) tContent=tContent+"<br>Отменен</br>";
+									if (SJSON.steps[i].state==8) tContent=tContent+"<br>Выполнен</br>";
+									var endDate=Date.parse(SJSON.steps[i].date.replace(' ','T')+'Z');
+									var eitem={id: ids, content: tContent, start: endDate, type: 'box', group: 'gr3', className: 'timeline_employee'};
+									ids++;
+									items.add(eitem);
+								}
+							}
+							else
+							{
+								var tContent=SJSON.steps[i].author;
+								if (i==0) tContent=tContent+"<br>Создан</br>";
+								var startDate=Date.parse(SJSON.steps[i].date.replace(' ','T')+'Z');
+								var endDate=Date.parse(SJSON.steps[i+1].date.replace(' ','T')+'Z');
+								var item={id: ids, content: stateName[SJSON.steps[i].state], start: startDate, end: endDate, group: 'gr1', type: 'range', style: 'background-color:'+stateColor[SJSON.steps[i].state]};
+								ids++;
+								var eitem={id: ids, content: tContent, start: startDate, type: 'box', group: 'gr3', className: 'timeline_employee'};
+								ids++;
+								items.add(item);
+								items.add(eitem);
+							}
+						}
+					}
+					catch (exception)
+					{
+						console.log(exception)
+					}
+					var options = {stack: false, align: 'left'};
+					var timeline = new vis.Timeline(TimeLineDiv.get(0), items,groups, options);
+				}
+				catch (exception)
+				{
+					console.log(exception)
+				}
+			});
+
+		},
+	});
 	
 	core.form_widget_registry.add('defectmap', defectmap);
 	core.form_widget_registry.add('defectphoto', defectphoto);
+	core.form_widget_registry.add('order_timeline', order_timeline);
 });

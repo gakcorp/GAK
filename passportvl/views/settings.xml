@@ -267,7 +267,7 @@
 			<field name="name">Global settings list</field>
 			<field name="model">uis.global.settings</field>
 			<field name="arch" type="xml">
-				<tree string="List of global settings" editable="top" create="false" edit="false">
+				<tree string="List of global settings" editable="top">
 					<field name="id"/>
 					<field name="name"/>
 					<field name="desc"/>

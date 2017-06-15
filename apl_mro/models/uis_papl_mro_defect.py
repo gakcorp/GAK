@@ -1,4 +1,8 @@
 from openerp import models, fields, api
+import logging
+
+_logger=logging.getLogger(__name__)
+_logger.setLevel(10)
 
 class apl_mro_defect(models.Model):
 	DEFECT_CATEGORY = [('1', 'Minor'),('2', 'Major'),('3', 'Pre-fault'),('4', 'Emergency')]
@@ -73,3 +77,11 @@ class apl_mro_defect(models.Model):
 	def defect_canceled(self):
 		for defect in self:
 			defect.state='cancel'
+	@api.multi
+	def view_defect_action(self):
+		_logger.debug("XXXXXXXXXXXXXXX ")
+		return{
+    			"type": "ir.actions.act_url",
+    			"url": "http://odoo.com",
+    			"target": "self",
+		}

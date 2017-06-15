@@ -1,40 +1,46 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api
 import logging
+import json
 
 _logger=logging.getLogger(__name__)
 _logger.setLevel(10)
 
 class apl_mro_order(models.Model):
 
-    STATE_SELECTION = [(0,'CANCELED'),(1, 'DRAFT'),(2, 'ASSIGNMENT'),(3, 'READY FOR WORK'),(4, 'WORK'),(5, 'COMPLETED'),(6, 'DONE')]
+    STATE_SELECTION = [(1,'CANCELED'),(2, 'DRAFT'),(3, 'CONFIRM'),(4, 'ASSIGNMENT'),(5, 'READY FOR WORK'),(6, 'WORK'),(7, 'COMPLETED'),(8, 'DONE')]
 
-    _inherit=['mail.thread']
+    _inherit=['mail.thread','ir.needaction_mixin']
     _name='uis.papl.mro.order'
     _description='Order'
     name=fields.Char('Order name', size=64,required=True, track_visibility=True)
-    description=fields.Text('Order Description')
-    apl_id=fields.Many2one('uis.papl.apl',string='Air power line',required=True)
-    pillar_ids=fields.Many2many('uis.papl.pillar', relation='order_pillar_rel',column1='order_id', column2='pillar_id')
-    pillar_ids_from_defect=fields.Many2many('uis.papl.pillar', relation='order_pillar_from_defect_rel',column1='order_id', column2='pillar_id',compute='get_def_pillars',store=True)
-    tap_ids=fields.Many2many('uis.papl.tap', relation='order_tap_rel',column1='order_id', column2='tap_id')
-    tap_ids_from_defect=fields.Many2many('uis.papl.tap', relation='order_tap_from_defect_rel',column1='order_id', column2='tap_id',compute='get_def_taps',store=True)
-    transformer_ids=fields.Many2many('uis.papl.transformer',relation='order_transformer_rel',column1='order_id', column2='transformer_id')
-    transformer_ids_from_defect=fields.Many2many('uis.papl.transformer',relation='order_transformer_from_defect_rel',column1='order_id', column2='transformer_id',compute='get_def_trans',store=True)
+    description=fields.Text('Order Description', required=True, track_visibility=True)
+    apl_id=fields.Many2one('uis.papl.apl',string='Air power line',required=True, track_visibility=True)
+    pillar_ids=fields.Many2many('uis.papl.pillar', relation='order_pillar_rel',column1='order_id', column2='pillar_id', track_visibility=True)
+    pillar_ids_from_defect=fields.Many2many('uis.papl.pillar', relation='order_pillar_from_defect_rel',column1='order_id', column2='pillar_id',compute='get_def_pillars',store=True, track_visibility=True)
+    tap_ids=fields.Many2many('uis.papl.tap', relation='order_tap_rel',column1='order_id', column2='tap_id', track_visibility=True)
+    tap_ids_from_defect=fields.Many2many('uis.papl.tap', relation='order_tap_from_defect_rel',column1='order_id', column2='tap_id',compute='get_def_taps',store=True, track_visibility=True)
+    transformer_ids=fields.Many2many('uis.papl.transformer',relation='order_transformer_rel',column1='order_id', column2='transformer_id', track_visibility=True)
+    transformer_ids_from_defect=fields.Many2many('uis.papl.transformer',relation='order_transformer_from_defect_rel',column1='order_id', column2='transformer_id',compute='get_def_trans',store=True, track_visibility=True)
 
     
     start_planned_date=fields.Datetime('Planned start date', required=True, track_visibility=True)
     end_planned_date=fields.Datetime('Planned end date', required=True, track_visibility=True)
-    take_to_work_date=fields.Datetime('Take to work date')
-    start_date=fields.Datetime('Start date')
-    end_date=fields.Datetime('End date')
+    take_to_work_date=fields.Datetime('Take to work date', track_visibility=True)
+    start_date=fields.Datetime('Start date', track_visibility=True)
+    end_date=fields.Datetime('End date', track_visibility=True)
     
-    defect_ids=fields.Many2many('uis.papl.mro.defect',relation='order_tdefect_rel',column1='order_id', column2='defect_id')
+    defect_ids=fields.Many2many('uis.papl.mro.defect',relation='order_tdefect_rel',column1='order_id', column2='defect_id', track_visibility=True)
+    defect_ids_kanban=fields.Many2many('uis.papl.mro.defect',store=False,compute='_get_defect_kanban')
 
-    contractor_id=fields.Many2one('res.company',string='Contractor')
+    contractor_id=fields.Many2one('res.company',string='Contractor', track_visibility=True)
+    contractor_logo=fields.Binary('logo',related='contractor_id.logo',readonly=True)
 
-    state=fields.Selection(STATE_SELECTION, 'Status', readonly=True, default=1)
-    
+    state=fields.Selection(STATE_SELECTION, 'Status', readonly=True, default=2, track_visibility=True)
+
+    attachments=fields.Many2many('ir.attachment',compute='_get_attachments',store=False, relation='order_attachment_rel',column1='order_id', column2='attachment_id')
+
+    order_steps_json=fields.Text(string='Order Steps JSON')
     @api.onchange('apl_id')
     def change_order_object(self):
         self.transformer_ids=[]
@@ -68,565 +74,142 @@ class apl_mro_order(models.Model):
 			if trans.id not in trans_ids:
 				trans_ids.append(trans.id)
 	  order.transformer_ids_from_defect=trans_ids
+    @api.multi
+    def order_confirmed(self):
+       for order in self:
+          order.state=3
+          order.add_step()
+    @api.multi
+    def order_assigned(self):
+       for order in self:
+          order.state=4
+          emps=self.env['res.users'].sudo().search([('is_manager','=',True),('company_id','=',order.contractor_id.id)])
+          for emp in emps:
+             order.message_subscribe([emp.partner_id.id])
+          mail_template=self.env.ref('apl_mro.new_order')
+          if mail_template:
+             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          order.add_step()
+    @api.multi
+    def order_take_to_work(self):
+       for order in self:
+          order.message_subscribe([self.env['res.users'].sudo().browse(self.env.uid).partner_id.id])
+          order.suspend_security().take_to_work_date=fields.datetime.now()
+	  order.suspend_security().state=5
+          mail_template=self.env.ref('apl_mro.order_change_status')
+          if mail_template:
+             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          order.add_step()
+    @api.multi
+    def order_get_started(self):
+       for order in self:
+          order.suspend_security().start_date=fields.datetime.now()
+          order.suspend_security().state=6
+          mail_template=self.env.ref('apl_mro.order_change_status')
+          if mail_template:
+             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          order.add_step()
+    @api.multi
+    def order_completed(self):
+       for order in self:
+          order.suspend_security().state=7
+          mail_template=self.env.ref('apl_mro.order_change_status')
+          if mail_template:
+             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          order.add_step()
+    @api.multi
+    def order_not_accepted(self):
+       for order in self:
+          order.state=6
+          mail_template=self.env.ref('apl_mro.order_change_status')
+          if mail_template:
+             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          order.add_step()
+    @api.multi
+    def order_done(self):
+       for order in self:
+          order.end_date=fields.datetime.now()
+          order.state=8
+          mail_template=self.env.ref('apl_mro.order_change_status')
+          if mail_template:
+             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          order.add_step()
+    @api.multi
+    def order_cancel(self):
+       for order in self:
+          order.state=1
+          mail_template=self.env.ref('apl_mro.order_change_status')
+          if mail_template:
+             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          order.add_step()
+    @api.multi
+    def order_draft(self):
+       for order in self:
+          order.state=2
+          order.add_step()
+    def _get_attachments(self):
+       for order in self:
+           attach=self.env['ir.attachment'].sudo().search([('res_id','=',order.id),('res_model','=','uis.papl.mro.order')])
+           order.attachments=attach
+       return
     @api.model
-    def create(self,vals):
-    	order=super(apl_mro_order,self).create(vals)
-	order.message_follower_ids=[(4,self.env.uid,0)]
-	_logger.debug("XuakXuak %r"%(self.env.uid))
-	return order
-
-'''import time
-
-from openerp.osv import fields, osv
-import openerp.addons.decimal_precision as dp
-from openerp.tools.translate import _
-from openerp import netsvc
-
-
-class mro_order(osv.osv):
-    """
-    APL Maintenance Orders
-    """
-    _name = 'uis.papl.mro.order'
-    _description = 'Maintenance Order'
-    _inherit = ['mail.thread', 'ir.needaction_mixin']
-
-    STATE_SELECTION = [
-        ('draft', 'DRAFT'),
-        ('released', 'WAITING PARTS'),
-        ('ready', 'READY TO MAINTENANCE'),
-        ('done', 'DONE'),
-        ('cancel', 'CANCELED')
-    ]
-
-    MAINTENANCE_TYPE_SELECTION = [
-        ('bm', 'Breakdown'),
-        ('cm', 'Corrective')
-    ]
-    _track={
-        'state':{
-            'apl_mro.mt_order_confirmed': lambda self,cr,uid,obj,ctx=None: obj['state'] == 'ready',
-        }
-    }
-    _columns = {
-        'name': fields.char('Reference', size=64),
-        'origin': fields.char('Source Document', size=64, readonly=True, states={'draft': [('readonly', False)]},
-            help="Reference of the document that generated this maintenance order."),
-        'state': fields.selection(STATE_SELECTION, 'Status', readonly=True,
-            help="When the maintenance order is created the status is set to 'Draft'.\n\
-            If the order is confirmed the status is set to 'Waiting Parts'.\n\
-            If the stock is available then the status is set to 'Ready to Maintenance'.\n\
-            When the maintenance is over, the status is set to 'Done'."),
-        'maintenance_type': fields.selection(MAINTENANCE_TYPE_SELECTION, 'Maintenance Type', required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        #'task_id': fields.many2one('mro.task', 'Task', readonly=True, states={'draft': [('readonly', False)]}),
-        'description': fields.char('Description', size=64, translate=True, required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        'apl_id': fields.many2one('uis.papl.apl', 'Air power line', required=False, readonly=True, states={'draft': [('readonly', False)]}),
-        'transformer_id': fields.many2one('uis.papl.transformer', 'Transformer', required=False, readonly=True, states={'draft':[('readonly',False)]}),
-        'date_planned': fields.datetime('Planned Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)]}),
-        'date_scheduled': fields.datetime('Scheduled Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)],'released':[('readonly',False)],'ready':[('readonly',False)]}),
-        'date_execution': fields.datetime('Execution Date', required=True, states={'done':[('readonly',True)],'cancel':[('readonly',True)]}),
-        'date_deadline': fields.datetime('Deadline Date', required=True,states={'draft':[('readonly',False)]}),
-        #'parts_lines': fields.one2many('mro.order.parts.line', 'maintenance_id', 'Planned parts',
-        #    readonly=True, states={'draft':[('readonly',False)]}),
-        #'parts_ready_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
-        #'parts_move_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
-        #'parts_moved_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
-        'tools_description': fields.text('Tools Description',translate=True),
-        'labor_description': fields.text('Labor Description',translate=True),
-        'operations_description': fields.text('Operations Description',translate=True),
-        'documentation_description': fields.text('Documentation Description',translate=True),
-        'problem_description': fields.text('Problem Description'),
-        'company_id': fields.many2one('res.company','Company',required=True, readonly=True, states={'draft':[('readonly',False)]}),
-        #'procurement_group_id': fields.many2one('procurement.group', 'Procurement group', copy=False),
-        #'category_ids': fields.related('asset_id', 'category_ids', type='many2many', relation='asset.category', string='Asset Category', readonly=True),
-    }
-    _defaults = {
-        'state': lambda *a: 'draft',
-        'maintenance_type': lambda *a: 'bm',
-        'date_planned': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-        'date_scheduled': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-        'date_execution': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-        'company_id': lambda self, cr, uid, c: self.pool.get('res.company')._company_default_get(cr, uid, 'uis.papl.mro.order', context=c),
-    }
-
-    _order = 'date_execution'
-
-    def onchange_apl(self, cr, uid, ids, apl):
-        value = {}
-        if apl:
-            value['apl_id'] = self.pool.get('uis.papl.apl').browse(cr, uid, apl).id #need correction
-        return {'value': value}
-    
-    def onchange_transformer(self, cr, uid, ids, trans):
-        value = {}
-        if trans:
-           apl_id = self.pool.get('uis.papl.transformer').browse(cr, uid, trans).apl_id #need correction
-        return {'value': {'apl_id':apl_id}}
-    
-    def onchange_planned_date(self, cr, uid, ids, date):
-        return {'value': {
-            'date_scheduled': date,
-        }}
-    def onchange_planned_date(self, cr, uid, ids, date):
-        """
-        onchange handler of date_planned.
-        """
-        return {'value': {
-            'date_scheduled': date,
-        }}
-
-    def onchange_scheduled_date(self, cr, uid, ids, date):
-        """
-        onchange handler of date_scheduled.
-        """
-        return {'value': {
-            'date_execution': date,
-        }}
-
-    def onchange_execution_date(self, cr, uid, ids, date, state):
-        """
-        onchange handler of date_execution.
-        """
-        value = {}
-        if state == 'draft':
-            value['value'] = {'date_planned': date}
-        else:
-            value['value'] = {'date_scheduled': date}
-        return value
-
-    _track = {
-        'state': {
-            'mro.mt_order_confirmed': lambda self, cr, uid, obj, ctx=None: obj['state'] == 'ready',
-        },
-    }
-
-    def _get_available_parts(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for order in self.browse(cr, uid, ids, context=context):
-            res[order.id] = {}
-            line_ids = []
-            available_line_ids = []
-            done_line_ids = []
-            if order.procurement_group_id:
-                for procurement in order.procurement_group_id.procurement_ids:
-                    line_ids += [move.id for move in procurement.move_ids if move.location_dest_id.id == order.asset_id.property_stock_asset.id]
-                    available_line_ids += [move.id for move in procurement.move_ids if move.location_dest_id.id == order.asset_id.property_stock_asset.id and move.state == 'assigned']
-                    done_line_ids += [move.id for move in procurement.move_ids if move.location_dest_id.id == order.asset_id.property_stock_asset.id and move.state == 'done']
-            res[order.id]['parts_ready_lines'] = line_ids
-            res[order.id]['parts_move_lines'] = available_line_ids
-            res[order.id]['parts_moved_lines'] = done_line_ids
-        return res
-
-    _columns = {
-        'name': fields.char('Reference', size=64),
-        'origin': fields.char('Source Document', size=64, readonly=True, states={'draft': [('readonly', False)]},
-            help="Reference of the document that generated this maintenance order."),
-        'state': fields.selection(STATE_SELECTION, 'Status', readonly=True,
-            help="When the maintenance order is created the status is set to 'Draft'.\n\
-            If the order is confirmed the status is set to 'Waiting Parts'.\n\
-            If the stock is available then the status is set to 'Ready to Maintenance'.\n\
-            When the maintenance is over, the status is set to 'Done'."),
-        'maintenance_type': fields.selection(MAINTENANCE_TYPE_SELECTION, 'Maintenance Type', required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        'task_id': fields.many2one('mro.task', 'Task', readonly=True, states={'draft': [('readonly', False)]}),
-        'description': fields.char('Description', size=64, translate=True, required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        'asset_id': fields.many2one('asset.asset', 'Asset', required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        'date_planned': fields.datetime('Planned Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)]}),
-        'date_scheduled': fields.datetime('Scheduled Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)],'released':[('readonly',False)],'ready':[('readonly',False)]}),
-        'date_execution': fields.datetime('Execution Date', required=True, states={'done':[('readonly',True)],'cancel':[('readonly',True)]}),
-        'parts_lines': fields.one2many('mro.order.parts.line', 'maintenance_id', 'Planned parts',
-            readonly=True, states={'draft':[('readonly',False)]}),
-        'parts_ready_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
-        'parts_move_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
-        'parts_moved_lines': fields.function(_get_available_parts, relation="stock.move", method=True, type="one2many", multi='parts'),
-        'tools_description': fields.text('Tools Description',translate=True),
-        'labor_description': fields.text('Labor Description',translate=True),
-        'operations_description': fields.text('Operations Description',translate=True),
-        'documentation_description': fields.text('Documentation Description',translate=True),
-        'problem_description': fields.text('Problem Description'),
-        'company_id': fields.many2one('res.company','Company',required=True, readonly=True, states={'draft':[('readonly',False)]}),
-        'procurement_group_id': fields.many2one('procurement.group', 'Procurement group', copy=False),
-        'category_ids': fields.related('asset_id', 'category_ids', type='many2many', relation='asset.category', string='Asset Category', readonly=True),
-    }
-
-    _defaults = {
-        'state': lambda *a: 'draft',
-        'maintenance_type': lambda *a: 'bm',
-        'date_planned': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-        'date_scheduled': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-        'date_execution': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-        'company_id': lambda self, cr, uid, c: self.pool.get('res.company')._company_default_get(cr, uid, 'mro.order', context=c),
-    }
-
-    _order = 'date_execution'
-
-    def onchange_asset(self, cr, uid, ids, asset):
-        value = {}
-        if asset:
-            value['category_ids'] = self.pool.get('asset.asset').browse(cr, uid, asset).category_ids
-        return {'value': value}
-
-    def onchange_planned_date(self, cr, uid, ids, date):
-        """
-        onchange handler of date_planned.
-        """
-        return {'value': {
-            'date_scheduled': date,
-        }}
-
-    def onchange_scheduled_date(self, cr, uid, ids, date):
-        """
-        onchange handler of date_scheduled.
-        """
-        return {'value': {
-            'date_execution': date,
-        }}
-
-    def onchange_execution_date(self, cr, uid, ids, date, state):
-        """
-        onchange handler of date_execution.
-        """
-        value = {}
-        if state == 'draft':
-            value['value'] = {'date_planned': date}
-        else:
-            value['value'] = {'date_scheduled': date}
-        return value
-
-    def onchange_task(self, cr, uid, ids, task_id, parts_lines):
-        task = self.pool.get('mro.task').browse(cr, uid, task_id)
-        new_parts_lines = []
-        for line in task.parts_lines:
-            new_parts_lines.append([0,0,{
-                'name': line.name,
-                'parts_id': line.parts_id.id,
-                'parts_qty': line.parts_qty,
-                'parts_uom': line.parts_uom.id,
-                }])
-        return {'value': {
-            'parts_lines': new_parts_lines,
-            'description': task.name,
-            'tools_description': task.tools_description,
-            'labor_description': task.labor_description,
-            'operations_description': task.operations_description,
-            'documentation_description': task.documentation_description
-        }}
-
-    def test_ready(self, cr, uid, ids):
-        res = True
-        for order in self.browse(cr, uid, ids):
-            if order.parts_lines and order.procurement_group_id:
-                states = []
-                for procurement in order.procurement_group_id.procurement_ids:
-                    states += [move.state != 'assigned' for move in procurement.move_ids if move.location_dest_id.id == order.asset_id.property_stock_asset.id]
-                if any(states) or len(states) == 0: res = False
-        return res
-
-    def action_confirm(self, cr, uid, ids, context=None):        
-        """ Confirms maintenance order.
-        @return: True
-        """
-        procurement_obj = self.pool.get('procurement.order')
-        for order in self.browse(cr, uid, ids, context=context):
-            proc_ids = []
-            group_id = self.pool.get("procurement.group").create(cr, uid, {'name': order.name}, context=context)
-            for line in order.parts_lines:
-                vals = {
-                    'name': order.name,
-                    'origin': order.name,
-                    'company_id': order.company_id.id,
-                    'group_id': group_id,
-                    'date_planned': order.date_planned,
-                    'product_id': line.parts_id.id,
-                    'product_qty': line.parts_qty,
-                    'product_uom': line.parts_uom.id,
-                    'location_id': order.asset_id.property_stock_asset.id
-                    }
-                proc_id = procurement_obj.create(cr, uid, vals, context=context)
-                proc_ids.append(proc_id)
-            procurement_obj.run(cr, uid, proc_ids, context=context)
-            order.write({'state':'released','procurement_group_id':group_id}, context=context)
-        return 0
-
-    def action_ready(self, cr, uid, ids):
-        self.write(cr, uid, ids, {'state': 'ready'})
-        return True
-
-    def action_done(self, cr, uid, ids, context=None):
-        for order in self.browse(cr, uid, ids, context=context):
-            self.pool.get('stock.move').action_done(cr, uid, [x.id for x in order.parts_move_lines])
-        self.write(cr, uid, ids, {'state': 'done', 'date_execution': time.strftime('%Y-%m-%d %H:%M:%S')})
-        return True
-
-    def action_cancel(self, cr, uid, ids, context=None):
-        for order in self.browse(cr, uid, ids, context=context):
-            self.pool.get('stock.move').action_cancel(cr, uid, [x.id for x in order.parts_ready_lines])
-        self.write(cr, uid, ids, {'state': 'cancel'})
-        return True
-
-    def test_if_parts(self, cr, uid, ids):
-        """
-        @return: True or False
-        """
-        res = True
-        for order in self.browse(cr, uid, ids):
-            if not order.parts_lines:
-                res = False
-        return res
-
-    def force_done(self, cr, uid, ids, context=None):
-        """ Assign and consume parts.
-        @return: True
-        """
-        self.force_parts_reservation(cr, uid, ids)
-        wf_service = netsvc.LocalService("workflow")
-        for order in self.browse(cr, uid, ids, context=context):
-            wf_service.trg_validate(uid, 'mro.order', order.id, 'button_done', cr)
-        return True
-
-    def force_parts_reservation(self, cr, uid, ids, context=None):
-        """ Assign parts.
-        @return: True
-        """
-        for order in self.browse(cr, uid, ids, context=context):
-            self.pool.get('stock.move').force_assign(cr, uid, [x.id for x in order.parts_ready_lines])
-        return True
-
-    def create(self, cr, uid, vals, context=None):
-        if vals.get('name','/')=='/':
-            vals['name'] = self.pool.get('ir.sequence').get(cr, uid, 'mro.order') or '/'
-        return super(mro_order, self).create(cr, uid, vals, context=context)
-
-    def write(self, cr, uid, ids, vals, context=None):
-        if vals.get('date_execution') and not vals.get('state'):
-            # constraint for calendar view
-            for order in self.browse(cr, uid, ids):
-                if order.state == 'draft':
-                    vals['date_planned'] = vals['date_execution']
-                    vals['date_scheduled'] = vals['date_execution']
-                elif order.state in ('released','ready'):
-                    vals['date_scheduled'] = vals['date_execution']
-                else: del vals['date_execution']
-        return super(mro_order, self).write(cr, uid, ids, vals, context=context)
-
-
-class mro_order_parts_line(osv.osv):
-    _name = 'mro.order.parts.line'
-    _description = 'Maintenance Planned Parts'
-    _columns = {
-        'name': fields.char('Description', size=64),
-        'parts_id': fields.many2one('product.product', 'Parts', required=True),
-        'parts_qty': fields.float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'), required=True),
-        'parts_uom': fields.many2one('product.uom', 'Unit of Measure', required=True),
-        'maintenance_id': fields.many2one('mro.order', 'Maintenance Order', select=True),
-    }
-
-    _defaults = {
-        'parts_qty': lambda *a: 1.0,
-    }
-
-    def onchange_parts(self, cr, uid, ids, parts_id):
-        """
-        onchange handler of parts_id.
-        """
-        parts = self.pool.get('product.product').browse(cr, uid, parts_id)
-        return {'value': {'parts_uom': parts.uom_id.id}}
-
-    def unlink(self, cr, uid, ids, context=None):
-        self.write(cr, uid, ids, {'maintenance_id': False})
-        return True
-
-    def create(self, cr, uid, values, context=None):
-        ids = self.search(cr, uid, [('maintenance_id','=',values['maintenance_id']),('parts_id','=',values['parts_id'])])
-        if len(ids)>0:
-            values['parts_qty'] = self.browse(cr, uid, ids[0]).parts_qty + values['parts_qty']
-            self.write(cr, uid, ids[0], values, context=context)
-            return ids[0]
-        ids = self.search(cr, uid, [('maintenance_id','=',False)])
-        if len(ids)>0:
-            self.write(cr, uid, ids[0], values, context=context)
-            return ids[0]
-        return super(mro_order_parts_line, self).create(cr, uid, values, context=context)
-
-
-class mro_task(osv.osv):
-    """
-    Maintenance Tasks (Template for order)
-    """
-    _name = 'mro.task'
-    _description = 'Maintenance Task'
-
-    MAINTENANCE_TYPE_SELECTION = [
-        ('cm', 'Corrective')
-    ]
-
-    _columns = {
-        'name': fields.char('Description', size=64, required=True, translate=True),
-        'category_id': fields.many2one('asset.category', 'Asset Category', ondelete='restrict', required=True),
-        'maintenance_type': fields.selection(MAINTENANCE_TYPE_SELECTION, 'Maintenance Type', required=True),
-        'parts_lines': fields.one2many('mro.task.parts.line', 'task_id', 'Parts'),
-        'tools_description': fields.text('Tools Description',translate=True),
-        'labor_description': fields.text('Labor Description',translate=True),
-        'operations_description': fields.text('Operations Description',translate=True),
-        'documentation_description': fields.text('Documentation Description',translate=True),
-        'active': fields.boolean('Active'),
-    }
-
-    _defaults = {
-        'active': True,
-        'maintenance_type': 'cm',
-    }
-
-
-class mro_task_parts_line(osv.osv):
-    _name = 'mro.task.parts.line'
-    _description = 'Maintenance Planned Parts'
-    _columns = {
-        'name': fields.char('Description', size=64),
-        'parts_id': fields.many2one('product.product', 'Parts', required=True),
-        'parts_qty': fields.float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'), required=True),
-        'parts_uom': fields.many2one('product.uom', 'Unit of Measure', required=True),
-        'task_id': fields.many2one('mro.task', 'Maintenance Task', select=True),
-    }
-
-    _defaults = {
-        'parts_qty': lambda *a: 1.0,
-    }
-
-    def onchange_parts(self, cr, uid, ids, parts_id):
-        """
-        onchange handler of parts_id.
-        """
-        parts = self.pool.get('product.product').browse(cr, uid, parts_id)
-        return {'value': {'parts_uom': parts.uom_id.id}}
-
-    def unlink(self, cr, uid, ids, context=None):
-        self.write(cr, uid, ids, {'task_id': False})
-        return True
-
-    def create(self, cr, uid, values, context=None):
-        ids = self.search(cr, uid, [('task_id','=',values['task_id']),('parts_id','=',values['parts_id'])])
-        if len(ids)>0:
-            values['parts_qty'] = self.browse(cr, uid, ids[0]).parts_qty + values['parts_qty']
-            self.write(cr, uid, ids[0], values, context=context)
-            return ids[0]
-        ids = self.search(cr, uid, [('task_id','=',False)])
-        if len(ids)>0:
-            self.write(cr, uid, ids[0], values, context=context)
-            return ids[0]
-        return super(mro_task_parts_line, self).create(cr, uid, values, context=context)
-
-
-class mro_request(osv.osv):
-    """
-    Maintenance Requests
-    """
-    _name = 'mro.request'
-    _description = 'Maintenance Request'
-    _inherit = ['mail.thread', 'ir.needaction_mixin']
-
-    STATE_SELECTION = [
-        ('draft', 'Draft'),
-        ('claim', 'Claim'),
-        ('run', 'Execution'),
-        ('done', 'Done'),
-        ('reject', 'Rejected'),
-        ('cancel', 'Canceled')
-    ]
-
-    _track = {
-        'state': {
-            'mro.mt_request_sent': lambda self, cr, uid, obj, ctx=None: obj['state'] == 'claim',
-            'mro.mt_request_confirmed': lambda self, cr, uid, obj, ctx=None: obj['state'] == 'run',
-            'mro.mt_request_rejected': lambda self, cr, uid, obj, ctx=None: obj['state'] == 'reject',
-        },
-    }
-
-    _columns = {
-        'name': fields.char('Reference', size=64),
-        'state': fields.selection(STATE_SELECTION, 'Status', readonly=True,
-            help="When the maintenance request is created the status is set to 'Draft'.\n\
-            If the request is sent the status is set to 'Claim'.\n\
-            If the request is confirmed the status is set to 'Execution'.\n\
-            If the request is rejected the status is set to 'Rejected'.\n\
-            When the maintenance is over, the status is set to 'Done'."),
-        'asset_id': fields.many2one('asset.asset', 'Asset', required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        'cause': fields.char('Cause', size=64, translate=True, required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        'description': fields.text('Description', readonly=True, states={'draft': [('readonly', False)]}),
-        'reject_reason': fields.text('Reject Reason', readonly=True),
-        'requested_date': fields.datetime('Requested Date', required=True, select=1, readonly=True, states={'draft': [('readonly', False)]}, help="Date requested by the customer for maintenance."),
-        'execution_date': fields.datetime('Execution Date', required=True, select=1, readonly=True, states={'draft':[('readonly',False)],'claim':[('readonly',False)]}),
-        'breakdown': fields.boolean('Breakdown', readonly=True, states={'draft': [('readonly', False)]}),
-        'create_uid': fields.many2one('res.users', 'Responsible'),
-    }
-
-    _defaults = {
-        'state': 'draft',
-        'requested_date': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-        'execution_date': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-        'breakdown': False,
-    }
-
-    def onchange_requested_date(self, cr, uid, ids, date):
-        """
-        onchange handler of requested_date.
-        """
-        return {'value': {
-            'execution_date': date,
-        }}
-
-    def onchange_execution_date(self, cr, uid, ids, date, state, breakdown):
-        """
-        onchange handler of execution_date.
-        """
-        value = {}
-        if state == 'draft' and not breakdown:
-            value['value'] = {'requested_date': date}
-        return value
-
-    def action_send(self, cr, uid, ids, context=None):
-        value = {'state': 'claim'}
-        for request in self.browse(cr, uid, ids, context=context):
-            if request.breakdown:
-                value['requested_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
-            self.write(cr, uid, ids, value)
-        return True
-
-    def action_confirm(self, cr, uid, ids, context=None):
-        """ Confirms maintenance request.
-        @return: Newly generated Maintenance Order Id.
-        """
-        order = self.pool.get('mro.order')
-        order_id = False
-        for request in self.browse(cr, uid, ids, context=context):
-            order_id = order.create(cr, uid, {
-                'date_planned':request.requested_date,
-                'date_scheduled':request.requested_date,
-                'date_execution':request.requested_date,
-                'origin': request.name,
-                'state': 'draft',
-                'maintenance_type': 'bm',
-                'asset_id': request.asset_id.id,
-                'description': request.cause,
-                'problem_description': request.description,
-            })
-        self.write(cr, uid, ids, {'state': 'run'})
-        return order_id
-
-    def action_done(self, cr, uid, ids, context=None):
-        self.write(cr, uid, ids, {'state': 'done', 'execution_date': time.strftime('%Y-%m-%d %H:%M:%S')})
-        return True
-
-    def action_reject(self, cr, uid, ids, context=None):
-        self.write(cr, uid, ids, {'state': 'reject', 'execution_date': time.strftime('%Y-%m-%d %H:%M:%S')})
-        return True
-
-    def action_cancel(self, cr, uid, ids, context=None):
-        self.write(cr, uid, ids, {'state': 'cancel', 'execution_date': time.strftime('%Y-%m-%d %H:%M:%S')})
-        return True
-
-    def create(self, cr, uid, vals, context=None):
-        if vals.get('name','/')=='/':
-            vals['name'] = self.pool.get('ir.sequence').get(cr, uid, 'mro.request') or '/'
-        return super(mro_request, self).create(cr, uid, vals, context=context)
-'''
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+    def _needaction_domain_get(self):
+       if self.env.user.has_group('passportvl.contractor'):
+          return ['|','|',('state', '=', 4),'&',('state', '=', 5),('start_planned_date','<',str(fields.datetime.now())),'&',('state', '=', 6),('end_planned_date','<',str(fields.datetime.now()))]
+       if self.env.user.has_group('passportvl.workshop_main_power_engineer') or self.env.user.has_group('passportvl.workshop_engineer'):
+          return ['|','|','|','|',('state', '=', 2),('state', '=', 3),'&','&',('start_planned_date','<',str(fields.datetime.now())),('state', '!=', 8),('state', '!=', 1),'&','&',('end_planned_date','<',str(fields.datetime.now())),('state', '!=', 8),('state', '!=', 1),('state', '=', 7)]
+    def get_server_url(self):
+	return self.env['uis.global.settings'].sudo().get_value('uis_server_port')+"/web#id="+str(self.id)+"&view_type=form&model=uis.papl.mro.order"
+    def get_contractor_manager_emails(self):
+       manager_emails=None
+       manager_id=self.env['res.users'].sudo().search([('is_manager','=',True),('company_id','=',self.contractor_id.id)])
+       for manager in manager_id:
+	  if ((manager_emails==None) and manager.email):
+	     manager_emails=manager.email
+          else:
+	     if ((manager_emails!=None) and manager.email):
+                manager_emails=manager_emails+","+manager.email  
+       if (manager_emails!=None): 
+          return manager_emails
+       else:
+          return ""
+    def get_customer_emails(self):
+       customer_emails=None
+       customer_id=self.env['res.users'].sudo().search([('partner_id','in',self.message_partner_ids.mapped('id')),('company_id','!=',self.contractor_id.id)])
+       for customer in customer_id:
+	  if ((customer_emails==None) and customer.email):
+	     customer_emails=customer.email
+          else:
+	     if ((customer_emails!=None) and customer.email):
+                customer_emails=customer_emails+","+customer.email
+       if (customer_emails!=None): 
+          return customer_emails
+       else:
+          return ""
+    def get_contractor_emails(self):
+       contractor_emails=None
+       contractor_id=self.env['res.users'].sudo().search([('partner_id','in',self.message_partner_ids.mapped('id')),('company_id','=',self.contractor_id.id)])
+       for contractor in contractor_id:
+	  if ((contractor_emails==None) and contractor.email):
+	     contractor_emails=contractor.email
+          else:
+	     if ((contractor_emails!=None) and contractor.email):
+                contractor_emails=contractor_emails+","+contractor.email
+       if (contractor_emails!=None): 
+          return contractor_emails
+       else:
+          return ""
+    def get_last_message_author(self):
+       return self.message_ids[0].create_uid.name
+    @api.depends('defect_ids')
+    def _get_defect_kanban(self):
+       for order in self:
+          for defect in order.defect_ids:
+             order.defect_ids_kanban=[(4,defect.id,0)]
+    def add_step(self):
+       _logger.debug(self.order_steps_json)
+       if self.order_steps_json==False:
+          user_name=self.create_uid.name
+          self.sudo().order_steps_json='{"steps":[{"state":2,"author":"'+self.create_uid.name+'","date":"'+self.create_date+'"}]}'
+       user_name=self.env['res.users'].sudo().browse(self.env.uid)[0].name
+       self.sudo().order_steps_json=self.order_steps_json[:self.order_steps_json.find("]}")]+',{"state":'+str(self.state)+',"author":"'+user_name+'","date":"'+str(fields.datetime.now())+'"}]}'      
