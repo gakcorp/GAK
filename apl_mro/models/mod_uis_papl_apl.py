@@ -16,7 +16,7 @@ class uis_apl_mro_mod_uis_papl_apl_defects(models.Model):
 	all_defect_ids=fields.One2many(string="All defects", comodel_name="uis.papl.mro.defect", inverse_name="apl_id")
 	all_defect_count=fields.Integer(string="All defect count", compute='_get_defect_count')
 	mro_count=fields.Integer(string="All maintenance count", compute='_get_mro_count')
-	defect_heatmap_data_json=fields.Text(string='Heatmap defect data', compute='_get_defect_heatmap_data')
+	defect_heatmap_data_json=fields.Text(string='Heatmap defect data', compute='_get_defect_heatmap_data', compute_sudo=True)
 	defect_state_category_data_json=fields.Text(string='Data about defects', compute='_get_defect_state_category_data')
 	mro_ids=fields.One2many(string="All mro", comodel_name="uis.papl.mro.order", inverse_name="apl_id")
 	mro_timeline_data_json=fields.Text(string="MRO Timeline", compute='_get_mro_timeline_data')
@@ -88,7 +88,7 @@ class uis_apl_mro_mod_uis_papl_apl_defects(models.Model):
 						vl+=fv['cnt']
 						defect_heat_data[:]=[d for d in defect_heat_data if not((d['lat']==rlat) and (d['lng']==rlng))]
 					defect_heat_data.append({'lat':rlat,'lng':rlng,'cnt':vl})
-			apl.defect_heatmap_data_json=json.dumps(defect_heat_data)
+			apl.sudo().defect_heatmap_data_json=json.dumps(defect_heat_data)
 	def _get_mro_count(self):
 		for apl in self:
 			apl.mro_count=len(apl.mro_ids)

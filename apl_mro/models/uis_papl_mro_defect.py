@@ -1,3 +1,4 @@
+from openerp.tools.translate import _
 from openerp import models, fields, api
 import logging
 
@@ -79,10 +80,35 @@ class apl_mro_defect(models.Model):
 			defect.state='cancel'
 	@api.multi
 	def view_defect_action(self):
+		'''
+		ids=[]
+		for apl in self:
+			ids.append(apl.id)
+		return {
+			'domain': "[('apl_id','in',[" + ','.join(map(str, ids)) + "])]",
+			'name': _('All Defects'),
+			'view_type': 'form',
+			'view_mode': 'tree,form',
+			'res_model': 'uis.papl.mro.defect',
+			'type': 'ir.actions.act_window',
+			'target': 'current',
+		}
+		'''
+		ph_id=self.photo_id.id
+		return {
+			'domain':"[('','in',[%r])]"%ph_id,
+			'name': _('Defect photo'),
+			'view_type': 'form',
+			'view_mode': 'form',
+			'res_model': 'uis.ap.photo',
+			'type': 'ir.actions.act_window',
+			'target': 'current',
+		}
+		'''
 		_logger.debug("XXXXXXXXXXXXXXX ")
 		return{
     			"type": "ir.actions.act_url",
     			"url": "http://odoo.com",
     			"target": "self",
-		}
+		}'''
 
