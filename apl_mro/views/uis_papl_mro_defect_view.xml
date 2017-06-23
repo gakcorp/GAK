@@ -79,6 +79,7 @@
 		<record id="mro_defect_form_view" model="ir.ui.view">
             <field name="name">uis.papl.mro.defect.form</field>
             <field name="model">uis.papl.mro.defect</field>
+	    <field name="priority" eval="1"/>
             <field name="arch" type="xml">
                 <form string="Defect Form">
 					<header>
@@ -111,7 +112,9 @@
 								<field name="image_800" options='{"size":[800,600]}' widget="defectphoto" nolabel="1" colspan="2"/>
 							</page>
 							<page string="Map">
-								<field name="longitude" widget="defectmap"/>
+								<div id="scheme_id_apls" style="height:300px; width:1000px;">
+									<field name="longitude" widget="defectmap"/>
+								</div>
 							</page>
 							<page string="Pillars" attrs="{'invisible':[('pillar_ids', '=', [])]}">
 								<field name="pillar_ids_2">

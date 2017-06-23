@@ -47,6 +47,7 @@ odoo.define('passportvl.form_widgets', function (require)
             vectorPillarBaseLayer.setVisible(false);
             
 			var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
+			OsmLayer.attributes={"type":"OsmLayer"};
 			/*var rrLayer=new ol.layer.Tile({
 				preload:1,
 				source: new ol.source.TileImage({
