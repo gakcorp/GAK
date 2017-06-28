@@ -83,29 +83,30 @@
             <field name="arch" type="xml">
                 <form string="Defect Form">
 					<header>
-						<button name="defect_confirmed" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible':[('state', '!=', 'draft')]}"/>
-						<button name="defect_canceled" type="object" string="Cancel" class="oe_highlight" attrs="{'invisible':[('state', '!=', 'draft')]}"/>
+						<button name="defect_confirmed" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible':[('state', '!=', 2)]}" confirm="Are you sure you want to confirm this defect?"/>
+						<button name="defect_canceled" type="object" string="Cancel" class="oe_highlight" attrs="{'invisible':[('state', '!=', 2)]}" confirm="Are you sure you want to cancel this defect?"/>
+						<button name="defect_draft" type="object" string="Draft" class="oe_highlight" attrs="{'invisible':[('state', '!=', 1)]}" confirm="Are you sure you want to draft this defect?"/>
 						<field name="state" widget="statusbar"/>
 					</header>
 					<sheet>
 						<group>
 							<group>
 								<field name="id" attrs="{'invisible':[('id', '>', 0)]}"/>
-								<field name="name"/>
-								<field name="category"/>
+								<field name="name" attrs="{'readonly':[('state', '!=', 2)]}"/>
+								<field name="category" attrs="{'readonly':[('state', '!=', 2)]}"/>
 								<field name="create_date" class="oe_read_only"/>
 								<field name="create_uid" class="oe_read_only"/>
 							</group>
 							<group>
 								<field name="apl_id" widget="many2one_tags" class="oe_read_only"/>
-								<field name="pillar_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('pillar_ids', '=', [])]}"/>
-								<field name="transformer_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('transformer_ids', '=', [])]}"/>
-								<field name="tap_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('tap_ids', '=', [])]}"/>
+								<field name="pillar_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('pillar_ids', '=', [])], 'readonly':[('state', '!=', 2)]}"/>
+								<field name="transformer_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('transformer_ids', '=', [])], 'readonly':[('state', '!=', 2)]}"/>
+								<field name="tap_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('tap_ids', '=', [])], 'readonly':[('state', '!=', 2)]}"/>
 							</group>
 						</group>
 						<notebook>
 							<page string="Description">
-								<field name="description"/>
+								<field name="description" attrs="{'readonly':[('state', '!=', 2)]}"/>
 							</page>
 							<page string="Photo">
 								<field name="defect_photo_area" attrs="{'invisible':[('id', '>', 0)]}"/>
@@ -149,6 +150,10 @@
 							</page>
 						</notebook>
                     </sheet>
+		    <div class="oe_chatter">
+		    	<field name="message_follower_ids" widget="mail_followers" group="base.group_user"/>
+			<field name="message_ids" widget="mail_thread"/>
+		    </div>
                 </form>
             </field>
         </record>

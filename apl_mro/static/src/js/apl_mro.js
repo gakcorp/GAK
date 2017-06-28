@@ -6,6 +6,9 @@ odoo.define('apl_mro.form_widgets', function (require)
 	var instance = openerp;
 	var FieldBinaryImage=core.form_widget_registry.get('image');
 	var AplMAP=core.form_widget_registry.get('aplmap');
+	
+	var kanban_widgets = require('web_kanban.widgets');
+	var Kanban_AbstractField = kanban_widgets.AbstractField;
 
 	defectmap=AplMAP.extend(
 	{
@@ -275,8 +278,60 @@ odoo.define('apl_mro.form_widgets', function (require)
 
 		},
 	});
+
+	defectphoto_kanban=Kanban_AbstractField.extend(
+	{
+		start: function()
+		{
+			this._super.apply(this, arguments);
+			try
+			{;
+				if (!this.field.raw_value) return;
+				var DJSON=JSON.parse(this.field.raw_value);
+				var fabricCanvas = new fabric.Canvas();
+				fabricCanvas.setWidth(DJSON.canvaswidth);
+				fabricCanvas.setHeight(DJSON.canvasheight);
+				var Coordinates=DJSON.coordinates;
+				var DefCircles=DJSON.defcircles;
+				for (var i in Coordinates)
+				{
+					var MasCoord=Coordinates[i];
+					var FirstPoint;
+					var LastPoint;
+					for (var a in MasCoord)
+					{
+						if (a==0) FirstPoint=MasCoord[a];
+						else
+						{
+							var Line=new fabric.Line([LastPoint[0],LastPoint[1],MasCoord[a][0],MasCoord[a][1]],{stroke:'red'});
+							Line.selectable=false;
+							fabricCanvas.add(Line);
+						}
+						LastPoint=MasCoord[a];
+					}
+					var Line=new fabric.Line([LastPoint[0],LastPoint[1],FirstPoint[0],FirstPoint[1]],{stroke:'red'});
+					Line.selectable=false;
+					fabricCanvas.add(Line);
+				}
+				for (var i in DefCircles)
+				{
+					var circle=new fabric.Circle({left:DefCircles[i][0],top:DefCircles[i][1],radius:DefCircles[i][2],fill: 'rgba(0,0,0,0)',stroke:'red'});
+					circle.selectable=false;
+					fabricCanvas.add(circle);
+				}
+				var canvasImg=$('<img style="max-width:100%;" src="'+fabricCanvas.toDataURL('png')+'"></canvas>');
+				this.$el.append(canvasImg);
+			}
+			catch (exception)
+			{
+				console.log(exception);
+			}
+		},
+	});
+
 	
 	core.form_widget_registry.add('defectmap', defectmap);
 	core.form_widget_registry.add('defectphoto', defectphoto);
 	core.form_widget_registry.add('order_timeline', order_timeline);
+	kanban_widgets.registry.add('defectphoto_kanban',defectphoto_kanban);
 });
