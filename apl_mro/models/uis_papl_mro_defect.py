@@ -23,7 +23,10 @@ class apl_mro_defect(models.Model):
 	transformer_ids=fields.Many2many('uis.papl.transformer',relation='defect_transformer_rel',column1='defect_id', column2='transformer_id')
 	transformer_ids_2=fields.Many2many('uis.papl.transformer',store=False,compute='_get_transformer')
 	state=fields.Selection(STATE_SELECTION, 'Status', readonly=True, default=2, track_visibility=True)
+        state_label=fields.Char('State Label',store=True,compute='_get_state_label')
+	state_progress=fields.Float('State Progress',store=False, compute='_get_state_label')
 	category=fields.Selection(DEFECT_CATEGORY,'Category',default=1, track_visibility=True)
+        category_label=fields.Char('Category Label',store=True,compute='_get_category_label')
 	defect_photo_area=fields.Text('Defect Photo Area')
 	photo_id=fields.Many2one('uis.ap.photo', string='Photo', readonly=True)
 	image_800=fields.Binary(string='Image800', store=False,related='photo_id.image_800')
@@ -93,3 +96,12 @@ class apl_mro_defect(models.Model):
 			'res_id': self.id,
 			'target': 'current',
 		}
+	@api.depends('state')
+    	def _get_state_label(self):
+       		for defect in self:
+          		defect.state_label=defect.STATE_SELECTION[defect.state-1][1]
+          		defect.state_progress=(100.0/6.0)*(defect.state-1)
+	@api.depends('category')
+    	def _get_category_label(self):
+       		for defect in self:
+          		defect.category_label=defect.DEFECT_CATEGORY[defect.category-1][1]    

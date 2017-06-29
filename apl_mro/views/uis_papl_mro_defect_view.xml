@@ -1,221 +1,263 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <openerp>
-	<data>
-		<template id="assets_backend" name="defectmap" inherit_id="web.assets_backend">
-			<xpath expr="." position="inside">
-				<script type="text/javascript" src="/apl_mro/static/src/js/apl_mro.js"/>
-				<script type="text/javascript" src="/apl_mro/static/src/js/vis.js"/>
-				<link rel="stylesheet" href="/apl_mro/static/src/css/vis.css"/>
-				<link rel="stylesheet" href="/apl_mro/static/src/css/order_timeline.css"/>
-			</xpath>
-		</template>
+   <data>
 
-        <record id="mro_defect_tree_view" model="ir.ui.view">
-            <field name="name">uis.papl.mro.defect.tree</field>
-            <field name="model">uis.papl.mro.defect</field>
-            <field name="arch" type="xml">
-                <tree>
-                    <field name="name"/>
-                    <!--<field name="date_execution" string="Order Date" widget="date"/>!-->
-                    <field name="apl_id"/>
-		    <field name="tap_ids"/>
-		    <field name="pillar_ids"/>
-	            <field name="transformer_ids"/>
-                    <field name="state"/>
-		    <field name="category"/>
-                </tree>
-            </field>
-        </record>
-        
-	   
+      <template id="assets_backend" name="defectmap" inherit_id="web.assets_backend">
+         <xpath expr="." position="inside">
+            <script type="text/javascript" src="/apl_mro/static/src/js/apl_mro.js" />
+            <script type="text/javascript" src="/apl_mro/static/src/js/vis.js" />
+            <link rel="stylesheet" href="/apl_mro/static/src/css/vis.css" />
+            <link rel="stylesheet" href="/apl_mro/static/src/css/order_timeline.css" />
+         </xpath>
+      </template>
 
-        <record id="mro_order_search" model="ir.ui.view">
-            <field name="name">uis.papl.mro.defect.search</field>
-            <field name="model">uis.papl.mro.defect</field>
-            <field name="arch" type="xml">
-                <search string="Search Defect">
-                    <field name="name"/>
-                    <field name="apl_id"/>
-					<field name="tap_ids"/>
-					<field name="pillar_ids"/>
-					<field name="transformer_ids"/>
-					
-                    <separator/>
-                    <group expand="0" string="Group By">
-                      <filter name="group_state"
-                              string="State"
-                              context="{'group_by': 'state'}"
-                              />
-                      <filter name="group_apl"
-                              string="APL"
-                              context="{'group_by': 'apl_id'}"
-                              />
-                    </group>
-                </search>
-            </field>
-        </record>
-		
-		<record id="wizard_create_defect_form" model="ir.actions.act_window.view">
-			<field eval="3" name="sequence"/>
-			<field name="view_mode">form</field>
-			<field name="view_id" ref="wizard_create_defect"/>
-			<field name="act_window_id" ref="uis_papl_menu_wiz_create_defect"/>
-		</record>
-		
-		<record id="defect_form" model="ir.actions.act_window.view">
-			<field eval="3" name="sequence"/>
-			<field name="view_mode">form</field>
-			<field name="view_id" ref="mro_defect_form_view"/>
-			<field name="act_window_id" ref="papl_action_apl_defects"/>
-		</record>
-		
-		<record id="defect_tree" model="ir.actions.act_window.view">
-			<field eval="1" name="sequence"/>
-			<field name="view_mode">tree</field>
-			<field name="view_id" ref="mro_defect_tree_view"/>
-			<field name="act_window_id" ref="papl_action_apl_defects"/>
-		</record>
-		
-		<record id="mro_defect_form_view" model="ir.ui.view">
-            <field name="name">uis.papl.mro.defect.form</field>
-            <field name="model">uis.papl.mro.defect</field>
-	    <field name="priority" eval="1"/>
-            <field name="arch" type="xml">
-                <form string="Defect Form">
-					<header>
-						<button name="defect_confirmed" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible':[('state', '!=', 2)]}" confirm="Are you sure you want to confirm this defect?"/>
-						<button name="defect_canceled" type="object" string="Cancel" class="oe_highlight" attrs="{'invisible':[('state', '!=', 2)]}" confirm="Are you sure you want to cancel this defect?"/>
-						<button name="defect_draft" type="object" string="Draft" class="oe_highlight" attrs="{'invisible':[('state', '!=', 1)]}" confirm="Are you sure you want to draft this defect?"/>
-						<field name="state" widget="statusbar"/>
-					</header>
-					<sheet>
-						<group>
-							<group>
-								<field name="id" attrs="{'invisible':[('id', '>', 0)]}"/>
-								<field name="name" attrs="{'readonly':[('state', '!=', 2)]}"/>
-								<field name="category" attrs="{'readonly':[('state', '!=', 2)]}"/>
-								<field name="create_date" class="oe_read_only"/>
-								<field name="create_uid" class="oe_read_only"/>
-							</group>
-							<group>
-								<field name="apl_id" widget="many2one_tags" class="oe_read_only"/>
-								<field name="pillar_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('pillar_ids', '=', [])], 'readonly':[('state', '!=', 2)]}"/>
-								<field name="transformer_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('transformer_ids', '=', [])], 'readonly':[('state', '!=', 2)]}"/>
-								<field name="tap_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('tap_ids', '=', [])], 'readonly':[('state', '!=', 2)]}"/>
-							</group>
-						</group>
-						<notebook>
-							<page string="Description">
-								<field name="description" attrs="{'readonly':[('state', '!=', 2)]}"/>
-							</page>
-							<page string="Photo">
-								<field name="defect_photo_area" attrs="{'invisible':[('id', '>', 0)]}"/>
-								<field name="image_800" options='{"size":[800,600]}' widget="defectphoto" nolabel="1" colspan="2"/>
-							</page>
-							<page string="Map">
-								<div id="scheme_id_apls" style="height:300px; width:1000px;">
-									<field name="longitude" widget="defectmap"/>
-								</div>
-							</page>
-							<page string="Pillars" attrs="{'invisible':[('pillar_ids', '=', [])]}">
-								<field name="pillar_ids_2">
-									<tree default_order="tap_id,num_by_vl">
-										<field name="name"/>
-										<field name="tap_id" invisible="1"/>
-										<field name="num_by_vl"/>
-										<field name="pillar_material_id"/>
-										<field name="pillar_type_id"/>
-										<field name="pillar_cut_id"/>
-									</tree>
-								</field>
-							</page>
-							<page string="Transformers" attrs="{'invisible':[('transformer_ids', '=', [])]}">
-								<field name="transformer_ids_2">
-									<tree>
-										<field name="name"/>
-									</tree>
-								</field>
-							</page>
-							<page string="Taps" attrs="{'invisible':[('tap_ids', '=', [])]}">
-								<field name="tap_ids_2">
-									<tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
-										<field name="num_by_vl" invisible="1"/>
-										<field name="name"/>
-										<field name="conn_pillar_id"/>
-										<field name="pillar_cnt"/>
-										<field name="line_len_calc"/>
-										<field name="is_main_line" invisible="1"/>
-									</tree>
-								</field>
-							</page>
-						</notebook>
-                    </sheet>
-		    <div class="oe_chatter">
-		    	<field name="message_follower_ids" widget="mail_followers" group="base.group_user"/>
-			<field name="message_ids" widget="mail_thread"/>
-		    </div>
-                </form>
-            </field>
-        </record>
+      <record id="mro_defect_tree_view" model="ir.ui.view">
+         <field name="name">uis.papl.mro.defect.tree</field>
+         <field name="model">uis.papl.mro.defect</field>
+         <field name="arch" type="xml">
+            <tree>
+               <field name="name" />
+               <!--<field name="date_execution" string="Order Date" widget="date"/>!-->
+               <field name="apl_id" />
+               <field name="tap_ids" />
+               <field name="pillar_ids" />
+               <field name="transformer_ids" />
+               <field name="state_progress" widget="progressbar"/>
+               <field name="category" />
+            </tree>
+         </field>
+      </record>
 
-        <record id="papl_action_apl_defects" model="ir.actions.act_window">
-            <field name="name">Defects</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">uis.papl.mro.defect</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-		
-		<record model="ir.ui.view" id="wizard_create_defect">
-			<field name="name">Create new defect</field>
-			<field name="type">form</field>
-			<field name="model">uis.papl.mro.defect</field>
-			<field name="arch" type="xml">
-				<form>
-					<group col="1">
-						<h1>Form for creation of new defect</h1>
-						<field name="name"/>
-						<laber for="apl_id" string="APL"/>
-						<field name="apl_id" options="{'no_create_edit':True,'no_quick_create':True}"/>
-						<laber for="def_object_type"/>
-						<field name="def_object_type"/>
-						<laber for="pillar_ids"/>
-						<field name="pillar_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'pillar')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
-						<laber for="transformer_ids"/>
-						<field name="transformer_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'transformer')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
-						<laber for="tap_ids"/>
-						<field name="tap_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'tap')]}" options="{'no_create_edit':True,'no_quick_create':True}"/>
-						<field name="category"/>
-						<field name="description"/>
-					</group>
-						<button string="Cancel" special="cancel"/>
-						<button name="create_defect_from_wizard" type="object" string="Create" class="oe_highlight"/>
-					<footer>
-					</footer>
-				</form>
-			</field>
-		</record>
-		
-		<record id="uis_papl_menu_wiz_create_defect" model="ir.actions.act_window">
-			<field name="name">Create new defect</field>
-			<field name="res_model">uis.papl.mro.defect</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">form</field>
-			<field name="target">new</field>
-		</record>
+      <record id="mro_order_search" model="ir.ui.view">
+         <field name="name">uis.papl.mro.defect.search</field>
+         <field name="model">uis.papl.mro.defect</field>
+         <field name="arch" type="xml">
+            <search string="Search Defect">
+               <field name="name" />
+               <field name="apl_id" />
+               <field name="tap_ids" />
+               <field name="pillar_ids" />
+               <field name="transformer_ids" />
+               <separator />
+               <group expand="0" string="Group By">
+                  <filter name="group_state" string="State" context="{'group_by': 'state'}" />
+                  <filter name="group_apl" string="APL" context="{'group_by': 'apl_id'}" />
+               </group>
+            </search>
+         </field>
+      </record>
+
+      <record id="wizard_create_defect_form" model="ir.actions.act_window.view">
+         <field eval="3" name="sequence" />
+         <field name="view_mode">form</field>
+         <field name="view_id" ref="wizard_create_defect" />
+         <field name="act_window_id" ref="uis_papl_menu_wiz_create_defect" />
+      </record>
+
+      <record id="defect_form" model="ir.actions.act_window.view">
+         <field eval="3" name="sequence" />
+         <field name="view_mode">form</field>
+         <field name="view_id" ref="mro_defect_form_view" />
+         <field name="act_window_id" ref="papl_action_apl_defects" />
+      </record>
+
+      <record id="defect_tree" model="ir.actions.act_window.view">
+         <field eval="1" name="sequence" />
+         <field name="view_mode">tree</field>
+         <field name="view_id" ref="mro_defect_tree_view" />
+         <field name="act_window_id" ref="papl_action_apl_defects" />
+      </record>
+
+      <record id="defect_kanban" model="ir.actions.act_window.view">
+         <field eval="4" name="sequence" />
+         <field name="view_mode">kanban</field>
+         <field name="view_id" ref="mro_defect_kanban_view" />
+         <field name="act_window_id" ref="papl_action_apl_defects" />
+      </record>
 
 
-        <menuitem name="Defects"
-			id="uis_papl_menu_defect_list" parent="uis_papl_menu_mro"
-			action="papl_action_apl_defects"
-			sequence="10"
-			/>
-		
-		<menuitem name="Create Defect"
-				  id="uis_papl_menu_defect_wiz"
-				  parent="uis_papl_menu_mro"
-				  action="uis_papl_menu_wiz_create_defect"
-				  />
+      <record id="mro_defect_form_view" model="ir.ui.view">
+         <field name="name">uis.papl.mro.defect.form</field>
+         <field name="model">uis.papl.mro.defect</field>
+         <field name="priority" eval="1" />
+         <field name="arch" type="xml">
+            <form string="Defect Form">
+               <header>
+                  <button name="defect_confirmed" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible':[('state', '!=', 2)]}" confirm="Are you sure you want to confirm this defect?" />
+                  <button name="defect_canceled" type="object" string="Cancel" class="oe_highlight" attrs="{'invisible':[('state', '!=', 2)]}" confirm="Are you sure you want to cancel this defect?" />
+                  <button name="defect_draft" type="object" string="Draft" class="oe_highlight" attrs="{'invisible':[('state', '!=', 1)]}" confirm="Are you sure you want to draft this defect?" />
+                  <field name="state" widget="statusbar" />
+               </header>
+               <sheet>
+                  <group>
+                     <group>
+                        <field name="id" attrs="{'invisible':[('id', '&gt;', 0)]}" />
+                        <field name="name" attrs="{'readonly':[('state', '!=', 2)]}" />
+                        <field name="category" attrs="{'readonly':[('state', '!=', 2)]}" />
+                        <field name="create_date" class="oe_read_only" />
+                        <field name="create_uid" class="oe_read_only" />
+                     </group>
+                     <group>
+                        <field name="apl_id" widget="many2one_tags" class="oe_read_only" />
+                        <field name="pillar_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('pillar_ids', '=', [])], 'readonly':[('state', '!=', 2)]}" />
+                        <field name="transformer_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('transformer_ids', '=', [])], 'readonly':[('state', '!=', 2)]}" />
+                        <field name="tap_ids" widget="many2many_tags" domain="[('apl_id', '=', apl_id)]" options="{'no_create_edit':True,'no_quick_create':True}" attrs="{'invisible':[('tap_ids', '=', [])], 'readonly':[('state', '!=', 2)]}" />
+                     </group>
+                  </group>
+                  <notebook>
+                     <page string="Description">
+                        <field name="description" attrs="{'readonly':[('state', '!=', 2)]}" />
+                     </page>
+                     <page string="Photo">
+                        <field name="defect_photo_area" attrs="{'invisible':[('id', '&gt;', 0)]}" />
+                        <field name="image_800" options="{&quot;size&quot;:[800,600]}" widget="defectphoto" nolabel="1" colspan="2" />
+                     </page>
+                     <page string="Map">
+                        <div id="scheme_id_apls" style="height:300px; width:1000px;">
+                           <field name="longitude" widget="defectmap" />
+                        </div>
+                     </page>
+                     <page string="Pillars" attrs="{'invisible':[('pillar_ids', '=', [])]}">
+                        <field name="pillar_ids_2">
+                           <tree default_order="tap_id,num_by_vl">
+                              <field name="name" />
+                              <field name="tap_id" invisible="1" />
+                              <field name="num_by_vl" />
+                              <field name="pillar_material_id" />
+                              <field name="pillar_type_id" />
+                              <field name="pillar_cut_id" />
+                           </tree>
+                        </field>
+                     </page>
+                     <page string="Transformers" attrs="{'invisible':[('transformer_ids', '=', [])]}">
+                        <field name="transformer_ids_2">
+                           <tree>
+                              <field name="name" />
+                           </tree>
+                        </field>
+                     </page>
+                     <page string="Taps" attrs="{'invisible':[('tap_ids', '=', [])]}">
+                        <field name="tap_ids_2">
+                           <tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
+                              <field name="num_by_vl" invisible="1" />
+                              <field name="name" />
+                              <field name="conn_pillar_id" />
+                              <field name="pillar_cnt" />
+                              <field name="line_len_calc" />
+                              <field name="is_main_line" invisible="1" />
+                           </tree>
+                        </field>
+                     </page>
+                  </notebook>
+               </sheet>
+               <div class="oe_chatter">
+                  <field name="message_follower_ids" widget="mail_followers" group="base.group_user" />
+                  <field name="message_ids" widget="mail_thread" />
+               </div>
+            </form>
+         </field>
+      </record>
 
- 	</data>
+      <record id="papl_action_apl_defects" model="ir.actions.act_window">
+         <field name="name">Defects</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">uis.papl.mro.defect</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">tree,form,kanban</field>
+      </record>
+
+      <record model="ir.ui.view" id="wizard_create_defect">
+         <field name="name">Create new defect</field>
+         <field name="type">form</field>
+         <field name="model">uis.papl.mro.defect</field>
+         <field name="arch" type="xml">
+            <form>
+               <group col="1">
+                  <h1>Form for creation of new defect</h1>
+                  <field name="name" />
+                  <laber for="apl_id" string="APL" />
+                  <field name="apl_id" options="{'no_create_edit':True,'no_quick_create':True}" />
+                  <laber for="def_object_type" />
+                  <field name="def_object_type" />
+                  <laber for="pillar_ids" />
+                  <field name="pillar_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'pillar')]}" options="{'no_create_edit':True,'no_quick_create':True}" />
+                  <laber for="transformer_ids" />
+                  <field name="transformer_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'transformer')]}" options="{'no_create_edit':True,'no_quick_create':True}" />
+                  <laber for="tap_ids" />
+                  <field name="tap_ids" widget="many2many_tags" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('def_object_type', '!=', 'tap')]}" options="{'no_create_edit':True,'no_quick_create':True}" />
+                  <field name="category" />
+                  <field name="description" />
+               </group>
+               <button string="Cancel" special="cancel" />
+               <button name="create_defect_from_wizard" type="object" string="Create" class="oe_highlight" />
+               <footer />
+            </form>
+         </field>
+      </record>
+
+      <record id="mro_defect_kanban_view" model="ir.ui.view">
+         <field name="name">Defect Kanban View</field>
+         <field name="model">uis.papl.mro.defect</field>
+         <field name="arch" type="xml">
+            <kanban default_group_by="state_label">
+               <field name="name"/>
+               <templates>
+                  <t t-name="kanban-box" create="false">
+                     <div class="container oe_module_vignette oe_kanban_global_click o_kanban_record">
+			<div class="row" style="margin: 0">
+			   <div class="col-md-9 col-lg-9" style="padding: 0"> 
+                              <h3 style="margin: 0px"><field name="name"/></h3>
+			      <p class="oe_module_name"><field name="description"/></p>
+			      <p style="color: rgba(51, 122, 183,1); margin-bottom: 0px"><field name="apl_id"/></p>
+			      <p class="oe_module_name" style="margin-bottom: 0px"><field name="create_uid"/></p>
+			   </div>
+			   <div class="col-md-3 col-lg-3" style="padding: 0">
+			      <img t-att-src="kanban_image('uis.papl.mro.defect','image_800',record.id.value)" style="max-width:100%"/>
+			   </div>
+			</div>
+                     </div>
+                  </t>
+               </templates>
+            </kanban>
+	 </field>
+      </record>
+
+      <record id="uis_papl_mro_defect_search" model="ir.ui.view">
+         <field name="name">uis.papl.mro.defect.search</field>
+	 <field name="model">uis.papl.mro.defect</field>
+	 <field name="arch" type="xml">
+            <search string="Search Defect">
+               <group expand="0" string="Group By">
+                  <filter name="group_defect_apl"
+                     string="APL"
+                     context="{'group_by': 'apl_id'}"
+                  />
+		  <filter name="group_defect_category"
+                     string="Category"
+                     context="{'group_by': 'category_label'}"
+                  />
+		  <filter name="group_defect_state"
+                     string="State"
+                     context="{'group_by': 'state_label'}"
+                  />
+                  <filter name="group_defect_creator"
+                     string="Creator"
+                     context="{'group_by': 'create_uid'}"
+                  />
+               </group>
+            </search>
+	 </field>
+      </record>
+
+      <record id="uis_papl_menu_wiz_create_defect" model="ir.actions.act_window">
+         <field name="name">Create new defect</field>
+         <field name="res_model">uis.papl.mro.defect</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">form</field>
+         <field name="target">new</field>
+      </record>
+
+      <menuitem name="Defects" id="uis_papl_menu_defect_list" parent="uis_papl_menu_mro" action="papl_action_apl_defects" sequence="10" />
+      <menuitem name="Create Defect" id="uis_papl_menu_defect_wiz" parent="uis_papl_menu_mro" action="uis_papl_menu_wiz_create_defect" />
+   </data>
 </openerp>

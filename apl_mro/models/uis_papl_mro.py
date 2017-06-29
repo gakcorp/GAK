@@ -39,6 +39,8 @@ class apl_mro_order(models.Model):
     contractor_logo=fields.Binary('logo',related='contractor_id.logo',readonly=True)
 
     state=fields.Selection(STATE_SELECTION, 'Status', readonly=True, default=2, track_visibility=True)
+    state_label=fields.Char('State Label',store=True,compute='_get_state_label')
+    state_progress=fields.Float('State Progress',store=False, compute='_get_state_label')
 
     attachments=fields.Many2many('ir.attachment',compute='_get_attachments',store=False, relation='order_attachment_rel',column1='order_id', column2='attachment_id')
 
@@ -244,4 +246,9 @@ class apl_mro_order(models.Model):
           user_name=self.create_uid.name
           self.sudo().order_steps_json='{"steps":[{"state":2,"author":"'+self.create_uid.name+'","date":"'+self.create_date+'"}]}'
        user_name=self.env['res.users'].sudo().browse(self.env.uid)[0].name
-       self.sudo().order_steps_json=self.order_steps_json[:self.order_steps_json.find("]}")]+',{"state":'+str(self.state)+',"author":"'+user_name+'","date":"'+str(fields.datetime.now())+'"}]}'      
+       self.sudo().order_steps_json=self.order_steps_json[:self.order_steps_json.find("]}")]+',{"state":'+str(self.state)+',"author":"'+user_name+'","date":"'+str(fields.datetime.now())+'"}]}'
+    @api.depends('state')
+    def _get_state_label(self):
+       for order in self:
+          order.state_label=order.STATE_SELECTION[order.state-1][1]
+          order.state_progress=(100.0/7.0)*(order.state-1)    
