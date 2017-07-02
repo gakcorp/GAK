@@ -58,70 +58,26 @@
                      </page>
                      <page string="Pillars">
                         <group string="Pillars List">
-                           <field name="pillar_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
-                              <tree default_order="tap_id,num_by_vl">
-                                 <field name="name" />
-                                 <field name="tap_id" invisible="1" />
-                                 <field name="num_by_vl" />
-                                 <field name="pillar_material_id" />
-                                 <field name="pillar_type_id" />
-                                 <field name="pillar_cut_id" />
-                              </tree>
-                           </field>
+                           <field name="pillar_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}" widget="many2many_gis"/>
                         </group>
                         <group string="Pillars from Defects" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}">
-                           <field name="pillar_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}">
-                              <tree default_order="tap_id,num_by_vl">
-                                 <field name="name" />
-                                 <field name="tap_id" invisible="1" />
-                                 <field name="num_by_vl" />
-                                 <field name="pillar_material_id" />
-                                 <field name="pillar_type_id" />
-                                 <field name="pillar_cut_id" />
-                              </tree>
-                           </field>
+                           <field name="pillar_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}"/>
                         </group>
                      </page>
                      <page string="Transformers">
                         <group string="Transformers List">
-                           <field name="transformer_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
-                              <tree>
-                                 <field name="name" />
-                              </tree>
-                           </field>
+                           <field name="transformer_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}" widget="many2many_gis"/>
                         </group>
                         <group string="Transfromers from Defects" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}">
-                           <field name="transformer_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}">
-                              <tree>
-                                 <field name="name" />
-                              </tree>
-                           </field>
+                           <field name="transformer_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}"/>
                         </group>
                      </page>
                      <page string="Taps">
                         <group string="Taps List">
-                           <field name="tap_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
-                              <tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
-                                 <field name="num_by_vl" invisible="1" />
-                                 <field name="name" />
-                                 <field name="conn_pillar_id" />
-                                 <field name="pillar_cnt" />
-                                 <field name="line_len_calc" />
-                                 <field name="is_main_line" invisible="1" />
-                              </tree>
-                           </field>
+                           <field name="tap_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}" widget="many2many_gis"/>
                         </group>
                         <group string="Taps from Defects" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}">
-                           <field name="tap_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}">
-                              <tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
-                                 <field name="num_by_vl" invisible="1" />
-                                 <field name="name" />
-                                 <field name="conn_pillar_id" />
-                                 <field name="pillar_cnt" />
-                                 <field name="line_len_calc" />
-                                 <field name="is_main_line" invisible="1" />
-                              </tree>
-                           </field>
+                           <field name="tap_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}"/>
                         </group>
                      </page>
                      <page string="Attachments">

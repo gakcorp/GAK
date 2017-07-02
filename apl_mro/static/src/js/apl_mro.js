@@ -6,6 +6,7 @@ odoo.define('apl_mro.form_widgets', function (require)
 	var instance = openerp;
 	var FieldBinaryImage=core.form_widget_registry.get('image');
 	var AplMAP=core.form_widget_registry.get('aplmap');
+	var Many2Many=core.form_widget_registry.get('many2many');
 	
 	var kanban_widgets = require('web_kanban.widgets');
 	var Kanban_AbstractField = kanban_widgets.AbstractField;
@@ -329,9 +330,55 @@ odoo.define('apl_mro.form_widgets', function (require)
 		},
 	});
 
+        many2many_gis=Many2Many.extend(
+	{
+		init: function(field_manager, node) 
+		{	
+			this._super.apply(this, arguments);
+		},
+		reload_current_view: function()
+		{
+			var result=this._super();
+			var self = this;
+        		self.is_loaded.then(function() 
+			{
+				try
+				{
+					if (!self.get("effective_readonly"))
+					{
+						var delRecords=self.$el.find(".oe_list_record_delete");
+						for (var i=0;i<delRecords.length;i++) 
+						{
+							var elem=$(delRecords[i]);
+							if (elem.is("th"))
+							{
+								elem.attr("style", "display: inline !important");
+							}
+							if (elem.is("td"))
+							{
+								console.log(self.$el.find("span").length);
+								if (elem.find("span").length>0)
+								{
+									elem.attr("style", "display: inline !important");
+								}
+							}
+						}
+					}
+
+				}
+				catch (exception)
+				{
+					console.log(exception);	
+				}
+			});
+			return result;
+		},
+	});
+
 	
 	core.form_widget_registry.add('defectmap', defectmap);
 	core.form_widget_registry.add('defectphoto', defectphoto);
 	core.form_widget_registry.add('order_timeline', order_timeline);
 	kanban_widgets.registry.add('defectphoto_kanban',defectphoto_kanban);
+	core.form_widget_registry.add('many2many_gis', many2many_gis);
 });
