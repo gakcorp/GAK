@@ -15,10 +15,10 @@
 		</template>
 		<template id="series_chart_assets_backend" name="series_chart" inherit_id="web.assets_backend">
 			<xpath expr="." position="inside">
-				<script type="text/javascript" src="/passportvl/static/src/vendors/highcharts/js/highcharts.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/vendors/highcharts/highcharts.js"/>
 				<script type="text/javascript" src="/passportvl/static/src/js/serieschart.js"/>
 				<link rel="stylesheet" href="/passportvl/static/src/css/serieschart.css"/>
-				<link rel="stylesheet" href="/passportvl/static/src/vendors/highcharts/css/highcharts.css"/>
+				<link rel="stylesheet" href="/passportvl/static/src/vendors/highcharts/highcharts.css"/>
 			</xpath>
 		</template>
 		<record id="uis_papl_apl_resistance_form" model="ir.ui.view">
@@ -223,8 +223,8 @@
 							</group>
 							<notebook>
 								<page string="Scheme">
-									<div id="scheme_id_apls" style="height:300px; width:1000px;">
-										<field name="scheme_image" widget="aplmap"/>
+									<div id="scheme_id_apls" style="width:700px; height:600px;">
+										<field name="scheme_image" widget="aplmap" options='{"altitude_chart":"true"}'/>
 									</div>
 								</page>
 								<page string="Main details">
