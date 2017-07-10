@@ -39,6 +39,8 @@ class apl_mro_order(models.Model):
     contractor_logo=fields.Binary('logo',related='contractor_id.logo',readonly=True)
 
     state=fields.Selection(STATE_SELECTION, 'Status', readonly=True, default=2, track_visibility=True)
+    state_label=fields.Char('State Label',store=True,compute='_get_state_label')
+    state_progress=fields.Float('State Progress',store=False, compute='_get_state_label')
 
     attachments=fields.Many2many('ir.attachment',compute='_get_attachments',store=False, relation='order_attachment_rel',column1='order_id', column2='attachment_id')
 
@@ -81,6 +83,8 @@ class apl_mro_order(models.Model):
        for order in self:
           order.state=3
           order.add_step()
+          for defect in order.defect_ids:
+	     defect.suspend_security().state=4
     @api.multi
     def order_assigned(self):
        for order in self:
@@ -88,9 +92,12 @@ class apl_mro_order(models.Model):
           emps=self.env['res.users'].sudo().search([('is_manager','=',True),('company_id','=',order.contractor_id.id)])
           for emp in emps:
              order.message_subscribe([emp.partner_id.id])
-          mail_template=self.env.ref('apl_mro.new_order')
-          if mail_template:
-             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          try:
+             mail_template=self.env.ref('apl_mro.new_order')
+             if mail_template:
+                mail_template.suspend_security().send_mail(order.id,force_send=True)
+          except:
+             _logger.error('apl_mro.new_order not found')
           order.add_step()
     @api.multi
     def order_take_to_work(self):
@@ -98,51 +105,75 @@ class apl_mro_order(models.Model):
           order.message_subscribe([self.env['res.users'].sudo().browse(self.env.uid).partner_id.id])
           order.suspend_security().take_to_work_date=fields.datetime.now()
 	  order.suspend_security().state=5
-          mail_template=self.env.ref('apl_mro.order_change_status')
-          if mail_template:
-             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          try:
+             mail_template=self.env.ref('apl_mro.order_change_status')
+             if mail_template:
+                mail_template.suspend_security().send_mail(order.id,force_send=True)
+          except:
+             _logger.error('apl_mro.order_change_status')
           order.add_step()
     @api.multi
     def order_get_started(self):
        for order in self:
           order.suspend_security().start_date=fields.datetime.now()
           order.suspend_security().state=6
-          mail_template=self.env.ref('apl_mro.order_change_status')
-          if mail_template:
-             mail_template.suspend_security().send_mail(order.id,force_send=True)
+	  for defect in order.defect_ids:
+	     defect.suspend_security().state=5
+	  try:
+             mail_template=self.env.ref('apl_mro.order_change_status')
+             if mail_template:
+                mail_template.suspend_security().send_mail(order.id,force_send=True)
+          except:
+             _logger.error('apl_mro.order_change_status')
           order.add_step()
     @api.multi
     def order_completed(self):
        for order in self:
           order.suspend_security().state=7
-          mail_template=self.env.ref('apl_mro.order_change_status')
-          if mail_template:
-             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          try:
+             mail_template=self.env.ref('apl_mro.order_change_status')
+             if mail_template:
+                mail_template.suspend_security().send_mail(order.id,force_send=True)
+          except:
+             _logger.error('apl_mro.order_change_status')
           order.add_step()
     @api.multi
     def order_not_accepted(self):
        for order in self:
           order.state=6
-          mail_template=self.env.ref('apl_mro.order_change_status')
-          if mail_template:
-             mail_template.suspend_security().send_mail(order.id,force_send=True)
+          try:
+             mail_template=self.env.ref('apl_mro.order_change_status')
+             if mail_template:
+                mail_template.suspend_security().send_mail(order.id,force_send=True)
+          except:
+             _logger.error('apl_mro.order_change_status')
           order.add_step()
     @api.multi
     def order_done(self):
        for order in self:
           order.end_date=fields.datetime.now()
           order.state=8
-          mail_template=self.env.ref('apl_mro.order_change_status')
-          if mail_template:
-             mail_template.suspend_security().send_mail(order.id,force_send=True)
+	  for defect in order.defect_ids:
+	     defect.suspend_security().state=6
+          try:
+             mail_template=self.env.ref('apl_mro.order_change_status')
+             if mail_template:
+                mail_template.suspend_security().send_mail(order.id,force_send=True)
+	  except:
+             _logger.error('apl_mro.order_change_status')
           order.add_step()
     @api.multi
     def order_cancel(self):
        for order in self:
           order.state=1
-          mail_template=self.env.ref('apl_mro.order_change_status')
-          if mail_template:
-             mail_template.suspend_security().send_mail(order.id,force_send=True)
+	  for defect in order.defect_ids:
+	     defect.suspend_security().state=3
+	  try:
+             mail_template=self.env.ref('apl_mro.order_change_status')
+             if mail_template:
+                mail_template.suspend_security().send_mail(order.id,force_send=True)
+	  except:
+             _logger.error('apl_mro.order_change_status')
           order.add_step()
     @api.multi
     def order_draft(self):
@@ -207,11 +238,17 @@ class apl_mro_order(models.Model):
     def _get_defect_kanban(self):
        for order in self:
           for defect in order.defect_ids:
-             order.defect_ids_kanban=[(4,defect.id,0)]
+             if (defect.image_800!=False):
+                order.defect_ids_kanban=[(4,defect.id,0)]
     def add_step(self):
        _logger.debug(self.order_steps_json)
        if self.order_steps_json==False:
           user_name=self.create_uid.name
           self.sudo().order_steps_json='{"steps":[{"state":2,"author":"'+self.create_uid.name+'","date":"'+self.create_date+'"}]}'
        user_name=self.env['res.users'].sudo().browse(self.env.uid)[0].name
-       self.sudo().order_steps_json=self.order_steps_json[:self.order_steps_json.find("]}")]+',{"state":'+str(self.state)+',"author":"'+user_name+'","date":"'+str(fields.datetime.now())+'"}]}'      
+       self.sudo().order_steps_json=self.order_steps_json[:self.order_steps_json.find("]}")]+',{"state":'+str(self.state)+',"author":"'+user_name+'","date":"'+str(fields.datetime.now())+'"}]}'
+    @api.depends('state')
+    def _get_state_label(self):
+       for order in self:
+          order.state_label=order.STATE_SELECTION[order.state-1][1]
+          order.state_progress=(100.0/7.0)*(order.state-1)    

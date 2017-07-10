@@ -25,8 +25,6 @@ odoo.define('passportvl.form_widgets', function (require)
             var AplID=this.GetAplID();
             this.$el.find('#defmap').remove();
             var defMap=$('<div id="defmap" class="apl_map"></div>');
-            /*defMap.css('width','900px');
-			defMap.css('height','300px');*/
 			this.$el.append(defMap);
             var vectorLineSource=new ol.source.Vector({projection: 'EPSG:4326'});
             var vectorLineLayer=new ol.layer.Vector({source: vectorLineSource});
@@ -47,6 +45,7 @@ odoo.define('passportvl.form_widgets', function (require)
             vectorPillarBaseLayer.setVisible(false);
             
 			var OsmLayer=new ol.layer.Tile({source: new ol.source.OSM()});
+			OsmLayer.attributes={"type":"OsmLayer"};
 			/*var rrLayer=new ol.layer.Tile({
 				preload:1,
 				source: new ol.source.TileImage({
@@ -54,6 +53,8 @@ odoo.define('passportvl.form_widgets', function (require)
 					projection: 'EPSG:4326'
 					})
 				});*/
+				
+			
             var map = new ol.Map({
              			 			//controls:ol.control.defaults().extend([
 									//			new ol.control.FullScreen()/*,
@@ -62,19 +63,37 @@ odoo.define('passportvl.form_widgets', function (require)
 									//				label: 'Transformers'
 									//				})*/
 									//		]),
-									controls:[new ol.control.FullScreen()],
+									controls:[new ol.control.FullScreen(), new ol.control.Zoom()],
 									target: defMap.get()[0],  // The DOM element that will contains the map
                 					renderer: 'canvas', // Force the renderer to be used
                 					layers: [OsmLayer, vectorLineLayer, vectorPillarBaseLayer,vectorPillarLayer,vectorTransLayer,vectorSubLayer],
-            					});
+									interactions: ol.interaction.defaults({mouseWheelZoom:false})
+            					});	
+								
+			var thisWidth,thisHeight;
+			if (this.$el.parent().width()) thisWidth=this.$el.parent().width();
+			if (this.$el.parent().height()) thisHeight=this.$el.parent().height();
+			if (this.$el.width()) thisWidth=this.$el.width();
+			if (this.$el.height()) thisHeight=this.$el.height();
+			if ((!thisWidth)||(!thisHeight))
+			{
+				console.log("AltitudeChart no size");
+				thisWidth=700;
+				thisHeight=300;
+			}
+			else
+			{
+				if (this.options.altitude_chart=="true") thisHeight=thisHeight/2;
+			}
 			
-			this.$el.width(this.$el.parent().width());
-			this.$el.height(this.$el.parent().height());
-			map.setSize([defMap.parent().width(),defMap.parent().height()]);
+			console.log(thisHeight);
+				
+			map.setSize([thisWidth,thisHeight]);
 			
-			//map.setSize([defMap.width(),defMap.height()]);
             
             this.map=map;
+			
+			if (this.options.altitude_chart=="true") this.render_altitude_chart(map,AplID);
             
             var PillarTypeModel=new Model('uis.papl.pillar.type');
             
@@ -286,8 +305,219 @@ odoo.define('passportvl.form_widgets', function (require)
                 if (map.getView().getZoom()>14) vectorPillarBaseLayer.setVisible(true);
                 else vectorPillarBaseLayer.setVisible(false);
             });
-        }
+        },
+		
+		render_altitude_chart: function(map,apl_id)
+		{
+			this.$el.find('#altitudeChart').remove();
+			var thisWidth,thisHeight;
+			if (this.$el.parent().width()) thisWidth=this.$el.parent().width();
+			if (this.$el.parent().height()) thisHeight=this.$el.parent().height();
+			if (this.$el.width()) thisWidth=this.$el.width();
+			if (this.$el.height()) thisHeight=this.$el.height();
+			if ((!thisWidth)||(!thisHeight))
+			{
+				console.log("AltitudeChart no size");
+				thisWidth=700;
+				thisHeight=300;
+			}
+			else thisHeight=thisHeight/2;
+			var apl_name=this.field_manager.get_field_value("name");
+			var divChart=$('<div id="altitudeChart"></div>');
+			this.$el.append(divChart);
+			
+			if (map)
+			{
+				var vectorAltSource=new ol.source.Vector({projection: 'EPSG:4326'});
+				var vectorAltLayer=new ol.layer.Vector({source: vectorAltSource});
+				vectorAltLayer.attributes={"type":"altitude_layer"};
+				map.addLayer(vectorAltLayer);
+			}
+			var ActPillar, ActPillarStroke;
+			
+			var altChart=new Highcharts.Chart(
+			{
+				credits:
+				{
+					enabled: false,
+				},
+				chart: 
+				{
+					width: thisWidth,
+					height: thisHeight,
+					renderTo: divChart.get(0),
+					type: 'area', 
+        			},
+				tooltip: 
+				{
+					crosshairs: [true]
+				},
+        			title: 
+				{
+            				text: 'Высотная диаграмма линии:'+apl_name
+        			},
+        			legend: 
+				{
+            				enabled: true
+        			},
+					xAxis:
+					{
+						allowDecimals: false,
+						min: 1,
+						title:
+						{
+							text: 'Номер опоры'
+						},
+					},
+					yAxis:
+					{
+						title:
+						{
+							text: 'Высота [м]'
+						},
+					},
+				plotOptions: 
+				{
+				 	series:
+				 	{
+						fillOpacity: 0.3,
+						pointStart: 0,
+            					marker: 
+						{
+                					enabled: false,
+                					symbol: 'circle',
+                					radius: 2,
+                					states: 
+							{
+                    						hover: 
+								{
+                        						enabled: true
+                    						}
+                					}
+            					},
+				 		events: 
+				    	{
+							show: function () 
+							{
+        							var chart = this.chart,
+            							series = chart.series,
+            							i = series.length,
+            							otherSeries;
+
+        							while (i--) 
+								{
+          								otherSeries = series[i];
+          								if (otherSeries != this && otherSeries.visible) 
+									{
+            									otherSeries.hide();
+          								}
+        							}
+      							},
+							legendItemClick: function (event) 
+							{
+								if (this.visible) return false;
+							},
+				    	},
+						point:
+						{
+							events:
+							{
+								mouseOut: function()
+								{
+									if (map)
+									{
+										if (ActPillar)
+										{
+											ActPillar.getStyle().getText().setStroke(ActPillarStroke);
+											vectorAltSource.clear();
+											ActPillar=null;
+										}
+									}
+								},
+								mouseOver: function()
+								{
+									if (map)
+									{
+										var Layers=map.getLayers().getArray();
+										for (var i in Layers)
+										{
+											if (Layers[i].attributes['type']=="pillar")
+											{
+												var Features=Layers[i].getSource().getFeatures();
+												for (var a in Features)
+												{
+													if ((Features[a].attributes['type']=="pillar") && (Features[a].attributes['id']==this.id))
+													{
+														ActPillar=Features[a].clone();
+														ActPillarStroke=ActPillar.getStyle().getText().getStroke();
+														ActPillar.getStyle().getText().setStroke(new ol.style.Stroke({color : 'red',width : 0.5}));
+														vectorAltSource.addFeature(ActPillar);
+														map.setView(new ol.View({
+																	center: ActPillar.getGeometry().getCoordinates(),
+																	zoom: 15
+																	}));
+													}
+												}
+											}
+										}
+									}
+								},
+							},
+						},
+					},
+				}
+			});
+			var APLModel=new Model('uis.papl.apl');
+            		APLModel.query(['tap_ids']).filter([['id','=',apl_id]]).all().then(function(APL)
+            		{
+				var tap_ids=APL[0].tap_ids;
+				var TapModel=new Model('uis.papl.tap');
+				TapModel.query(['id','name','is_main_line','pillar_ids']).filter([['id','in',tap_ids]]).all().then(function(taps)
+                    		{
+					for (var i in taps)
+					{
+						var TapID=taps[i].id;
+						var TapName=taps[i].name;
+						var TapIsMainLine=taps[i].is_main_line;
+						var TapPillars=taps[i].pillar_ids;
+						var PillarModel=new Model('uis.papl.pillar');
+						(function(TapName,TapIsMainLine,TapPillars)
+						{
+							PillarModel.query(['id','num_by_vl','elevation']).order_by('num_by_vl').filter([['id','in',TapPillars]]).all().then(function(pillars)
+                    					{
+								var altSeries = [];
+                        					for (var i in pillars)
+                        					{
+									altSeries.push({x: pillars[i].num_by_vl, y: pillars[i].elevation, id: pillars[i].id});
+								}
+								if (TapIsMainLine)
+								{
+									altChart.addSeries(
+									{
+										name : TapName,
+    									data : altSeries,
+										visible: true,
+										colorIndex: 0,
+									});
+								}
+								else
+								{
+									altChart.addSeries(
+									{
+										name : TapName,
+    										data : altSeries,
+										visible: false,
+										colorIndex: 0,
+									})
+								}	
+							});
+						})(TapName,TapIsMainLine,TapPillars);
+					}
+				});	
+			});
+		},
     });
+
     
     core.form_widget_registry.add('aplmap', aplmap);
 });

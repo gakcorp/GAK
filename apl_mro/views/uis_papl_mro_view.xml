@@ -1,204 +1,236 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <openerp>
-	<data>
-		<record id="mro_order_form_view" model="ir.ui.view">
-            <field name="name">Orders Form</field>
-            <field name="model">uis.papl.mro.order</field>
-            <field name="arch" type="xml">
-                <form string="Order Form">
-						<header>
-							<button name="order_confirmed" type="object" string="Confirm" class="oe_highlight, oe_read_only" attrs="{'invisible':[('state', '!=', 2)]}" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to confirm this order?"/>
-							<button name="order_assigned" type="object" string="Assign" attrs="{'invisible':['|',('contractor_id','==',False),('state', '!=', 3)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to assign this order?"/>
-							<button name="order_take_to_work" type="object" string="Take To Work" attrs="{'invisible':[('state', '!=', 4)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to take to work this order?"/>
-							<button name="order_get_started" type="object" string="Get Started" attrs="{'invisible':[('state', '!=', 5)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to start working on this order?"/>
-							<button name="order_completed" type="object" string="Complete" attrs="{'invisible':[('state', '!=', 6)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to complete this order?"/>
-							<button name="order_not_accepted" type="object" string="Not Accepted" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to not accept this order?"/>
-							<button name="order_done" type="object" string="Done" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to finish this order?"/>
-							<button name="order_cancel" type="object" string="Cancel" attrs="{'invisible':['|',('state', '==', 1),('state', '==', 8)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to cancel this order?"/>
-							<button name="order_draft" type="object" string="Draft" attrs="{'invisible':[('state', '!=', 1)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to draft this order?"/>
-							<field name="state" widget="statusbar"/>
-						</header>
-						<sheet>
-							<group>
-								<group>
-									<field name="id" attrs="{'invisible':'1'}"/>
-									<field name="name" attrs="{'readonly':[('state', '!=', 2)]}"/>
-									<field name="apl_id" widget="many2one_tags" attrs="{'readonly':[('state', '!=', 2)]}"/>
-									<field name="create_date" class="oe_read_only"/>
-									<field name="create_uid" class="oe_read_only"/>
-									<field name="contractor_id" attrs="{'readonly':[('state', '!=', 2)]}"/>
-									<field name="contractor_logo" widget="image" class="oe_avatar"/>
-								</group>>
-								<group>
-									<field name="start_planned_date" attrs="{'readonly':[('state', '!=', 2)]}"/>
-									<field name="end_planned_date" attrs="{'readonly':[('state', '!=', 2)]}"/>
-									<field name="take_to_work_date" class="oe_read_only"/>
-									<field name="start_date" class="oe_read_only"/>
-									<field name="end_date" class="oe_read_only"/>
-								</group>
-							</group>
-							<notebook>
-								<page string="Description">
-									<field name="description" attrs="{'readonly':[('state', '!=', 2)]}"/>
-								</page>
-								<page string="Defects">
-									<field name="defect_ids" domain="[('apl_id','=',apl_id),('state','=','confirmed')]" attrs="{'readonly':[('state', '!=', 2)]}">
-										<tree>
-											<field name="name"/>
-											<field name="tap_ids"/>
-											<field name="pillar_ids"/>
-											<field name="transformer_ids"/>
-											<field name="state"/>
-											<field name="category"/>
-										</tree>
-									</field>>
-								</page>
-								<page string="Pillars">
-									<group string="Pillars List">
-										<field name="pillar_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
-											<tree default_order="tap_id,num_by_vl">
-												<field name="name"/>
-												<field name="tap_id" invisible="1"/>
-												<field name="num_by_vl"/>
-												<field name="pillar_material_id"/>
-												<field name="pillar_type_id"/>
-												<field name="pillar_cut_id"/>
-											</tree>
-										</field>
-									</group>
-									<group string="Pillars from Defects" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}">
-										<field name="pillar_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}">
-											<tree default_order="tap_id,num_by_vl">
-												<field name="name"/>
-												<field name="tap_id" invisible="1"/>
-												<field name="num_by_vl"/>
-												<field name="pillar_material_id"/>
-												<field name="pillar_type_id"/>
-												<field name="pillar_cut_id"/>
-											</tree>
-										</field>
-									</group>
-								</page>
-								<page string="Transformers">
-									<group string="Transformers List">
-										<field name="transformer_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
-											<tree>
-												<field name="name"/>
-											</tree>
-										</field>
-									</group>
-									<group string="Transfromers from Defects" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}">
-										<field name="transformer_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}">
-											<tree>
-												<field name="name"/>
-											</tree>
-										</field>
-									</group>
-								</page>
-								<page string="Taps">
-									<group string="Taps List">
-										<field name="tap_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}">
-											<tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
-												<field name="num_by_vl" invisible="1"/>
-												<field name="name"/>
-												<field name="conn_pillar_id"/>
-												<field name="pillar_cnt"/>
-												<field name="line_len_calc"/>
-												<field name="is_main_line" invisible="1"/>
-											</tree>
-										</field>
-									</group>
-									<group string="Taps from Defects" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}">
-										<field name="tap_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}">
-											<tree default_order="num_by_vl" fonts="bold:is_main_line==True" colors="blue:is_main_line==True">
-												<field name="num_by_vl" invisible="1"/>
-												<field name="name"/>
-												<field name="conn_pillar_id"/>
-												<field name="pillar_cnt"/>
-												<field name="line_len_calc"/>
-												<field name="is_main_line" invisible="1"/>
-											</tree>
-										</field>
-									</group>
-								</page>
-								<page string="Attachments">
-									<field name="attachments">
-										<tree>
-											<field name="name"/>
-											<field name="mimetype"/>
-											<field name="datas"/>
-											<field name="create_uid"/>
-											<field name="create_date"/>
-										</tree>
-									</field>
-								</page>
-								<page string="Defect Photos">
-									<field name="defect_ids_kanban" widget="many2many_kanban">
-										<kanban>
-											<templates>
-												<t t-name="kanban-box">
-													<div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
-														<a type="object" name="view_defect_action">
-															<img style="max-width:100%;" t-att-src="kanban_image('uis.papl.mro.defect','image_800',record.id.value)" class="oe_kanban_image"/>
-														</a>
-													</div>
-												</t>
-											</templates>
-										</kanban>
-									</field>
-								</page>
-								<page string="Timeline">
-									<field name="order_steps_json" widget="order_timeline"/>
-								</page>
-							</notebook>
-						</sheet>
-						<div class="oe_chatter">
-							<field name="message_follower_ids" widget="mail_followers" group="base.group_user"/>
-							<field name="message_ids" widget="mail_thread"/>
-						</div>
-                </form>
-            </field>
-        </record>
-		
-		<record id="mro_order_tree_view" model="ir.ui.view">
-            <field name="name">Orders Tree</field>
-            <field name="model">uis.papl.mro.order</field>
-            <field name="arch" type="xml">
-                <tree>
-                    <field name="name"/>
-                    <field name="apl_id"/>
-                </tree>
-            </field>
-        </record>
-		
-		<record id="papl_action_apl_orders" model="ir.actions.act_window">
-            <field name="name">Orders</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">uis.papl.mro.order</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree, form</field>
-        </record>
-		
-		<record id="order_tree" model="ir.actions.act_window.view">
-			<field eval="1" name="sequence"/>
-			<field name="view_mode">tree</field>
-			<field name="view_id" ref="mro_order_tree_view"/>
-			<field name="act_window_id" ref="papl_action_apl_orders"/>
-		</record>
-		
-		<record id="order_form" model="ir.actions.act_window.view">
-			<field eval="2" name="sequence"/>
-			<field name="view_mode">form</field>
-			<field name="view_id" ref="mro_order_form_view"/>
-			<field name="act_window_id" ref="papl_action_apl_orders"/>
-		</record>
-		
-		<menuitem name="MRO" id="uis_papl_menu_mro" parent="passportvl.uis_papl_menu_root"/>
+   <data>
 
-        <menuitem name="Maintance Orders"
-			id="uis_papl_menu_mro_list" parent="uis_papl_menu_mro"
-			action="papl_action_apl_orders"
-			sequence="10"
-			/>
- 	</data>
+      <record id="mro_order_form_view" model="ir.ui.view">
+         <field name="name">Orders Form</field>
+         <field name="model">uis.papl.mro.order</field>
+         <field name="arch" type="xml">
+            <form string="Order Form">
+               <header>
+                  <button name="order_confirmed" type="object" string="Confirm" class="oe_highlight, oe_read_only" attrs="{'invisible':[('state', '!=', 2)]}" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to confirm this order?" />
+                  <button name="order_assigned" type="object" string="Assign" attrs="{'invisible':['|',('contractor_id','==',False),('state', '!=', 3)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to assign this order?" />
+                  <button name="order_take_to_work" type="object" string="Take To Work" attrs="{'invisible':[('state', '!=', 4)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to take to work this order?" />
+                  <button name="order_get_started" type="object" string="Get Started" attrs="{'invisible':[('state', '!=', 5)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to start working on this order?" />
+                  <button name="order_completed" type="object" string="Complete" attrs="{'invisible':[('state', '!=', 6)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to complete this order?" />
+                  <button name="order_not_accepted" type="object" string="Not Accepted" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to not accept this order?" />
+                  <button name="order_done" type="object" string="Done" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to finish this order?" />
+                  <button name="order_cancel" type="object" string="Cancel" attrs="{'invisible':['|',('state', '==', 1),('state', '==', 8)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to cancel this order?" />
+                  <button name="order_draft" type="object" string="Draft" attrs="{'invisible':[('state', '!=', 1)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to draft this order?" />
+                  <field name="state" widget="statusbar" />
+               </header>
+               <sheet>
+                  <group>
+                     <group>
+                        <field name="id" attrs="{'invisible':'1'}" />
+                        <field name="name" attrs="{'readonly':[('state', '!=', 2)]}" />
+                        <field name="apl_id" widget="many2one_tags" attrs="{'readonly':[('state', '!=', 2)]}" />
+                        <field name="create_date" class="oe_read_only" />
+                        <field name="create_uid" class="oe_read_only" />
+                        <field name="contractor_id" attrs="{'readonly':[('state', '!=', 2),('state', '!=', 3)]}" />
+                        <field name="contractor_logo" widget="image" class="oe_avatar" />
+                     </group>
+                     &gt;
+                     <group>
+                        <field name="start_planned_date" attrs="{'readonly':[('state', '!=', 2)]}" />
+                        <field name="end_planned_date" attrs="{'readonly':[('state', '!=', 2)]}" />
+                        <field name="take_to_work_date" class="oe_read_only" />
+                        <field name="start_date" class="oe_read_only" />
+                        <field name="end_date" class="oe_read_only" />
+                     </group>
+                  </group>
+                  <notebook>
+                     <page string="Description">
+                        <field name="description" attrs="{'readonly':[('state', '!=', 2)]}" />
+                     </page>
+                     <page string="Defects">
+                        <field name="defect_ids" domain="[('apl_id','=',apl_id),('state','=',3)]" attrs="{'readonly':[('state', '!=', 2)]}">
+                           <tree>
+                              <field name="name" />
+                              <field name="tap_ids" />
+                              <field name="pillar_ids" />
+                              <field name="transformer_ids" />
+                              <field name="state" />
+                              <field name="category" />
+                           </tree>
+                        </field>
+                        &gt;
+                     </page>
+                     <page string="Pillars">
+                        <group string="Pillars List">
+                           <field name="pillar_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}" widget="many2many_gis"/>
+                        </group>
+                        <group string="Pillars from Defects" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}">
+                           <field name="pillar_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('pillar_ids_from_defect', '=', [])]}"/>
+                        </group>
+                     </page>
+                     <page string="Transformers">
+                        <group string="Transformers List">
+                           <field name="transformer_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}" widget="many2many_gis"/>
+                        </group>
+                        <group string="Transfromers from Defects" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}">
+                           <field name="transformer_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('transformer_ids_from_defect', '=', [])]}"/>
+                        </group>
+                     </page>
+                     <page string="Taps">
+                        <group string="Taps List">
+                           <field name="tap_ids" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'readonly':[('state', '!=', 2)]}" widget="many2many_gis"/>
+                        </group>
+                        <group string="Taps from Defects" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}">
+                           <field name="tap_ids_from_defect" nolabel="1" domain="[('apl_id','=',apl_id)]" attrs="{'invisible':[('tap_ids_from_defect', '=', [])]}"/>
+                        </group>
+                     </page>
+                     <page string="Attachments">
+                        <field name="attachments">
+                           <tree>
+                              <field name="name" />
+                              <field name="mimetype" />
+                              <field name="datas" />
+                              <field name="create_uid" />
+                              <field name="create_date" />
+                           </tree>
+                        </field>
+                     </page>
+                     <page string="Defect Photos">
+                        <field name="defect_ids_kanban" widget="many2many_kanban">
+                           <kanban>
+                              <templates>
+                                 <t t-name="kanban-box">
+                                    <div class="oe_kanban_vignette oe_semantic_html_override" style="padding:0px;">
+                                       <a type="object" name="view_defect_action">
+                                          <img style="max-width:100%;" t-att-src="kanban_image('uis.papl.mro.defect','image_800',record.id.value)" class="oe_kanban_image" />
+                                       </a>
+                                       <div class="oe_kanban_details" style="position: absolute;top: 10px;left: 0px;padding-left: 10px;background: rgba(182, 187, 255, 0.44);">
+                                          <h4>
+                                             <a type="object" name="view_defect_action" style="color: white">
+                                                <field name="name" />
+                                             </a>
+                                          </h4>
+                                       </div>
+                                       <div class="oe_kanban_details" style="position: absolute; top: 0;left: 0; width: 100%; height: 100%">
+                                          <a type="object" name="view_defect_action">
+                                             <field name="defect_photo_area" widget="defectphoto_kanban" />
+                                          </a>
+                                       </div>
+                                    </div>
+                                 </t>
+                              </templates>
+                           </kanban>
+                        </field>
+                     </page>
+                     <page string="Timeline">
+                        <field name="order_steps_json" widget="order_timeline" />
+                     </page>
+                  </notebook>
+               </sheet>
+               <div class="oe_chatter">
+                  <field name="message_follower_ids" widget="mail_followers" group="base.group_user" />
+                  <field name="message_ids" widget="mail_thread" />
+               </div>
+            </form>
+         </field>
+      </record>
+
+      <record id="mro_order_tree_view" model="ir.ui.view">
+         <field name="name">Orders Tree</field>
+         <field name="model">uis.papl.mro.order</field>
+         <field name="arch" type="xml">
+            <tree>
+               <field name="name"/>
+               <field name="apl_id"/>
+	       <field name="contractor_id"/>
+               <field name="state_progress" widget="progressbar"/>
+	       <field name="start_planned_date"/>
+	       <field name="end_planned_date"/>
+            </tree>
+         </field>
+      </record>
+
+      <record id="mro_order_kanban_view" model="ir.ui.view">
+         <field name="name">Order Kanban View</field>
+         <field name="model">uis.papl.mro.order</field>
+         <field name="arch" type="xml">
+            <kanban default_group_by="state_label">
+               <field name="name"/>
+               <templates>
+                  <t t-name="kanban-box" create="false">
+                     <div class="container oe_module_vignette oe_kanban_global_click o_kanban_record">
+			<div class="row" style="margin: 0">
+			   <div class="col-md-3 col-lg-3" style="padding: 0">
+			      <img t-att-src="kanban_image('uis.papl.mro.order','contractor_logo',record.id.value)" style="max-width:100%"/>
+			   </div>
+			   <div class="col-md-9 col-lg-9" style="padding: 0"> 
+                              <h3 style="margin: 0px"><field name="name"/></h3>
+			      <p class="oe_module_name"><field name="description"/></p>
+			   </div>
+			</div>
+			<div class="row" style="margin: 0">
+			   <div class="col-md-12 col-lg-12" style="padding: 0">
+			      <p style="color: rgba(51, 122, 183,1); margin-bottom: 0px"><field name="apl_id"/></p>
+			      <p class="oe_module_name" style="margin-bottom: 0px"><field name="create_uid"/></p>
+                           </div>
+			</div>
+                     </div>
+                  </t>
+               </templates>
+            </kanban>
+	 </field>
+      </record>
+      
+      <record id="uis_papl_mro_order_search" model="ir.ui.view">
+         <field name="name">uis.papl.mro.order.search</field>
+	 <field name="model">uis.papl.mro.order</field>
+	 <field name="arch" type="xml">
+            <search string="Search Order">
+               <group expand="0" string="Group By">
+                  <filter name="group_order_apl"
+                     string="APL"
+                     context="{'group_by': 'apl_id'}"
+                  />
+		  <filter name="group_order_state"
+                     string="State"
+                     context="{'group_by': 'state_label'}"
+                  />
+                  <filter name="group_order_contractor"
+                     string="Contractor"
+                     context="{'group_by': 'contractor_id'}"
+                  />
+               </group>
+            </search>
+	 </field>
+      </record>
+
+      <record id="papl_action_apl_orders" model="ir.actions.act_window">
+         <field name="name">Orders</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">uis.papl.mro.order</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">tree, form, kanban</field>
+      </record>
+
+      <record id="order_tree" model="ir.actions.act_window.view">
+         <field eval="1" name="sequence" />
+         <field name="view_mode">tree</field>
+         <field name="view_id" ref="mro_order_tree_view" />
+         <field name="act_window_id" ref="papl_action_apl_orders" />
+      </record>
+
+      <record id="order_form" model="ir.actions.act_window.view">
+         <field eval="2" name="sequence" />
+         <field name="view_mode">form</field>
+         <field name="view_id" ref="mro_order_form_view" />
+         <field name="act_window_id" ref="papl_action_apl_orders" />
+      </record>
+
+      <record id="order_kanban" model="ir.actions.act_window.view">
+         <field eval="3" name="sequence" />
+         <field name="view_mode">kanban</field>
+         <field name="view_id" ref="mro_order_kanban_view" />
+         <field name="act_window_id" ref="papl_action_apl_orders" />
+      </record>
+
+      <menuitem name="MRO" id="uis_papl_menu_mro" parent="passportvl.uis_papl_menu_root" />
+      <menuitem name="Maintance Orders" id="uis_papl_menu_mro_list" parent="uis_papl_menu_mro" action="papl_action_apl_orders" sequence="10" />
+
+   </data>
 </openerp>
