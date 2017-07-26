@@ -44,7 +44,7 @@ class apl_mro_defect(models.Model):
 			defect.def_object_type='transformer'
 			for transID in ObjIDS:
 				defect.transformer_ids=[(4,int(transID),0)]
-		defect.category=DCat
+		defect.category=int(DCat)
 		defect.photo_id=int(PhotoID)
 		defect.longitude=Longitude
 		defect.latitude=Latitude

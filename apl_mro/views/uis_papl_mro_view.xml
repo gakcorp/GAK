@@ -8,16 +8,16 @@
          <field name="arch" type="xml">
             <form string="Order Form">
                <header>
-                  <button name="order_confirmed" type="object" string="Confirm" class="oe_highlight, oe_read_only" attrs="{'invisible':[('state', '!=', 2)]}" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to confirm this order?" />
-                  <button name="order_assigned" type="object" string="Assign" attrs="{'invisible':['|',('contractor_id','==',False),('state', '!=', 3)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to assign this order?" />
-                  <button name="order_take_to_work" type="object" string="Take To Work" attrs="{'invisible':[('state', '!=', 4)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to take to work this order?" />
-                  <button name="order_get_started" type="object" string="Get Started" attrs="{'invisible':[('state', '!=', 5)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to start working on this order?" />
-                  <button name="order_completed" type="object" string="Complete" attrs="{'invisible':[('state', '!=', 6)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor" confirm="Are you sure you want to complete this order?" />
-                  <button name="order_not_accepted" type="object" string="Not Accepted" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to not accept this order?" />
-                  <button name="order_done" type="object" string="Done" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to finish this order?" />
-                  <button name="order_cancel" type="object" string="Cancel" attrs="{'invisible':['|',('state', '==', 1),('state', '==', 8)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to cancel this order?" />
-                  <button name="order_draft" type="object" string="Draft" attrs="{'invisible':[('state', '!=', 1)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer" confirm="Are you sure you want to draft this order?" />
-                  <field name="state" widget="statusbar" />
+                  <button name="order_confirmed" type="object" string="Confirm" class="oe_highlight, oe_read_only" attrs="{'invisible':[('state', '!=', 2)]}" groups="passportvl.workshop_main_power_engineer,base.group_system" confirm="Are you sure you want to confirm this order?" />
+                  <button name="order_assigned" type="object" string="Assign" attrs="{'invisible':['|',('contractor_id','==',False),('state', '!=', 3)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer,base.group_system" confirm="Are you sure you want to assign this order?" />
+                  <button name="order_take_to_work" type="object" string="Take To Work" attrs="{'invisible':[('state', '!=', 4)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor,base.group_system" confirm="Are you sure you want to take to work this order?" />
+                  <button name="order_get_started" type="object" string="Get Started" attrs="{'invisible':[('state', '!=', 5)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor,base.group_system" confirm="Are you sure you want to start working on this order?" />
+                  <button name="order_completed" type="object" string="Complete" attrs="{'invisible':[('state', '!=', 6)]}" class="oe_highlight, oe_read_only" groups="passportvl.contractor,base.group_system" confirm="Are you sure you want to complete this order?" />
+                  <button name="order_not_accepted" type="object" string="Not Accepted" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer,base.group_system" confirm="Are you sure you want to not accept this order?" />
+                  <button name="order_done" type="object" string="Done" attrs="{'invisible':[('state', '!=', 7)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer,base.group_system" confirm="Are you sure you want to finish this order?" />
+                  <button name="order_cancel" type="object" string="Cancel" attrs="{'invisible':['|',('state', '==', 1),('state', '==', 8)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer,base.group_system" confirm="Are you sure you want to cancel this order?" />
+                  <button name="order_draft" type="object" string="Draft" attrs="{'invisible':[('state', '!=', 1)]}" class="oe_highlight, oe_read_only" groups="passportvl.workshop_main_power_engineer,base.group_system" confirm="Are you sure you want to draft this order?" />
+                  <field name="state" widget="statusbar" clickable="1"/>
                </header>
                <sheet>
                   <group>
