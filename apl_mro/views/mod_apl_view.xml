@@ -28,7 +28,7 @@
 				<xpath expr="//div[@name='infobar']" position="inside">
 					<group>
 						<div id="defect_heat_map" style="height:200px; width:400px;">
-							<field name="defect_heatmap_data_json" widget="heatmap" options='{"radius":200}'/>
+							<field name="defect_heatmap_data_json" widget="defectheatmap" options='{"radius":200}'/>
 						</div>
 					</group>
 				</xpath>
