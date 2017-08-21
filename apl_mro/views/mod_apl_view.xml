@@ -20,12 +20,17 @@
 				<xpath expr="/form/sheet/div[@id='im_main']/notebook" position="inside">
 					<page string="Defects">
 						<field name="all_defect_ids" context="{'form_view_ref': 'apl_mro.mro_defect_form_view',}"/>
+						<group>
+							<div id="defect_heat_map" style="height:400px; width:1000px;">
+								<field name="defect_heatmap_data_json" widget="defectheatmap" options='{"radius":200}'/>
+							</div>
+						</group>
 						<!-- try 'target': 'current'!-->
 					</page>
 				</xpath>
 				<!--<xpath expr="/form/sheet/group/group" position="before">!-->
 				
-				<xpath expr="//div[@name='infobar']" position="inside">
+				<!--<xpath expr="//div[@name='infobar']" position="inside">
 					<group>
 						<div id="defect_heat_map" style="height:200px; width:400px;">
 							<field name="defect_heatmap_data_json" widget="defectheatmap" options='{"radius":200}'/>
@@ -47,7 +52,7 @@
 							<field name="mro_timeline_data_json" widget="imvis_timeline" options='{}'/>
 						</div>
 					</group>
-				</xpath>
+				</xpath>-->
             </field>
         </record>
  	</data>
