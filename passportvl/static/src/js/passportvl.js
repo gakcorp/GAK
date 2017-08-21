@@ -517,7 +517,60 @@ odoo.define('passportvl.form_widgets', function (require)
 			});
 		},
     });
+	
+	weather_table=instance.web.form.AbstractField.extend(
+	{
+		Apl_ID: null,
+		render_value: function()
+		{
+			try
+			{
+				if (typeof(this.get("value"))=="number") var Apl_ID=this.get("value");
+				else Apl_ID=this.get("value")[0];
+				if (this.Apl_ID==Apl_ID) return;
+				this.Apl_ID=Apl_ID;
+				this._super.apply(this, arguments);
+				this.$el.find('#weather_div').remove();
+				var WeatherDiv=$('<div id="weather_div" class="weather_table"></div>');
+				this.$el.append(WeatherDiv);
+				var WeatherTable=$('<table id="weather_id"><tr id="weather_title"><th></th></tr><tr id="weather_image"><td></td></tr><tr id="weather_description"><td></td></tr><tr id="weather_temp_day"><td>Температура днем [°C]</td></tr><tr id="weather_temp_night"><td>Температура ночью [°C]</td></tr><tr id="weather_wind_speed"><td>Скорость ветра [м/c]</td></tr></table>');
+				var APLModel=new Model("uis.papl.apl");
+				APLModel.query(['pillar_id','name']).filter([['id','=',Apl_ID]]).all().then(function(APL)
+				{
+					var PillarModel=new Model("uis.papl.pillar");
+					WeatherDiv.append('<h3>Прогноз погоды на 7 дней в районе линии '+APL[0].name+'</h3>');
+					WeatherDiv.append(WeatherTable);
+					PillarModel.query(['longitude','latitude']).filter([['id','=',APL[0].pillar_id[0]]]).all().then(function(Pillar)
+					{
+						$.ajax(
+						{
+							url : 'http://api.openweathermap.org/data/2.5/forecast/daily?lat='+Pillar[0].latitude+'&lon='+Pillar[0].longitude+'&units=metric&APPID=00e684844073fbbd8dabdef237e25ec6&lang=ru',
+							method : 'GET',
+							success : function (data) 
+							{
+								for (var i in data.list)
+								{
+									var dayDate=new Date(parseInt(data.list[i].dt)*1000);
+									$('#weather_title').append('<th>'+dayDate.toISOString().split('T')[0]+'</th>');
+									$('#weather_image').append('<td>'+data.list[i].weather[0].description+'</td>');
+									$('#weather_description').append('<td><img src="http://openweathermap.org/img/w/'+data.list[i].weather[0].icon+'.png" /></td>');
+									$('#weather_temp_day').append('<td>'+data.list[i].temp.day+'</td>');
+									$('#weather_temp_night').append('<td>'+data.list[i].temp.night+'</td>');
+									$('#weather_wind_speed').append('<td>'+data.list[i].speed+'</td>');
+								}
+							}
+						});
+					});
+				});
+			}
+			catch (exception)
+			{
+				console.log(exception);	
+			}
+		},
+	});
 
     
     core.form_widget_registry.add('aplmap', aplmap);
+	core.form_widget_registry.add('weather_table', weather_table);
 });

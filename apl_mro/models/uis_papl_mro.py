@@ -41,10 +41,11 @@ class apl_mro_order(models.Model):
     state=fields.Selection(STATE_SELECTION, 'Status', readonly=True, default=2, track_visibility=True)
     state_label=fields.Char('State Label',store=True,compute='_get_state_label')
     state_progress=fields.Float('State Progress',store=False, compute='_get_state_label')
-
     attachments=fields.Many2many('ir.attachment',compute='_get_attachments',store=False, relation='order_attachment_rel',column1='order_id', column2='attachment_id')
 
     order_steps_json=fields.Text(string='Order Steps JSON')
+    weather_apl_id=fields.Many2one(related='apl_id')
+	
     @api.onchange('apl_id')
     def change_order_object(self):
         self.transformer_ids=[]
