@@ -121,6 +121,9 @@
                      <page string="Timeline">
                         <field name="order_steps_json" widget="order_timeline" />
                      </page>
+					 <page string="Weather Forecast">
+						<field name="weather_apl_id" widget="weather_table"/>
+					 </page>
                   </notebook>
                </sheet>
                <div class="oe_chatter">

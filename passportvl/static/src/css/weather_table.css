@@ -1,0 +1,25 @@
+
+.weather_table table { 
+    width: 90; 
+    border-collapse: collapse; 
+    margin:50px auto;
+	}
+    
+/* Zebra striping */
+.weather_table tr:nth-of-type(odd) { 
+    background: #eee;
+	padding: 10px; 
+    border: 1px solid #ccc; 
+    text-align: center; 
+    font-size: 14px;
+    }
+.weather_table th { 
+    background: #3498db; 
+    color: white; 
+    font-weight: bold;
+	padding: 10px; 
+    border: 1px solid #ccc; 
+    text-align: center; 
+    font-size: 14px;
+    }
+}

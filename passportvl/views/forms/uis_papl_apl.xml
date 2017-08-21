@@ -5,6 +5,7 @@
 			<xpath expr="." position="inside">
 				<script type="text/javascript" src="/passportvl/static/src/js/passportvl.js"/>
 				<link rel="stylesheet" href="/passportvl/static/src/css/passportvl.css"/>
+				<link rel="stylesheet" href="/passportvl/static/src/css/weather_table.css"/>
 			</xpath>
 		</template>
 		<template id="heatmap_assets_backend" name="heatmap" inherit_id="web.assets_backend">
@@ -371,6 +372,9 @@
 								</page>
 								<page string="Insulators">
 								  
+								</page>
+								<page string="Weather Forecast">
+									<field name="id" widget="weather_table"/>
 								</page>
 							</notebook>
 						</div>
