@@ -544,7 +544,7 @@ odoo.define('passportvl.form_widgets', function (require)
 					{
 						$.ajax(
 						{
-							url : 'http://api.openweathermap.org/data/2.5/forecast/daily?lat='+Pillar[0].latitude+'&lon='+Pillar[0].longitude+'&units=metric&APPID=00e684844073fbbd8dabdef237e25ec6&lang=ru',
+							url : 'https://api.openweathermap.org/data/2.5/forecast/daily?lat='+Pillar[0].latitude+'&lon='+Pillar[0].longitude+'&units=metric&APPID=00e684844073fbbd8dabdef237e25ec6&lang=ru',
 							method : 'GET',
 							success : function (data) 
 							{
@@ -553,7 +553,7 @@ odoo.define('passportvl.form_widgets', function (require)
 									var dayDate=new Date(parseInt(data.list[i].dt)*1000);
 									$('#weather_title').append('<th>'+dayDate.toISOString().split('T')[0]+'</th>');
 									$('#weather_image').append('<td>'+data.list[i].weather[0].description+'</td>');
-									$('#weather_description').append('<td><img src="http://openweathermap.org/img/w/'+data.list[i].weather[0].icon+'.png" /></td>');
+									$('#weather_description').append('<td><img src="https://openweathermap.org/img/w/'+data.list[i].weather[0].icon+'.png" /></td>');
 									$('#weather_temp_day').append('<td>'+data.list[i].temp.day+'</td>');
 									$('#weather_temp_night').append('<td>'+data.list[i].temp.night+'</td>');
 									$('#weather_wind_speed').append('<td>'+data.list[i].speed+'</td>');

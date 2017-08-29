@@ -405,6 +405,27 @@ class uis_papl_apl(models.Model):
 	image_file=fields.Char(string="Scheme File Name", compute='_get_scheme_image_file_name')
 	scheme_image=fields.Binary(string="Scheme", compute='_get_scheme_image_3')
 	
+	
+	def read_group(self,cr,uid,domain,fields,groupby,offset=0,limit=None,context=None, orderby=False,lazy=True):
+		res=super(uis_papl_apl,self).read_group(cr,uid,domain,fields,groupby,offset,limit=limit,context=context,orderby=orderby,lazy=lazy)
+		if 'pillar_cnt' in fields:
+			for line in res:
+				if '__domain' in line:
+					lines=self.search(cr,uid,line['__domain'],context=context)
+					cnt_value=0
+					for apl in self.browse(cr,uid,lines,context=context):
+						cnt_value+=apl.pillar_cnt
+					line['pillar_cnt']=cnt_value
+		if 'line_len_calc' in fields:
+			for line in res:
+				if '__domain' in line:
+					lines=self.search(cr,uid,line['__domain'],context=context)
+					len_value=0.0
+					for apl in self.browse(cr,uid,lines,context=context):
+						len_value+=apl.line_len_calc
+					line['line_len_calc']=len_value
+		return res
+	
 	@api.depends('pillar_id')
 	def _get_apl_pillar_cnt(self):
 		for apl in self:
