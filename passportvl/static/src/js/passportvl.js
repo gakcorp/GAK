@@ -542,6 +542,7 @@ odoo.define('passportvl.form_widgets', function (require)
 					WeatherDiv.append(WeatherTable);
 					PillarModel.query(['longitude','latitude']).filter([['id','=',APL[0].pillar_id[0]]]).all().then(function(Pillar)
 					{
+						if (Pillar.length<1) return;
 						$.ajax(
 						{
 							url : 'https://api.openweathermap.org/data/2.5/forecast/daily?lat='+Pillar[0].latitude+'&lon='+Pillar[0].longitude+'&units=metric&APPID=00e684844073fbbd8dabdef237e25ec6&lang=ru',
@@ -568,8 +569,49 @@ odoo.define('passportvl.form_widgets', function (require)
 				console.log(exception);	
 			}
 		},
+	}); 
+	
+	var form_widget = require('web.form_widgets');
+	
+	form_widget.WidgetButton.include({
+		on_click: function() 
+		{
+			if(this.node.attrs.id == "load_pillars")
+			{
+				$("#Load_Pillars_File").unbind( "change" );
+				$("#Load_Pillars_File").change(function() 
+				{
+					var textFile=this.files[0];
+					if (textFile.type == 'text/plain')
+					{
+						var reader = new FileReader();
+						reader.onerror = function()
+						{
+							alert('Ошибка чтения файла!');
+						};
+						reader.onloadend = function(event)
+						{
+							var TJSON = event.target.result;
+							var model = new instance.web.Model("uis.papl.apl");
+							model.call("load_pillars",[TJSON]).then(function(result)
+							{
+								if (result==1) alert("Опоры успешно загружены"); 
+								else alert("Ошибка загрузки опор"); 
+							});
+						};
+						reader.readAsText(textFile);
+					}
+					else
+					{
+						alert('Выбран не текстовый файл');
+					}
+				});
+				$("#Load_Pillars_File").click();
+				return;
+			}
+			this._super();
+		},
 	});
-
     
     core.form_widget_registry.add('aplmap', aplmap);
 	core.form_widget_registry.add('weather_table', weather_table);

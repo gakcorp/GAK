@@ -10,6 +10,8 @@ from scheme_apl_v3 import drawscheme
 import logging
 import datetime
 import openerp
+import json
+import traceback
 from openerp.exceptions import Warning
 
 import numpy as np
@@ -376,6 +378,7 @@ class uis_papl_apl(models.Model):
 	line_len=fields.Float(digits=(3,2))
 	line_len_calc=fields.Float(digits=(6,2), compute='_apl_get_len')
 	line_len_calc_int=fields.Integer(string="Length of the APL (meters)", compute='_get_apl_int_len')
+	line_len_profile_calc=fields.Float(digits=(6,2), compute='_apl_get_len', string='Length of the APL (meters, given the profile)')
 	prol_max_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_med_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_min_len=fields.Float(digits=(2,2), compute='_apl_get_len')
@@ -424,6 +427,14 @@ class uis_papl_apl(models.Model):
 					for apl in self.browse(cr,uid,lines,context=context):
 						len_value+=apl.line_len_calc
 					line['line_len_calc']=len_value
+		if 'line_len_profile_calc' in fields:
+			for line in res:
+				if '__domain' in line:
+					lines=self.search(cr,uid,line['__domain'],context=context)
+					len_value=0.0
+					for apl in self.browse(cr,uid,lines,context=context):
+						len_value+=apl.line_len_profile_calc
+					line['line_len_profile_calc']=len_value
 		return res
 	
 	@api.depends('pillar_id')
@@ -597,6 +608,9 @@ class uis_papl_apl(models.Model):
 			pils=apl.pillar_id
 			vcnt=len(pils)
 			lpps=pils.mapped('len_prev_pillar')
+			lppps=pils.mapped('len_profile_prev_pillar')
+			if lppps:
+				apl.line_len_profile_calc=sum(lppps)
 			if lpps:
 				vmax,vmin,vsum=max(lpps),min(lpps),sum(lpps)
 				vmed=vsum/vcnt
@@ -604,4 +618,40 @@ class uis_papl_apl(models.Model):
 				apl.prol_max_len=vmax
 				apl.prol_min_len=vmin
 				apl.prol_med_len=vmed
-	
+				
+	@api.model			
+	def load_pillars(self,TJSON):
+		PillarDict={}
+		try:
+			data = json.loads(TJSON)
+			for TAPJSON in data["tapsArray"]:
+				TAP=self.env["uis.papl.tap"].sudo().browse([int(TAPJSON["id"])])
+				APL=TAP.apl_id
+				num_by_vl=0
+				for PillarJSON in TAPJSON["pillarsArray"]:
+					num_by_vl+=1
+					np=self.env["uis.papl.pillar"].sudo().create({'num_by_vl':num_by_vl})
+					np.tap_id=TAP
+					np.apl_id=APL
+					np.longitude=PillarJSON["pillarLongitude"]
+					np.latitude=PillarJSON["pillarLatitude"]
+					if int(PillarJSON["pillarMaterial"])!=-1:
+						np.pillar_material_id=self.env["uis.papl.pillar.material"].sudo().browse([int(PillarJSON["pillarMaterial"])])
+					if int(PillarJSON["pillarType"])!=-1:
+						np.pillar_type_id=self.env["uis.papl.pillar.type"].sudo().browse([int(PillarJSON["pillarType"])])
+					if int(PillarJSON["pillarCut"])!=-1:
+						np.pillar_cut_id=self.env["uis.papl.pillar.cut"].sudo().browse([int(PillarJSON["pillarCut"])])
+					PillarDict[PillarJSON["id"]]=np
+			for TAPJSON in data["tapsArray"]:
+				for PillarJSON in TAPJSON["pillarsArray"]:
+					if (PillarJSON.get("prevPillar")):
+						np=PillarDict[PillarJSON["id"]]
+						prev_pillar=PillarDict[PillarJSON["prevPillar"]]
+						_logger.debug("Test %r"%(prev_pillar))
+						np.parent_id=prev_pillar
+		except:
+			_logger.debug("Error %r"%( traceback.format_exc()))
+			for key in PillarDict:
+				PillarDict[key].sudo().unlink()
+			return 0
+		return 1

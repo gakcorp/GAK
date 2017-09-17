@@ -173,6 +173,7 @@
 				<field name="startexp_date" string="Start Explatation Date"/>
 				<!--<field name="line_len" string="Line Lengt (km)"/>!-->
 				<field name="line_len_calc" string="Calculate line len(m)" sum="Total length"/>
+				<field name="line_len_profile_calc" sum="Total length (given profile)"/>
 				<field name="pillar_cnt" string="Pillars" sum="Total pillars"/>
 						  <!--<field name="cnt_pillar_wo_tap"/>!-->
 				<field name="sup_substation_id" string="Supply Substation" widget='many2one'/>
@@ -218,6 +219,10 @@
 			<field name="model">uis.papl.apl</field>
 			<field name="arch" type="xml">
 				<form string="APL form">
+					<head>
+						<button string="Load Pillars" id="load_pillars"/>
+						<input type="file" id="Load_Pillars_File" style="display: none;"/>
+					</head>
 					<sheet string="Details">
 						<div id="infobar" class="im_pvl_infobar" name="infobar"></div>
 						<div id="im_main">
@@ -264,6 +269,7 @@
 											<field name="cable_ids" widget="many2many_tags"/>
 											<field name="line_len"/>
 											<field name="line_len_calc"/>
+											<field name="line_len_profile_calc"/>
 											<field name="prol_max_len"/>
 											<field name="prol_med_len"/>
 											<field name="prol_min_len"/>
