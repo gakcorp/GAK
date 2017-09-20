@@ -84,6 +84,7 @@ class uis_papl_tap_elevation(models.Model):
 class uis_papl_tap(models.Model):
 	_name = 'uis.papl.tap'
 	name=fields.Char(string="Name", compute='_get_tap_full_name')
+	spec_name=fields.Char(string="Special Name")
 	full_name=fields.Char()
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
 	cnt_np=fields.Integer(compute='_get_cnt_np', string='Pillars wo prev')

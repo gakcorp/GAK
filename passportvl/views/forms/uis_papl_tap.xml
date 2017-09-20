@@ -41,7 +41,10 @@
 						</group>
 						<notebook>
 							<page string="Main">
-						
+								<group>
+									<field name="is_main_line"/>
+									<field name="spec_name"/>
+								</group>
 							</page>
 							<page string="Profile">
 								<field name="profile_image" widget="image" class="imagescheme2" options='{"size":[800,400]}'/>
