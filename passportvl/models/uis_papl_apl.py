@@ -376,6 +376,7 @@ class uis_papl_apl(models.Model):
 	line_len=fields.Float(digits=(3,2))
 	line_len_calc=fields.Float(digits=(6,2), compute='_apl_get_len')
 	line_len_calc_int=fields.Integer(string="Length of the APL (meters)", compute='_get_apl_int_len')
+	line_len_profile_calc=fields.Float(digits=(6,2), compute='_apl_get_len', string='Length of the APL (meters, given the profile)')
 	prol_max_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_med_len=fields.Float(digits=(2,2), compute='_apl_get_len')
 	prol_min_len=fields.Float(digits=(2,2), compute='_apl_get_len')
@@ -424,6 +425,14 @@ class uis_papl_apl(models.Model):
 					for apl in self.browse(cr,uid,lines,context=context):
 						len_value+=apl.line_len_calc
 					line['line_len_calc']=len_value
+		if 'line_len_profile_calc' in fields:
+			for line in res:
+				if '__domain' in line:
+					lines=self.search(cr,uid,line['__domain'],context=context)
+					len_value=0.0
+					for apl in self.browse(cr,uid,lines,context=context):
+						len_value+=apl.line_len_profile_calc
+					line['line_len_profile_calc']=len_value
 		return res
 	
 	@api.depends('pillar_id')
@@ -597,6 +606,9 @@ class uis_papl_apl(models.Model):
 			pils=apl.pillar_id
 			vcnt=len(pils)
 			lpps=pils.mapped('len_prev_pillar')
+			lppps=pils.mapped('len_profile_prev_pillar')
+			if lppps:
+				apl.line_len_profile_calc=sum(lppps)
 			if lpps:
 				vmax,vmin,vsum=max(lpps),min(lpps),sum(lpps)
 				vmed=vsum/vcnt

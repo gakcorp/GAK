@@ -79,6 +79,7 @@ class uis_papl_pillar(models.Model):
 	prev_longitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
 	prev_latitude=fields.Float(digits=(2,6), compute='_pillar_get_len')
 	len_prev_pillar=fields.Float(digits=(5,2), compute='_pillar_get_len')
+	len_profile_prev_pillar=fields.Float(digits=(5,2), string="Distance to the previous pillar (given the profile)", compute='_pillar_get_len')
 	fix_lpp=fields.Float(digits=(5,2), string="SysFixlen to prev pillar")
 	azimut_from_prev=fields.Float(digits=(3,2), compute='_pillar_get_len')
 	elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
@@ -317,10 +318,17 @@ class uis_papl_pillar(models.Model):
 			long2=record.longitude
 			lat1=record.parent_id.latitude
 			long1=record.parent_id.longitude
+			e2=record.elevation
+			e1=record.parent_id.elevation
 			record.prev_longitude=long1
 			record.prev_latitude=lat1
+			
 			dist=0
+			dist_profile=0
 			angledeg=0
-			dist,angledeg=distangle2points(lat1,long1,lat2,long2)
-			record.len_prev_pillar=dist
-			record.azimut_from_prev=angledeg
+			if record.parent_id:
+				dist,angledeg=distangle2points(lat1,long1,lat2,long2)
+				dist_profile=math.sqrt(math.pow(dist,2)+math.pow(e2-e1,2))
+				record.len_prev_pillar=dist
+				record.azimut_from_prev=angledeg
+				record.len_profile_prev_pillar=dist_profile

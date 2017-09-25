@@ -19,5 +19,16 @@ class uis_papl_disconnector(models.Model):
 	name=fields.Char("Disconnector name")
 	pillar1_id=fields.Many2one('uis.papl.pillar', string='Pillar from')
 	pillar2_id=fields.Many2one('uis.papl.pillar', string='Pillar to')
-	longitude=fields.Float(digits=(2,6), string='Longitude')
-	latitude=fields.Float(digits=(2,6), string='Latitude')
+	trans_ids= fields.Many2many('uis.papl.transformer', string="Connected transformer")
+	apl_id=fields.Many2one('uis.papl.apl'. compute="_getapl_id"
+	#trans_ids=fields.One2Many()
+	#fields.One2many('uis.papl.pillar','apl_id', string ="Pillars")
+	mount_on_pillar=fields.Boolean(string='Linear disconnector on pillar')
+	#(string="Scheme", compute='_get_scheme_image_3')
+	
+	longitude=fields.Float(digits=(2,6), string='Longitude', compute='_get_coordinates')
+	latitude=fields.Float(digits=(2,6), string='Latitude', compute='_get_coordinates')
+	
+	def _get_coordinates(self):
+		for lr in self:
+			
