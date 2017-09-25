@@ -156,10 +156,28 @@ def point_in_poly(lat,lng,poly):
 
 
 class uis_ap_photo(models.Model):
+	
+	def _name_search_custom(self, operator, value):
+		_logger.debug(self)
+		ids=[]
+		ph_ids=self.search([])
+		_logger.debug(ph_ids)
+		value_split=value.split()
+		for ph in ph_ids:
+			pstr=ph.name
+			if ph.apl_ids:
+				for apl in ph.apl_ids:
+					pstr+=apl.name
+			_logger.debug(pstr)
+			for val in value_split:
+				if val.lower() in pstr.lower():
+					ids.append(ph.id)
+		return [('id', 'in' , ids)]
+	
 	_name='uis.ap.photo'
 	_description='Photo_apl'
 	_order='image_date desc'
-	name=fields.Char('Name')
+	name=fields.Char('Name', search=_name_search_custom)
 	image=fields.Binary(string='Image')
 	image_length=fields.Integer(string='Image Length')
 	image_width=fields.Integer(string='Image Width')

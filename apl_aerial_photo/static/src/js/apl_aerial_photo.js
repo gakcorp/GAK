@@ -66,8 +66,10 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 				var pillar_tbody=$('<tbody></tbody>');
 				var trans_table=$('<table class="l_table"><caption>Трансформаторы</caption><thead><tr><th style="display:none;">ID</th><th>Имя</th><th>Дистанция</th></tr></thead></table>')
 				var trans_tbody=$('<tbody></tbody>');
+				
 				pillar_table.append(pillar_tbody);
 				trans_table.append(trans_tbody);
+				
 				$("#l_controle_block").append(pillar_table);
 				$("#l_controle_block").append(trans_table);
 
@@ -332,6 +334,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 				$('.fotorama').on('fotorama:load', function (e, fotorama, extra) 
 				{
 					var mainPhoto=fotorama.activeFrame.$stageFrame.children("img")[0];
+					//console.log(mainPhoto);
 					if ((mainPhoto)&&(!fotoramaWasLoad))
 					{
 						$(".fotorama__nav__shaft").css({"pointer-events":"auto"});
@@ -406,6 +409,10 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 								}
 							}
 							spinner.stop();
+							dscr=$(".fotorama__caption");
+							console.log(dscr);
+							$('#div'+ID).append(dscr);
+							console.log(ID);
 						});
 
 						var APLModel=new Model('uis.papl.apl');
@@ -429,8 +436,13 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 							ID=masExpr[1];
 							InitPhotoModel();
 						}
+						
 					}
+					
 				});
+				$('.fotorama').on('fotorama:showend', function(e,fotorama,extra){
+					
+					});
 
 				$('#l_button').mouseover(function()
 				{
@@ -495,25 +507,42 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					}
 					$(".zoomContainer").remove();
 					var PhotoModel=new Model(ModelName);
-					PhotoModel.query(['longitude','latitude','rotation','view_distance','focal_angles','next_photo_ids','pillar_ids','near_pillar_ids','transformer_ids','near_transformer_ids','visable_view_json','near_apl_ids']).filter([['id','=',ID]]).all().then(function(photos)
+					PhotoModel.query(['len_start_apl','longitude','latitude','rotation','view_distance','focal_angles','next_photo_ids','pillar_ids','near_pillar_ids','transformer_ids','near_transformer_ids','visable_view_json','near_apl_ids']).filter([['id','=',ID]]).all().then(function(photos)
 					{
 						var next_photo_ids=photos[0]['next_photo_ids'];
-						var url = session.url('/web/image', {model: ModelName,
+						var len_start_apl=photos[0]['len_start_apl'];
+						var d_caption="";
+						/*var url = session.url('/web/image', {model: ModelName,
                                         					id: ID,
                                         					field: FieldName,
 										unique: ID
 										});
-						$('#fotorama').append('<img src="'+url+'">');
+						$('#fotorama').append('<img src="'+url+'">');*/
+						
+						var pos_fotorama=0;
 						for (var nextid in next_photo_ids)
 						{
+								var p_field='image_400';
+								var tS=64;
+								
+								if (next_photo_ids[nextid]==ID){
+									//console.log (nextid);
+									p_field=FieldName;
+									pos_fotorama=nextid;
+									d_caption=len_start_apl;
+								}
 								var nexturl = session.url('/web/image', {model: ModelName,
                                         							id: next_photo_ids[nextid],
-                                        							field: 'image_400',
-												unique: next_photo_ids[nextid]
+                                        							field: p_field,
+																	unique: next_photo_ids[nextid]
 										});
-								$('#fotorama').append('<img src="'+nexturl+'">');
+								$('#fotorama').append('<img src="'+nexturl+'" data-caption="'+d_caption+'">');
 						}
+						
+						
 						fotorama=$('#fotorama').fotorama().data('fotorama');
+						//console.log(pos_fotorama);
+						fotorama.show(pos_fotorama);
 						var latitude=photos[0]['latitude'];
 						mainPhotoLatitude=latitude;
 						var longitude=photos[0]['longitude'];

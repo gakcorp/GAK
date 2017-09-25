@@ -342,26 +342,30 @@ class uis_papl_apl(models.Model):
 	
 	#@api.v8
 	def _name_search_custom(self, operator, value):
-		_logger.debug(self)
+		#_logger.debug(self)
 		ids=[]
 		apl_ids=self.search([])
-		_logger.debug(apl_ids)
+		#_logger.debug(apl_ids)
 		value_split=value.split()
 		for apl in apl_ids:
-			_logger.debug(apl.name)
+			#_logger.debug(apl.name)
 			for val in value_split:
 				if val.lower() in apl.name.lower():
 					ids.append(apl.id)
+				if (apl.department_id) and (val.lower() in apl.department_id.name.lower()):
+					ids.append(apl.id)
+				if (apl.sup_substation_id) and (val.lower() in apl.sup_substation_id.name.lower()):
+					ids.append(apl.id)
 		return [('id', 'in' , ids)]
 
-	name = fields.Char(string="Name", compute=_get_name, search=_name_search_custom)
+	name = fields.Char(string="Name", compute=_get_name, search=_name_search_custom, index=True)
 	short_name=fields.Char(string="Short name")
 	locality=fields.Char(string="Locality")
 	apl_type=fields.Char(string="Type APL")
 	feeder_num=fields.Integer(string="Feeder")
 	voltage=fields.Integer(string="Voltage (kV)")
 	inv_num = fields.Char()
-	department_id=fields.Many2one('uis.papl.department', string="Department")
+	department_id=fields.Many2one('uis.papl.department', string="Department", index=True)
 	department_id_as_substation=fields.Boolean(string="As at the substation")
 	department_id_save=fields.Many2one('uis.papl.department', string="Saved Department")
 	bld_year =fields.Char(string="Building year")

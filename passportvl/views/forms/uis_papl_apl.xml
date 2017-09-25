@@ -187,14 +187,20 @@
 			<field name="name">uis.papl.apl.search</field>
 				<field name="model">uis.papl.apl</field>
 				<field name="arch" type="xml">
-				<search string="Search Pillar">
-					<field name="id"/>
+				<search string="Search APL">
+					
 					<field name="name"/>
+					<field name="department_id"/>
 					<field name="apl_type"/>
 					<field name="inv_num"/>
 					<field name="sup_substation_id"/>
+					<field name="id"/>
 					<separator/>
 					<group expand="0" string="Group By">
+						<filter name="group_apl_department"
+							string="Department"
+							context="{'group_by': 'department_id'}"
+						/>
 						<filter name="group_apl_sup_substation"
 							string="Supply substation"
 							context="{'group_by': 'sup_substation_id'}"
@@ -203,10 +209,7 @@
 							string="Voltage"
 							context="{'group_by': 'voltage'}"
 						/>
-						<filter name="group_apl_department"
-							string="Department"
-							context="{'group_by': 'department_id'}"
-						/>
+						
 					</group>
 				</search>
 			</field>
