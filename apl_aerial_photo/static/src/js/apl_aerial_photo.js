@@ -507,10 +507,12 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 					}
 					$(".zoomContainer").remove();
 					var PhotoModel=new Model(ModelName);
-					PhotoModel.query(['len_start_apl','longitude','latitude','rotation','view_distance','focal_angles','next_photo_ids','pillar_ids','near_pillar_ids','transformer_ids','near_transformer_ids','visable_view_json','near_apl_ids']).filter([['id','=',ID]]).all().then(function(photos)
+					PhotoModel.query(['len_start_apl','apl_id','longitude','latitude','rotation','view_distance','focal_angles','next_photo_ids','pillar_ids','near_pillar_ids','transformer_ids','near_transformer_ids','visable_view_json','near_apl_ids']).filter([['id','=',ID]]).all().then(function(photos)
 					{
+						console.log(photos);
 						var next_photo_ids=photos[0]['next_photo_ids'];
 						var len_start_apl=photos[0]['len_start_apl'];
+						var apl_name=photos[0]['apl_id'][1];
 						var d_caption="";
 						/*var url = session.url('/web/image', {model: ModelName,
                                         					id: ID,
@@ -529,7 +531,7 @@ odoo.define('apl_aerial_photo.form_widgets', function (require)
 									//console.log (nextid);
 									p_field=FieldName;
 									pos_fotorama=nextid;
-									d_caption=len_start_apl;
+									d_caption='('+len_start_apl+') '+apl_name;
 								}
 								var nexturl = session.url('/web/image', {model: ModelName,
                                         							id: next_photo_ids[nextid],

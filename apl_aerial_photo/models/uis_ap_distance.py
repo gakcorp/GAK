@@ -18,27 +18,34 @@ _logger.setLevel(10)
 class uis_ap_photo_mod_distance(models.Model):
 	_inherit='uis.ap.photo'
 	len_start_apl=fields.Float(digits=(2,2), string='Distance from start APL', compute='_get_len_start_apl', store=True)
+	apl_id=fields.Many2one('uis.papl.apl', string='APL', compute='_get_len_start_apl', store=True)
 	
 	@api.depends('vis_objects_ids','latitude','longitude','pillar_ids','near_pillar_ids')
 	def _get_len_start_apl(self):
 		for ph in self:
 			rval=0
+			apl_id=False
 			if ph.vis_objects_ids:
 				vo=ph.vis_objects_ids.sorted(key=lambda r:r.distance_from_photo_point)[0]
 				if vo.pillar_id:
 					vodsa=vo.pillar_id.len_start_apl
+					apl_id=vo.pillar_id.apl_id
 				if vo.transformer_id:
 					vodsa=vo.transformer_id.len_start_apl
+					apl_id=vo.transformer_id.apl_id
 				rval=vo.distance_from_photo_point+vodsa
 			if not(ph.vis_objects_ids):
 				if ph.pillar_ids:
 					mp=ph.pillar_ids.sorted(key=lambda r:r.num_by_vl)[0]
 					rval=mp.len_start_apl
+					apl_id=mp.apl_id
 				if not(ph.pillar_ids):
 					if ph.near_pillar_ids:
 						mp=ph.near_pillar_ids.sorted(key=lambda r:r.num_by_vl)[0]
 						rval=mp.len_start_apl
+						apl_id=mp.apl_id
 			ph.len_start_apl=rval
+			ph.apl_id=apl_id
 	
 	@api.depends('latitude', 'longitude')
 	def _get_next_photo(self,cr,uid,ids,context=None):

@@ -63,6 +63,7 @@
 				<field name="longitude"/>
 				<field name="altitude"/>
 				<field name="len_start_apl"/>
+				<field name="apl_id"/>
 				<field name="image" filename="name"/>
 				<button name="generate_snap" string="small photos generate" type="object" icon="STOCK_REFRESH"/>
 				
