@@ -612,7 +612,597 @@ odoo.define('passportvl.form_widgets', function (require)
 			this._super();
 		},
 	});
+	
+	aplmapnew=instance.web.form.AbstractField.extend(
+	{
+		getMapHeight: function()
+		{
+			//return this.options.height;
+			return "300px";
+		},
+		
+		getMapWidth: function()
+		{
+			return "100%";
+		},
+		
+		isAltitudeChart: function()
+		{
+			return true;
+		},
+		
+		getApls: function()
+        {
+			var aplArrayID=[];
+			aplArrayID.push(parseInt(this.field_manager.get_field_value("id")));
+			return aplArrayID;
+		},
+		
+		loadApls: function()
+		{
+			var widgetIns=this;
+			var aplModel=new Model('uis.papl.apl');
+            aplModel.query(['name','pillar_id','transformer_ids',"crossing_ids","tap_ids","sup_substation_id","voltage"]).filter([['id','in',widgetIns.aplArrayID]]).all().then(function(aplResult)
+            {
+				for (var i in aplResult)
+				{
+					var apl=new Apl(aplResult[i].id,aplResult[i].name,aplResult[i].voltage);
+					widgetIns.aplMap[aplResult[i].id]=apl;
+					widgetIns.pillarArrayID=widgetIns.pillarArrayID.concat(aplResult[i].pillar_id);
+					widgetIns.transformerArrayID=widgetIns.transformerArrayID.concat(aplResult[i].transformer_ids);
+					widgetIns.crossingArrayID=widgetIns.crossingArrayID.concat(aplResult[i].crossing_ids);
+					widgetIns.substationArrayID.push(aplResult[i].sup_substation_id[0]);
+				}
+				widgetIns.loadPillars();
+			});
+		},
+		
+		loadPillarTypes: function()
+		{
+			var widgetIns=this;
+			var pillarTypeModel=new Model('uis.papl.pillar.type');
+			pillarTypeModel.query(['name','base']).all().then(function(pillarTypeResult)
+			{
+				for (var i in pillarTypeResult)
+				{
+					var pillarType=new PillarType(pillarTypeResult[i].id, pillarTypeResult[i].name, pillarTypeResult[i].base);
+					widgetIns.pillarTypeMap[pillarTypeResult[i].id]=pillarType;
+				}
+				widgetIns.loadTaps();
+				widgetIns.loadPillars();
+			});
+		},
+		
+		loadTaps: function()
+		{
+			var widgetIns=this;
+			var TapModel=new Model('uis.papl.tap');
+			TapModel.query(['id','name','is_main_line','apl_id']).filter([['apl_id','in',widgetIns.aplArrayID]]).all().then(function(tapResult)
+			{
+				for (var i in tapResult)
+				{
+					var apl=widgetIns.aplMap[tapResult[i].apl_id[0]];
+					var tap=new Tap(tapResult[i].id, tapResult[i].name, tapResult[i].is_main_line, apl);
+					widgetIns.tapMap[tapResult[i].id]=tap;
+					if (apl) apl.pushTap(tap);
+				}
+			});
+			widgetIns.loadPillars();
+		},
+		
+		loadPillarMaterial: function()
+		{
+			var widgetIns=this;
+			var pillarMaterialModel=new Model('uis.papl.pillar.material');
+			pillarMaterialModel.query(['name']).all().then(function(pillarMaterialResult)
+			{
+				for (var i in pillarMaterialResult)
+				{
+					var pillarMaterial=new PillarMaterial(pillarMaterialResult[i].id, pillarMaterialResult[i].name);
+					widgetIns.pillarMaterialMap[pillarMaterialResult[i].id]=pillarMaterial;
+				}
+				widgetIns.loadPillars();
+			});
+		},
+		
+		loadPillarIcon: function()
+		{
+			var widgetIns=this;
+			var pillarIconModel=new Model('uis.icon.settings.pillar');
+			pillarIconModel.query(['pillar_icon_code','pillar_type_id', 'pillar_cut_id', 'pillar_icon_path', 'fill_path', 'fill_color', 'stroke_width','stroke_color']).all().then(function(pillarIconResult)
+			{
+				for (var i in pillarIconResult)
+				{
+					var pillarIcon=new PillarIcon(pillarIconResult[i].id, pillarIconResult[i].pillar_icon_code,pillarIconResult[i].pillar_type_id,pillarIconResult[i].pillar_cut_id,pillarIconResult[i].pillar_icon_path,pillarIconResult[i].fill_path, pillarIconResult[i].fill_color,pillarIconResult[i].stroke_width,pillarIconResult[i].stroke_color);
+					widgetIns.pillarIconMap[pillarIconResult[i].pillar_icon_code]=pillarIcon;
+				}
+				widgetIns.loadPillars();
+			});
+		},
+		
+		loadPillars:function()
+		{
+			this.loadsBeforePillarCount+=1;
+			if (this.loadsBeforePillarCount<5) return;
+			var widgetIns=this;
+			var pillarModel=new Model('uis.papl.pillar');
+			pillarModel.query(['name','num_by_vl','pillar_material_id','pillar_type_id','pillar_cut_id','pillar_icon_code','longitude','latitude','apl_id','tap_id','parent_id','elevation']).filter([['id','in',widgetIns.pillarArrayID]]).all().then(function(pillarResult)
+			{
+				var minLatitude=999;
+				var maxLatitude=-999;
+				var minLongitude=999;
+				var maxLongitude=-999;
+				///// Раставляем опоры /////
+				for (var i in pillarResult)
+				{
+					var pillarMaterial=false;
+					var pillarType=false;
+					var pillarCut=false;
+					var pillarIcon=false;
+					if (pillarResult[i].pillar_material_id) pillarMaterial=widgetIns.pillarMaterialMap[pillarResult[i].pillar_material_id[0]];
+					if (pillarResult[i].pillar_type_id) pillarType=widgetIns.pillarTypeMap[pillarResult[i].pillar_type_id[0]];
+					if (pillarResult[i].pillar_cut_id) pillarCut=pillarResult[i].pillar_cut_id[0];
+					if (pillarResult[i].pillar_icon_code) pillarIcon=widgetIns.pillarIconMap[pillarResult[i].pillar_icon_code];
+					var apl=widgetIns.aplMap[pillarResult[i].apl_id[0]];
+					var tap=widgetIns.tapMap[pillarResult[i].tap_id[0]];
+					
+					var pillar=new Pillar(pillarResult[i].id, pillarResult[i].name, pillarResult[i].num_by_vl, pillarMaterial, pillarType, pillarCut, pillarIcon, pillarResult[i].latitude, pillarResult[i].longitude, apl, tap, pillarResult[i].elevation);
+					widgetIns.pillarMap[pillarResult[i].id]=pillar;
+					apl.pushPillar(pillar);
+					tap.pushPillar(pillar);
+					
+					pillar.addTo(widgetIns.widgetMap);
+					
+					if (parseFloat(pillarResult[i].latitude)<minLatitude) minLatitude=parseFloat(pillarResult[i].latitude);
+					if (parseFloat(pillarResult[i].latitude)>maxLatitude) maxLatitude=parseFloat(pillarResult[i].latitude);
+					if (parseFloat(pillarResult[i].longitude)<minLongitude) minLongitude=parseFloat(pillarResult[i].longitude);
+					if (parseFloat(pillarResult[i].longitude)>maxLongitude) maxLongitude=parseFloat(pillarResult[i].longitude);
+					
+				}
+				minLatitude=parseFloat(minLatitude);
+				maxLatitude=parseFloat(maxLatitude);
+				minLongitude=parseFloat(minLongitude);
+				maxLongitude=parseFloat(maxLongitude);
+				widgetIns.widgetMap.setView([(minLatitude+maxLatitude)/2,(minLongitude+maxLongitude)/2],widgetIns.defaultZoom);		
+				
+				///// Раставляем линии /////
+				for (var i in pillarResult)
+				{
+					if (pillarResult[i].parent_id)
+					{
+						var pillar=widgetIns.pillarMap[pillarResult[i].id];
+						var prevPillar=widgetIns.pillarMap[pillarResult[i].parent_id[0]];
+						pillar.setPrevPillar(prevPillar);
+						var aplLine=new AplLine(prevPillar,pillar);
+						aplLine.addTo(widgetIns.widgetMap);
+						pillar.setInLine(aplLine);
+						if (pillar.getTap()==prevPillar.getTap()) prevPillar.setOutLine(aplLine);
+					}
+				}
+				
+				widgetIns.loadTransformers();
+				widgetIns.loadCrossings();
+				widgetIns.loadSubstations();
+				
+				if (widgetIns.isAltitudeChart()) widgetIns.renderAltitudeChart();
+			});
+ 		},
+		
+		loadTransformers: function()
+		{
+			var widgetIns=this;
+			var TransformerModel=new Model('uis.papl.transformer');
+			TransformerModel.query(['id','longitude','latitude','name','pillar_id','pillar2_id','trans_stay_rotation','apl_id','tap_id']).filter([['id','in',widgetIns.transformerArrayID]]).all().then(function(transformerResult)
+			{
+				for (var i in transformerResult)
+				{
+					var apl=widgetIns.aplMap[transformerResult[i].apl_id[0]];
+					var tap=widgetIns.tapMap[transformerResult[i].tap_id[0]];
+					var pillarIn=null;
+					var pillarOut=null;
+					if (transformerResult[i].pillar_id)
+					{
+						pillarIn=widgetIns.pillarMap[transformerResult[i].pillar_id[0]];
+					}
+					if (transformerResult[i].pillar2_id)
+					{
+						pillarOut=widgetIns.pillarMap[transformerResult[i].pillar2_id[0]];
+					}
+					var trans=new Transformer(transformerResult[i].id,transformerResult[i].name,transformerResult[i].latitude,transformerResult[i].longitude,transformerResult[i].trans_stay_rotation,pillarIn,pillarOut,apl,tap);
+					apl.pushTransformer(trans);
+					tap.pushTransformer(trans);
+					widgetIns.transformerMap[transformerResult[i].id]=trans;
+					trans.addTo(widgetIns.widgetMap);
+				}
+				widgetIns.loadSecArea();
+			});
+			
+		},
+		
+		loadCrossings()
+		{
+			var widgetIns=this;
+			var CrossingModel=new Model('uis.papl.apl.crossing');
+            CrossingModel.query(['id','from_pillar_id','to_pillar_id']).filter([['id','in',widgetIns.crossingArrayID]]).all().then(function(crossingResult)
+			{
+				for (var i in crossingResult)
+				{
+					var id=crossingResult[i].id;
+					var startPillar=widgetIns.pillarMap[crossingResult[i].from_pillar_id[0]];
+					var endPillar=widgetIns.pillarMap[crossingResult[i].to_pillar_id[0]];
+					if (startPillar && endPillar)
+					{
+						crossing=new Crossing(id,startPillar,endPillar);
+						crossing.addTo(widgetIns.widgetMap);
+					}
+					else
+					{
+						console.log("Crossing Pillar not found");
+					}
+				}
+			});
+		},
+		
+		loadSubstations()
+		{
+			var widgetIns=this;
+			var SubstationModel=new Model('uis.papl.substation');
+            SubstationModel.query(['id','longitude','latitude','name','conn_pillar_ids']).filter([['id','in',widgetIns.substationArrayID]]).all().then(function(substationResult)
+            {
+				for (var i in substationResult)
+				{
+					var pillarTempMap={};
+					for (var a in substationResult[i].conn_pillar_ids)
+					{
+						var pillar=widgetIns.pillarMap[substationResult[i].conn_pillar_ids[a]];
+						if (pillar) pillarTempMap[pillar.getID()]=pillar;
+					}
+					var substation=new Substation(substationResult[i].id,substationResult[i].name,substationResult[i].latitude,substationResult[i].longitude,pillarTempMap);
+					widgetIns.substationMap[substationResult[i].id]=substation;
+					substation.addTo(widgetIns.widgetMap);
+				}
+				widgetIns.loadSecArea();
+			});
+		},
+		
+		loadSecArea()
+		{
+			this.loadsBeforeSecAreaCount+=1;
+			if (this.loadsBeforeSecAreaCount<2) return;
+			var widgetIns=this;
+			////Расстановка охранных зон/////
+			for (var i in widgetIns.tapMap)
+			{
+				var tap=widgetIns.tapMap[i];
+				var widthSecArea=tap.getWidthSecArea();
+				widgetIns.createSecArea(tap.getSortJSTSCoords(),widthSecArea);
+				for (var i in tap.transformerMap)
+				{
+					widgetIns.createSecArea(tap.transformerMap[i].getSortJSTSCoords(),widthSecArea);
+				}
+			}
+		},
+		
+		createSecArea(jstsArray,widthSecArea)
+		{
+			if (!jstsArray) return;
+			var widgetIns=this
+			var geometryFactory = new jsts.geom.GeometryFactory();
+			var shell = geometryFactory.createLineString(jstsArray);
+			var polygon = shell.buffer(widthSecArea);
+			var masCoords=[];
+			for (var i in polygon.shell.points.coordinates)
+			{
+				var point=L.point(polygon.shell.points.coordinates[i].x, polygon.shell.points.coordinates[i].y);
+				var latlng=L.CRS.EPSG3857.unproject(point);
+				masCoords.push(latlng);
+			}
+			var secArea=new L.polygon(masCoords,{stroke: false, fillOpacity: 0.5});
+			secArea.addTo(widgetIns.secAreaLayer);
+		},
+		
+		render_value: function()
+		{
+			this._super.apply(this, arguments);
+			var widgetIns=this;
+			
+			////Получаем ВЛ на вывод/////
+			this.actPillar=null;
+			this.aplArrayID=this.getApls();
+			this.aplMap={};
+			this.tapMap={};
+			this.transformerMap={};
+			this.substationMap={};
+			this.pillarMap={};
+			this.pillarTypeMap={};
+			this.pillarMaterialMap={};
+			this.pillarIconMap={};
+			this.pillarArrayID=[];
+			this.transformerArrayID=[];
+			this.crossingArrayID=[];
+			this.substationArrayID=[];
+			this.defaultZoom=14;
+			
+			this.loadsBeforePillarCount=0;
+			this.loadsBeforeSecAreaCount=0;
+			
+			this.divChart=null;
+			this.altChart=null;
+			this.aplMapDiv=null;
+			this.widgetMap=null;
+			this.secAreaLayer=null;
+			////////////////////////////
+			
+			this.$el.find('#aplMapDiv').remove();
+			this.$el.find('#altitudeChart').remove();
+			
+			///// Установка блока для виджета /////
+			this.aplMapDiv=$('<div id="aplMapDiv"></div>');
+			this.$el.append(this.aplMapDiv);
+			this.aplMapDiv.width(10);
+			this.aplMapDiv.height(10);
+			//////////////////////////////////////
+			
+			///// Инициализируем карту /////
+			var GoogleTile =L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+											maxZoom: 25,
+											attribution: 'Google Map',
+											maxNativeZoom: 18,
+										});
+										
+			var YandexTile =L.tileLayer('https://sat02.maps.yandex.net/tiles?l=sat&v=3.340.0&x={x}&y={y}&z={z}&lang=ru_RU', {
+											maxZoom: 25,
+											attribution: 'Yandex Map',
+											maxNativeZoom: 18,
+										});
+										
+			var ArcgisTile =L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+											maxZoom: 25,
+											attribution: 'Arcgis Map',
+											maxNativeZoom: 17,
+										});
+			var RosreestrTile =L.tileLayer('http://pkk5.rosreestr.ru/arcgis/services/Cadastre/CadastreWMS/MapServer/WMSServer', {
+											maxZoom: 25,
+											attribution: 'Rosreestr Map',
+											maxNativeZoom: 18,
+										});
+			this.secAreaLayer=L.layerGroup();
+			this.widgetMap = new L.map(this.aplMapDiv.get()[0],{layers: [GoogleTile, YandexTile, ArcgisTile], scrollWheelZoom: false});
+			this.widgetMap.addControl(new L.Control.Fullscreen());
+			var layerControl=L.control.layers().addTo(this.widgetMap);
+			layerControl.addBaseLayer(GoogleTile, "Google");
+			layerControl.addBaseLayer(YandexTile, "Yandex");
+			layerControl.addBaseLayer(ArcgisTile, "Arcgis");
+			layerControl.addOverlay(RosreestrTile, "Rosreestr");
+			layerControl.addOverlay(this.secAreaLayer, "Securtiy Area");
+			///////////////////////////////
+			
+			//// События карты /////
+			this.widgetMap.on('zoomend', function(e) 
+			{
+				widgetIns.mapChangeZoom(e);
+			});
+			////////////////////////
+			
+			///// Загружаем объекты /////
+			this.loadApls();
+			this.loadPillarTypes();
+			this.loadPillarMaterial();
+			this.loadPillarIcon();
+			
+			
+			this.widgetMap.on('baselayerchange', function(e)
+			{
+				widgetIns.mapChangeBaseLayer(e);
+			});
+			
+			var intervalId = setInterval(function() 
+			{
+				widgetIns.aplMapDiv.width(widgetIns.getMapWidth());
+				if (widgetIns.aplMapDiv.width()>100)
+				{
+					widgetIns.aplMapDiv.height(widgetIns.getMapHeight());
+					widgetIns.widgetMap.invalidateSize();
+					if (widgetIns.isAltitudeChart())
+					{
+						if (widgetIns.altChart)
+						{
+							widgetIns.divChart.height(widgetIns.getMapHeight());
+							widgetIns.divChart.width(widgetIns.getMapWidth());
+							widgetIns.altChart.setSize(widgetIns.divChart.width(),widgetIns.divChart.height());
+							widgetIns.altChart.reflow();
+							widgetIns.altChart.yAxis[0].update();
+							if ($("#altitudeChart").length==0)
+							{
+								widgetIns.$el.append(widgetIns.divChart);
+							}
+							else clearInterval(intervalId);
+						}
+					}
+					else
+					{
+						clearInterval(intervalId);
+					}
+				}
+			}, 1000);
+		},
+		
+		mapChangeZoom: function(e)
+		{
+			var widgetIns=this;
+			var zoom=widgetIns.widgetMap.getZoom();
+			for (var i in widgetIns.pillarMap) widgetIns.pillarMap[i].changeZoom(zoom);
+			for (var i in widgetIns.transformerMap) widgetIns.transformerMap[i].changeZoom(zoom);
+			for (var i in widgetIns.substationMap) widgetIns.substationMap[i].changeZoom(zoom);
+		},
+		
+		mapChangeBaseLayer: function(e)
+		{
+			var zoom=this.widgetMap.getZoom();
+			var center=this.widgetMap.getCenter();
+			if (e.name=="Yandex") 
+			{
+				this.widgetMap.options.crs = L.CRS.EPSG3395;
+			}
+			else this.widgetMap.options.crs = L.CRS.EPSG3857;
+			if (zoom && center)
+			{
+				this.widgetMap.setView(center,zoom);
+			}
+		},
+		
+		renderAltitudeChart()
+		{
+			this.divChart=$('<div id="altitudeChart"></div>');
+			this.divChart.height(10);
+			this.divChart.width(10);
+			this.$el.append(this.divChart);
+			var widgetIns=this;
+			
+			this.altChart=new Highcharts.Chart(
+			{
+				credits:
+				{
+					enabled: false,
+				},
+				chart: 
+				{
+					width: 10,
+					height: 10,
+					renderTo: this.divChart.get(0),
+					type: 'area', 
+				},
+				tooltip: 
+				{
+					crosshairs: [true]
+				},
+				title: 
+				{
+            		text: 'Высотная диаграмма линии:'
+        		},
+				legend: 
+				{
+            		enabled: true
+        		},
+				xAxis:
+				{
+					allowDecimals: false,
+					min: 1,
+					title:
+					{
+						text: 'Номер опоры'
+					},
+				},
+				yAxis:
+				{
+					title:
+					{
+						text: 'Высота [м]'
+					},
+				},
+				plotOptions:
+				{
+					series:
+				 	{
+						fillOpacity: 0.3,
+						pointStart: 0,
+            			marker: 
+						{
+                			enabled: false,
+                			symbol: 'circle',
+                			radius: 2,
+                			states: 
+							{
+                    			hover: 
+								{
+                        			enabled: true
+                    			}
+                			}
+            			},
+						events:
+						{
+							show: function () 
+							{
+        						var chart = this.chart;
+            					var series = chart.series;
+            					var i = series.length;
+            					var otherSeries;
+        						while (i--) 
+								{
+          							otherSeries = series[i];
+          							if (otherSeries != this && otherSeries.visible) 
+									{
+										otherSeries.hide();
+          							}
+        						}
+      						},
+							legendItemClick: function (event) 
+							{
+								if (this.visible) return false;
+							},
+						},
+						point:
+						{
+							events:
+							{
+								mouseOut: function()
+								{
+									if (widgetIns.actPillar)
+									{
+										widgetIns.actPillar.unselectPillar();
+									}
+								},
+								mouseOver: function()
+								{
+									var pillar=widgetIns.pillarMap[this.id];
+									if (pillar)
+									{
+										pillar.selectPillar();
+										widgetIns.actPillar=pillar;
+										widgetIns.widgetMap.setView(pillar.getLatLng(),widgetIns.widgetMap.getZoom());
+									}
+								},
+							},
+						},
+					}
+				}
+			});
+			
+			for (var i in this.tapMap)
+			{
+				var tap=this.tapMap[i];
+				var pillarArray=tap.getSortPillarArrayNum();
+				var altSeries = [];
+				for (var a in pillarArray)
+				{
+					pillar=pillarArray[a];
+					altSeries.push({x: pillar.num_by_vl, y: pillar.elevation, id: pillar.id});
+				}
+				if (tap.tapIsMain())
+				{
+					this.altChart.addSeries(
+					{
+						name : tap.getName(),
+						data : altSeries,
+						visible: true,
+						colorIndex: 0,
+					});
+				}
+				else
+				{
+					this.altChart.addSeries(
+					{
+						name : tap.getName(),
+						data : altSeries,
+						visible: false,
+						colorIndex: 0,
+					});
+				}
+			}
+		},
+	});
     
     core.form_widget_registry.add('aplmap', aplmap);
 	core.form_widget_registry.add('weather_table', weather_table);
+	core.form_widget_registry.add('aplmapnew', aplmapnew);
 });

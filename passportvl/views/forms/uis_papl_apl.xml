@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-		<template id="assets_backend" name="aplmap" inherit_id="web.assets_backend">
+		<!--<template id="assets_backend" name="aplmap" inherit_id="web.assets_backend">
 			<xpath expr="." position="inside">
 				<script type="text/javascript" src="/passportvl/static/src/js/passportvl.js"/>
 				<link rel="stylesheet" href="/passportvl/static/src/css/passportvl.css"/>
@@ -20,6 +20,33 @@
 				<script type="text/javascript" src="/passportvl/static/src/js/serieschart.js"/>
 				<link rel="stylesheet" href="/passportvl/static/src/css/serieschart.css"/>
 				<link rel="stylesheet" href="/passportvl/static/src/vendors/highcharts/highcharts.css"/>
+			</xpath>
+		</template>-->
+		<template id="assets_backend" name="widget" inherit_id="web.assets_backend">
+			<xpath expr="." position="inside">
+			    <!--AplMap Library-->
+				<link rel="stylesheet" href="/passportvl/static/src/vendors/leaflet/leaflet.css"/>
+				<link rel="stylesheet" href="/passportvl/static/src/vendors/leaflet/leaflet.fullscreen.css"/>
+				<link rel="stylesheet" href="/passportvl/static/src/vendors/highcharts/highcharts.css"/>
+				<script type="text/javascript" src="/passportvl/static/src/vendors/leaflet/leaflet.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/vendors/leaflet/leaflet-ant-path.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/vendors/leaflet/leaflet.polylineoffset.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/vendors/leaflet/Leaflet.fullscreen.min.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/vendors/highcharts/highcharts.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/vendors/jsts/jsts.min.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_apl.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_tap.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_pillartype.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_pillarmaterial.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_pillaricon.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_pillar.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_aplline.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_transformer.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_crossing.js"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/aplmap/aplmap_substation.js"/>
+				<!--Weather Table-->
+				<link rel="stylesheet" href="/passportvl/static/src/css/weather_table.css"/>
+				<script type="text/javascript" src="/passportvl/static/src/js/passportvl.js"/>
 			</xpath>
 		</template>
 		<record id="uis_papl_apl_resistance_form" model="ir.ui.view">
@@ -259,8 +286,8 @@
 							</group>
 							<notebook>
 								<page string="Scheme">
-									<div id="scheme_id_apls" style="width:700px; height:600px;">
-										<field name="scheme_image" widget="aplmap" options='{"altitude_chart":"true"}'/>
+									<div id="scheme_id_apls" style="width:100%; height:600px;">
+										<field name="scheme_image" widget="aplmapnew" options='{"altitude_chart":"true", "height":600}'/>
 									</div>
 								</page>
 								<page string="Main details">
