@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pillar Creator</title>
+  <meta charset="utf-8" />
+  <link rel="shortcut icon" href="./images/favicon.png" type="image/x-icon">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="./lib/leaflet.css" />
+  <link href="./lib/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+  <link id="test" href="./dict/uis.papl.apl.csv" rel="alternate">
+  <link id="test" href="./dict/uis.papl.tap.csv" rel="alternate">
+  <style type="text/css">
+    #basemapslidercontainer {
+      position: absolute;
+      top: 50px;
+      right: 10px;
+      z-index: 1000;
+    }
+
+    #basemapslider{
+      font-size:62.5%;
+      margin: 14px;
+      height: 125px;
+      width:7px;
+    }
+
+    #map{
+       width: 75%;
+       height: 600px;
+    }
+    
+    #controlpanel
+    {
+      width: 25%;
+      height: 600px;
+      position: absolute;
+      left: 75%;
+      top: 0;
+      background: rgb(88, 99, 113);
+    }
+    
+    .icon
+    {
+      margin: 10px;
+      border: 2px solid white;
+    }
+    
+    .controlText
+    {
+      font-size: 16px;
+      color: white;
+      margin-left: 10px;
+    }
+    
+    .controlInput
+    {
+      margin-top: 10px;
+    }
+    
+    .markerClass
+    {
+    }
+    
+    #projectSelectDiv
+    {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: url(./images/bg.jpg);
+    }
+    
+    .controlDiv
+    {
+      top: 40%;
+      left: 40%;
+      position: absolute;
+    }
+    
+    #startButton
+    {
+      top: 120%;
+      left: 30%;
+      position: absolute;
+      font-size: 20px;
+    }
+    
+  </style>
+  <script src="./lib/jquery.js"></script>
+  <script src="./lib/jquery-ui.min.js"></script>
+  <script src="./lib/leaflet.js"></script>
+  <script src="./lib/leaflet-ant-path.js"></script>
+  <script src="./lib/FileSaver.js"></script>
+  <script src="./lib/uisgis_apl.js"></script>
+  <script src="./lib/uisgis_tap.js"></script>
+  <script src="./lib/uisgis_vis_pillar_attr.js"></script>
+  <script src="./lib/uisgis_pillar.js"></script>
+  <script src="./lib/uisgis_polyline.js"></script>
+  <script src="./lib/uisgis_pillar_icon.js"></script>
+  <script src="./lib/uisgis_pillar_type.js"></script>
+  <script src="./lib/GpsGate.js"></script>
+  <script src="./lib/uisgis_current_position.js"></script>
+  <script>  
+    $(document).ready(function () {
+      ///// Конфигурационные переменные /////
+      var PillarCutDict=[{id:1 , name:'Круг'},{id:2, name:'Квадрат'}];
+      var PillarMaterailDict=[{id:1, name:'Бетон'},{id:2, name: 'Металл'}];
+      
+      var defaultMapZoom=6;
+      var defaultMapLongitude=58.01741;
+      var defaultMapLatitude=56.28552;
+      //////////////////////////////////////
+      
+      ///// Глобальные переменные для видимости /////
+      var map;
+      var addPillarToForwardSelect=false;
+      var addPillarToBackSelect=false;
+      var AplMap=new Map();
+      var TapMap=new Map();
+      var PillarTypeMap=new Map();
+      var PillarIconMap=new Map();
+      var PillarCutMap=new Map();
+      var PillarMaterailMap=new Map();
+      var visPillarAttr;
+      var actAPL;
+      ////////////////////////////////////
+      
+      ///// Загрузка справочника ВЛ /////
+      
+      try
+      {
+        var client = new XMLHttpRequest();
+        client.overrideMimeType('text/plain');
+        client.open('GET', './dict/uis.papl.apl.csv', false);
+        client.onreadystatechange = function()
+        {
+          if (client.readyState==4)
+          {
+              var confMas=client.responseText.split('\r\n');
+              for (var i in confMas)
+              {
+                var line=confMas[i];
+                if (line.indexOf('uis_papl_apl_')!=-1)
+                {
+                  var expr=/uis_papl_apl_(\d+)","(.+)"$/;
+                  var tempMas=expr.exec(line);
+                  var apl=new APL(tempMas[1],tempMas[2]);
+                  AplMap.set(apl.id,apl);
+                }
+              }
+          }
+        }
+        client.send();
+      }
+      catch (err)
+      {
+        alert("Ошибка загрузки справочника ВЛ "+err);
+      }
+      
+      ///// Загрузка справочника отпаек /////
+      try
+      {
+        var client = new XMLHttpRequest();
+        client.overrideMimeType('text/plain');
+        client.open('GET', './dict/uis.papl.tap.csv', false);
+        client.onreadystatechange = function()
+        {
+          if (client.readyState==4)
+          {
+            var confMas=client.responseText.split('\r\n');
+            for (var i in confMas)
+            {
+              var line=confMas[i];
+              if (line.indexOf('uis_papl_tap_')!=-1)
+              {
+                var expr=/uis_papl_tap_(\d+)","(\d*)","(.+)","(.*)"$/;
+                var tempMas=expr.exec(line);
+                var id=tempMas[1];
+                var apl_id=tempMas[2];
+                var name=tempMas[3];
+                var specName=tempMas[4];
+                if (apl_id)
+                {
+                  var tap=new Tap(parseInt(id),name,specName);
+                  var apl=AplMap.get(apl_id);
+                  if (apl)
+                  {
+                    apl.pushTap(tap);
+                  }
+                }
+              }
+            }
+          }
+        }
+        client.send();
+      }
+      catch (err)
+      {
+        alert("Ошибка загрузки справочника Отпаек "+err);
+      }
+      //////////////////////////////////////
+      
+      /// Загрузка справочника иконок ///
+      try
+      {
+        var client = new XMLHttpRequest();
+        client.overrideMimeType('text/plain');
+        client.open('GET', './dict/uis.icon.settings.pillar.csv', false);
+        client.onreadystatechange = function()
+        {
+          if (client.readyState==4)
+          {
+            var confMas=client.responseText.split('\r\n');
+            for (var i in confMas)
+            {
+              var line=confMas[i];
+              if (line.indexOf('uis_icon_settings_pillar_')!=-1)
+              {
+                var expr=/uis_icon_settings_pillar_(\d+)","(\d*)","(\d*)","(.+)","(\d*)","(.*)","(.*)","(.*)"$/;
+                var tempMas=expr.exec(line);
+                var icon=new PillarIcon(tempMas[1],tempMas[2],tempMas[3],tempMas[4],tempMas[5],tempMas[6],tempMas[7],tempMas[8]);
+                PillarIconMap.set(icon.id, icon);
+              }
+            }
+          }
+        }
+        client.send();
+      }
+      catch (err)
+      {
+        alert("Ошибка загрузки справочника Иконок "+err);
+      }
+      //////////////////////////////////
+      
+      
+      ///// Загрузка справочника типов опор /////
+      try
+      {
+        var client = new XMLHttpRequest();
+        client.overrideMimeType('text/plain');
+        client.open('GET', './dict/uis.papl.pillar.type.csv', false);
+        client.onreadystatechange = function()
+        {
+          if (client.readyState==4)
+          {
+            var confMas=client.responseText.split('\r\n');
+            for (var i in confMas)
+            {
+              var line=confMas[i];
+              if (line.indexOf('uis_papl_pillar_type_')!=-1)
+              {
+                var expr=/uis_papl_pillar_type_(\d+)","(.+)","(.+)"$/
+                var tempMas=expr.exec(line);
+                var type=new PillarType(tempMas[1],tempMas[2],tempMas[3]);
+                PillarTypeMap.set(type.id,type);
+              }
+            }
+          }
+        }
+        client.send();
+      }
+      catch (err)
+      {
+        alert("Ошибка загрузки справочника Типов Опор "+err);
+      }
+      //////////////////////////////////////////
+      
+      ///// Создание нового - Загрузка старого проекта 
+      var projectSelectDiv=$("<div id='projectSelectDiv'></div>");
+      var controlDiv=$("<div id='controlDiv' class='controlDiv'></div>");
+      projectSelectDiv.append(controlDiv);
+      projectSelectDiv.append("<img id='bigLogo' src='./images/uisgis.png'>");
+      controlDiv.append("<div id='div_select_apl' class='controlText controlInput'><label for='select_apl'>Выберите ВЛ:    </label><select id='select_apl'></select></div>");
+      controlDiv.append("<label class='controlText controlInput'>Или загрузите проект</label>");
+      controlDiv.append("<input id='inputFile' class='controlText controlInput' type='file'>");
+      controlDiv.append("<button id='startButton' class='controlInput'>Старт</button>");
+      
+      $('body').append(projectSelectDiv);
+      
+      $('#select_apl').append($("<option selected disabled hidden></option>").attr("value",-1));
+      
+      for (var i of AplMap.keys())
+      {
+        var apl=AplMap.get(i);
+        $('#select_apl').append($("<option></option>").attr("value",i).text(apl.name));
+      }
+      
+      $("#startButton").on('click', function()
+      {
+        if ($("#inputFile")[0].files.length>0)
+        {
+          readProjectFromFile($("#inputFile")[0].files[0]);
+        }
+        else
+        {
+          var apl_id=$('#select_apl').val();
+          if (apl_id)
+          {
+            actAPL=AplMap.get(apl_id);
+            TapMap=actAPL.TapMap;
+            InitMap();
+          }
+        }
+      });
+      
+      function readProjectFromFile(textFile)
+      {
+        if (textFile.type == 'text/plain')
+        {
+          var reader = new FileReader();
+          reader.onerror = function()
+          {
+            alert('Ошибка чтения файла!');
+          };
+          reader.onloadend = function(event)
+          {
+            var text = event.target.result;
+            try
+            {
+              var MapJSON=JSON.parse(text);
+              var pillarTempMap=new Map();
+              var aplLineTempMap=new Map();
+              defaultMapLatitude=MapJSON.mapLatitude;
+              defaultMapLongitude=MapJSON.mapLongitude;
+              defaultMapZoom=MapJSON.mapZoom;
+              
+              actAPL=new APL(MapJSON.aplID,MapJSON.aplName);
+              
+              for (var i in MapJSON.tapsArray)
+              {
+                var TAP=MapJSON.tapsArray[i];
+                var tap=new Tap(TAP.id, TAP.name);
+                actAPL.pushTap(tap);
+              }
+              TapMap=actAPL.TapMap;
+              
+              InitMap();
+              ///// Расстановка опор /////
+              for (var i in MapJSON.tapsArray)
+              {
+                var TAP=MapJSON.tapsArray[i];
+                for (var k in TAP.pillarsArray)
+                {
+                  var pillar=TAP.pillarsArray[k];
+                  var marker = new PillarMarker([pillar.pillarLatitude,pillar.pillarLongitude],{draggable: true, isBase: true},map, visPillarAttr).addTo(map);
+                  marker.pillarType=pillar.pillarType;
+                  marker.pillarCut=pillar.pillarCut;
+                  marker.pillarMaterial=pillar.pillarMaterial;
+                  
+                  var tapID=parseInt(pillar.id.split("_")[0]);
+                  marker.pillarTap=TapMap.get(tapID);
+                  marker.pillarTap.addPillar(marker);
+                  marker.setPillarIcon(null);
+                  
+                  pillarTempMap.set(pillar.id, marker);
+                }
+              }
+                
+                ///// Растановка линий /////
+                for (var i in MapJSON.tapsArray)
+                {
+                  var TAP=MapJSON.tapsArray[i];
+                  for (var k in TAP.pillarsArray)
+                  {
+                    var pillar=TAP.pillarsArray[k];
+                    var marker=pillarTempMap.get(pillar.id);
+                    if (pillar.prevPillar)
+                    {
+                      marker.prevPillar=pillarTempMap.get(pillar.prevPillar);
+                    }
+                    if (pillar.nextPillar)
+                    {
+                      marker.nextPillar=pillarTempMap.get(pillar.nextPillar);
+                    }
+                    if (pillar.inputLine)
+                    {
+                      var startMarker=pillarTempMap.get(pillar.inputLine);
+                      var aplLine=new AplLine([startMarker.getLatLng(),marker.getLatLng()],map,startMarker,marker);
+                      aplLineTempMap.set(pillar.inputLine+"_"+pillar.id,aplLine);
+                      marker.inputLine=aplLine;
+                      if (startMarker.pillarTap==marker.pillarTap)
+                      {
+                        startMarker.outputLine=aplLine;
+                      }
+                      else
+                      {
+                        startMarker.tapsLine.push(aplLine);
+                      }
+                    }
+                  }
+                }
+                
+                ///// ParentLine /////
+                for (var i in MapJSON.tapsArray)
+                {
+                  var TAP=MapJSON.tapsArray[i];
+                  for (var k in TAP.pillarsArray)
+                  {
+                    var pillar=TAP.pillarsArray[k];
+                    if (pillar.parentLine)
+                    {
+                      var marker=pillarTempMap.get(pillar.id);
+                      var aplLine=aplLineTempMap.get(pillar.parentLine);
+                      marker.parentLine=aplLine;
+                      aplLine.PillarArray.push(marker);
+                      marker.options.isBase=false;
+                    }
+                  }
+                }
+                
+                /////Установка слоев//////
+                try
+                {
+                  var layerControlElement = document.getElementsByClassName('leaflet-control-layers-base')[0];
+                  if (MapJSON.baseLayer=="Google") layerControlElement.getElementsByTagName('input')[0].click();
+                  if (MapJSON.baseLayer=="Yandex") layerControlElement.getElementsByTagName('input')[1].click();
+                  if (MapJSON.rosreestr)
+                  {
+                    layerControlElement = document.getElementsByClassName('leaflet-control-layers-overlays')[0];
+                    layerControlElement.getElementsByTagName('input')[0].click();
+                  }
+                }
+                catch (err)
+                {
+                }
+                
+            }
+            catch (err)
+            {
+              alert("Ошибка JSON формата");
+              console.log(err);
+            }
+          };
+          reader.readAsText(textFile);
+        }
+        else
+        {
+          alert('Выбран не текстовый файл');
+        }
+      };
+                   
+      //////////////////////////////////////////////////////
+        
+      ///// Инициализации карты /////
+      function InitMap()
+      {
+        $("#projectSelectDiv").remove();
+        $("#basemapslider").slider({
+            animate: true,
+            value: 1,
+            orientation: "vertical",
+            min: 0,
+            max: 1,
+            step: 0.1,
+            slide: function (event, ui) {
+                mytile.setOpacity(ui.value);
+            }
+       });
+
+        $('#basemapslider').mousedown(function(){
+          map.dragging.disable();
+        })
+
+        $('#basemapslider').mouseup(function(){
+          map.dragging.enable();
+        })
+
+
+      var GoogleTile =L.tileLayer('./Tiles/Google/{z}/{x}/{y}.png', {
+        maxZoom: 25,
+        tms: true,
+        attribution: 'Google Map',
+        maxNativeZoom: 18,
+      });
+      
+      var YandexTile =L.tileLayer('./Tiles/Yandex/{z}/{x}/{y}.png', {
+        maxZoom: 25,
+        tms: true,
+        attribution: 'Yandex Map',
+        maxNativeZoom: 18,
+      });
+      
+      var ArcgisTile =L.tileLayer('./Tiles/Arcgis/{z}/{x}/{y}.png', {
+        maxZoom: 25,
+        tms: true,
+        attribution: 'Arcgis Map',
+        maxNativeZoom: 17,
+      });
+      
+      var RosreestrTile =L.tileLayer('./Tiles/Rosreestr/{z}/{x}/{y}.png', {
+        maxZoom: 25,
+        tms: true,
+        attribution: 'Rosreestr Map',
+        maxNativeZoom: 18,
+      });
+      
+      map = L.map('map', {layers: [GoogleTile, YandexTile, ArcgisTile, RosreestrTile]}).setView([defaultMapLatitude, defaultMapLongitude], defaultMapZoom);
+      
+      var layerControl=L.control.layers().addTo(map);
+      layerControl.addBaseLayer(GoogleTile, "Google");
+      layerControl.addBaseLayer(YandexTile, "Yandex");
+      layerControl.addBaseLayer(ArcgisTile, "Arcgis");
+      layerControl.addOverlay(RosreestrTile, "Rosreestr");
+      
+    
+      map.on('click',mapClick);
+      //////////////////////////////////////////////
+      
+      ///// Заполнение справочников опор ////////
+      for (var i in PillarCutDict)
+      {
+        PillarCutMap.set(PillarCutDict[i].id, PillarCutDict[i].name);
+      }
+      
+      for (var i in PillarMaterailDict)
+      {
+        PillarMaterailMap.set(PillarMaterailDict[i].id, PillarMaterailDict[i].name);
+      }
+      
+      PillarMarker.PillarIconMap=PillarIconMap;
+      //////////////////////////////////////////
+      
+      ///// Инициализация классов /////
+      visPillarAttr=new VisPillarAttr($('#vis_pillar_attr'),TapMap, PillarTypeMap, PillarCutMap, PillarMaterailMap, actAPL,map);
+      /////////////////////////////////
+      layerControl.expand();
+      
+      /////Отображение текущей позиции/////
+      currentPosition=new CurrentPosition(map);
+      currentPosition.startShow();
+      ///// Функции контроллеров /////
+      
+      function mapClick(e)
+      {
+        if (visPillarAttr.addPillarToForwardSelect || visPillarAttr.addPillarToBackSelect)
+        {
+          visPillarAttr.addPillar(e);
+        }
+        if (visPillarAttr.addTapPillarSelect)
+        {
+          visPillarAttr.addPillarToTap(e);
+        }
+      }
+      /////////////////////////////////////
+      }
+	  
+    })
+  </script>
+</head>
+<body>
+  <div id="map">
+    <div id="basemapslidercontainer">
+      <div id="basemapslider">
+      </div>
+    </div>
+  </div>
+  <div id="controlpanel">
+    <div id="vis_pillar_attr">
+    </div>
+  </div>
+</body>
+</html>
