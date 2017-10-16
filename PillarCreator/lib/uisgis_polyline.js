@@ -94,7 +94,7 @@ class AplLine
             }
         }
         
-        transferPillarFromLines(firstLine,secondLine)
+        transferPillarFromLines(firstLine,secondLine, centralPillar)
         {
             var firstPillar1=null;
             var lastPillar1=null;
@@ -118,6 +118,11 @@ class AplLine
                 pillar.noMove=true;
                 pillar.setLatLng([StartLat+deltaLat*coordK,StartLng+deltaLng*coordK]);
             }
+            if (centralPillar)
+            {
+                var pillar=firstLine.endPillar;
+                this.PillarArray.push(pillar);
+            }
             for (var i in secondLine.PillarArray)
             {
                 var pillar=secondLine.PillarArray[i];
@@ -129,14 +134,25 @@ class AplLine
                 pillar.noMove=true;
                 pillar.setLatLng([StartLat+deltaLat*coordK,StartLng+deltaLng*coordK]);
             }
+            firstLine.PillarArray=[];
+            secondLine.PillarArray=[];
+            if (centralPillar)
+            {
+                var pillar=firstLine.endPillar;
+                pillar.setParentLine(this);
+                var coordK=(firstLine.getDistanceFromStart(pillar.getLatLng())*k)/(firstLine.getDistance()*(1+k));
+                pillar.noMove=true;
+                pillar.setLatLng([StartLat+deltaLat*coordK,StartLng+deltaLng*coordK]);
+                return;
+            }
             if (firstPillar1)
             {
-                this.startPillar.setNextPillar(firstPillar1);
+                if (this.startPillar.pillarTap==firstPillar1.pillarTap) this.startPillar.setNextPillar(firstPillar1);
                 firstPillar1.setPrevPillar(this.startPillar);
             }
             else if (firstPillar2)
             {
-                this.startPillar.setNextPillar(firstPillar2);
+                if (this.startPillar.pillarTap==firstPillar2.pillarTap) this.startPillar.setNextPillar(firstPillar2);
                 firstPillar2.setPrevPillar(this.startPillar);
             }
             
@@ -156,8 +172,6 @@ class AplLine
                 lastPillar1.setNextPillar(firstPillar2);
                 firstPillar2.setPrevPillar(lastPillar1);
             }
-            firstLine.PillarArray=[];
-            secondLine.PillarArray=[];
         }
         
         setLineTap(lineTap)

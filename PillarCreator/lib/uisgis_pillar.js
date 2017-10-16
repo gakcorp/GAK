@@ -245,7 +245,7 @@ var PillarMarker=L.Marker.extend(
               startPillar.outputLine=null
               endPillar.inputLine=null;
               startPillar.addToForward(endPillar);
-              startPillar.outputLine.transferPillarFromLines(this.inputLine,this.outputLine);
+              startPillar.outputLine.transferPillarFromLines(this.inputLine,this.outputLine,false);
               this.inputLine.remove();
               this.outputLine.remove();
               this.pillarTap.sortPillar(null);
@@ -253,12 +253,17 @@ var PillarMarker=L.Marker.extend(
             else
             {
               ///Отпайка///
+              var aplLine=new AplLine([startPillar.getLatLng(),endPillar.getLatLng()],this.map,startPillar,endPillar);
               var removeLineIndex=startPillar.tapsLine.indexOf(this.inputLine);
               if (removeLineIndex) startPillar.tapsLine.splice(removeLineIndex, 1);
+              startPillar.tapsLine.push(aplLine);
+              endPillar.inputLine=aplLine;
+              aplLine.transferPillarFromLines(this.inputLine,this.outputLine,false);
               this.inputLine.remove();
               this.outputLine.remove();
-              startPillar.addToTap(endPillar);
-              endPillar.pillarTap.sortPillar(endPillar);
+              this.inputLine=null;
+              this.outputLine=null;
+              this.pillarTap.sortPillar(null);
             }
           }
           else
@@ -373,15 +378,50 @@ var PillarMarker=L.Marker.extend(
             prevBasePillar.tapsLine.push(aplLine);
           }
           var prevPillar=this.prevPillar;
-          while(!prevPillar.options.isBase)
+          while((!prevPillar.options.isBase) && (this.pillarTap==prevPillar.pillarTap))
           {
             prevPillar.parentLine=aplLine;
-            aplLine.PillarArray.push(prevPillar);
+            aplLine.PillarArray.unshift(prevPillar);
             prevPillar=prevPillar.prevPillar;
           }
           this.parentLine.PillarArray=[];
           this.parentLine.remove();
           this.parentLine=null;
+        },
+        
+        toNoBase()
+        {
+          if (this.inputLine && this.outputLine)
+          {
+            var startPillar=this.inputLine.startPillar;
+            var endPillar=this.outputLine.endPillar;
+            if (startPillar.pillarTap==this.pillarTap)
+            {
+              var aplLine=new AplLine([startPillar.getLatLng(),endPillar.getLatLng()],this.map,startPillar,endPillar);
+              startPillar.outputLine=aplLine;
+              endPillar.inputLine=aplLine;
+              aplLine.transferPillarFromLines(this.inputLine,this.outputLine,true);
+              this.inputLine.remove();
+              this.outputLine.remove();
+              this.inputLine=null;
+              this.outputLine=null;
+            }
+            else
+            {
+              var aplLine=new AplLine([startPillar.getLatLng(),endPillar.getLatLng()],this.map,startPillar,endPillar);
+              var removeLineIndex=startPillar.tapsLine.indexOf(this.inputLine);
+              if (removeLineIndex) startPillar.tapsLine.splice(removeLineIndex, 1);
+              startPillar.tapsLine.push(aplLine);
+              endPillar.inputLine=aplLine;
+              aplLine.transferPillarFromLines(this.inputLine,this.outputLine,true);
+              this.inputLine.remove();
+              this.outputLine.remove();
+              this.inputLine=null;
+              this.outputLine=null;
+              if (!this.prevPillar) this.prevPillar=startPillar;
+            }
+            this.options.isBase=false;
+          }
         },
         
       });

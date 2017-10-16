@@ -299,11 +299,14 @@ class VisPillarAttr
         if (this.actPillar)
         {
             this.actPillar.setPillarType($('#pillar_type').val());
-            if (this.actPillar.pillarTap)
-            this.actPillar.setPillarIcon("#FF0000");
+            if (this.actPillar.pillarTap) this.actPillar.setPillarIcon("#FF0000");
             if (!(this.actPillar.options.isBase) && (this.PillarTypeMap.get($('#pillar_type').val()).isBase))
             {
                 this.actPillar.toBase();
+            }
+            if ((this.actPillar.options.isBase) && !(this.PillarTypeMap.get($('#pillar_type').val()).isBase))
+            {
+                this.actPillar.toNoBase();
             }
         }
     }

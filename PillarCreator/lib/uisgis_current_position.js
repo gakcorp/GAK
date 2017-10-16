@@ -21,7 +21,8 @@ class CurrentPosition
                     {
                         if (!currentPosition.marker)
                         {
-                            currentPosition.marker=L.marker([latitude, longitude]).addTo(currentPosition.map);
+                            var posIcon=L.icon({iconUrl: './images/position.png'});
+                            currentPosition.marker=L.marker([latitude, longitude],{icon: posIcon}).addTo(currentPosition.map);
                         }
                         else
                         {
