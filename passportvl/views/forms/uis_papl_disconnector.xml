@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!--from for disconnector!-->
+		<record id="uis_papl_disconnector_form" model="ir.ui.view">
+			<field name="name">Disconnector view</field>
+			<field name="model">uis.papl.disconnector</field>
+			<field name="arch" type="xml">
+				<form string="Fitting">
+					<field name="name"/>
+					<field name="apl_id"/>
+					<field name="type_id"/>
+					<field name="mount_on_pillar_b"/>
+					<field name="mount_on_pillar_id"/>
+					<!--<field name="apl_id" invisible="context.get('apl_id',False)"/>!-->
+					<group>
+						<group string="From">
+							<field name="pillar1_id"/>
+						</group>
+						<group string="To">
+							<field name="pillar2_id"/>
+							<field name="trans_ids" widget="many2many_tags"/>
+							
+						</group>
+					</group>
+					<group>
+						<group>
+							<field name="depends_pillar_ids" widget="many2many_tags"/>
+						</group>
+						<group>
+							<field name="depends_trans_ids" widget="many2many_tags"/>
+						</group>
+					</group>
+					
+					
+				</form>
+			</field>
+		</record>
+		<!-- list for disconnectors!-->
+		
+		<!--menu for disconnectors!-->
+		
+		<!--menu for type disconnectors!-->
+		
+		<!-- form for disconnector type!-->
+		
+	</data>
+</openerp>

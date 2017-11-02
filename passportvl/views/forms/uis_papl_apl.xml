@@ -221,7 +221,7 @@
 			<field name="name">APL form view</field>
 			<field name="model">uis.papl.apl</field>
 			<field name="arch" type="xml">
-				<form string="APL form">
+				<form string="APL form" create="false">
 					<sheet string="Details">
 						<div id="infobar" class="im_pvl_infobar" name="infobar"></div>
 						<div id="im_main">
@@ -393,7 +393,7 @@
 								</page>
 								<page string="Fittings">
 									<field name="fitting_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id}">
-										<tree default_order="fitting name" colors="red:qnt==0">
+										<tree default_order="fitting_name" colors="red:qnt==0">
 											<field name="class_id"/>
 											<field name="fitting_type"/>
 											<field name="fitting_name"/>
@@ -402,8 +402,17 @@
 										</tree>
 									</field>					  
 								</page>
-								<page string="Connections">
-								  
+								
+								<page string="Disconnectors">
+									<field name="disconnector_ids" nolabel="1" domain="['apl_id','=',active_id]" context="{'apl_id':active_id}">
+										<tree default_order="" colors="red:state=='off'">
+											<field name="type_id"/>
+											<field name="mount_on_pillar_id"/>
+											<field name="pillar1_id"/>
+											<field name="pillar2_id"/>
+											<field name="trans_ids"/>
+										</tree>
+									</field>
 								</page>
 								<page string="Insulators">
 								  
@@ -435,7 +444,7 @@
 			<field name="name">APL Kanban view</field>
 			<field name="model">uis.papl.apl</field>
 			<field name="arch" type="xml">
-				<kanban>
+				<kanban quick_create="false" create="false" >
 					<field name="name"/>
 					<templates>
 						<t t-name="kanban-box" create="false"><!--default_group_by="field"!-->

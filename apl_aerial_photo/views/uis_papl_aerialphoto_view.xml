@@ -48,6 +48,24 @@
 			</kanban>
 		</field>
 	</record>
+	<record id="uis_ap_photo_search" model="ir.ui.view">
+		<field name="name">uis.ap.photo.search</field>
+			<field name="model">uis.ap.photo</field>
+				<field name="arch" type="xml">
+					<search string="Photo">
+						<field name="name"/>
+						<field name="apl_id"/>
+					<separator/>
+					<group expand="0" string="Group By">
+						<filter name="group_photo_apl"
+							string="APL"
+							context="{'group_by': 'apl_id'}"
+						/>
+					</group>
+				</search>
+			</field>
+	</record>
+	
     <record model="ir.ui.view" id="uis_ap_photo_list">
 		<field name="name">Photo List</field>
 		<field name="model">uis.ap.photo</field>

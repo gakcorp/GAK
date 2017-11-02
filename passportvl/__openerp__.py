@@ -27,6 +27,7 @@
         'views/views.xml',
         'views/forms/uis_papl_tap.xml',
         'views/forms/uis_papl_apl.xml',
+        'views/forms/uis_papl_disconnector.xml',
         'views/department.xml',
         'views/templates.xml',
         'views/transformation.xml',

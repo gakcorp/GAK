@@ -157,7 +157,7 @@ def point_in_poly(lat,lng,poly):
 
 class uis_ap_photo(models.Model):
 	
-	def _name_search_custom(self, operator, value):
+	def _photo_name_search_custom(self, operator, value):
 		_logger.debug(self)
 		ids=[]
 		ph_ids=self.search([])
@@ -177,7 +177,7 @@ class uis_ap_photo(models.Model):
 	_name='uis.ap.photo'
 	_description='Photo_apl'
 	_order='image_date desc'
-	name=fields.Char('Name', search=_name_search_custom)
+	name=fields.Char(string='Name', search=_photo_name_search_custom)
 	image=fields.Binary(string='Image')
 	image_length=fields.Integer(string='Image Length')
 	image_width=fields.Integer(string='Image Width')
@@ -190,8 +190,8 @@ class uis_ap_photo(models.Model):
 	image_filename=fields.Char(string='Image file name')
 	image_date=fields.Datetime(string='Image date')
 	load_hist_id=fields.One2many('uis.ap.photo.load_hist','photo_ids','Load data')
-	longitude=fields.Float(digits=(2,6), string='Longitude')
-	latitude=fields.Float(digits=(2,6), string='Latitude')
+	longitude=fields.Float(digits=(2,6), string='Longitude', indexed=True)
+	latitude=fields.Float(digits=(2,6), string='Latitude', indexed=True)
 	altitude=fields.Float(digits=(2,2), string='Altitude')
 	elevation_point=fields.Float(digits=(2,2), string="Ground Elevation", compute='_get_photo_elev', store=True, compute_sudo=True)
 	rotation=fields.Float(digits=(2,2),string='Rotation')
@@ -243,6 +243,34 @@ class uis_ap_photo(models.Model):
 							column1='photo_id',
 							column2='transformer_id',
 							compute='_get_photo_trans', compute_sudo=True)
+	
+	def read_group(self,cr,uid,domain,fields,groupby,offset=0,limit=None,context=None, orderby=False,lazy=True):
+		res=super(uis_ap_photo,self).read_group(cr,uid,domain,fields,groupby,offset,limit=limit,context=context,orderby=orderby,lazy=lazy)
+		if 'latitude' in fields:
+			for line in res:
+				if '__domain' in line:
+					lines=self.search(cr,uid,line['__domain'],context=context)
+					med_latitude=np.median(self.browse(cr,uid,lines,context=context).mapped('latitude'))
+					line['latitude']=med_latitude
+		if 'longitude' in fields:
+			for line in res:
+				if '__domain' in line:
+					lines=self.search(cr,uid,line['__domain'],context=context)
+					med_longitude=np.median(self.browse(cr,uid,lines,context=context).mapped('longitude'))
+					line['longitude']=med_longitude
+		if 'altitude' in fields:
+			for line in res:
+				if '__domain' in line:
+					lines=self.search(cr,uid,line['__domain'],context=context)
+					max_altitude=max(self.browse(cr,uid,lines,context=context).mapped('altitude'))
+					line['altitude']=max_altitude
+		if 'len_start_apl' in fields:
+			for line in res:
+				if '__domain' in line:
+					lines=self.search(cr,uid,line['__domain'],context=context)
+					max_distance=max(self.browse(cr,uid,lines,context=context).mapped('len_start_apl'))
+					line['len_start_apl']=max_distance
+		return res
 	
 	@api.onchange('latitude','longitude','rotation','vd_min','vd_max', 'relative_altitude', 'vert_angle', 'hori_angle')
 	def _get_visable_view_json(self):

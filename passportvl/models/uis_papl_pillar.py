@@ -85,7 +85,7 @@ class uis_papl_pillar(models.Model):
 	elevation=fields.Float(digits=(4,2), compute='_get_elevation', store=True)
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
 	tap_id=fields.Many2one('uis.papl.tap', string='Taps')
-	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]")
+	parent_id=fields.Many2one('uis.papl.pillar', string='Prev pillar', domain="[('id','in',near_pillar_ids[0][2])]", indexed=True)
 	prev_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Prev base pillar', compute='_get_prev_base_pillar')
 	next_base_pillar_id=fields.Many2one('uis.papl.pillar',string='Next base pillar')
 	len_prev_base_pillar=fields.Float(digits=(5,2), compute='_get_len_to_prev_base')
@@ -246,7 +246,7 @@ class uis_papl_pillar(models.Model):
 			if pillar_cut_id:
 				np.pillar_cut_id=pillar_cut_id
 			_logger.debug(np)
-			np.tap_id.act_normalize_num()
+			#np.tap_id.act_normalize_num()
 		tlr.fix_end()
 		return np
 	

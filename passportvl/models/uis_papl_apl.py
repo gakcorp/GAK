@@ -403,6 +403,7 @@ class uis_papl_apl(models.Model):
 	fitting_ids=fields.One2many('uis.papl.apl.fitting','apl_id', string="Fittings")
 	crossing_ids=fields.One2many('uis.papl.apl.crossing','apl_id', string="Crossing")
 	crossing_rel_ids=fields.One2many(related='crossing_ids', string="Crossing")
+	disconnector_ids=fields.One2many('uis.papl.disconnector','apl_id',string="Disconnectors")
 	tap_text=fields.Html(compute='_get_tap_text_for_apl', string="Taps")
 	code_maps=fields.Text()
 	status=fields.Char()

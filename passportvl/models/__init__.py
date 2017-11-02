@@ -12,6 +12,7 @@ from . import uis_papl_employee
 from . import uis_papl_transformation
 from . import uis_papl_settings
 from . import uis_papl_logger
+from . import uis_papl_disconnector
 
 #load modernizing models
 from . import mod

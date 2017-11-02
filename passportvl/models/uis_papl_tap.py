@@ -510,9 +510,10 @@ class uis_papl_tap(models.Model):
 			pillars=tap.pillar_ids
 			pillar_cnt=len(pillars)
 			max_num=max(pillars.mapped('num_by_vl'))
+			_logger.debug('max_num is %r'%max_num)
 			#cp=filter(lambda pil: pil.num_by_vl == max_num, pillars)
 			lp=pillars.filtered(lambda r: r.num_by_vl == max_num)
-			tlr.add_comment('[1] Last pillar is %r'%lp.id)
+			#tlr.add_comment('[1] Last pillar is %r'%lp[0].id)
 			tlr.add_comment('[2] Max number is %r'%max_num)
 			if pillars and lp:
 				cp=lp
