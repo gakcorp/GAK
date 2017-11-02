@@ -118,7 +118,6 @@
       var map;
       var addPillarToForwardSelect=false;
       var addPillarToBackSelect=false;
-      var AplMap=new Map();
       var TapMap=new Map();
       var PillarTypeMap=new Map();
       var PillarIconMap=new Map();
@@ -126,82 +125,11 @@
       var PillarMaterailMap=new Map();
       var visPillarAttr;
       var actAPL;
+      var id_counter=1;
+      var removePillars=[];
+      var FileName=null;
       ////////////////////////////////////
       
-      ///// Загрузка справочника ВЛ /////
-      
-      try
-      {
-        var client = new XMLHttpRequest();
-        client.overrideMimeType('text/plain');
-        client.open('GET', './dict/uis.papl.apl.csv', false);
-        client.onreadystatechange = function()
-        {
-          if (client.readyState==4)
-          {
-              var confMas=client.responseText.split('\r\n');
-              for (var i in confMas)
-              {
-                var line=confMas[i];
-                if (line.indexOf('uis_papl_apl_')!=-1)
-                {
-                  var expr=/uis_papl_apl_(\d+)","(.+)"$/;
-                  var tempMas=expr.exec(line);
-                  var apl=new APL(tempMas[1],tempMas[2]);
-                  AplMap.set(apl.id,apl);
-                }
-              }
-          }
-        }
-        client.send();
-      }
-      catch (err)
-      {
-        alert("Ошибка загрузки справочника ВЛ "+err);
-      }
-      
-      ///// Загрузка справочника отпаек /////
-      try
-      {
-        var client = new XMLHttpRequest();
-        client.overrideMimeType('text/plain');
-        client.open('GET', './dict/uis.papl.tap.csv', false);
-        client.onreadystatechange = function()
-        {
-          if (client.readyState==4)
-          {
-            var confMas=client.responseText.split('\r\n');
-            for (var i in confMas)
-            {
-              var line=confMas[i];
-              if (line.indexOf('uis_papl_tap_')!=-1)
-              {
-                var expr=/uis_papl_tap_(\d+)","(\d*)","(.+)","(.*)"$/;
-                var tempMas=expr.exec(line);
-                var id=tempMas[1];
-                var apl_id=tempMas[2];
-                var name=tempMas[3];
-                var specName=tempMas[4];
-                if (apl_id)
-                {
-                  var tap=new Tap(parseInt(id),name,specName);
-                  var apl=AplMap.get(apl_id);
-                  if (apl)
-                  {
-                    apl.pushTap(tap);
-                  }
-                }
-              }
-            }
-          }
-        }
-        client.send();
-      }
-      catch (err)
-      {
-        alert("Ошибка загрузки справочника Отпаек "+err);
-      }
-      //////////////////////////////////////
       
       /// Загрузка справочника иконок ///
       try
@@ -273,7 +201,7 @@
       var controlDiv=$("<div id='controlDiv' class='controlDiv'></div>");
       projectSelectDiv.append(controlDiv);
       projectSelectDiv.append("<img id='bigLogo' src='./images/uisgis.png'>");
-      controlDiv.append("<div id='div_select_apl' class='controlText controlInput'><label for='select_apl'>Выберите ВЛ:    </label><select id='select_apl'></select></div>");
+      controlDiv.append("<div id='div_select_apl' class='controlText controlInput'><label for='input_apl'>Введите имя ВЛ:    </label><input type='text' id='input_apl'></input></div>");
       controlDiv.append("<label class='controlText controlInput'>Или загрузите проект</label>");
       controlDiv.append("<input id='inputFile' class='controlText controlInput' type='file'>");
       controlDiv.append("<button id='startButton' class='controlInput'>Старт</button>");
@@ -281,12 +209,6 @@
       $('body').append(projectSelectDiv);
       
       $('#select_apl').append($("<option selected disabled hidden></option>").attr("value",-1));
-      
-      for (var i of AplMap.keys())
-      {
-        var apl=AplMap.get(i);
-        $('#select_apl').append($("<option></option>").attr("value",i).text(apl.name));
-      }
       
       $("#startButton").on('click', function()
       {
@@ -296,10 +218,11 @@
         }
         else
         {
-          var apl_id=$('#select_apl').val();
-          if (apl_id)
+          var apl_name=$('#input_apl').val();
+          if (apl_name)
           {
-            actAPL=AplMap.get(apl_id);
+            actAPL=new APL("ext_"+id_counter,apl_name);
+            id_counter++;
             TapMap=actAPL.TapMap;
             InitMap();
           }
@@ -320,44 +243,55 @@
             var text = event.target.result;
             try
             {
-              var MapJSON=JSON.parse(text);
-              var pillarTempMap=new Map();
-              var aplLineTempMap=new Map();
-              defaultMapLatitude=MapJSON.mapLatitude;
-              defaultMapLongitude=MapJSON.mapLongitude;
-              defaultMapZoom=MapJSON.mapZoom;
-              
-              actAPL=new APL(MapJSON.aplID,MapJSON.aplName);
-              
-              for (var i in MapJSON.tapsArray)
+              try
               {
-                var TAP=MapJSON.tapsArray[i];
-                var tap=new Tap(TAP.id, TAP.name);
-                actAPL.pushTap(tap);
-              }
-              TapMap=actAPL.TapMap;
-              
-              InitMap();
-              ///// Расстановка опор /////
-              for (var i in MapJSON.tapsArray)
-              {
-                var TAP=MapJSON.tapsArray[i];
-                for (var k in TAP.pillarsArray)
+                var MapJSON=JSON.parse(text);
+                var pillarTempMap=new Map();
+                var aplLineTempMap=new Map();
+                var pillarJSONTempMap=new Map();
+                
+                if (MapJSON.mapLatitude) defaultMapLatitude=MapJSON.mapLatitude;
+                if (MapJSON.mapLongitude) defaultMapLongitude=MapJSON.mapLongitude;
+                if (MapJSON.mapZoom) defaultMapZoom=MapJSON.mapZoom;
+                
+                if (MapJSON.id_counter) id_counter=MapJSON.id_counter;
+                if (MapJSON.removePillars) removePillars=MapJSON.removePillars;
+                
+                FileName=textFile.name;
+                
+                actAPL=new APL(MapJSON.id,MapJSON.name);
+                
+                for (var i in MapJSON.tapsArray)
                 {
-                  var pillar=TAP.pillarsArray[k];
-                  var marker = new PillarMarker([pillar.pillarLatitude,pillar.pillarLongitude],{draggable: true, isBase: true},map, visPillarAttr).addTo(map);
-                  marker.pillarType=pillar.pillarType;
-                  marker.pillarCut=pillar.pillarCut;
-                  marker.pillarMaterial=pillar.pillarMaterial;
-                  
-                  var tapID=parseInt(pillar.id.split("_")[0]);
-                  marker.pillarTap=TapMap.get(tapID);
-                  marker.pillarTap.addPillar(marker);
-                  marker.setPillarIcon(null);
-                  
-                  pillarTempMap.set(pillar.id, marker);
+                  var TAP=MapJSON.tapsArray[i];
+                  var tap=new Tap(String(TAP.id), TAP.name);
+                  actAPL.pushTap(tap);
                 }
-              }
+                
+                TapMap=actAPL.TapMap;
+              
+                InitMap();
+                
+                ///// Расстановка опор /////
+                for (var i in MapJSON.tapsArray)
+                {
+                  var TAP=MapJSON.tapsArray[i];
+                  for (var k in TAP.pillarsArray)
+                  {
+                    var pillar=TAP.pillarsArray[k];
+                    var marker = new PillarMarker([pillar.latitude,pillar.longitude],{draggable: true, isBase: true},map, visPillarAttr).addTo(map);
+                    marker.id=pillar.id;
+                    if (pillar.pillar_type_id) marker.pillarType=pillar.pillar_type_id;
+                    if (pillar.pillar_cut_id) marker.pillarCut=pillar.pillar_cut_id;
+                    if (pillar.pillar_material_id) marker.pillarMaterial=pillar.pillar_material_id;
+                    
+                    marker.pillarTap=TapMap.get(String(pillar.tap_id));
+                    marker.pillarTap.addPillar(marker, pillar.num_by_vl);
+                    marker.setPillarIcon(null);
+                    pillarTempMap.set(pillar.id, marker);
+                    pillarJSONTempMap.set(pillar.id, pillar);
+                  }
+                }
                 
                 ///// Растановка линий /////
                 for (var i in MapJSON.tapsArray)
@@ -367,46 +301,54 @@
                   {
                     var pillar=TAP.pillarsArray[k];
                     var marker=pillarTempMap.get(pillar.id);
-                    if (pillar.prevPillar)
+                    if (pillar.parent_id)
                     {
-                      marker.prevPillar=pillarTempMap.get(pillar.prevPillar);
-                    }
-                    if (pillar.nextPillar)
-                    {
-                      marker.nextPillar=pillarTempMap.get(pillar.nextPillar);
-                    }
-                    if (pillar.inputLine)
-                    {
-                      var startMarker=pillarTempMap.get(pillar.inputLine);
-                      var aplLine=new AplLine([startMarker.getLatLng(),marker.getLatLng()],map,startMarker,marker);
-                      aplLineTempMap.set(pillar.inputLine+"_"+pillar.id,aplLine);
-                      marker.inputLine=aplLine;
-                      if (startMarker.pillarTap==marker.pillarTap)
+                      var prevMarker=pillarTempMap.get(pillar.parent_id);
+                      marker.prevPillar=prevMarker;
+                      if (prevMarker.pillarTap==marker.pillarTap)
                       {
-                        startMarker.outputLine=aplLine;
+                        prevMarker.nextPillar=marker;
+                      }
+                    }
+                    if ((pillar.prev_base_pillar_id) && (marker.isBaseByType()))
+                    {
+                      var prevMarker=pillarTempMap.get(pillar.prev_base_pillar_id);
+                      var aplLine=new AplLine([prevMarker.getLatLng(),marker.getLatLng()],map,prevMarker,marker);
+                      aplLineTempMap.set(prevMarker.id+"_"+marker.pillarTap.id,aplLine);
+                      marker.inputLine=aplLine;
+                      if (prevMarker.pillarTap==marker.pillarTap)
+                      {
+                        prevMarker.outputLine=aplLine;
                       }
                       else
                       {
-                        startMarker.tapsLine.push(aplLine);
+                        prevMarker.tapsLine.push(aplLine);
                       }
                     }
                   }
                 }
-                
-                ///// ParentLine /////
-                for (var i in MapJSON.tapsArray)
+                for (var i of TapMap.keys())
                 {
-                  var TAP=MapJSON.tapsArray[i];
-                  for (var k in TAP.pillarsArray)
+                  TapMap.get(i).sortPillar(null);
+                }
+                
+                ///// ParentLine. Использую отпайки, так как опоры там отсортированы /////
+                for (var i of TapMap.keys())
+                {
+                  var TAP=TapMap.get(i);
+                  for (var k of TAP.PillarMap.keys())
                   {
-                    var pillar=TAP.pillarsArray[k];
-                    if (pillar.parentLine)
+                    var marker=TAP.PillarMap.get(k);
+                    var pillar=pillarJSONTempMap.get(marker.id);
+                    if ((!marker.isBaseByType()) && (pillar.prev_base_pillar_id))
                     {
-                      var marker=pillarTempMap.get(pillar.id);
-                      var aplLine=aplLineTempMap.get(pillar.parentLine);
-                      marker.parentLine=aplLine;
-                      aplLine.PillarArray.push(marker);
-                      marker.options.isBase=false;
+                      var aplLine=aplLineTempMap.get(pillar.prev_base_pillar_id+"_"+marker.pillarTap.id);
+                      if (aplLine)
+                      {
+                        marker.parentLine=aplLine;
+                        aplLine.PillarArray.push(marker);
+                        marker.options.isBase=false;
+                      }
                     }
                   }
                 }
@@ -425,8 +367,14 @@
                 }
                 catch (err)
                 {
+                  console.log("Ошибка установки слоев");
                 }
-                
+              }
+              catch (exception)
+              {
+                alert("Ошибка загрузки файла");
+                console.log(exception);
+              }  
             }
             catch (err)
             {
@@ -524,7 +472,7 @@
       //////////////////////////////////////////
       
       ///// Инициализация классов /////
-      visPillarAttr=new VisPillarAttr($('#vis_pillar_attr'),TapMap, PillarTypeMap, PillarCutMap, PillarMaterailMap, actAPL,map);
+      visPillarAttr=new VisPillarAttr($('#vis_pillar_attr'),TapMap, PillarTypeMap, PillarCutMap, PillarMaterailMap, actAPL,map,id_counter, removePillars, FileName);
       /////////////////////////////////
       layerControl.expand();
       

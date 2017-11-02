@@ -47,6 +47,8 @@
 				<!--Weather Table-->
 				<link rel="stylesheet" href="/passportvl/static/src/css/weather_table.css"/>
 				<script type="text/javascript" src="/passportvl/static/src/js/passportvl.js"/>
+				<!--File Saver-->
+				<script type="text/javascript" src="/passportvl/static/src/vendors/FileSaver/FileSaver.js"/>
 			</xpath>
 		</template>
 		<record id="uis_papl_apl_resistance_form" model="ir.ui.view">
@@ -247,8 +249,9 @@
 			<field name="arch" type="xml">
 				<form string="APL form">
 					<head>
-						<button string="Load Pillars" id="load_pillars"/>
-						<input type="file" id="Load_Pillars_File" style="display: none;"/>
+						<button string="Import APL" id="import_apl"/>
+						<input type="file" id="Import_Apl_File" style="display: none;"/>
+						<button string="Export APL" id="export_apl"/>
 					</head>
 					<sheet string="Details">
 						<div id="infobar" class="im_pvl_infobar" name="infobar"></div>
@@ -286,9 +289,7 @@
 							</group>
 							<notebook>
 								<page string="Scheme">
-									<div id="scheme_id_apls" style="width:100%; height:600px;">
-										<field name="scheme_image" widget="aplmapnew" options='{"altitude_chart":"true", "height":600}'/>
-									</div>
+									<field name="scheme_image" widget="aplmapnew" options='{"altitude_chart":"true", "height":600, "width":"100%"}'/>
 								</page>
 								<page string="Main details">
 									<group>

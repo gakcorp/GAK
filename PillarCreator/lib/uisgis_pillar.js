@@ -13,6 +13,7 @@ var PillarMarker=L.Marker.extend(
         pillarType: -1,
         pillarCut: -1,
         pillarMaterial: -1,
+        id: -1,
         
         onMouseDown: function(event)
         {
@@ -133,7 +134,8 @@ var PillarMarker=L.Marker.extend(
         addToTap: function(pillar)
         {
           var aplLine=new AplLine([this.getLatLng(),pillar.getLatLng()],this.map,this,pillar);
-          pillar.inputLine=aplLine
+          pillar.inputLine=aplLine;
+          pillar.prevPillar=this;
           aplLine.setLineTap(pillar.pillarTap);
           this.tapsLine.push(aplLine);
         },
@@ -263,8 +265,10 @@ var PillarMarker=L.Marker.extend(
               this.outputLine.remove();
               this.inputLine=null;
               this.outputLine=null;
-              this.pillarTap.sortPillar(null);
+              if (this.num_by_vl==1) this.pillarTap.sortPillar(this.nextPillar);
+              else this.pillarTap.sortPillar(null);
             }
+            console.log(startPillar.nextPillar.num_by_vl+"   "+endPillar.prevPillar.num_by_vl);
           }
           else
           {
@@ -321,30 +325,58 @@ var PillarMarker=L.Marker.extend(
           {
             this.parentLine.removePillar(this);
           }
+          /////Запоминаем только удаленные опоры с id из Odoo/////
+          if ((this.id!=-1) && (String(this.id).indexOf('ext_')==-1))
+          {
+            this.visPillarAttr.removePillars.push(this.id);
+          }
         },
         
         getJSON()
         {
           var JSON={};
-          JSON.id=this.pillarTap.id+"_"+this.num_by_vl;
-          if (this.prevPillar) JSON.prevPillar=this.prevPillar.pillarTap.id+"_"+this.prevPillar.num_by_vl;
-          if (this.nextPillar) JSON.nextPillar=this.nextPillar.pillarTap.id+"_"+this.nextPillar.num_by_vl;
-          if (this.inputLine) JSON.inputLine=this.inputLine.startPillar.pillarTap.id+"_"+this.inputLine.startPillar.num_by_vl;
-          if (this.parentLine) JSON.parentLine=this.parentLine.startPillar.pillarTap.id+"_"+this.parentLine.startPillar.num_by_vl+"_"+this.parentLine.endPillar.pillarTap.id+"_"+this.parentLine.endPillar.num_by_vl;
-          if (this.tapsLine.length>0)
+          if (this.id!=-1) JSON.id=this.id
+          else
           {
-            var tapsLine=[];
-            for (var i in this.tapsLine)
-            {
-              tapsLine.push(this.tapsLine[i].endPillar.pillarTap.id+"_"+this.tapsLine[i].endPillar.num_by_vl);
-            }
-            JSON.tapsLine=tapsLine;
+            JSON.id='ext_'+this.visPillarAttr.id_counter;
+            this.id=JSON.id;
+            this.visPillarAttr.id_counter++;
           }
-          JSON.pillarType=this.pillarType;
-          JSON.pillarCut=this.pillarCut;
-          JSON.pillarMaterial=this.pillarMaterial;
-          JSON.pillarLatitude=this.getLatLng().lat;
-          JSON.pillarLongitude=this.getLatLng().lng;
+          JSON.num_by_vl=this.num_by_vl;
+          JSON.apl_id=this.visPillarAttr.actAPL.id;
+          JSON.tap_id=this.pillarTap.id;
+          JSON.pillar_material_id=this.pillarMaterial;
+          JSON.pillar_type_id=this.pillarType;
+          JSON.pillar_cut_id=this.pillarCut;
+          JSON.latitude=this.getLatLng().lat;
+          JSON.longitude=this.getLatLng().lng;
+          if (this.prevPillar)
+          {
+            if (this.prevPillar.id==-1)
+            {
+              this.prevPillar.id='ext_'+this.visPillarAttr.id_counter;
+              this.visPillarAttr.id_counter++;
+            }
+            JSON.parent_id=this.prevPillar.id
+          }
+          if (this.inputLine)
+          {
+            if (this.inputLine.startPillar.id==-1)
+            {
+              this.inputLine.startPillar.id='ext_'+this.visPillarAttr.id_counter;
+              this.visPillarAttr.id_counter++;
+            }
+            JSON.prev_base_pillar_id=this.inputLine.startPillar.id;
+          }
+          if (this.parentLine)
+          {
+            if (this.parentLine.startPillar.id==-1)
+            {
+              this.parentLine.startPillar.id='ext_'+this.visPillarAttr.id_counter;
+              this.visPillarAttr.id_counter++;
+            }
+            JSON.prev_base_pillar_id=this.parentLine.startPillar.id;
+          }
           return JSON;
         },
         
@@ -422,6 +454,13 @@ var PillarMarker=L.Marker.extend(
             }
             this.options.isBase=false;
           }
+        },
+        
+        isBaseByType()
+        {
+          var pillarType=this.visPillarAttr.PillarTypeMap.get(String(this.pillarType));
+          if (pillarType) return pillarType.isBase;
+          else return false;
         },
         
       });

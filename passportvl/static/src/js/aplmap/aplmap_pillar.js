@@ -59,9 +59,9 @@ class Pillar
 		this.marker.setIcon(pillarIcon);
 	}
 	
-	unselectPillar()
+	unselectPillar(zoom)
 	{
-		this.setIcon();
+		this.setIcon(zoom);
 	}
 	
 	changeZoom(zoom)

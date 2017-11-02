@@ -145,6 +145,7 @@ class AplLine
                 pillar.setLatLng([StartLat+deltaLat*coordK,StartLng+deltaLng*coordK]);
                 return;
             }
+
             if (firstPillar1)
             {
                 if (this.startPillar.pillarTap==firstPillar1.pillarTap) this.startPillar.setNextPillar(firstPillar1);
@@ -154,6 +155,11 @@ class AplLine
             {
                 if (this.startPillar.pillarTap==firstPillar2.pillarTap) this.startPillar.setNextPillar(firstPillar2);
                 firstPillar2.setPrevPillar(this.startPillar);
+            }
+            else
+            {
+                if (this.startPillar.pillarTap==this.endPillar.pillarTap) this.startPillar.setNextPillar(this.endPillar);
+                this.endPillar.setPrevPillar(this.startPillar);
             }
             
             if (lastPillar2)

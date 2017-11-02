@@ -84,7 +84,6 @@ class uis_papl_tap_elevation(models.Model):
 class uis_papl_tap(models.Model):
 	_name = 'uis.papl.tap'
 	name=fields.Char(string="Name", compute='_get_tap_full_name')
-	spec_name=fields.Char(string="Special Name")
 	full_name=fields.Char()
 	apl_id=fields.Many2one('uis.papl.apl', string='APL')
 	cnt_np=fields.Integer(compute='_get_cnt_np', string='Pillars wo prev')
@@ -117,6 +116,7 @@ class uis_papl_tap(models.Model):
 				
 	@api.depends('tap_encode_path')
 	def _get_surface_data(self):
+		tlr=_ulog(self, code='GET_SURFACE_DATA', lib=__name__, desc='Get Surface Data')
 		point_per_ax=22
 		hcode_key='AIzaSyClGM7fuqSCiIXgp35PiKma2-DsSry3wrI' #NUPD load from settings
 		key= self.env['uis.global.settings'].get_value('uis_google_api_key') or hcode_key
@@ -312,6 +312,9 @@ class uis_papl_tap(models.Model):
 			tlr.add_comment('[%r] Get elevation'%tap.id)
 			qnt_point_perpil=10 #NUPD Load from settings
 			qnt_point=min(512,qnt_point_perpil*tap.pillar_cnt)
+			### Kopylov check ###
+			if (qnt_point==0):
+				qnt_point=1
 			
 			_logger.debug('tap points %r is %r qnt_points is %r'%(tap,tap.pillar_cnt,qnt_point))
 			res=[]

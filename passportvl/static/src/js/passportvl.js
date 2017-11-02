@@ -576,10 +576,10 @@ odoo.define('passportvl.form_widgets', function (require)
 	form_widget.WidgetButton.include({
 		on_click: function() 
 		{
-			if(this.node.attrs.id == "load_pillars")
+			if(this.node.attrs.id == "import_apl")
 			{
-				$("#Load_Pillars_File").unbind( "change" );
-				$("#Load_Pillars_File").change(function() 
+				$("#Import_Apl_File").unbind( "change" );
+				$("#Import_Apl_File").change(function() 
 				{
 					var textFile=this.files[0];
 					if (textFile.type == 'text/plain')
@@ -593,10 +593,10 @@ odoo.define('passportvl.form_widgets', function (require)
 						{
 							var TJSON = event.target.result;
 							var model = new instance.web.Model("uis.papl.apl");
-							model.call("load_pillars",[TJSON]).then(function(result)
+							model.call("import_apl",[TJSON]).then(function(result)
 							{
-								if (result==1) alert("Опоры успешно загружены"); 
-								else alert("Ошибка загрузки опор"); 
+								if (result==1) alert("Линия успешно загружена"); 
+								else alert("Ошибка загрузки линии"); 
 							});
 						};
 						reader.readAsText(textFile);
@@ -606,7 +606,33 @@ odoo.define('passportvl.form_widgets', function (require)
 						alert('Выбран не текстовый файл');
 					}
 				});
-				$("#Load_Pillars_File").click();
+				$("#Import_Apl_File").click();
+				return;
+			}
+			if(this.node.attrs.id == "export_apl")
+			{
+				var model = new instance.web.Model("uis.papl.apl");
+				model.call("export_apl",[this.field_manager.get_field_value("id")]).then(function(result)
+				{
+					if (result==1) 
+					{
+						alert("Ошибка выгрузки файла");
+						return;
+					}
+					else
+					{
+						try
+						{
+							var blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
+							saveAs(blob, result.name+".txt");
+						}
+						catch (exception)
+						{
+							console.log(exception);
+							alert("Ошибка выгрузки файла");
+						}
+					}
+				});
 				return;
 			}
 			this._super();
@@ -617,18 +643,27 @@ odoo.define('passportvl.form_widgets', function (require)
 	{
 		getMapHeight: function()
 		{
-			//return this.options.height;
-			return "300px";
+			if (this.options.height)
+			{
+				if (this.options.altitude_chart=="true") return this.options.height/2;
+				else return this.options.height;
+			}
+			return 300;
 		},
 		
 		getMapWidth: function()
 		{
+			if (this.options.width) 
+			{
+				return (this.options.width);
+			}
 			return "100%";
 		},
 		
 		isAltitudeChart: function()
 		{
-			return true;
+			if (this.options.altitude_chart=="true") return true;
+			else return false;
 		},
 		
 		getApls: function()
@@ -1149,7 +1184,7 @@ odoo.define('passportvl.form_widgets', function (require)
 								{
 									if (widgetIns.actPillar)
 									{
-										widgetIns.actPillar.unselectPillar();
+										widgetIns.actPillar.unselectPillar(widgetIns.widgetMap.getZoom());
 									}
 								},
 								mouseOver: function()

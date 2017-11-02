@@ -1,19 +1,27 @@
 class Tap
 {
-    constructor(id, name, specName)
+    constructor(id, name)
     {
-        if (specName) this.name=specName;
-        else this.name=name;
+        this.name=name;
         this.id=id;
         this.PillarMap=new Map();
         this.curNum=1;
     }
     
-    addPillar(pillar)
+    addPillar(pillar, num_by_vl)
     {
-        pillar.setNumByVL(this.curNum);
-        this.curNum+=1;
-        this.PillarMap.set(pillar.num_by_vl,pillar);
+        if (num_by_vl)
+        {
+            pillar.setNumByVL(num_by_vl);
+            this.PillarMap.set(num_by_vl,pillar);
+            this.curNum+=1;
+        }
+        else
+        {
+            pillar.setNumByVL(this.curNum);
+            this.curNum+=1;
+            this.PillarMap.set(pillar.num_by_vl,pillar);
+        }
     }
     
     sortPillar(firstPillar)

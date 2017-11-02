@@ -1,6 +1,6 @@
 class VisPillarAttr
 {
-    constructor(mainDiv,TapMap, PillarTypeMap, PillarCutMap, PillarMaterialMap, actAPL,map)
+    constructor(mainDiv,TapMap, PillarTypeMap, PillarCutMap, PillarMaterialMap, actAPL,map,id_counter, removePillars,FileName)
     {
         this.mainDiv=mainDiv;
         this.TapMap=TapMap;
@@ -11,12 +11,16 @@ class VisPillarAttr
         this.map=map
         this.rosreestr=true;
         this.baseLayer="Arcgis";
+        this.id_counter=id_counter;
+        this.removePillars=removePillars;
+        this.FileName=FileName;
         mainDiv.append("<img id='addPillarToForward' src='./images/addPillarToForward.png' class='icon'>");
         mainDiv.append("<img id='addPillarToBack' src='./images/addPillarToBack.png' class='icon'>");
         mainDiv.append("<img id='addTapPillar' src='./images/addTapPillar.png' class='icon'>");
         mainDiv.append("<img id='deletePillar' src='./images/deletePillar.png' class='icon'>");
         mainDiv.append("<img id='addLinePillar' src='./images/addLinePillar.png' class='icon'>");
         mainDiv.append("<img id='Save' src='./images/Save.png' class='icon'>");
+        mainDiv.append("<img id='newTap' src='./images/newTap.png' class='icon'>");
         mainDiv.append("<div id='div_pillar_vl_num' class='controlText controlInput'><label for='pillar_vl_num'>Номер опоры: </label><input id='pillar_vl_num' disabled></div>");
         mainDiv.append("<div id='div_pillar_latitude' class='controlText controlInput'><label for='pillar_latitude'>Широта опоры: </label><input id='pillar_latitude'></div>");
         mainDiv.append("<div id='div_pillar_longitude' class='controlText controlInput'><label for='pillar_longitude'>Долгота опоры: </label><input id='pillar_longitude'></div>");
@@ -54,7 +58,7 @@ class VisPillarAttr
         {
             $('#pillar_material').append($("<option></option>").attr("value",i).text(PillarMaterialMap.get(i)));
         }
-        var visPillarAttr=this
+        var visPillarAttr=this;
         $("#addPillarToForward").on('click', function()
         {
            visPillarAttr.addPillarToForward();
@@ -78,6 +82,10 @@ class VisPillarAttr
         $("#Save").on('click', function()
         {
            visPillarAttr.Save();
+        });
+        $("#newTap").on('click', function()
+        {
+           visPillarAttr.newTap();
         });
         $('#pillar_tap_id').on('change',function()
         {
@@ -271,7 +279,7 @@ class VisPillarAttr
         if (!this.actPillar) return;
         if (!this.actPillar.pillarTap)
         {
-            var TAP=this.TapMap.get(parseInt($('#pillar_tap_id').val()));
+            var TAP=this.TapMap.get($('#pillar_tap_id').val());
             if (TAP.GetPillarsCount()>0)
             {
                 alert("Данная отпайка уже содержит другие опоры - сначала удалите их или переместите на другую отпайку");
@@ -285,7 +293,7 @@ class VisPillarAttr
         else
         {
             var oldPillarTap=this.actPillar.pillarTap;
-            var newPillarTap=this.TapMap.get(parseInt($('#pillar_tap_id').val()));
+            var newPillarTap=this.TapMap.get($('#pillar_tap_id').val());
             if (oldPillarTap!=newPillarTap)
             {
                 newPillarTap.CopyPillarFrom(oldPillarTap);
@@ -421,6 +429,14 @@ class VisPillarAttr
     Save()
     {
         var MapJSON={};
+        MapJSON.id=this.actAPL.id;
+        MapJSON.name=this.actAPL.name;
+        MapJSON.mapLatitude=this.map.getCenter().lat;
+        MapJSON.mapLongitude=this.map.getCenter().lng;
+        MapJSON.mapZoom=this.map.getZoom();
+        MapJSON.rosreestr=this.rosreestr;
+        MapJSON.baseLayer=this.baseLayer;
+        MapJSON.removePillars=this.removePillars;
         var tapsArray=[];
         for (var i of this.TapMap.keys())
         {
@@ -428,7 +444,7 @@ class VisPillarAttr
             var Tap=this.TapMap.get(i);
             tapJSON.id=Tap.id;
             tapJSON.name=Tap.name;
-            var pillarsArray=[]; 
+            var pillarsArray=[];
             for (var k of Tap.PillarMap.keys())
             {
                 var pillar=Tap.PillarMap.get(k);
@@ -437,16 +453,11 @@ class VisPillarAttr
             tapJSON.pillarsArray=pillarsArray;
             tapsArray.push(tapJSON);
         }
-        MapJSON.mapLatitude=this.map.getCenter().lat;
-        MapJSON.mapLongitude=this.map.getCenter().lng;
-        MapJSON.mapZoom=this.map.getZoom();
-        MapJSON.rosreestr=this.rosreestr;
-        MapJSON.baseLayer=this.baseLayer;
-        MapJSON.aplID=this.actAPL.id;
-        MapJSON.aplName=this.actAPL.name;
         MapJSON.tapsArray=tapsArray;
+        MapJSON.id_counter=this.id_counter;
         var blob = new Blob([JSON.stringify(MapJSON)], {type: "text/plain;charset=utf-8"});
-        saveAs(blob, this.actAPL.name+".txt");
+        if (this.FileName) saveAs(blob, this.FileName);
+        else saveAs(blob, this.actAPL.name+".txt");
     }
     
     setIntermediatePillar(pillar)
@@ -469,5 +480,50 @@ class VisPillarAttr
                 pillar.setPillarType(this.PillarTypeMap.get(i).id);
             }
         }
+    }
+    
+    newTap()
+    {
+        this.mainDiv.hide();
+        var newTapDiv=$("<div class='controlText controlInput'></div>");
+        $('#controlpanel').append(newTapDiv);
+        newTapDiv.append("<label for='new_tap_name'>Введите имя отпайки:    </label><input type='text' id='new_tap_name'></input>");
+        newTapDiv.append("<button id='new_tap_create' style='margin-right: 10px; margin-top: 15px'>Создать</button>");
+        newTapDiv.append("<button id='new_tap_cancel' style='margin-right: 10px; margin-top: 15px'>Отмена</button>");
+        
+        var visPillarAttr=this;
+        
+        $("#new_tap_create").on('click', function()
+        {
+            if ($('#new_tap_name').val())
+            {
+                var newTap=new Tap("ext_"+visPillarAttr.id_counter,$('#new_tap_name').val());
+                visPillarAttr.id_counter++;
+                visPillarAttr.actAPL.pushTap(newTap);
+                $('#pillar_tap_id').find('option').remove();
+                $('#pillar_tap_id').append($("<option selected disabled hidden></option>").attr("value",-1));
+                for (var i of visPillarAttr.TapMap.keys())
+                {
+                    $('#pillar_tap_id').append($("<option></option>").attr("value",i).text(visPillarAttr.TapMap.get(i).name));
+                }
+                $("#new_tap_create").unbind('click');
+                $("#new_tap_cancel").unbind('click');
+                newTapDiv.remove();
+                visPillarAttr.mainDiv.show();
+            }
+            else
+            {
+                alert("Введите имя отпайки");
+                return;
+            }
+        });
+        
+        $("#new_tap_cancel").on('click', function()
+        {
+            $("#new_tap_create").unbind('click');
+            $("#new_tap_cancel").unbind('click');
+            newTapDiv.remove();
+            visPillarAttr.mainDiv.show();
+        });
     }
 }

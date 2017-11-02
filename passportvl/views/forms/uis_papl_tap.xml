@@ -43,7 +43,6 @@
 							<page string="Main">
 								<group>
 									<field name="is_main_line"/>
-									<field name="spec_name"/>
 								</group>
 							</page>
 							<page string="Profile">
