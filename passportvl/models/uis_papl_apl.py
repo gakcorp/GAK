@@ -10,6 +10,8 @@ from scheme_apl_v3 import drawscheme
 import logging
 import datetime
 import openerp
+import json
+import traceback
 from openerp.exceptions import Warning
 
 import numpy as np
@@ -622,3 +624,151 @@ class uis_papl_apl(models.Model):
 				apl.prol_min_len=vmin
 				apl.prol_med_len=vmed
 	
+	@api.model
+	def import_apl(self,TJSON):
+		AplCreateDict={}
+		TapCreateDict={}
+		PillarCreateDict={}
+		PillarUpdateDict={}
+		PillarDict={}
+		
+		try:
+			data = json.loads(TJSON)
+			apl_id=data.get("id")
+			apl_name=data.get("name")
+			apl=None
+			tap=None
+			
+			if ("ext_" in str(apl_id)):
+				apl=self.env["uis.papl.apl"].sudo().create({'short_name':apl_name})
+				AplCreateDict[apl.id]=apl
+			else:
+				apl=self.env["uis.papl.apl"].sudo().browse([int(apl_id)])
+				
+			if (apl.exists()):
+				for TAPJSON in data.get("tapsArray"):
+					tap=None
+					tap_id=TAPJSON.get("id")
+					if ("ext_" in str(tap_id)):
+						tap=self.env["uis.papl.tap"].sudo().create({'apl_id': apl.id})
+						TapCreateDict[tap.id]=tap
+					else:
+						tap=self.env["uis.papl.tap"].sudo().browse([int(tap_id)])
+					
+					if (not tap.exists()):
+						break
+					
+					for PillarJSON in TAPJSON.get("pillarsArray"):
+						pillar_id=PillarJSON.get("id")
+						pillar=None
+						pillarMaterial=None
+						pillarType=None
+						pillarCut=None
+						
+						if ("ext_" in str(pillar_id)):
+							pillar=self.env["uis.papl.pillar"].sudo().create({'num_by_vl':int(PillarJSON.get("num_by_vl"))})
+							PillarCreateDict[pillar.id]=pillar
+						else:
+							pillar=self.env["uis.papl.pillar"].sudo().browse([int(pillar_id)])
+							pillarOldValue={}
+							pillarOldValue["pillar"]=pillar
+							pillarOldValue["num_by_vl"]=pillar.num_by_vl
+							pillarOldValue["apl_id"]=pillar.apl_id
+							pillarOldValue["tap_id"]=pillar.tap_id
+							pillarOldValue["latitude"]=pillar.latitude
+							pillarOldValue["longitude"]=pillar.longitude
+							pillarOldValue["pillar_material_id"]=pillar.pillar_material_id
+							pillarOldValue["pillar_type_id"]=pillar.pillar_type_id
+							pillarOldValue["pillar_cut_id"]=pillar.pillar_cut_id
+							pillarOldValue["parent_id"]=pillar.parent_id
+							PillarUpdateDict[pillar.id]=pillarOldValue
+							
+						pillar.num_by_vl=int(PillarJSON.get("num_by_vl"))
+						pillar.apl_id=apl
+						pillar.tap_id=tap
+						pillar.latitude=PillarJSON.get("latitude")
+						pillar.longitude=PillarJSON.get("longitude")
+						
+						pillarMaterial=self.env["uis.papl.pillar.material"].sudo().browse([PillarJSON.get("pillar_material_id")])
+						if pillarMaterial.exists():
+							pillar.pillar_material_id=pillarMaterial
+						pillarType=self.env["uis.papl.pillar.type"].sudo().browse([PillarJSON.get("pillar_type_id")])
+						if pillarType.exists():
+							pillar.pillar_type_id=pillarType
+						pillarCut=self.env["uis.papl.pillar.cut"].sudo().browse([PillarJSON.get("pillar_cut_id")])
+						if pillarCut.exists():
+							pillar.pillar_cut_id=pillarCut
+							
+						PillarDict[PillarJSON.get("id")]=pillar
+								
+				for TAPJSON in data.get("tapsArray"):
+					for PillarJSON in TAPJSON.get("pillarsArray"):
+						if (PillarJSON.get("parent_id")):
+							pillar=PillarDict.get(PillarJSON.get("id"))
+							parentPillar=PillarDict.get(PillarJSON.get("parent_id"))
+							pillar.latitude+=0.0001
+							pillar.latitude-=0.0001
+							pillar.parent_id=parentPillar
+							
+				if data.get("removePillars"):
+					for pillar_id in data.get("removePillars"):
+						pillar=self.env["uis.papl.pillar"].sudo().browse([int(pillar_id)])
+						pillar.sudo().unlink()
+				return 1
+		except:
+			_logger.debug("Error %r"%( traceback.format_exc()))
+		
+		for key in PillarUpdateDict:
+			pillarOldValue=PillarUpdateDict[key]
+			pillar=pillarOldValue["pillar"]
+			pillar.num_by_vl=pillarOldValue["num_by_vl"]
+			pillar.apl_id=pillarOldValue["apl_id"]
+			pillar.tap_id=pillarOldValue["tap_id"]
+			pillar.latitude=pillarOldValue["latitude"]
+			pillar.longitude=pillarOldValue["longitude"]
+			pillar.pillar_material_id=pillarOldValue["pillar_material_id"]
+			pillar.pillar_type_id=pillarOldValue["pillar_type_id"]
+			pillar.pillar_cut_id=pillarOldValue["pillar_cut_id"]
+			pillar.parent_id=pillarOldValue["parent_id"]
+		for key in PillarCreateDict:
+			PillarCreateDict[key].sudo().unlink()
+		for key in TapCreateDict:
+			TapCreateDict[key].sudo().unlink()
+		for key in TapCreateDict:
+			AplCreateDict[key].sudo().unlink()
+		return 0
+	
+	@api.model
+	def export_apl(self, id):
+		try:
+			data={}
+			tapsArray=[]
+			data['id']=id
+			apl=self.env["uis.papl.apl"].sudo().browse([int(id)])
+			data['name']=apl.name
+			for tap in apl.tap_ids:
+				tapJSON={}
+				tapJSON["id"]=tap.id
+				tapJSON["name"]=tap.name
+				pillarsArray=[]
+				for pillar in tap.pillar_ids:
+					pillarJSON={}
+					pillarJSON["id"]=pillar.id
+					pillarJSON["num_by_vl"]=pillar.num_by_vl
+					pillarJSON["apl_id"]=pillar.apl_id.id
+					pillarJSON["tap_id"]=pillar.tap_id.id
+					pillarJSON["pillar_material_id"]=pillar.pillar_material_id.id
+					pillarJSON["pillar_type_id"]=pillar.pillar_type_id.id
+					pillarJSON["pillar_cut_id"]=pillar.pillar_cut_id.id
+					pillarJSON["latitude"]=pillar.latitude
+					pillarJSON["longitude"]=pillar.longitude
+					pillarJSON["parent_id"]=pillar.parent_id.id
+					pillarJSON["prev_base_pillar_id"]=pillar.prev_base_pillar_id.id
+					pillarsArray.append(pillarJSON)
+				tapJSON["pillarsArray"]=pillarsArray
+				tapsArray.append(tapJSON)
+			data['tapsArray']=tapsArray
+			return data
+		except:
+			_logger.debug("Error %r"%( traceback.format_exc()))
+		return 1

@@ -1,0 +1,4 @@
+uis.papl.apl Наименоваие
+uis.papl.tap ВЛ.ID, Наименование, Special Name
+uis.icon.settings.pillar Тип, Сечение, SVG контур, Толщина штриха, Цвет штриха, Цвет контура, Цвет заливки
+uis.papl.pillar.type.csv Наименоваие, Базовая опора
