@@ -1,10 +1,24 @@
 class AplLine
 {
-	constructor(startObject, endObject)
+	constructor(objectArray)
 	{
-		this.startObject=startObject;
-		this.endObject=endObject;
-		this.polyline=new L.polyline.antPath([this.startObject.getLatLng(),this.endObject.getLatLng()], {pulseColor: '#0000FF', opacity: 0.5, color: '#FFFFFF', weight: 3});
+		this.startObject=objectArray[0];
+		this.endObject=objectArray[objectArray.length-1];
+		var coordArray=[];
+		if (objectArray.length==1)
+		{
+			if (this.endObject.getPrevPillar())
+			{
+				this.startObject=this.endObject.getPrevPillar();
+				coordArray.push(this.endObject.getPrevPillar().getLatLng());
+			}
+			else 
+			{
+				coordArray.push(this.endObject.getLatLng());
+			}
+		}
+		for (var i in objectArray) coordArray.push(objectArray[i].getLatLng());
+		this.polyline=new L.polyline.antPath(coordArray, {pulseColor: '#0000FF', opacity: 0.5, color: '#FFFFFF', weight: 3});
 	}
 	
 	addTo(map)

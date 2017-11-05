@@ -808,11 +808,18 @@ odoo.define('passportvl.form_widgets', function (require)
 						var pillar=widgetIns.pillarMap[pillarResult[i].id];
 						var prevPillar=widgetIns.pillarMap[pillarResult[i].parent_id[0]];
 						pillar.setPrevPillar(prevPillar);
-						var aplLine=new AplLine(prevPillar,pillar);
-						aplLine.addTo(widgetIns.widgetMap);
+						var aplLine=new AplLine([prevPillar,pillar]);
+						///// Линия не орисовывается, чтобы не было ряби /////
+						//aplLine.addTo(widgetIns.widgetMap);
 						pillar.setInLine(aplLine);
 						if (pillar.getTap()==prevPillar.getTap()) prevPillar.setOutLine(aplLine);
 					}
+				}
+				for (var i in widgetIns.tapMap)
+				{
+					var aplLine=new AplLine(widgetIns.tapMap[i].getSortPillarArrayNum());
+					///// Рисуем линию /////
+					aplLine.addTo(widgetIns.widgetMap);
 				}
 				
 				widgetIns.loadTransformers();
