@@ -17,7 +17,7 @@ class Substation
 		this.setIcon(map.getZoom());
 		for (var i in this.pillarMap)
 		{
-			var aplLine=new AplLine(this,this.pillarMap[i]);
+			var aplLine=new AplLine([this,this.pillarMap[i]]);
 			this.pillarMap[i].setInLine(aplLine);
 			aplLine.addTo(map);
 		}

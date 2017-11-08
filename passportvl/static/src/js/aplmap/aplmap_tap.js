@@ -27,7 +27,7 @@ class Tap
 		{
 			var pillar=this.pillarMap[i];
 			//tempMas.splice(parseInt(pillar.getNumByVl())-1,0,pillar);
-			tempMas[pillar.getNumByVl()]=pillar;
+			tempMas[pillar.getNumByVl()-1]=pillar;
 		}
 		return tempMas;
 	}

@@ -28,13 +28,13 @@ class Transformer
 		this.setIcon(map.getZoom());
 		if (this.pillarIn)
 		{
-			var aplLine=new AplLine(this.pillarIn,this);
+			var aplLine=new AplLine([this.pillarIn,this]);
 			this.setInLine(aplLine);
 			aplLine.addTo(map);
 		}
 		if (this.pillarOut)
 		{
-			var aplLine=new AplLine(this,this.pillarOut);
+			var aplLine=new AplLine([this,this.pillarOut]);
 			this.pillarOut.setInLine(aplLine);
 			aplLine.addTo(map);
 		}
