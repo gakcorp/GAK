@@ -817,7 +817,12 @@ odoo.define('passportvl.form_widgets', function (require)
 				}
 				for (var i in widgetIns.tapMap)
 				{
-					var aplLine=new AplLine(widgetIns.tapMap[i].getSortPillarArrayNum());
+					var sortPillarArray=widgetIns.tapMap[i].getSortPillarArrayNum();
+					if (sortPillarArray[0].getPrevPillar())
+					{
+						sortPillarArray.splice(0, 0, sortPillarArray[0].getPrevPillar());
+					}
+					var aplLine=new AplLine(sortPillarArray);
 					///// Рисуем линию /////
 					aplLine.addTo(widgetIns.widgetMap);
 				}
@@ -986,24 +991,25 @@ odoo.define('passportvl.form_widgets', function (require)
 			//////////////////////////////////////
 			
 			///// Инициализируем карту /////
-			var GoogleTile =L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+			
+			var GoogleTile =L.tileLayer('/maps/google_sat/{z}/{x}/{y}', {
 											maxZoom: 25,
 											attribution: 'Google Map',
 											maxNativeZoom: 18,
 										});
 										
-			var YandexTile =L.tileLayer('https://sat02.maps.yandex.net/tiles?l=sat&v=3.340.0&x={x}&y={y}&z={z}&lang=ru_RU', {
+			var YandexTile =L.tileLayer('/maps/yandex_sat/{z}/{x}/{y}', {
 											maxZoom: 25,
 											attribution: 'Yandex Map',
 											maxNativeZoom: 18,
 										});
 										
-			var ArcgisTile =L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			var ArcgisTile =L.tileLayer('/maps/arcgis/{z}/{x}/{y}', {
 											maxZoom: 25,
 											attribution: 'Arcgis Map',
 											maxNativeZoom: 17,
 										});
-			var RosreestrTile =L.tileLayer('http://pkk5.rosreestr.ru/arcgis/services/Cadastre/CadastreWMS/MapServer/WMSServer', {
+			var RosreestrTile =L.tileLayer('/maps/rosreestr_cadastre/{z}/{x}/{y}', {
 											maxZoom: 25,
 											attribution: 'Rosreestr Map',
 											maxNativeZoom: 18,
