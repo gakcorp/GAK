@@ -15,6 +15,7 @@ class Transformer
 		this.marker.bindPopup(this.name);
 		this.inLine=null;
 		this.outLine=null;
+		this.isSelected=false;
 	}
 	
 	getID()
@@ -43,6 +44,15 @@ class Transformer
 	setIcon(zoom)
 	{
 		if (!zoom) return;
+		var strokeColor="black";
+		if (this.isSelected) 
+		{
+			strokeColor="#ff0000";
+			if (zoom<14) 
+			{
+				zoom=14;
+			}
+		}
 		if (zoom<14)
 		{
 			var pillarIcon=new L.divIcon({className: 'disableClassName'});
@@ -53,8 +63,20 @@ class Transformer
 		if (zoom==16) scaleK=0.7;
 		if (zoom<16) scaleK=0.5
 		var rotation=180+this.rotation;
-		var icon=new L.divIcon({html: '<div><svg width="30" height="30"><path stroke="black" stroke-width="2" fill="none" d="M -11,-11 -11,11 11,11 11,-11 -11,-11 -11,11 0,-11 11,11" transform="scale('+1*scaleK+') translate('+15/scaleK+','+15/scaleK+') rotate('+rotation+',0,0)"/></svg></div>', className: 'markerClass',iconAnchor: [15,15], iconSize: [100,100]});
+		var icon=new L.divIcon({html: '<div><svg width="30" height="30"><path stroke="'+strokeColor+'" stroke-width="2" fill="none" d="M -11,-11 -11,11 11,11 11,-11 -11,-11 -11,11 0,-11 11,11" transform="scale('+1*scaleK+') translate('+15/scaleK+','+15/scaleK+') rotate('+rotation+',0,0)"/></svg></div>', className: 'markerClass',iconAnchor: [15,15], iconSize: [100,100]});
 		this.marker.setIcon(icon);
+	}
+	
+	selectTransformer(zoom)
+	{
+		this.isSelected=true;
+		this.setIcon(zoom);
+	}
+	
+	unselectTransformer(zoom)
+	{
+		this.isSelected=false;
+		this.setIcon(zoom);
 	}
 	
 	changeZoom(zoom)

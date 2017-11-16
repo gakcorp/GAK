@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
    <data>
-
-      <template id="assets_backend" name="defectmap" inherit_id="web.assets_backend">
-         <xpath expr="." position="inside">
-            <script type="text/javascript" src="/apl_mro/static/src/js/apl_mro.js" />
-            <script type="text/javascript" src="/apl_mro/static/src/js/vis.js" />
-            <link rel="stylesheet" href="/apl_mro/static/src/css/vis.css" />
-            <link rel="stylesheet" href="/apl_mro/static/src/css/order_timeline.css" />
-         </xpath>
-      </template>
-
       <record id="mro_defect_tree_view" model="ir.ui.view">
          <field name="name">uis.papl.mro.defect.tree</field>
          <field name="model">uis.papl.mro.defect</field>

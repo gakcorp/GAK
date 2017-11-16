@@ -23,11 +23,16 @@ class Tap
 	getSortPillarArrayNum()
 	{
 		var tempMas=[];
+		var minNum=99999;
+		for (var i in this.pillarMap)
+		{
+			if (this.pillarMap[i].getNumByVl()<minNum) minNum=this.pillarMap[i].getNumByVl();
+		}
 		for (var i in this.pillarMap)
 		{
 			var pillar=this.pillarMap[i];
 			//tempMas.splice(parseInt(pillar.getNumByVl())-1,0,pillar);
-			tempMas[pillar.getNumByVl()-1]=pillar;
+			tempMas[pillar.getNumByVl()-minNum]=pillar;
 		}
 		return tempMas;
 	}

@@ -19,6 +19,7 @@ class Pillar
 		this.prevPillar=null;
 		this.inLine=null;
 		this.outLine=null;
+		this.isSelected=false;
 	}
 	
 	getID()
@@ -34,6 +35,10 @@ class Pillar
 	
 	setIcon(zoom)
 	{
+		if (this.isSelected) 
+		{
+			return;
+		}
 		if (this.type)
 		{
 			if (zoom>14 && this.type.isBase())
@@ -57,10 +62,12 @@ class Pillar
 	{
 		var pillarIcon=new L.divIcon({html: '<svg width="50" height="30"><path fill="'+'#ff0000'+'" stroke="'+'#ff0000'+'" stroke-width="'+this.icon.strokeWidth+'" d="'+this.icon.iconSVG+'" transform="translate(5,5)"/><foreignObject class="node" width="35" height="15" x="15" y="15"><div style="color:'+'#ff0000'+'">'+this.name+'</div></foreignObject></svg>', className: 'disableClassName', iconAnchor: [10,10]});
 		this.marker.setIcon(pillarIcon);
+		this.isSelected=true;
 	}
 	
 	unselectPillar(zoom)
 	{
+		this.isSelected=false;
 		this.setIcon(zoom);
 	}
 	
