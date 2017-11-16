@@ -5,12 +5,60 @@ odoo.define('apl_mro.form_widgets', function (require)
 	var session = require('web.session');
 	var instance = openerp;
 	var FieldBinaryImage=core.form_widget_registry.get('image');
-	var AplMAP=core.form_widget_registry.get('aplmap');
+	var aplmapnew=core.form_widget_registry.get('aplmapnew');
 	var Many2Many=core.form_widget_registry.get('many2many');
 	
 	var kanban_widgets = require('web_kanban.widgets');
 	var Kanban_AbstractField = kanban_widgets.AbstractField;
 
+	defectmap=aplmapnew.extend(
+	{
+		getApls: function()
+        {
+			var aplArrayID=[];
+			aplArrayID.push(parseInt(this.field_manager.get_field_value("apl_id")));
+			return aplArrayID;
+		},
+		
+		render_value: function()
+		{
+			this._super.apply(this, arguments);
+		},
+		
+		LoadAllObjects: function()
+		{
+			var defectID=this.field_manager.get_field_value("id");
+			var defectModel=new Model("uis.papl.mro.defect");
+			var widgetIns=this;
+			defectModel.query(['pillar_ids','transformer_ids']).filter([['id','=',defectID]]).all().then(function(defects)
+			{
+				var pillarIDs=defects[0].pillar_ids;
+				var transformerIDs=defects[0].transformer_ids;
+				for (var i in pillarIDs)
+				{
+					var pillar=widgetIns.pillarMap[pillarIDs[i]];
+					if (pillar)
+					{
+						pillar.selectPillar();
+						widgetIns.actPillar=pillar;
+						widgetIns.widgetMap.setView(pillar.getLatLng(),widgetIns.widgetMap.getZoom());
+					}
+				}
+				for (var i in transformerIDs)
+				{
+					var transformer=widgetIns.transformerMap[transformerIDs[i]];
+					if (transformer)
+					{
+						transformer.selectTransformer(widgetIns.widgetMap.getZoom());
+						widgetIns.widgetMap.setView(transformer.getLatLng(),widgetIns.widgetMap.getZoom());
+					}
+				}
+			});
+			this._super.apply(this, arguments);
+		},
+	});
+
+	/*
 	defectmap=AplMAP.extend(
 	{
 			GetAplID: function()
@@ -101,7 +149,8 @@ odoo.define('apl_mro.form_widgets', function (require)
 			{
 				this._super.apply(this, arguments);
 			},
-	});
+	});*/
+	
 	
 	defectphoto=FieldBinaryImage.extend(
 	{
@@ -374,7 +423,6 @@ odoo.define('apl_mro.form_widgets', function (require)
 			return result;
 		},
 	});
-
 	
 	core.form_widget_registry.add('defectmap', defectmap);
 	core.form_widget_registry.add('defectphoto', defectphoto);

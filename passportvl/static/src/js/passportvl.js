@@ -928,6 +928,7 @@ odoo.define('passportvl.form_widgets', function (require)
 					widgetIns.createSecArea(tap.transformerMap[i].getSortJSTSCoords(),widthSecArea);
 				}
 			}
+			widgetIns.LoadAllObjects();
 		},
 		
 		createSecArea(jstsArray,widthSecArea)
@@ -1248,6 +1249,11 @@ odoo.define('passportvl.form_widgets', function (require)
 				}
 			}
 		},
+		
+		LoadAllObjects: function()
+        {
+            return;
+        },
 	});
     
     core.form_widget_registry.add('aplmap', aplmap);

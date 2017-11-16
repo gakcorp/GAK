@@ -49,6 +49,11 @@
 				<script type="text/javascript" src="/passportvl/static/src/js/passportvl.js"/>
 				<!--File Saver-->
 				<script type="text/javascript" src="/passportvl/static/src/vendors/FileSaver/FileSaver.js"/>
+				<!--- Apl_Mro Library-->
+				<link rel="stylesheet" href="/apl_mro/static/src/css/vis.css" />
+				<link rel="stylesheet" href="/apl_mro/static/src/css/order_timeline.css" />
+				<script type="text/javascript" src="/apl_mro/static/src/js/apl_mro.js" />
+				<script type="text/javascript" src="/apl_mro/static/src/js/vis.js" />
 			</xpath>
 		</template>
 		<record id="uis_papl_apl_resistance_form" model="ir.ui.view">
