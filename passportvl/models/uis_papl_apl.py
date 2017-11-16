@@ -686,13 +686,13 @@ class uis_papl_apl(models.Model):
 						
 						pillarMaterial=self.env["uis.papl.pillar.material"].sudo().browse([PillarJSON.get("pillar_material_id")])
 						if pillarMaterial.exists():
-							pillar.pillar_material_id=pillarMaterial
+							pillar.sudo().write({'pillar_material_id':pillarMaterial.id})
 						pillarType=self.env["uis.papl.pillar.type"].sudo().browse([PillarJSON.get("pillar_type_id")])
 						if pillarType.exists():
-							pillar.pillar_type_id=pillarType
+							pillar.sudo().write({'pillar_type_id':pillarType.id})
 						pillarCut=self.env["uis.papl.pillar.cut"].sudo().browse([PillarJSON.get("pillar_cut_id")])
 						if pillarCut.exists():
-							pillar.pillar_cut_id=pillarCut
+							pillar.sudo().write({'pillar_cut_id':pillarCut.id})
 							
 						PillarDict[PillarJSON.get("id")]=pillar
 								
